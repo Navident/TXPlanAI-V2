@@ -27,7 +27,7 @@ const Dashboard = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ description: inputText }) // Adjust this based on your TreatmentPlanDto structure
+                body: JSON.stringify({ description: inputText }) 
             });
 
             if (response.ok) {
