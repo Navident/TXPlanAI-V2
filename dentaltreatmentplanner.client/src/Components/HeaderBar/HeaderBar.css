@@ -1,0 +1,34 @@
+.header-bar {
+    background-color: #fcfbfe;
+    color: black; /* Updated for visibility */
+    height: 80px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This aligns children to the sides */
+    border-bottom: 1px solid #eceef0;
+    position: fixed;
+    z-index: 100;
+    top: 0;
+}
+
+.header-logo-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 50px;
+}
+
+.header-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-right: 50px;
+}
+
+
+    .header-logo-container img {
+        width: 170px; 
+        height: auto;
+    }

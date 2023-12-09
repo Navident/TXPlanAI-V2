@@ -1,0 +1,41 @@
+.sidebar-container {
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+
+}
+
+.search-patient input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.search-patient {
+    background-color: white;
+    width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.all-patients-container {
+    width: 320px;
+    background-color: white;
+}
+
+.patients-inner-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+}
+
+.all-patients-container .purple-button {
+    width: 100%;
+
+}
