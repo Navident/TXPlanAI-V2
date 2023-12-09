@@ -27,19 +27,20 @@ const Dashboard = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ description: inputText }) 
+                body: JSON.stringify({ description: inputText })
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setTreatmentPlan(data);
             } else {
-                console.error('Failed to create treatment plan');
+                console.error(`Failed to create treatment plan. Status: ${response.status}, ${response.statusText}`);
             }
         } catch (error) {
             console.error('Error:', error);
         }
     };
+
     return (
         <div className="dashboard-container">
             <HeaderBar /> 

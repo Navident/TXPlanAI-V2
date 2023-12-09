@@ -40,13 +40,27 @@ public class TreatmentPlansController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TreatmentPlanDto>> CreateTreatmentPlan(TreatmentPlanDto treatmentPlanDto)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new { error = "Invalid model state", details = ModelState });
+        }
+
+        try
         {
             var createdTreatmentPlan = await _dentalTreatmentPlannerService.CreateTreatmentPlanAsync(treatmentPlanDto);
+            if (createdTreatmentPlan == null)
+            {
+                return BadRequest(new { error = "Failed to create treatment plan" });
+            }
+
             return CreatedAtAction(nameof(GetTreatmentPlan), new { id = createdTreatmentPlan.TreatmentPlanId }, createdTreatmentPlan);
         }
-        return BadRequest(ModelState);
+        catch (Exception ex)
+        {
+            // Log the exception details
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
     }
-
-    // Other actions like PUT (Edit) and DELETE can be added here later
 }
+
+
