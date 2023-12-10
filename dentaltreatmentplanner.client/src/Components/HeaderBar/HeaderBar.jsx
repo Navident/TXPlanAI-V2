@@ -1,7 +1,7 @@
 // HeaderBar component
 import './HeaderBar.css';
 import PropTypes from 'prop-types';
-import logo from '../../assets/header-logo.png';
+import logo from '../../assets/navident-logo.svg';
 
 const HeaderBar = ({ children }) => {
     return (

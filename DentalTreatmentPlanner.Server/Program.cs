@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", builder =>
     {
-        builder.WithOrigins("http://localhost:5173") 
+        builder.WithOrigins("*") //allow any origin, only for testing
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
@@ -51,6 +51,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Use CORS policy
+app.UseCors("MyCorsPolicy");
 
 app.UseHttpsRedirection();
 

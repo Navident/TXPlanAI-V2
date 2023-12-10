@@ -22,24 +22,34 @@ const Dashboard = () => {
 
     const generateTreatmentPlan = async () => {
         try {
-            const response = await fetch('api/TreatmentPlans', {
+            const response = await fetch('https://localhost:7089/api/TreatmentPlans', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ description: inputText })
+                body: JSON.stringify({
+                    description: inputText,
+                    Visits: [] // Add an empty array or default values
+                })
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setTreatmentPlan(data);
             } else {
-                console.error(`Failed to create treatment plan. Status: ${response.status}, ${response.statusText}`);
+                // Log more detailed error information
+                const errorText = await response.text();
+                console.error(`Failed to create treatment plan. Status: ${response.status}, ${response.statusText}, Response Body: ${errorText}`);
             }
         } catch (error) {
-            console.error('Error:', error);
+            if (error.name === 'TypeError') {
+                console.error('Network error or CORS issue:', error.message);
+            } else {
+                console.error('Other error:', error.message);
+            }
         }
     };
+
 
     return (
         <div className="dashboard-container">
@@ -67,7 +77,16 @@ const Dashboard = () => {
                                         <div>PATIENT ID:</div>
                                     </div>
                                 </div>
-                                <div className="grid-item"></div>
+                                <div className="grid-item">
+                                    <div className="patient-info-inner-buttons">
+                                        <button className="purple-button">
+                                            Create New Tx Plan
+                                        </button>
+                                        <button className="purple-outline-button">
+                                            View Saved Tx Plans
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -103,7 +122,20 @@ const Dashboard = () => {
                                     <div className="large-text">Treatment Plan</div>
                                     {treatmentPlan && (
                                         <div>
-                                            <p>{treatmentPlan.description}</p> 
+                                            <p>Description: {treatmentPlan.description}</p>
+                                            {treatmentPlan.Visits && treatmentPlan.Visits.length > 0 && (
+                                                <div>
+                                                    <h3>Visits:</h3>
+                                                    {treatmentPlan.Visits.map(visit => (
+                                                        <div key={visit.VisitId}>
+                                                            <p>Visit {visit.visitNumber}: {visit.description}</p>
+                                                            {visit.CdtCodes && visit.CdtCodes.map((cdtCode, cdtIndex) => (
+                                                                <p key={cdtIndex}>CDT Code: {cdtCode.code}</p>
+                                                            ))}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>

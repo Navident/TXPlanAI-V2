@@ -92,7 +92,17 @@
         border-right: 1px solid #ccc;
     }
 
-.grid-item-2-inner{
+.grid-item-2-inner {
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+}
+
+.patient-info-inner-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
+    align-items: center;
+    height: 100%;
 }

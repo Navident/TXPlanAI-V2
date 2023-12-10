@@ -32,8 +32,155 @@ namespace DentalTreatmentPlanner.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Model configuration code goes here
-           
+            // Map Facility entity
+            modelBuilder.Entity<Facility>(entity =>
+            {
+                entity.ToTable("facility");
+                entity.Property(e => e.FacilityId).HasColumnName("facility_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Street).HasColumnName("street");
+                entity.Property(e => e.Suite).HasColumnName("suite");
+                entity.Property(e => e.ZipCode).HasColumnName("zip_code");
+                entity.Property(e => e.City).HasColumnName("city");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map FacilityProviderMap entity
+            modelBuilder.Entity<FacilityProviderMap>(entity =>
+            {
+                entity.ToTable("facility_provider_map");
+                entity.Property(e => e.FacilityProviderMapId).HasColumnName("facility_provider_map_id");
+                entity.Property(e => e.FacilityId).HasColumnName("facility_id");
+                entity.Property(e => e.ProviderId).HasColumnName("provider_id");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map VisitCdtCodeMap entity
+            modelBuilder.Entity<VisitCdtCodeMap>(entity =>
+            {
+                entity.ToTable("visit_cdt_code_map");
+                entity.Property(e => e.VisitCdtCodeMapId).HasColumnName("visit_cdt_code_map_id");
+                entity.Property(e => e.VisitId).HasColumnName("visit_id");
+                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
+                entity.Property(e => e.Order).HasColumnName("order");
+                entity.Property(e => e.ProcedureTypeId).HasColumnName("procedure_type_id");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map Provider entity
+            modelBuilder.Entity<Provider>(entity =>
+            {
+                entity.ToTable("provider");
+                entity.Property(e => e.ProviderId).HasColumnName("provider_id");
+                entity.Property(e => e.LastName).HasColumnName("last_name");
+                entity.Property(e => e.FirstName).HasColumnName("first_name");
+                entity.Property(e => e.Npi).HasColumnName("npi");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map TreatmentPlan entity
+            modelBuilder.Entity<TreatmentPlan>(entity =>
+            {
+                entity.ToTable("treatment_plan");
+                entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.FacilityProviderMapId).HasColumnName("facility_provider_map_id");
+                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
+                entity.Property(e => e.ToothNumber).HasColumnName("tooth_number");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map Visit entity
+            modelBuilder.Entity<Visit>(entity =>
+            {
+                entity.ToTable("visit");
+                entity.Property(e => e.VisitId).HasColumnName("visit_id");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
+                entity.Property(e => e.VisitNumber).HasColumnName("visit_number");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            modelBuilder.Entity<UserRole>().ToTable("user_role");
+            // Map User entity
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("user");
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+                entity.Property(e => e.UserRoleId).HasColumnName("user_role_id");
+                entity.Property(e => e.LastName).HasColumnName("last_name");
+                entity.Property(e => e.FirstName).HasColumnName("first_name");
+                entity.Property(e => e.LastLogin).HasColumnName("last_login");
+                entity.Property(e => e.Disabled).HasColumnName("disabled");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map CdtCode entity
+            modelBuilder.Entity<CdtCode>(entity =>
+            {
+                entity.ToTable("cdt_code");
+                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
+                entity.Property(e => e.Code).HasColumnName("cdt_code"); // Assuming you have a property named 'Code' for 'cdt_code'
+                entity.Property(e => e.FacilityId).HasColumnName("facility_id");
+                entity.Property(e => e.CdtCodeCategoryId).HasColumnName("cdt_code_category_id");
+                entity.Property(e => e.CdtCodeSubcategoryId).HasColumnName("cdt_code_subcategory_id");
+                entity.Property(e => e.LongDescription).HasColumnName("long_description");
+                entity.Property(e => e.ShortDescription).HasColumnName("short_description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map CdtCodeCategory entity
+            modelBuilder.Entity<CdtCodeCategory>(entity =>
+            {
+                entity.ToTable("cdt_code_category");
+                entity.Property(e => e.CdtCodeCategoryId).HasColumnName("cdt_code_category_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map CdtCodeSubcategory entity
+            modelBuilder.Entity<CdtCodeSubcategory>(entity =>
+            {
+                entity.ToTable("cdt_code_subcategory");
+                entity.Property(e => e.CdtCodeSubcategoryId).HasColumnName("cdt_code_subcategory_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map ProcedureType entity
+            modelBuilder.Entity<ProcedureType>(entity =>
+            {
+                entity.ToTable("procedure_type");
+                entity.Property(e => e.ProcedureTypeId).HasColumnName("procedure_type_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map ProcedureCategory entity
+            modelBuilder.Entity<ProcedureCategory>(entity =>
+            {
+                entity.ToTable("procedure_category");
+                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map AlternativeProcedure entity
+            modelBuilder.Entity<AlternativeProcedure>(entity =>
+            {
+                entity.ToTable("alternative_procedure");
+                entity.Property(e => e.AlternativeProcedureId).HasColumnName("alternative_procedure_id");
+                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
+                entity.Property(e => e.Type).HasColumnName("type");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+
         }
     }
 }

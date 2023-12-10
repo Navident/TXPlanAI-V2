@@ -19,6 +19,21 @@
         background-color: #65658a;
     }
 
+.purple-outline-button {
+    background-color: white;
+    color: #7777a1;
+    border: 1px solid #7777a1;
+    padding: 12px;
+    cursor: pointer;
+    outline: none;
+    width: fit-content;
+    transition: background-color 0.1s;
+}
+
+    .purple-outline-button:hover {
+        background-color: #eeeef3;
+    }
+
 
 .home-image-hero img {
     width: 500px;
@@ -553,34 +568,6 @@ nav {
         margin-top: 4rem;
     }
 
-    .secondary-button {
-        font-size: 1rem;
-        padding: 0.8rem 2rem;
-        cursor: pointer;
-    }
-
-    .about-section-container {
-        margin-top: 5rem !important;
-    }
-
-    .about-buttons-container {
-        justify-content: center;
-        flex-direction: column;
-    }
-
-    .primary-subheading {
-        text-align: center;
-    }
-
-    .watch-video-button {
-        margin-left: 0rem !important;
-        margin-top: 1rem;
-        font-size: 1rem !important;
-    }
-
-        .watch-video-button svg {
-            margin-right: 0.5rem !important;
-        }
 
     .about-section-image-container {
         margin-right: 0rem !important;
