@@ -29,6 +29,13 @@ namespace DentalTreatmentPlanner.Server.Data
                 var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
                 builder.UseSqlServer(connectionString);
 
+                // Add the logger factory to log SQL statements
+                ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                {
+                    builder.AddConsole();
+                });
+                builder.UseLoggerFactory(loggerFactory);
+
                 return new ApplicationDbContext(builder.Options);
             }
             catch (Exception ex)

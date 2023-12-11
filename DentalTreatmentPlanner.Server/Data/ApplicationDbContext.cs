@@ -26,7 +26,8 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<ProcedureType> ProcedureTypes { get; set; }
         public DbSet<ProcedureCategory> ProcedureCategories { get; set; }
         public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
-
+        public DbSet<ProcedureCategoryCdtCodeMap> ProcedureCategoryCdtCodeMaps { get; set; }
+        public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -122,7 +123,7 @@ namespace DentalTreatmentPlanner.Server.Data
             {
                 entity.ToTable("cdt_code");
                 entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
-                entity.Property(e => e.Code).HasColumnName("cdt_code"); // Assuming you have a property named 'Code' for 'cdt_code'
+                entity.Property(e => e.Code).HasColumnName("cdt_code"); 
                 entity.Property(e => e.FacilityId).HasColumnName("facility_id");
                 entity.Property(e => e.CdtCodeCategoryId).HasColumnName("cdt_code_category_id");
                 entity.Property(e => e.CdtCodeSubcategoryId).HasColumnName("cdt_code_subcategory_id");
@@ -179,6 +180,35 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            });
+            // Map ProcedureCategoryCdtCodeMap entity
+            modelBuilder.Entity<ProcedureCategoryCdtCodeMap>(entity =>
+            {
+                entity.ToTable("procedure_category_cdt_code_map"); 
+                entity.HasKey(e => e.MapId); // Configure MapId as the primary key
+                entity.Property(e => e.MapId).HasColumnName("map_id");
+                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
+                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
+
+                // Relationships
+                entity.HasOne(d => d.ProcedureCategory)
+                      .WithMany(p => p.ProcedureCategoryCdtCodeMaps)
+                      .HasForeignKey(d => d.ProcedureCategoryId);
+
+                entity.HasOne(d => d.CdtCode)
+                      .WithMany(p => p.ProcedureCategoryCdtCodeMaps)
+                      .HasForeignKey(d => d.CdtCodeId);
+            });
+            // Configure VisitOrderRule entity
+            modelBuilder.Entity<VisitOrderRule>(entity =>
+            {
+                entity.ToTable("visit_order_rule");
+                entity.HasKey(e => e.VisitOrderRuleId); // Configure VisitOrderRuleId as the primary key
+                entity.Property(e => e.VisitOrderRuleId).HasColumnName("visit_order_rule_id");
+                entity.Property(e => e.ToothNumberRangeStart).HasColumnName("tooth_number_range_start");
+                entity.Property(e => e.ToothNumberRangeEnd).HasColumnName("tooth_number_range_end");
+                entity.Property(e => e.VisitNumber).HasColumnName("visit_number");
+                entity.Property(e => e.OrderValue).HasColumnName("order_value");
             });
 
         }

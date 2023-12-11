@@ -2,6 +2,7 @@ using Azure.Identity;
 using DentalTreatmentPlanner.Server.Data; 
 using DentalTreatmentPlanner.Server.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
 // Register DentalTreatmentPlanner service
 builder.Services.AddScoped<DentalTreatmentPlannerService>();
 
@@ -35,7 +37,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+// Add controllers and configure JSON options
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

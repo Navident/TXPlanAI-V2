@@ -10,6 +10,8 @@
     background-color: #eeeef3;
     height: 100vh;
     display: flex;
+    max-height: 100vh;
+    overflow:hidden;
 }
 
 .create-treatment-plan-section-inner img{
@@ -68,14 +70,7 @@
     background-color: white;
 }
 
-.treatment-plan-output-section {
-    flex-grow: 1; 
-    background-color: white;
-}
 
-.treatment-plan-output-section-inner{
-    padding: 20px;
-}
 
 .patient-info-inner-container {
     display: grid;

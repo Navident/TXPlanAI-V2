@@ -7,7 +7,7 @@
         public int TreatmentPlanId { get; set; }
         public int VisitNumber { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int CreatedUserId { get; set; }
+        public int? CreatedUserId { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
         public TreatmentPlan TreatmentPlan { get; set; }

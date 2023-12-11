@@ -7,8 +7,9 @@
         public int CdtCodeId { get; set; }
         public string Code { get; set; } 
         public int Order { get; set; }
-        public int? ProcedureTypeId { get; set; } 
+        public int? ProcedureTypeId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public string LongDescription { get; set; }
     }
 }

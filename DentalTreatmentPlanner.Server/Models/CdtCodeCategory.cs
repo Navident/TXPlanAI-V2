@@ -7,7 +7,7 @@
         public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
-        public ICollection<CdtCode> CdtCodes { get; set; }
+        //public ICollection<CdtCode> CdtCodes { get; set; }
     }
 
 }

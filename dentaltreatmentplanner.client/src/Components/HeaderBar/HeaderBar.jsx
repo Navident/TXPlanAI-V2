@@ -1,4 +1,3 @@
-// HeaderBar component
 import './HeaderBar.css';
 import PropTypes from 'prop-types';
 import logo from '../../assets/navident-logo.svg';

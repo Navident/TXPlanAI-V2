@@ -3,8 +3,10 @@ import { TextField } from "@mui/material";
 import './Dashboard.css'; 
 import SideBar from "../SideBar/SideBar";
 import HeaderBar from "../HeaderBar/HeaderBar"; 
-import React, { useState } from 'react';
+import TreatmentPlanOutput from "../TreatmentPlanOutput/TreatmentPlanOutput";
+import React, { useState, useEffect } from 'react';
 import PenIcon from '../../assets/pen-icon.svg';
+import { generateTreatmentPlan, getTreatmentPlanById } from '../../ClientServices/apiService';
 
 const Dashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -13,40 +15,65 @@ const Dashboard = () => {
         setSearchQuery(e.target.value);
         // Here I will Implement search functionality or pass the search query to the parent component
     };
+
     const [inputText, setInputText] = useState('');
     const [treatmentPlan, setTreatmentPlan] = useState(null);
+    const [treatmentPlanId, setTreatmentPlanId] = useState(null);
 
     const handleInputChange = (event) => {
         setInputText(event.target.value);
     };
 
-    const generateTreatmentPlan = async () => {
-        try {
-            const response = await fetch('https://localhost:7089/api/TreatmentPlans', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    description: inputText,
-                    Visits: [] // Add an empty array or default values
-                })
-            });
+    const parseInput = (input) => {
+        const lines = input.split('\n');
+        const visits = [];
+        let description = '';
+        let toothNumber = null;
 
-            if (response.ok) {
-                const data = await response.json();
-                setTreatmentPlan(data);
-            } else {
-                // Log more detailed error information
-                const errorText = await response.text();
-                console.error(`Failed to create treatment plan. Status: ${response.status}, ${response.statusText}, Response Body: ${errorText}`);
-            }
-        } catch (error) {
-            if (error.name === 'TypeError') {
-                console.error('Network error or CORS issue:', error.message);
-            } else {
-                console.error('Other error:', error.message);
-            }
+        if (lines.length > 0) {
+            // Extract the tooth number from the first line
+            const toothNumberMatch = lines[0].match(/\d+/);
+            toothNumber = toothNumberMatch ? parseInt(toothNumberMatch[0]) : null;
+            // Extract the description to get procedure category name
+            description = lines[0].replace(/#\d+\s*/, '').trim();
+        }
+
+        lines.forEach((line, index) => {
+            // Add a visit for each line
+            visits.push({
+                description: `Visit ${index + 1}`, // Set visit description
+                visitNumber: index + 1, // Increment visit number for each line
+            });
+        });
+
+        return {
+            toothNumber,
+            description, // Set the procedure category name as description
+            visits
+        };
+    };
+
+
+
+    const handleGenerateTreatmentPlan = async () => {
+        const parsedData = parseInput(inputText);
+        console.log("Parsed Data:", parsedData);
+        await generateTreatmentPlan(parsedData, setTreatmentPlanId);
+    };
+
+    useEffect(() => {
+        if (treatmentPlanId) {
+            console.log("Attempting to retrieve treatment plan now");
+            getTreatmentPlanById(treatmentPlanId, setTreatmentPlan);
+        }
+    }, [treatmentPlanId]);
+
+    const handleGetTreatmentPlanById = async () => {
+        if (treatmentPlanId) {
+            console.log("Attempting to retrieve treatment plan now");
+            await getTreatmentPlanById(treatmentPlanId, setTreatmentPlan);
+        } else {
+            console.log("No treatment plan ID available.");
         }
     };
 
@@ -82,7 +109,7 @@ const Dashboard = () => {
                                         <button className="purple-button">
                                             Create New Tx Plan
                                         </button>
-                                        <button className="purple-outline-button">
+                                        <button onClick={handleGetTreatmentPlanById} className="purple-outline-button">
                                             View Saved Tx Plans
                                         </button>
                                     </div>
@@ -112,33 +139,13 @@ const Dashboard = () => {
                                         value={inputText}
                                         onChange={handleInputChange}
                                     />
-                                    <button onClick={generateTreatmentPlan} className="purple-button">
+                                    <button onClick={handleGenerateTreatmentPlan} className="purple-button">
                                         Generate Treatment Plan
                                     </button>
                                 </div>
                             </div>
                             <div className="treatment-plan-output-section">
-                                <div className="treatment-plan-output-section-inner">
-                                    <div className="large-text">Treatment Plan</div>
-                                    {treatmentPlan && (
-                                        <div>
-                                            <p>Description: {treatmentPlan.description}</p>
-                                            {treatmentPlan.Visits && treatmentPlan.Visits.length > 0 && (
-                                                <div>
-                                                    <h3>Visits:</h3>
-                                                    {treatmentPlan.Visits.map(visit => (
-                                                        <div key={visit.VisitId}>
-                                                            <p>Visit {visit.visitNumber}: {visit.description}</p>
-                                                            {visit.CdtCodes && visit.CdtCodes.map((cdtCode, cdtIndex) => (
-                                                                <p key={cdtIndex}>CDT Code: {cdtCode.code}</p>
-                                                            ))}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
+                                <TreatmentPlanOutput treatmentPlan={treatmentPlan} />
                             </div>
                         </div>
 

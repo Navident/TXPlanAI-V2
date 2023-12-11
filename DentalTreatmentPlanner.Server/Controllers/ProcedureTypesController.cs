@@ -102,13 +102,9 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProcedureTypeExists(procedureType.ProcedureTypeId))
+                    if (id != procedureType.ProcedureTypeId.GetValueOrDefault())
                     {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
                     }
                 }
                 return RedirectToAction(nameof(Index));

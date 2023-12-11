@@ -16,7 +16,7 @@ public class TreatmentPlansController : ControllerBase
 
     // GET: api/TreatmentPlans
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TreatmentPlanDto>>> GetTreatmentPlans()
+    public async Task<ActionResult<IEnumerable<CreateTreatmentPlanDto>>> GetTreatmentPlans()
     {
         var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansAsync();
         return Ok(treatmentPlans);
@@ -24,7 +24,7 @@ public class TreatmentPlansController : ControllerBase
 
     // GET: api/TreatmentPlans/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<TreatmentPlanDto>> GetTreatmentPlan(int id)
+    public async Task<ActionResult<CreateTreatmentPlanDto>> GetTreatmentPlan(int id)
     {
         var treatmentPlan = await _dentalTreatmentPlannerService.GetTreatmentPlanAsync(id);
 
@@ -38,7 +38,7 @@ public class TreatmentPlansController : ControllerBase
 
     // POST: api/TreatmentPlans
     [HttpPost]
-    public async Task<ActionResult<TreatmentPlanDto>> CreateTreatmentPlan(TreatmentPlanDto treatmentPlanDto)
+    public async Task<ActionResult<CreateTreatmentPlanDto>> CreateTreatmentPlan(CreateTreatmentPlanDto treatmentPlanDto)
     {
         if (!ModelState.IsValid)
         {
@@ -62,5 +62,6 @@ public class TreatmentPlansController : ControllerBase
         }
     }
 }
+
 
 
