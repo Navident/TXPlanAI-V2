@@ -25,9 +25,11 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<CdtCodeSubcategory> CdtCodeSubcategories { get; set; }
         public DbSet<ProcedureType> ProcedureTypes { get; set; }
         public DbSet<ProcedureCategory> ProcedureCategories { get; set; }
+        public DbSet<ProcedureSubCategory> ProcedureSubCategories { get; set; }
         public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
-        public DbSet<ProcedureCategoryCdtCodeMap> ProcedureCategoryCdtCodeMaps { get; set; }
         public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,7 +88,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.FacilityProviderMapId).HasColumnName("facility_provider_map_id");
-                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
+                entity.Property(e => e.ProcedureSubcategoryId).HasColumnName("procedure_subcategory_id"); // Corrected name
                 entity.Property(e => e.ToothNumber).HasColumnName("tooth_number");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
@@ -169,6 +171,27 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+
+                // Define the one-to-many relationship with ProcedureSubCategory
+                entity.HasMany(c => c.ProcedureSubCategories)
+                      .WithOne(s => s.ProcedureCategory)
+                      .HasForeignKey(s => s.ProcedureCategoryId);
+            });
+            // Map ProcedureCategory entity
+            modelBuilder.Entity<ProcedureSubCategory>(entity =>
+            {
+                entity.ToTable("procedure_subcategory");
+                entity.Property(e => e.ProcedureSubCategoryId).HasColumnName("procedure_subcategory_id");
+                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+
+                // Define the foreign key relationship
+                entity.HasOne(d => d.ProcedureCategory)
+                    .WithMany(p => p.ProcedureSubCategories)
+                    .HasForeignKey(d => d.ProcedureCategoryId);
             });
             // Map AlternativeProcedure entity
             modelBuilder.Entity<AlternativeProcedure>(entity =>
@@ -181,24 +204,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
             });
-            // Map ProcedureCategoryCdtCodeMap entity
-            modelBuilder.Entity<ProcedureCategoryCdtCodeMap>(entity =>
-            {
-                entity.ToTable("procedure_category_cdt_code_map"); 
-                entity.HasKey(e => e.MapId); // Configure MapId as the primary key
-                entity.Property(e => e.MapId).HasColumnName("map_id");
-                entity.Property(e => e.ProcedureCategoryId).HasColumnName("procedure_category_id");
-                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
 
-                // Relationships
-                entity.HasOne(d => d.ProcedureCategory)
-                      .WithMany(p => p.ProcedureCategoryCdtCodeMaps)
-                      .HasForeignKey(d => d.ProcedureCategoryId);
-
-                entity.HasOne(d => d.CdtCode)
-                      .WithMany(p => p.ProcedureCategoryCdtCodeMaps)
-                      .HasForeignKey(d => d.CdtCodeId);
-            });
             // Configure VisitOrderRule entity
             modelBuilder.Entity<VisitOrderRule>(entity =>
             {
@@ -210,6 +216,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.VisitNumber).HasColumnName("visit_number");
                 entity.Property(e => e.OrderValue).HasColumnName("order_value");
             });
+
 
         }
     }

@@ -12,7 +12,7 @@
     top: 0;
 }
 
-.header-logo-container {
+.header-left-corner-container {
     height: 100%;
     display: flex;
     align-items: center;
@@ -20,7 +20,7 @@
     margin-left: 50px;
 }
 
-.header-text-container {
+.header-right-corner-container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -28,7 +28,11 @@
 }
 
 
-    .header-logo-container img {
-        width: 170px; 
-        height: auto;
+    .header-bar img {
+        height: 37px;
+        width: auto;
     }
+
+.header-bar .navident-logo {
+    height: 50px;
+} 

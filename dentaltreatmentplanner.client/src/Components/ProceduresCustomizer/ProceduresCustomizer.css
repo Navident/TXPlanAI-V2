@@ -1,0 +1,16 @@
+.procedure-customizer-wrapper .large-text {
+    text-align: left;
+}
+
+.procedure-customizer-wrapper .edit-procedures-inner .table-inner-header th {
+    text-align: left;
+}
+
+
+.procedure-customizer-wrapper .edit-procedures-inner .tx-table td {
+    text-align: left;
+}
+
+.procedure-customizer-wrapper .edit-procedures-inner .tx-table {
+    border-right: none;
+}

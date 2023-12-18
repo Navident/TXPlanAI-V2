@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import dentalHero from "../../assets/home-hero.jpg";
 import { TextField, Button } from "@mui/material";
 import HeaderBar from "../HeaderBar/HeaderBar";
+import logo from '../../assets/navident-logo.svg';
 
 
 const Home = () => {
@@ -18,7 +19,9 @@ const Home = () => {
 
 	return (
 		<div className="home-container">
-			<HeaderBar />
+			<HeaderBar
+				leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}		
+			/>
 			<div className="home-banner-container">
 				<div className="home-left-side-container">
 					<div className="home-left-text-section">

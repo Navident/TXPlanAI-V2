@@ -1,13 +1,18 @@
 import HeaderBar from "../HeaderBar/HeaderBar";
 import { Link } from 'react-router-dom';
+import logo from '../../assets/navident-logo.svg';
 
 const SignupForm = () => {
     return (
         <div className="login-container">
-            <HeaderBar>
-                <div className="header-extra-text">
+            <HeaderBar
+                leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
+                rightCornerElement=
+                {<div className="header-extra-text">
                     <p>ALREADY HAVE AN ACCOUNT? <Link to="/login" className="link">LOG IN</Link></p>
-                </div>
+                </div>}
+            >
+
             </HeaderBar>
             <div className="content-container">
                 <div className="side-container left-side">

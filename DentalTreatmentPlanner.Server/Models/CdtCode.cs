@@ -17,7 +17,5 @@
         public CdtCodeSubcategory CdtCodeSubcategory { get; set; }
         public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
         public ICollection<AlternativeProcedure> AlternativeProcedures { get; set; }
-        public ICollection<ProcedureCategoryCdtCodeMap> ProcedureCategoryCdtCodeMaps { get; set; }
-
     }
 }

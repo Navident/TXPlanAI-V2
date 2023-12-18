@@ -7,8 +7,17 @@ import TreatmentPlanOutput from "../TreatmentPlanOutput/TreatmentPlanOutput";
 import React, { useState, useEffect } from 'react';
 import PenIcon from '../../assets/pen-icon.svg';
 import { generateTreatmentPlan, getTreatmentPlanById } from '../../ClientServices/apiService';
+import circleIcon from '../../assets/circle-icon.svg';
+import userIcon from '../../assets/user-icon.svg';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+
+    const handleUserIconClick = () => {
+        navigate("/DefaultProcedures"); // This will navigate to the DefaultProcedures page
+    };
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const handleSearchChange = (e) => {
@@ -22,43 +31,6 @@ const Dashboard = () => {
 
     const handleInputChange = (event) => {
         setInputText(event.target.value);
-    };
-
-    const parseInput = (input) => {
-        const lines = input.split('\n');
-        const visits = [];
-        let description = '';
-        let toothNumber = null;
-
-        if (lines.length > 0) {
-            // Extract the tooth number from the first line
-            const toothNumberMatch = lines[0].match(/\d+/);
-            toothNumber = toothNumberMatch ? parseInt(toothNumberMatch[0]) : null;
-            // Extract the description to get procedure category name
-            description = lines[0].replace(/#\d+\s*/, '').trim();
-        }
-
-        lines.forEach((line, index) => {
-            // Add a visit for each line
-            visits.push({
-                description: `Visit ${index + 1}`, // Set visit description
-                visitNumber: index + 1, // Increment visit number for each line
-            });
-        });
-
-        return {
-            toothNumber,
-            description, // Set the procedure category name as description
-            visits
-        };
-    };
-
-
-
-    const handleGenerateTreatmentPlan = async () => {
-        const parsedData = parseInput(inputText);
-        console.log("Parsed Data:", parsedData);
-        await generateTreatmentPlan(parsedData, setTreatmentPlanId);
     };
 
     useEffect(() => {
@@ -77,12 +49,17 @@ const Dashboard = () => {
         }
     };
 
-
     return (
-        <div className="dashboard-container">
-            <HeaderBar /> 
-            <div className="dashboard-main-content">
-                <div className="dashboard-content-area">
+        <div className="tx-container">
+            <HeaderBar
+                leftCornerElement={<img src={circleIcon} alt="Logo" />}
+                rightCornerElement={<img src={userIcon} alt="Logo"
+                    onClick={handleUserIconClick}
+                />}
+                className="dashboard-header"
+            /> 
+            <div className="tx-main-content">
+                <div className="tx-content-area">
                     <div className="dashboard-top-row">
                         <div className="search-patient">
                             <div className="patients-inner-section">
@@ -109,7 +86,7 @@ const Dashboard = () => {
                                         <button className="purple-button">
                                             Create New Tx Plan
                                         </button>
-                                        <button onClick={handleGetTreatmentPlanById} className="purple-outline-button">
+                                        <button className="purple-outline-button">
                                             View Saved Tx Plans
                                         </button>
                                     </div>
@@ -139,13 +116,16 @@ const Dashboard = () => {
                                         value={inputText}
                                         onChange={handleInputChange}
                                     />
-                                    <button onClick={handleGenerateTreatmentPlan} className="purple-button">
+                                    <button onClick={handleGetTreatmentPlanById} className="purple-button">
                                         Generate Treatment Plan
                                     </button>
                                 </div>
                             </div>
                             <div className="treatment-plan-output-section">
-                                <TreatmentPlanOutput treatmentPlan={treatmentPlan} />
+                                <div className="treatment-plan-output-section-inner">
+                                    <div className="large-text">Treatment Plan</div>
+                                    <TreatmentPlanOutput treatmentPlan={treatmentPlan} />
+                                </div>
                             </div>
                         </div>
 

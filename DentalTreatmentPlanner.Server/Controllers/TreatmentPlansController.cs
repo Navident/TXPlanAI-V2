@@ -61,6 +61,21 @@ public class TreatmentPlansController : ControllerBase
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
+
+    // GET: api/TreatmentPlans/Subcategory/5
+    [HttpGet("Subcategory/{subcategoryName}")]
+    public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetTreatmentPlansBySubcategory(string subcategoryName)
+    {
+        var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansBySubcategoryAsync(subcategoryName);
+
+        if (treatmentPlans == null || !treatmentPlans.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(treatmentPlans);
+    }
+
 }
 
 
