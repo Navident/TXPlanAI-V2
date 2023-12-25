@@ -36,5 +36,20 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<IEnumerable<ProcedureCategoryDto>>> GetCategories()
+        {
+            try
+            {
+                var categories = await _service.GetAllCategoriesAsync();
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
     }
 }
+

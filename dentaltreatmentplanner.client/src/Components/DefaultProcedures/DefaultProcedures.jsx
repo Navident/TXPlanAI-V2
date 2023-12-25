@@ -7,32 +7,63 @@ import { useNavigate } from 'react-router-dom';
 
 
 import { useState, useEffect } from 'react';
-const DefaultProcedures = () => {
-    const [subCategories, setSubCategories] = useState([]);
+import { getCategories, getTreatmentPlansBySubcategory, getSubCategoriesByCategoryName } from '../../ClientServices/apiService';
 
+const DefaultProcedures = () => {
+    const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        getCategories((fetchedCategories) => {
+            console.log("Fetched Categories with Structure:", fetchedCategories);
+            // Initialize subcategories with a status
+            const categoriesWithStatus = fetchedCategories.map(category => ({
+                ...category,
+                subCategories: [],
+                subCategoriesStatus: 'not_fetched'
+            }));
+            setCategories(categoriesWithStatus);
+        });
+    }, []);
+
+    useEffect(() => { //we are gonna have to make this more efficient, this is using a lot of nested loops.
+        categories.forEach(category => {
+            if (category.subCategoriesStatus === 'not_fetched') {
+                getSubCategoriesByCategoryName(category.name, (subCategories) => {
+                    // Update categories with fetched subcategories and change their status
+                    setCategories(prevCategories => prevCategories.map(cat =>
+                        cat.name === category.name ? {
+                            ...cat,
+                            subCategories: subCategories.map(subCat => ({ ...subCat, treatmentPlansStatus: 'not_fetched' })),
+                            subCategoriesStatus: 'fetched'
+                        } : cat
+                    ));
+
+                    // Fetch treatment plans for each subcategory
+                    subCategories.forEach(subCategory => {
+                        if (subCategory.treatmentPlansStatus === 'not_fetched') {
+                            getTreatmentPlansBySubcategory(subCategory.name, (treatmentPlans) => {
+                                setCategories(prevCategories => prevCategories.map(cat =>
+                                    cat.name === category.name ? {
+                                        ...cat,
+                                        subCategories: cat.subCategories.map(subCat =>
+                                            subCat.name === subCategory.name ? { ...subCat, treatmentPlans, treatmentPlansStatus: 'fetched' } : subCat
+                                        )
+                                    } : cat
+                                ));
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    }, [categories]);
+
+
 
     const handleEditClick = (subcategoryName) => {
         navigate(`/ProceduresCustomizer/${subcategoryName}`);
     };
-
-    useEffect(() => {
-        const fetchSubCategories = async () => {
-            try {
-                const response = await fetch('https://localhost:7089/api/ProcedureCategory/subcategories/Crowns');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                const data = await response.json();
-                console.log('Data:', data);
-                setSubCategories(data);
-            } catch (error) {
-                console.error('Error fetching data: ', error);
-            }
-        };
-
-        fetchSubCategories();
-    }, []);
 
     return (
         <div className="tx-container">
@@ -47,27 +78,28 @@ const DefaultProcedures = () => {
                     <div className="edit-procedures-container">
                         <div className="edit-procedures-inner">
                             <div className="large-text">Procedure Categories</div>
-                            <div className="table-container">
-                                <div className="edit-procedures-table-outer-header">Crowns</div>
-                                <table className="tx-table">
-                                    <thead>
-                                        <tr className="table-inner-header">
-                                            <th>Sub-Categories</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {subCategories.map(subCategory => (
-                                            <tr key={subCategory.procedureSubCategoryId}>
-                                                <td>{subCategory.name}
-
-                                                    <img src={editIcon} className="edit-button" alt="Edit" onClick={() => handleEditClick(subCategory.name)} />
-
-                                                </td>
+                            {categories.map(category => (
+                                <div className="table-container" key={category.procedureCategoryId}>
+                                    <div className="edit-procedures-table-outer-header">{category.name}</div>
+                                    <table className="tx-table">
+                                        <thead>
+                                            <tr className="table-inner-header">
+                                                <th>Sub-Categories</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {category.subCategories?.map(subCategory => (
+                                                <tr key={subCategory.procedureSubCategoryId}>
+                                                    <td>
+                                                        {subCategory.name}
+                                                        <img src={editIcon} className="edit-button" alt="Edit" onClick={() => handleEditClick(subCategory.name)} />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

@@ -2,8 +2,10 @@
 {
     public class CreateVisitDto
     {
-        public int VisitId { get; set; }
+        public int TreatmentPlanId { get; set; }
         public string Description { get; set; }
-        public ICollection<int> CdtCodeIds { get; set; } 
+        public int VisitNumber { get; set; }
+        public string TempVisitId { get; set; }
     }
+
 }

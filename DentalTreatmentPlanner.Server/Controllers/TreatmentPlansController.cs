@@ -62,6 +62,42 @@ public class TreatmentPlansController : ControllerBase
         }
     }
 
+    // PUT: api/TreatmentPlans/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTreatmentPlan(int id, UpdateTreatmentPlanDto updateTreatmentPlanDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (id != updateTreatmentPlanDto.TreatmentPlanId)
+        {
+            return BadRequest("ID mismatch");
+        }
+
+        try
+        {
+            var updatedTreatmentPlan = await _dentalTreatmentPlannerService.UpdateTreatmentPlanAsync(updateTreatmentPlanDto);
+
+            if (updatedTreatmentPlan == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedTreatmentPlan);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception details
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
+    }
+
     // GET: api/TreatmentPlans/Subcategory/5
     [HttpGet("Subcategory/{subcategoryName}")]
     public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetTreatmentPlansBySubcategory(string subcategoryName)

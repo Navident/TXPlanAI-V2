@@ -12,6 +12,8 @@
     <Folder Include="src\Components\HeaderBar\" />
     <Folder Include="src\Components\Dashboard\" />
     <Folder Include="src\ClientServices\" />
+    <Folder Include="src\Components\TreatmentPlanOutput\" />
     <Folder Include="src\Components\ProceduresCustomizer\" />
+    <Folder Include="src\Utils\" />
   </ItemGroup>
 </Project>

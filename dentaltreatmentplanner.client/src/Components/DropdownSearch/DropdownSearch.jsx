@@ -2,7 +2,7 @@ import React from 'react';
 import Select, { components } from 'react-select';
 import PropTypes from 'prop-types';
 
-const DropdownSearch = ({ cdtCodes, onSelect }) => {
+const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
     const options = cdtCodes.map(code => ({
         value: code.code,
         label: `${code.code} - ${code.longDescription}`,
@@ -10,21 +10,18 @@ const DropdownSearch = ({ cdtCodes, onSelect }) => {
     }));
 
     const handleChange = selectedOption => {
-        onSelect(selectedOption ? selectedOption.longDescription : '');
+        onSelect(selectedOption ? selectedOption : null);
     };
 
-    // Custom SingleValue component to display only the code, need to clean this up later
+    // Custom SingleValue component to display only the code
     const SingleValue = (props) => (
         <components.SingleValue {...props}>
             {props.data.value}
         </components.SingleValue>
     );
 
-    SingleValue.propTypes = {
-        data: PropTypes.shape({
-            value: PropTypes.string.isRequired,
-        }).isRequired,
-    };
+    // Find the option that matches the selectedCode
+    const selectedOption = options.find(option => option.value === selectedCode);
 
     return (
         <div style={{ width: 300 }}>
@@ -32,6 +29,7 @@ const DropdownSearch = ({ cdtCodes, onSelect }) => {
                 options={options}
                 onChange={handleChange}
                 components={{ SingleValue }}
+                value={selectedOption} // Control the selected value
             />
         </div>
     );

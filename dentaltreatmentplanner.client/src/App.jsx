@@ -17,7 +17,7 @@ function App() {
                 <Route path="/DefaultProcedures" element={<DefaultProcedures />} />
                 <Route path="/ProceduresCustomizer/:subcategory" element={<ProceduresCustomizer />} />
             </Routes>
-        </div>
+            </div>
     );
 }
 

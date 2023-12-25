@@ -41,13 +41,12 @@ const Dashboard = () => {
     }, [treatmentPlanId]);
 
     const handleGetTreatmentPlanById = async () => {
-        if (treatmentPlanId) {
-            console.log("Attempting to retrieve treatment plan now");
-            await getTreatmentPlanById(treatmentPlanId, setTreatmentPlan);
-        } else {
-            console.log("No treatment plan ID available.");
-        }
+        const id = 101; // Hardcoded ID
+        setTreatmentPlanId(id); // Set the treatmentPlanId state
+        console.log("Attempting to retrieve treatment plan now");
+        await getTreatmentPlanById(id, setTreatmentPlan);
     };
+
 
     return (
         <div className="tx-container">
@@ -122,8 +121,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="treatment-plan-output-section">
-                                <div className="treatment-plan-output-section-inner">
-                                    <div className="large-text">Treatment Plan</div>
+                                <div className="treatment-plan-output-section-inner">                                  
                                     <TreatmentPlanOutput treatmentPlan={treatmentPlan} />
                                 </div>
                             </div>

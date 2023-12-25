@@ -2,8 +2,8 @@
 
 .visit-separator td {
     padding: 10px;
-
 }
+
 .visit-section {
     display: flex;
     flex-direction: column;
@@ -12,12 +12,7 @@
 
 .visit-number {
     font-weight: bold;
-
     text-align: left;
-}
-
-.visit-separator {
-    margin-top: 20px; 
 }
 
 
@@ -37,7 +32,7 @@
     position: relative;
 }
 
-.dynamic-table-bottom-row{
+.dynamic-table-bottom-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
