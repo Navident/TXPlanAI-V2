@@ -97,7 +97,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
 
         if (result.type === "row") {
             const tableId = result.source.droppableId.replace('droppable-table-', '');
-            const rows = allRows[tableId]; // Use the extracted tableId to access the rows
+            const rows = allRows[tableId]; 
 
             if (!rows) {
                 return;

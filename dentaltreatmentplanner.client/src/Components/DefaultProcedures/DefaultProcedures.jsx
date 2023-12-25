@@ -26,7 +26,7 @@ const DefaultProcedures = () => {
         });
     }, []);
 
-    useEffect(() => { //we are gonna have to make this more efficient, this is using a lot of nested loops.
+    useEffect(() => { //we are going to have to make this more efficient, this is using a lot of nested loops.
         categories.forEach(category => {
             if (category.subCategoriesStatus === 'not_fetched') {
                 getSubCategoriesByCategoryName(category.name, (subCategories) => {
