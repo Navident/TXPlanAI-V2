@@ -17,7 +17,6 @@ const ProceduresCustomizer = () => {
     const subcategory = params.subcategory;
 
     const getOrderKey = (treatmentPlan) => {
-        // Serialize the order of visit IDs
         return treatmentPlan.visits.map(visit => visit.visitId).join('-');
     };
 
@@ -53,7 +52,7 @@ const ProceduresCustomizer = () => {
     const updateVisitsInTreatmentPlan = (treatmentPlanId, updatedVisits) => {
         setTreatmentPlans(prevPlans => prevPlans.map(plan =>
             plan.treatmentPlanId === treatmentPlanId
-                ? { ...plan, visits: [...updatedVisits] } // Reflect the new order
+                ? { ...plan, visits: [...updatedVisits] } 
                 : plan
         ));
     };
