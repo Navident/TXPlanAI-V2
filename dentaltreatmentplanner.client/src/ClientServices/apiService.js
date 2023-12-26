@@ -1,7 +1,12 @@
-const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
-const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
-const VISITS_API_URL = 'https://localhost:7089/api/visits';
-const PROCEDURES_API_URL = 'https://localhost:7089/api';
+//const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
+//const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
+//const VISITS_API_URL = 'https://localhost:7089/api/visits';
+//const PROCEDURES_API_URL = 'https://localhost:7089/api';
+const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
+const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
+const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
+const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
+
 
 // Function to generate a treatment plan
 export const generateTreatmentPlan = async (parsedData, setTreatmentPlanId) => {

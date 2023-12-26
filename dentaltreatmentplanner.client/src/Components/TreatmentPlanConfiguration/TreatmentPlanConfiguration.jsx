@@ -51,9 +51,9 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     });
 
     useEffect(() => {
+        console.log('Initial treatmentPlan:', treatmentPlan);
         const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
-        // Process sorted data to create rows for the UI
         const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
             const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
             const initialRowId = `initial-${visitId}`;
@@ -65,7 +65,11 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
 
         setAllRows(newAllRows);
         setVisitOrder(sortedVisits.map(visit => visit.visitId));
+
+        console.log("newAllRows after useEffect:", newAllRows);
+        console.log("newVisitOrder after useEffect:", sortedVisits.map(visit => visit.visitId));
     }, [treatmentPlan, cdtCodes]);
+
 
     const handleSelect = (selectedCode, visitId, rowId) => {
         // Lookup the CDT code object by its code value
@@ -116,6 +120,16 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
         }
     };
 
+    const reorderAllRows = (newVisitOrder) => {
+        const reorderedRows = {};
+        newVisitOrder.forEach(visitId => {
+            if (allRows[visitId]) {
+                reorderedRows[visitId] = allRows[visitId];
+            }
+        });
+        setAllRows(reorderedRows);
+    };
+
     const onTableDragEnd = (result) => {
         if (!result.destination || result.type !== "table") {
             return;
@@ -125,8 +139,22 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
             result.source.index,
             result.destination.index
         );
+
+        // Update visit order
         setVisitOrder(newOrder);
+
+        // Update visitNumber for each visit
+        const updatedVisits = treatmentPlan.visits.map(visit => {
+            const newOrderIndex = newOrder.indexOf(visit.visitId);
+            return { ...visit, visitNumber: newOrderIndex + 1 }; // Assuming visitNumber starts at 1
+        });
+
+        // Update parent component's state
+        onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
+
+        reorderAllRows(newOrder);
     };
+
 
     const handleDeleteRow = (visitId, rowId) => {
         console.log("Deleting row:", rowId, "from visit:", visitId);

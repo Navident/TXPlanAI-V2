@@ -30,6 +30,11 @@ const ProceduresCustomizer = () => {
         }
     }, [subcategory]);
 
+    useEffect(() => {
+        console.log("treatmentPlans updated:", treatmentPlans);
+    }, [treatmentPlans]);
+
+
     const handleAddVisitToTreatmentPlan = (treatmentPlanId, newVisit) => {
         setTreatmentPlans(prevPlans => prevPlans.map(plan => {
             if (plan.treatmentPlanId === treatmentPlanId) {
@@ -52,10 +57,11 @@ const ProceduresCustomizer = () => {
     const updateVisitsInTreatmentPlan = (treatmentPlanId, updatedVisits) => {
         setTreatmentPlans(prevPlans => prevPlans.map(plan =>
             plan.treatmentPlanId === treatmentPlanId
-                ? { ...plan, visits: [...updatedVisits] } 
+                ? { ...plan, visits: [...updatedVisits] }
                 : plan
         ));
     };
+
 
 
 
