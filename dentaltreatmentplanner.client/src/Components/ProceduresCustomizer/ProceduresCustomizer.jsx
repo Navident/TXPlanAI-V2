@@ -62,11 +62,6 @@ const ProceduresCustomizer = () => {
         ));
     };
 
-
-
-
-
-
     return (
         <div className="procedure-customizer-wrapper">
             <div className="tx-container">
@@ -83,41 +78,26 @@ const ProceduresCustomizer = () => {
                                 <div className="large-text">Procedure Category: Crowns</div>
                                 <div className="large-text">Procedure Sub-Category: {subcategory}</div>
                                 <div>
-                                    {cdtCodes.length > 0 && (
-                                        treatmentPlans.length > 0 ? (
-                                            treatmentPlans.map((plan, index) => {
-                                                const key = `${plan.treatmentPlanId}-${getOrderKey(plan)}`;
-                                                console.log(`Rendering TreatmentPlanConfiguration with key: ${key}`);
-                                                return (
-                                                    <TreatmentPlanConfiguration
-                                                        key={key}
-                                                        treatmentPlan={plan}
-                                                        includeExtraRow={true}
-                                                        cdtCodes={cdtCodes}
-                                                        addProcedureElement={<span>+ Add Procedure</span>}
-                                                        useImageIconColumn={true}
-                                                        hideToothNumber={true}
-                                                        onAddVisit={(newVisit) => handleAddVisitToTreatmentPlan(plan.treatmentPlanId, newVisit)}
-                                                        onUpdateVisitsInTreatmentPlan={updateVisitsInTreatmentPlan}
-                                                        onDeleteVisit={(treatmentPlanId, deletedVisitId) => handleDeleteVisitInTreatmentPlan(treatmentPlanId, deletedVisitId)}
-                                                    />
-                                                );
-                                            })
-                                        ) : (
-                                            <TreatmentPlanConfiguration //removing this later on
-                                                key={0}
-                                                treatmentPlan={{}} // Pass an empty object or default values
-                                                includeExtraRow={true}
-                                                cdtCodes={cdtCodes}
-                                                addProcedureElement={<span>+ Add Procedure</span>}
-                                                useImageIconColumn={true}
-                                                hideToothNumber={true}
-                                                onAddVisit={(newVisit) => {/* Handle adding a new visit */ }}
-                                                onUpdateVisitsInTreatmentPlan={() => {/* Handle updating the treatment plan */ }}
-                                                onDeleteVisit={() => {/* Handle deleting a visit */ }}
-                                            />
-                                        )
-                                    )}
+                                    {cdtCodes.length > 0 && treatmentPlans.length > 0 &&
+                                        treatmentPlans.map((plan, index) => {
+                                            const key = `${plan.treatmentPlanId}-${getOrderKey(plan)}`;
+                                            console.log(`Rendering TreatmentPlanConfiguration with key: ${key}`);
+                                            return (
+                                                <TreatmentPlanConfiguration
+                                                    key={key}
+                                                    treatmentPlan={plan}
+                                                    includeExtraRow={true}
+                                                    cdtCodes={cdtCodes}
+                                                    addProcedureElement={<span>+ Add Procedure</span>}
+                                                    useImageIconColumn={true}
+                                                    hideToothNumber={true}
+                                                    onAddVisit={(newVisit) => handleAddVisitToTreatmentPlan(plan.treatmentPlanId, newVisit)}
+                                                    onUpdateVisitsInTreatmentPlan={updateVisitsInTreatmentPlan}
+                                                    onDeleteVisit={(treatmentPlanId, deletedVisitId) => handleDeleteVisitInTreatmentPlan(treatmentPlanId, deletedVisitId)}
+                                                />
+                                            );
+                                        })
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -127,5 +107,5 @@ const ProceduresCustomizer = () => {
         </div>
     );
 };
+    export default ProceduresCustomizer;
 
-export default ProceduresCustomizer;

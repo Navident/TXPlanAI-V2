@@ -1,0 +1,29 @@
+.rounded-button {
+    display: flex;
+    align-items: center;
+    padding: 12.5px 0;
+    border-radius: 20px;
+    border: 1px solid black;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    justify-content: center;
+    height: 50px;
+    transition: background-color 0.1s;
+}
+
+    .button-icon {
+    margin-right: 10px;
+    width: 24px; 
+    height: 24px;
+}
+
+.rounded-login-buttons-container{
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+    gap: 20px;
+    
+}
+

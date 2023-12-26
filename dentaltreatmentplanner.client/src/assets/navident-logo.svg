@@ -15,7 +15,8 @@
       }
 
       .cls-5 {
-        font-family: MVBoli, 'MV Boli';
+        
+		-family: MVBoli, 'MV Boli';
         font-size: 72px;
       }
     </style>
