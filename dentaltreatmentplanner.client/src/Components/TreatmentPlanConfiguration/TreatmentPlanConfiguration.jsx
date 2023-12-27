@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import './TreatmentPlanConfiguration.css';
 import Table from "../Table/Table";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DropdownSearch from "../DropdownSearch/DropdownSearch";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
-import { updateTreatmentPlan, createVisit } from '../../ClientServices/apiService';
+import { updateTreatmentPlan, createVisit, createNewProcedures } from '../../ClientServices/apiService';
 import { mapToDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';
 import { sortTreatmentPlan } from '../../Utils/helpers';
 import deleteIcon from '../../assets/delete-x.svg';
@@ -21,7 +21,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     const [visitOrder, setVisitOrder] = useState([]);
     const [deletedRowIds, setDeletedRowIds] = useState([]);
     const [deletedVisitIds, setDeletedVisitIds] = useState([]);
-
+    const isInitialLoad = useRef(true);
 
     const createStaticRows = (visit, index) => ({
         id: `static-${visit.visitId}-${index}`,
@@ -51,24 +51,23 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     });
 
     useEffect(() => {
-        console.log('Initial treatmentPlan:', treatmentPlan);
-        const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
+        if (isInitialLoad.current) {
+            console.log('Initial treatmentPlan:', treatmentPlan);
+            const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
-        const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
-            const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
-            const initialRowId = `initial-${visitId}`;
-            const dynamicRows = [createDynamicRow(visitId, initialRowId)];
+            const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
+                const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
+                const initialRowId = `initial-${visitId}`;
+                acc[visitId] = [...staticRows, createDynamicRow(visitId, initialRowId)];
+                return acc;
+            }, {});
 
-            acc[visitId] = [...staticRows, ...dynamicRows];
-            return acc;
-        }, {});
-
-        setAllRows(newAllRows);
-        setVisitOrder(sortedVisits.map(visit => visit.visitId));
-
-        console.log("newAllRows after useEffect:", newAllRows);
-        console.log("newVisitOrder after useEffect:", sortedVisits.map(visit => visit.visitId));
+            setAllRows(newAllRows);
+            setVisitOrder(sortedVisits.map(visit => visit.visitId));
+            isInitialLoad.current = false; // Set the flag to false after initial setup
+        }
     }, [treatmentPlan, cdtCodes]);
+
 
 
     const handleSelect = (selectedCode, visitId, rowId) => {
@@ -146,7 +145,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
         // Update visitNumber for each visit
         const updatedVisits = treatmentPlan.visits.map(visit => {
             const newOrderIndex = newOrder.indexOf(visit.visitId);
-            return { ...visit, visitNumber: newOrderIndex + 1 }; // Assuming visitNumber starts at 1
+            return { ...visit, visitNumber: newOrderIndex + 1 }; 
         });
 
         // Update parent component's state
@@ -168,6 +167,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     };
 
     const handleAddProcedure = (visitId) => {
+        console.log(`Adding new procedure to visitId: ${visitId}`);
         setAllRows(prevRows => {
             const newRowId = `dynamic-${visitId}-${Date.now()}`;
             const newRow = {
@@ -182,12 +182,16 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                     />
                 ]
             };
-            return {
+            console.log("New row being added:", newRow);
+            const newRows = {
                 ...prevRows,
                 [visitId]: [...(prevRows[visitId] || []), newRow]
             };
+            console.log("All rows after adding new procedure:", newRows);
+            return newRows;
         });
     };
+
 
     const handleAddVisit = () => {
         const tempVisitId = `temp-${Date.now()}`;
@@ -229,6 +233,8 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     };
 
     const handleUpdateTreatmentPlan = async () => {
+        console.log("Updating treatment plan with current state of allRows:", allRows);
+        console.log("Current visit order:", visitOrder);
         try {
             // Identify new visits
             const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith('temp-'));
@@ -243,52 +249,93 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
 
             // Create a mapping from tempVisitId to actualVisitId
             const visitIdMap = createdVisits.reduce((acc, visitResponse) => {
-                const actualVisitId = visitResponse.visit.visitId; // Accessing visitId from the visit object
-                const tempId = visitResponse.tempVisitId; // Accessing the tempVisitId
-
-                acc[tempId] = actualVisitId; // Mapping the temp ID to the actual visit ID
+                const actualVisitId = visitResponse.visit.visitId;
+                const tempId = visitResponse.tempVisitId;
+                acc[tempId] = actualVisitId;
                 return acc;
             }, {});
 
+            // Identify new procedures
+            const newProcedures = [];
+            Object.keys(allRows).forEach(visitId => {
+                allRows[visitId].forEach(row => {
+                    if (!row.visitCdtCodeMapId && row.selectedCdtCode) {
+                        const cdtCodeId = row.selectedCdtCode.cdtCodeId;
+                        newProcedures.push({
+                            visitId: visitId,
+                            CdtCodeId: cdtCodeId,
+                            Order: 0
+                        });
+                    }
+                });
+            });
+
+            // Send new procedures to backend and process the response
+            if (newProcedures.length > 0) {
+                const newProcedureResponse = await createNewProcedures(newProcedures);
+                console.log("newProcedureResponse: ", newProcedureResponse);
+                newProcedureResponse.forEach(proc => {
+                    const { visitId, visitCdtCodeMapId, cdtCodeId } = proc;
+                    const rows = allRows[visitId];
+                    const rowIndex = rows.findIndex(row => row.selectedCdtCode && row.selectedCdtCode.cdtCodeId === cdtCodeId);
+                    if (rowIndex > -1) {
+                        rows[rowIndex].visitCdtCodeMapId = visitCdtCodeMapId;
+                    }
+                });
+            }
+
+            // Update the visit order
             const updatedVisitOrder = visitOrder.map(visitId =>
                 visitIdMap[visitId] ? visitIdMap[visitId] : visitId
             );
 
+            // Update the treatment plan visits
             const updatedVisits = treatmentPlan.visits.map(visit => {
                 const actualVisitId = visitIdMap[visit.visitId] || visit.visitId;
-                return { ...visit, visitId: actualVisitId };
+                const updatedProcedures = allRows[actualVisitId]
+                    ? allRows[actualVisitId]
+                        .filter(row => row.selectedCdtCode !== null)
+                        .map(row => {
+                            return {
+                                visitCdtCodeMapId: row.visitCdtCodeMapId,
+                                cdtCodeId: row.selectedCdtCode.cdtCodeId,
+                                description: row.description,
+                                // ... I may need to add other properties eventually here
+                            };
+                        })
+                    : visit.procedures;
+
+                return { ...visit, visitId: actualVisitId, procedures: updatedProcedures };
             });
 
-            if (typeof onUpdateVisitsInTreatmentPlan === 'function') {
-                const orderedUpdatedVisits = updatedVisitOrder.map(visitId =>
-                    updatedVisits.find(v => v.visitId === visitId)
-                );
-                onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, orderedUpdatedVisits);
-            }
-            console.log("Updated visit order being sent to parent:", updatedVisitOrder);
+            console.log("Updated visits being sent to parent:", updatedVisits);
+
+            // Update allRows with new VisitCdtCodeMapIds and actualVisitIds
             const updatedAllRows = { ...allRows };
             Object.keys(updatedAllRows).forEach(tempVisitId => {
                 const actualVisitId = visitIdMap[tempVisitId];
-
                 if (actualVisitId) {
-                    // Replace the tempVisitId key with actualVisitId key in allRows
                     updatedAllRows[actualVisitId] = updatedAllRows[tempVisitId];
                     delete updatedAllRows[tempVisitId];
                 }
             });
-
+            console.log("updatedAllRows: ", updatedAllRows);
             setVisitOrder(updatedVisitOrder);
             setAllRows(updatedAllRows);
 
             // Now we update the treatment plan
             const updateDto = mapToDto(treatmentPlan, updatedAllRows, updatedVisitOrder, deletedRowIds, deletedVisitIds);
-            console.log('Update DTO:', updateDto);
             const updatedTreatmentPlan = await updateTreatmentPlan(treatmentPlan.treatmentPlanId, updateDto);
+            // Call parent's callback with the updated treatment plan data
+            onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
             console.log('Updated Treatment Plan:', updatedTreatmentPlan);
+
         } catch (error) {
             console.error('Error updating treatment plan:', error);
         }
     };
+
+
 
     return (
         <>

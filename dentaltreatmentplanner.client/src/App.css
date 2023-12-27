@@ -10,8 +10,15 @@
 @font-face {
     font-family: 'Poppins-SemiBold';
     src: url('../assets/fonts/Poppins-SemiBold.ttf') format('truetype');
-    font-weight: normal; /* Set to normal because the font file itself is SemiBold */
+    font-weight: normal; 
     font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-Bold';
+    font-weight: bold;
+    font-style: normal;
+    src: url('../assets/fonts/Poppins-Bold.woff2') format('woff2'), url('../assets/fonts/Poppins-Bold.woff') format('woff'), url('../assets/fonts/Poppins-Bold.ttf') format('truetype');
 }
 
 

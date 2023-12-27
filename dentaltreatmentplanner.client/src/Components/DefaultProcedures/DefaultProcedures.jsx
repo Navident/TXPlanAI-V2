@@ -80,7 +80,7 @@ const DefaultProcedures = () => {
                             <div className="large-text">Procedure Categories</div>
                             {categories.map(category => (
                                 <div className="table-container" key={category.procedureCategoryId}>
-                                    <div className="edit-procedures-table-outer-header">{category.name}</div>
+                                    <div className="edit-procedures-table-outer-header large-text-bold">{category.name}</div>
                                     <table className="tx-table">
                                         <thead>
                                             <tr className="table-inner-header">

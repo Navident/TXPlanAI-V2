@@ -4,8 +4,9 @@
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
 const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
 const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
-const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
+const VISITS_API_URL = 'https://localhost:7089/api/visits';
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
+const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 
 
 // Function to generate a treatment plan
@@ -219,6 +220,33 @@ export const createVisit = async (visitData, tempVisitId) => {
     } catch (error) {
         console.error('Error creating visit:', error.message);
         throw error; 
+    }
+};
+
+export const createNewProcedures = async (newProcedures) => {
+    try {
+        console.log('Creating new procedures with data:', newProcedures);
+        const response = await fetch(CREATE_NEW_PROCEDURES_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newProcedures)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('New procedures created successfully:', responseData);
+            return responseData; // Optionally return data for further processing
+        } else {
+            const responseText = await response.text();
+            console.error('Failed to create new procedures. Status:', response.status, response.statusText);
+            console.error('Response Body:', responseText);
+            throw new Error('Failed to create new procedures');
+        }
+    } catch (error) {
+        console.error('Error creating new procedures:', error.message);
+        throw error;
     }
 };
 

@@ -160,6 +160,52 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
+        public async Task<List<VisitCdtCodeMapDto>> CreateNewProceduresAsync(List<NewProcedureDto> newProcedures)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var newCdtCodeMaps = new List<VisitCdtCodeMap>();
+
+                    foreach (var newProc in newProcedures)
+                    {
+                        Console.Write($"Creating new VisitCdtCodeMap with VisitId: {newProc.VisitId}, CdtCodeId: {newProc.CdtCodeId}, Order: {newProc.Order}");
+                        var newCdtCodeMap = new VisitCdtCodeMap
+                        {
+                            VisitId = newProc.VisitId,
+                            CdtCodeId = newProc.CdtCodeId,
+                            Order = newProc.Order
+                        };
+
+                        newCdtCodeMaps.Add(newCdtCodeMap);
+                    }
+
+                    _context.VisitCdtCodeMaps.AddRange(newCdtCodeMaps);
+                    await _context.SaveChangesAsync();
+
+                    var newCdtCodeMapDtos = newCdtCodeMaps.Select(c => new VisitCdtCodeMapDto
+                    {
+                        VisitCdtCodeMapId = c.VisitCdtCodeMapId,
+                        VisitId = c.VisitId,
+                        CdtCodeId = c.CdtCodeId,
+                        Order = c.Order
+                    }).ToList();
+
+                    await transaction.CommitAsync();
+                    return newCdtCodeMapDtos;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error occurred during new procedures creation: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+
+
         public async Task<TreatmentPlan> UpdateTreatmentPlanAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -222,24 +268,18 @@ namespace DentalTreatmentPlanner.Server.Services
 
         private void UpdateVisitCdtCodes(Visit visit, ICollection<VisitCdtCodeMapDto> updatedCdtCodeMaps)
         {
+            // Update existing VisitCdtCodeMaps
             foreach (var cdtCodeMapDto in updatedCdtCodeMaps)
             {
                 var cdtCodeMap = visit.VisitCdtCodeMaps.FirstOrDefault(c => c.VisitCdtCodeMapId == cdtCodeMapDto.VisitCdtCodeMapId);
-                if (cdtCodeMap == null)
-                {
-                    visit.VisitCdtCodeMaps.Add(new VisitCdtCodeMap
-                    {
-                        VisitId = visit.VisitId,
-                        CdtCodeId = cdtCodeMapDto.CdtCodeId,
-                        Order = cdtCodeMapDto.Order
-                    });
-                }
-                else
+                if (cdtCodeMap != null)
                 {
                     cdtCodeMap.Order = cdtCodeMapDto.Order;
+                    // Update other fields if necessary
                 }
             }
 
+            // Remove VisitCdtCodeMaps that are no longer in the updated list
             var cdtCodeMapsToRemove = visit.VisitCdtCodeMaps
                 .Where(c => !updatedCdtCodeMaps.Any(uc => uc.VisitCdtCodeMapId == c.VisitCdtCodeMapId))
                 .ToList();
@@ -249,6 +289,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 _context.VisitCdtCodeMaps.Remove(cdtCodeMap);
             }
         }
+
 
         public async Task<VisitCreationResult> CreateVisitAsync(CreateVisitDto createVisitDto)
         {

@@ -45,5 +45,26 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return StatusCode(500, ex.Message); // Internal Server Error
             }
         }
+
+        [HttpPost("CreateNewProcedures")]
+        public async Task<IActionResult> CreateNewProcedures([FromBody] List<NewProcedureDto> newProcedures)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _dentalTreatmentPlannerService.CreateNewProceduresAsync(newProcedures);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred during new procedures creation: {ex}");
+                return StatusCode(500, new { message = ex.Message, detail = ex.StackTrace });
+
+            }
+        }
     }
 }

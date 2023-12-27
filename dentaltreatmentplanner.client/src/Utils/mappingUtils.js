@@ -21,6 +21,7 @@ export const mapToDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, dele
                     LongDescription: cdtCode.longDescription,
                 };
             });
+        console.log(`Processing visitId: ${visitId}, cdtCodeDtos:`, cdtCodeDtos);
 
         const cdtCodeIds = cdtCodeDtos.map(dto => dto.CdtCodeId);
 

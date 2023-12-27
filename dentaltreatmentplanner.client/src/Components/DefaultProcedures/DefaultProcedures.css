@@ -11,6 +11,17 @@
     gap: 20px;
 }
 
+.large-text {
+    font-family: 'Poppins-SemiBold';
+    font-size: 20px;
+}
+
+.large-text-bold {
+    font-family: 'Poppins-Bold';
+    font-size: 20px;
+}
+
+
 .edit-procedures-inner .large-text{
     text-align: center;
 }
