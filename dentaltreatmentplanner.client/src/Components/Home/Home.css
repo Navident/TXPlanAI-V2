@@ -57,8 +57,12 @@
     max-width: 600px;
     flex: 1;
 }
-.primary-heading {
-    font-family: 'Poppins-SemiBold', sans-serif;
+
+.primary-heading{
+    width: 100%;
+}
+.primary-heading span {
+    font-weight: 600;
     font-size: 48px;
     line-height: 56px;
     max-width: 600px;

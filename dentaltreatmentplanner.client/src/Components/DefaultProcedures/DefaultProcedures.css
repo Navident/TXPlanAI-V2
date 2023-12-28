@@ -12,18 +12,20 @@
 }
 
 .large-text {
-    font-family: 'Poppins-SemiBold';
-    font-size: 20px;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .large-text-bold {
-    font-family: 'Poppins-Bold';
-    font-size: 20px;
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 18px;
 }
 
 
-.edit-procedures-inner .large-text{
+.centered-title {
     text-align: center;
+    font-size: 21px;
 }
 
 .edit-procedures-table-outer-header {
