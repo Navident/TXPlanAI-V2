@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
 import TreatmentPlanConfiguration from "../TreatmentPlanConfiguration/TreatmentPlanConfiguration";
-
+import { addVisitToTreatmentPlan, deleteVisitInTreatmentPlan, updateVisitsInTreatmentPlan } from '../../Utils/helpers';
 import { getCdtCodes } from '../../ClientServices/apiService';
 
 const ProceduresCustomizer = () => {
@@ -36,31 +36,24 @@ const ProceduresCustomizer = () => {
 
 
     const handleAddVisitToTreatmentPlan = (treatmentPlanId, newVisit) => {
-        setTreatmentPlans(prevPlans => prevPlans.map(plan => {
-            if (plan.treatmentPlanId === treatmentPlanId) {
-                return { ...plan, visits: [...plan.visits, newVisit] };
-            }
-            return plan;
-        }));
+        setTreatmentPlans(prevPlans => addVisitToTreatmentPlan(prevPlans, treatmentPlanId, newVisit));
     };
 
     const handleDeleteVisitInTreatmentPlan = (treatmentPlanId, deletedVisitId) => {
-        setTreatmentPlans(prevPlans => prevPlans.map(plan => {
-            if (plan.treatmentPlanId === treatmentPlanId) {
-                const updatedVisits = plan.visits.filter(visit => visit.visitId !== deletedVisitId);
-                return { ...plan, visits: updatedVisits };
-            }
-            return plan;
-        }));
+        setTreatmentPlans(prevPlans => deleteVisitInTreatmentPlan(prevPlans, treatmentPlanId, deletedVisitId));
     };
 
-    const updateVisitsInTreatmentPlan = (treatmentPlanId, updatedVisits) => {
-        setTreatmentPlans(prevPlans => prevPlans.map(plan =>
-            plan.treatmentPlanId === treatmentPlanId
-                ? { ...plan, visits: [...updatedVisits] }
-                : plan
-        ));
+    const handleUpdateVisitsInTreatmentPlan = (treatmentPlanId, updatedVisits) => {
+        setTreatmentPlans(prevPlans => {
+            return prevPlans.map(plan => {
+                if (plan.treatmentPlanId === treatmentPlanId) {
+                    return { ...plan, visits: updatedVisits };
+                }
+                return plan;
+            });
+        });
     };
+
 
     return (
         <div className="procedure-customizer-wrapper">
@@ -80,7 +73,7 @@ const ProceduresCustomizer = () => {
                                 <div>
                                     {cdtCodes.length > 0 && treatmentPlans.length > 0 &&
                                         treatmentPlans.map((plan, index) => {
-                                            const key = `${plan.treatmentPlanId}-${getOrderKey(plan)}`;
+                                            const key = index; //`${plan.treatmentPlanId}-${getOrderKey(plan)}`
                                             console.log(`Rendering TreatmentPlanConfiguration with key: ${key}`);
                                             return (
                                                 <TreatmentPlanConfiguration
@@ -89,11 +82,10 @@ const ProceduresCustomizer = () => {
                                                     includeExtraRow={true}
                                                     cdtCodes={cdtCodes}
                                                     addProcedureElement={<span>+ Add Procedure</span>}
-                                                    useImageIconColumn={true}
-                                                    hideToothNumber={true}
                                                     onAddVisit={(newVisit) => handleAddVisitToTreatmentPlan(plan.treatmentPlanId, newVisit)}
-                                                    onUpdateVisitsInTreatmentPlan={updateVisitsInTreatmentPlan}
+                                                    onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => handleUpdateVisitsInTreatmentPlan(treatmentPlanId, updatedVisits)}
                                                     onDeleteVisit={(treatmentPlanId, deletedVisitId) => handleDeleteVisitInTreatmentPlan(treatmentPlanId, deletedVisitId)}
+                                                    showToothNumber={false}
                                                 />
                                             );
                                         })

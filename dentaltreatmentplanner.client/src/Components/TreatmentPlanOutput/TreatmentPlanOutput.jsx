@@ -18,7 +18,7 @@ const TreatmentPlanOutput = ({ treatmentPlan }) => {
         // unique table ID for each visit
         const tableId = `visit-${visit.visitId}`;
 
-        return <Table headers={headers} rows={rows} tableId={tableId} enableDragDrop={false} />;
+        return <Table headers={headers} rows={rows} tableId={tableId} enableDragDrop={true} />;
     };
 
     return (

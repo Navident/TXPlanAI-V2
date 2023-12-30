@@ -10,24 +10,31 @@ import { generateTreatmentPlan, getTreatmentPlanById } from '../../ClientService
 import circleIcon from '../../assets/circle-icon.svg';
 import userIcon from '../../assets/user-icon.svg';
 import { useNavigate } from 'react-router-dom';
+import TreatmentPlanConfiguration from "../TreatmentPlanConfiguration/TreatmentPlanConfiguration";
+import { getCdtCodes, getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
+import { addVisitToTreatmentPlan, deleteVisitInTreatmentPlan, updateVisitsInTreatmentPlan } from '../../Utils/helpers';
 
 const Dashboard = () => {
+
+    const [inputText, setInputText] = useState('');
+    const [treatmentPlan, setTreatmentPlan] = useState(null);
+    const [treatmentPlanId, setTreatmentPlanId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [cdtCodes, setCdtCodes] = useState([]);
+
     const navigate = useNavigate();
 
     const handleUserIconClick = () => {
         navigate("/DefaultProcedures"); // This will navigate to the DefaultProcedures page
     };
-
-    const [searchQuery, setSearchQuery] = useState('');
+    useEffect(() => {
+        getCdtCodes(setCdtCodes); // Fetch CDT codes when component mounts    
+    }, []);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
         // Here I will Implement search functionality or pass the search query to the parent component
     };
-
-    const [inputText, setInputText] = useState('');
-    const [treatmentPlan, setTreatmentPlan] = useState(null);
-    const [treatmentPlanId, setTreatmentPlanId] = useState(null);
 
     const handleInputChange = (event) => {
         setInputText(event.target.value);
@@ -40,11 +47,45 @@ const Dashboard = () => {
         }
     }, [treatmentPlanId]);
 
-    const handleGetTreatmentPlanById = async () => {
-        const id = 101; // Hardcoded ID
-        setTreatmentPlanId(id); // Set the treatmentPlanId state
-        console.log("Attempting to retrieve treatment plan now");
-        await getTreatmentPlanById(id, setTreatmentPlan);
+    const handleGenerateTreatmentPlan = async () => {
+        const inputParts = inputText.split(' ');
+        const subcategory = inputParts.slice(1).join(' ');
+
+        if (subcategory) {
+            console.log(`Fetching treatment plans for subcategory: ${subcategory}`);
+            await getTreatmentPlansBySubcategory(subcategory, (plans) => {
+                if (plans && plans.length > 0) {
+                    setTreatmentPlan(plans[0]); // Assuming we take the first plan
+                } else {
+                    // Handle case when no plans are returned
+                    console.log(`No treatment plans found for subcategory: ${subcategory}`);
+                }
+            });
+        }
+    };
+
+    // Local handler for adding a visit
+    const handleAddVisit = (newVisit) => {
+        if (treatmentPlan) {
+            const updatedPlan = addVisitToTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, newVisit);
+            setTreatmentPlan(updatedPlan[0]);
+        }
+    };
+
+    // Local handler for deleting a visit
+    const onDeleteVisit = (deletedVisitId) => {
+        if (treatmentPlan) {
+            const updatedPlan = deleteVisitInTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, deletedVisitId);
+            setTreatmentPlan(updatedPlan[0]);
+        }
+    };
+
+    // Local handler for updating visits
+    const onUpdateVisitsInTreatmentPlan = (updatedVisits) => {
+        if (treatmentPlan) {
+            const updatedPlan = updateVisitsInTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, updatedVisits);
+            setTreatmentPlan(updatedPlan[0]);
+        }
     };
 
 
@@ -115,14 +156,25 @@ const Dashboard = () => {
                                         value={inputText}
                                         onChange={handleInputChange}
                                     />
-                                    <button onClick={handleGetTreatmentPlanById} className="purple-button">
+                                    <button onClick={handleGenerateTreatmentPlan} className="purple-button">
                                         Generate Treatment Plan
                                     </button>
                                 </div>
                             </div>
                             <div className="treatment-plan-output-section">
-                                <div className="treatment-plan-output-section-inner">                                  
-                                    <TreatmentPlanOutput treatmentPlan={treatmentPlan} />
+                                <div className="treatment-plan-output-section-inner">
+                                    {treatmentPlan && (
+                                        <TreatmentPlanConfiguration
+                                            treatmentPlan={treatmentPlan}
+                                            cdtCodes={cdtCodes}
+                                            onAddVisit={handleAddVisit}
+                                            useImageIconColumn={false}
+                                            hideToothNumber={false}
+                                            onUpdateVisitsInTreatmentPlan={onUpdateVisitsInTreatmentPlan}
+                                            onDeleteVisit={onDeleteVisit}
+                                            showToothNumber={true}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>

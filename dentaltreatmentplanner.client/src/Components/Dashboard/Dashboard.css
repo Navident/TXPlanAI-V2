@@ -59,7 +59,7 @@
 
 .patient-info-inner-container {
     display: grid;
-    grid-template-columns: 200px 200px 1fr; 
+    grid-template-columns: 1fr 1fr 1fr; 
     height: 100%;
 }
 
@@ -92,5 +92,6 @@
     flex-direction: row;
     gap: 22px;
     align-items: center;
+    justify-content: center;
     height: 100%;
 }

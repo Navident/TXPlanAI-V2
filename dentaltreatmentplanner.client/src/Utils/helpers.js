@@ -17,3 +17,30 @@ export const sortTreatmentPlan = (treatmentPlan) => {
 
     return { sortedVisits, sortedCdtCodes };
 };
+
+export const addVisitToTreatmentPlan = (treatmentPlans, treatmentPlanId, newVisit) => {
+    return treatmentPlans.map(plan => {
+        if (plan.treatmentPlanId === treatmentPlanId) {
+            return { ...plan, visits: [...plan.visits, newVisit] };
+        }
+        return plan;
+    });
+};
+
+export const deleteVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, deletedVisitId) => {
+    return treatmentPlans.map(plan => {
+        if (plan.treatmentPlanId === treatmentPlanId) {
+            const updatedVisits = plan.visits.filter(visit => visit.visitId !== deletedVisitId);
+            return { ...plan, visits: updatedVisits };
+        }
+        return plan;
+    });
+};
+
+export const updateVisitsInTreatmentPlan = (treatmentPlans, treatmentPlanId, updatedVisits) => {
+    return treatmentPlans.map(plan =>
+        plan.treatmentPlanId === treatmentPlanId
+            ? { ...plan, visits: [...updatedVisits] }
+            : plan
+    );
+};

@@ -3,52 +3,49 @@ import PropTypes from 'prop-types';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, deleteImageIconSrcHeader, dragImageIconSrc, onDeleteRow, onDeleteVisit }) => {
+    
     const renderDraggableRow = (rowData, rowIndex) => {
-        const rowId = rowData.id;
-        console.log("Rendering row with ID:", rowId);
-        console.log("Rendering row with ID:", rowId);
         return (
             <Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">
-                {(provided) => (
-                    <tr ref={provided.innerRef} {...provided.draggableProps}>
+                {(provided, snapshot) => (
+                    <tr
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        style={{
+                            ...provided.draggableProps.style,
+                            borderBottom: snapshot.isDragging ? '1px solid #7777a1' : '',
+                        }}
+                    >
+                        <td>
+                            <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />
+                        </td>
                         {rowData.data.map((cell, cellIndex) => (
-                            <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>
-                                {cellIndex === 0 && (
-                                    <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />
-                                )}
-                                {cell}
-                                {cellIndex === rowData.data.length - 1 && rowIndex !== rows.length - 1 && (
-                                    <img src={deleteImageIconSrc} className="delete-icon" alt="Delete Icon" onClick={() => onDeleteRow(rowId)} />
-                                )}
-                            </td>
+                            <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                         ))}
+                        <td>
+                            {rowData.deleteIconCell || <span></span>} {/* Render empty span if no delete icon */}
+                        </td>
                     </tr>
                 )}
             </Draggable>
         );
     };
 
-
     const renderRow = (rowData, rowIndex) => {
-        const rowId = rowData.id; 
         return (
             <tr key={`row-${tableId}-${rowIndex}`}>
-                {rowData.data.map((cell, cellIndex) => ( 
-                    <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>
-                        {cellIndex === 0 && (
-                            <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />
-                        )}
-                        {cell}
-                        {cellIndex === rowData.data.length - 1 && rowIndex !== rows.length - 1 && (
-                            <img src={deleteImageIconSrc} className="delete-icon" alt="Delete Icon" onClick={() => onDeleteRow(rowId)} />
-                        )}
-                    </td>
+                <td>
+                    <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />
+                </td>
+                {rowData.data.map((cell, cellIndex) => (
+                    <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                 ))}
+                <td>
+                    {rowData.deleteIconCell || <span></span>} {/* Render empty span if no delete icon */}
+                </td>
             </tr>
         );
     };
-
-
 
     const renderBody = (provided) => (
         <tbody ref={provided ? provided.innerRef : null} {...(provided ? provided.droppableProps : {})}>
@@ -62,16 +59,21 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
             <table className="tx-table">
                 <thead>
                     <tr className="table-inner-header">
+                        {/* th for drag icon */}
+                        <th>
+                            <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />
+                        </th>
+                        {/* Map through headers */}
                         {headers.map((header, index) => (
-                            <th key={`header-${index}`}>
-                                {header}
-                                {index === headers.length - 1 && (
-                                    <img src={deleteImageIconSrcHeader} className="delete-icon" alt="Delete Icon" onClick={onDeleteVisit} />
-                                )}
-                            </th>
+                            <th key={`header-${index}`}>{header}</th>
                         ))}
+                        {/* Separate th for delete icon in header */}
+                        <th>
+                            <img src={deleteImageIconSrcHeader} className="delete-icon" alt="Delete Icon" onClick={onDeleteVisit} />
+                        </th>
                     </tr>
                 </thead>
+                {/* Table body */}
                 {enableDragDrop ? (
                     <Droppable droppableId={`droppable-${tableId}`} type="row">
                         {renderBody}
