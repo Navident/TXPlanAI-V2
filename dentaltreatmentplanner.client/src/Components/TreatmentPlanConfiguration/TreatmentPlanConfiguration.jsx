@@ -485,6 +485,8 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                                             baseRowData.push(''); // Add an extra cell if needed
                                         }
 
+                                        const isDynamicRow = !row.id.startsWith('static-'); // dynamic rows do not start with 'static-'
+
                                         const deleteIconCell = (index !== visitRows.length - 1) ? (
                                             <img src={deleteIcon} className="delete-icon" alt="Delete Icon" onClick={() => handleDeleteRow(visit.visitId, row.id)} />
                                         ) : null;
@@ -492,7 +494,8 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                                         return {
                                             id: row.id,
                                             data: baseRowData,
-                                            deleteIconCell
+                                            deleteIconCell,
+                                            isDynamic: isDynamicRow // Add this line
                                         };
                                     });
 

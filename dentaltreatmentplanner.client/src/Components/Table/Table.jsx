@@ -5,6 +5,8 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, deleteImageIconSrcHeader, dragImageIconSrc, onDeleteRow, onDeleteVisit }) => {
     
     const renderDraggableRow = (rowData, rowIndex) => {
+        const isLastDynamicRow = rowIndex === rows.length - 1 && rowData.isDynamic;
+        console.log("isLastDynamicRow", isLastDynamicRow);
         return (
             <Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">
                 {(provided, snapshot) => (
@@ -17,13 +19,13 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                         }}
                     >
                         <td>
-                            <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />
+                            {!isLastDynamicRow && <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />}
                         </td>
                         {rowData.data.map((cell, cellIndex) => (
                             <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                         ))}
                         <td>
-                            {rowData.deleteIconCell || <span></span>} {/* Render empty span if no delete icon */}
+                            {!isLastDynamicRow && rowData.deleteIconCell || <span></span>}
                         </td>
                     </tr>
                 )}
@@ -32,16 +34,19 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
     };
 
     const renderRow = (rowData, rowIndex) => {
+        const isLastDynamicRow = rowIndex === rows.length - 1 && rowData.isDynamic;
+        console.log("isLastDynamicRow: ", isLastDynamicRow);
+
         return (
             <tr key={`row-${tableId}-${rowIndex}`}>
                 <td>
-                    <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />
+                    {!isLastDynamicRow && <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />}
                 </td>
                 {rowData.data.map((cell, cellIndex) => (
                     <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                 ))}
                 <td>
-                    {rowData.deleteIconCell || <span></span>} {/* Render empty span if no delete icon */}
+                    {!isLastDynamicRow && rowData.deleteIconCell || <span></span>}
                 </td>
             </tr>
         );
