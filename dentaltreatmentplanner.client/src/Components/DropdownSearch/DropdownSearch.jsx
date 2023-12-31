@@ -23,6 +23,28 @@ const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
     // Find the option that matches the selectedCode
     const selectedOption = options.find(option => option.value === selectedCode);
 
+    const customStyles = {
+        control: (provided, state) => ({
+            ...provided,
+            borderColor: state.isFocused ? '#7777a1' : provided.borderColor,
+            boxShadow: state.isFocused ? `0 0 0 1px #7777a1` : provided.boxShadow,
+            '&:hover': {
+                borderColor: state.isFocused ? '#7777a1' : provided.borderColor,
+            },
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            backgroundColor: state.isFocused ? '#eeeef3' : provided.backgroundColor,
+            color: 'black', // Set text color to black
+            '&:hover': {
+                backgroundColor: '#eeeef3',
+                color: 'black', // Ensure text color is black on hover
+            },
+        }),
+    };
+
+
+
     return (
         <div style={{ width: 300 }}>
             <Select
@@ -30,6 +52,7 @@ const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
                 onChange={handleChange}
                 components={{ SingleValue }}
                 value={selectedOption} // Control the selected value
+                styles={customStyles}
             />
         </div>
     );

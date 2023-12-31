@@ -156,7 +156,18 @@ const Dashboard = () => {
                                         minRows={3}
                                         value={inputText}
                                         onChange={handleInputChange}
+                                        sx={{
+                                            '& label.Mui-focused': {
+                                                color: '#7777a1',
+                                            },
+                                            '& .MuiOutlinedInput-root': {
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#7777a1',
+                                                },
+                                            },
+                                        }}
                                     />
+
                                     <button onClick={handleGenerateTreatmentPlan} className="purple-button">
                                         Generate Treatment Plan
                                     </button>
