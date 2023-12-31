@@ -6,7 +6,11 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
     
     const renderDraggableRow = (rowData, rowIndex) => {
         const isLastDynamicRow = rowIndex === rows.length - 1 && rowData.isDynamic;
-        console.log("isLastDynamicRow", isLastDynamicRow);
+
+        if (isLastDynamicRow) {
+            // Render as a normal row, not draggable
+            return renderRow(rowData, rowIndex);
+        }
         return (
             <Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">
                 {(provided, snapshot) => (
@@ -35,7 +39,6 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
 
     const renderRow = (rowData, rowIndex) => {
         const isLastDynamicRow = rowIndex === rows.length - 1 && rowData.isDynamic;
-        console.log("isLastDynamicRow: ", isLastDynamicRow);
 
         return (
             <tr key={`row-${tableId}-${rowIndex}`}>
@@ -51,6 +54,7 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
             </tr>
         );
     };
+
 
     const renderBody = (provided) => (
         <tbody ref={provided ? provided.innerRef : null} {...(provided ? provided.droppableProps : {})}>

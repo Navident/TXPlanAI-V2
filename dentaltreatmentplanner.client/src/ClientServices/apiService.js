@@ -147,7 +147,7 @@ export const getSubCategoriesByCategoryName = async (categoryName, setSubCategor
 
 
 // Function to get treatment plans by subcategory name
-export const getTreatmentPlansBySubcategory = async (subcategoryName, setTreatmentPlans) => {
+export const getTreatmentPlansBySubcategory = async (subcategoryName) => {
     try {
         const response = await fetch(`${API_BASE_URL}/Subcategory/${subcategoryName}`, {
             method: 'GET',
@@ -160,18 +160,22 @@ export const getTreatmentPlansBySubcategory = async (subcategoryName, setTreatme
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
                 const data = await response.json();
-                setTreatmentPlans(data);
                 console.log(`Treatment plans for subcategory Name ${subcategoryName}:`, data);
+                return data; // Return the data directly
             } else {
                 console.log(`Received non-JSON response for subcategory Name ${subcategoryName}`);
+                return null; 
             }
         } else {
             console.error(`Failed to retrieve treatment plans for subcategory Name ${subcategoryName}. Status:`, response.status);
+            return null; 
         }
     } catch (error) {
         console.error(`Error fetching treatment plans for subcategory Name ${subcategoryName}:`, error.message);
+        return null; 
     }
 };
+
 
 export const getCdtCodes = async (setCdtCodes) => {
     try {

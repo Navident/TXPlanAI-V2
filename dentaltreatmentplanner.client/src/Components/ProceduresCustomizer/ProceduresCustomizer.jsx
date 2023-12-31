@@ -25,10 +25,22 @@ const ProceduresCustomizer = () => {
     }, []);
 
     useEffect(() => {
-        if (subcategory) {
-            getTreatmentPlansBySubcategory(subcategory, setTreatmentPlans);
-        }
+        const fetchTreatmentPlans = async () => {
+            if (subcategory) {
+                const plans = await getTreatmentPlansBySubcategory(subcategory);
+                if (plans) {
+                    setTreatmentPlans(plans);
+                } else {
+                    // Handle the case when no treatment plans are returned or an error occurs
+                    console.log(`No treatment plans found for subcategory: ${subcategory}`);
+                }
+            }
+        };
+
+        fetchTreatmentPlans();
     }, [subcategory]);
+
+
 
     useEffect(() => {
         console.log("treatmentPlans updated:", treatmentPlans);

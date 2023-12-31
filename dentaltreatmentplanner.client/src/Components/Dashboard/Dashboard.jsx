@@ -17,7 +17,7 @@ import { addVisitToTreatmentPlan, deleteVisitInTreatmentPlan, updateVisitsInTrea
 const Dashboard = () => {
 
     const [inputText, setInputText] = useState('');
-    const [treatmentPlan, setTreatmentPlan] = useState(null);
+    const [treatmentPlans, setTreatmentPlans] = useState([]);
     const [treatmentPlanId, setTreatmentPlanId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [cdtCodes, setCdtCodes] = useState([]);
@@ -48,45 +48,46 @@ const Dashboard = () => {
     }, [treatmentPlanId]);
 
     const handleGenerateTreatmentPlan = async () => {
-        const inputParts = inputText.split(' ');
-        const subcategory = inputParts.slice(1).join(' ');
+        const lines = inputText.split('\n');
+        const planPromises = lines.map(async line => {
+            const inputParts = line.trim().split(' ');
+            const subcategory = inputParts.slice(1).join(' ');
 
-        if (subcategory) {
-            console.log(`Fetching treatment plans for subcategory: ${subcategory}`);
-            await getTreatmentPlansBySubcategory(subcategory, (plans) => {
-                if (plans && plans.length > 0) {
-                    setTreatmentPlan(plans[0]); // Assuming we take the first plan
-                } else {
-                    // Handle case when no plans are returned
-                    console.log(`No treatment plans found for subcategory: ${subcategory}`);
-                }
-            });
-        }
+            if (subcategory) {
+                console.log(`Fetching treatment plans for subcategory: ${subcategory}`);
+                const plans = await getTreatmentPlansBySubcategory(subcategory);
+                return plans && plans.length > 0 ? plans[0] : null;
+            }
+        });
+
+        const newTreatmentPlans = (await Promise.all(planPromises)).filter(plan => plan !== null);
+        setTreatmentPlans(newTreatmentPlans);
     };
+
+
+
+
 
     // Local handler for adding a visit
-    const handleAddVisit = (newVisit) => {
-        if (treatmentPlan) {
-            const updatedPlan = addVisitToTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, newVisit);
-            setTreatmentPlan(updatedPlan[0]);
-        }
+    const handleAddVisit = (treatmentPlanId, newVisit) => {
+        const updatedPlans = addVisitToTreatmentPlan(treatmentPlans, treatmentPlanId, newVisit);
+        setTreatmentPlans(updatedPlans);
     };
+
 
     // Local handler for deleting a visit
-    const onDeleteVisit = (deletedVisitId) => {
-        if (treatmentPlan) {
-            const updatedPlan = deleteVisitInTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, deletedVisitId);
-            setTreatmentPlan(updatedPlan[0]);
-        }
+    const onDeleteVisit = (treatmentPlanId, deletedVisitId) => {
+        const updatedPlans = deleteVisitInTreatmentPlan(treatmentPlans, treatmentPlanId, deletedVisitId);
+        setTreatmentPlans(updatedPlans);
     };
 
+
     // Local handler for updating visits
-    const onUpdateVisitsInTreatmentPlan = (updatedVisits) => {
-        if (treatmentPlan) {
-            const updatedPlan = updateVisitsInTreatmentPlan([treatmentPlan], treatmentPlan.treatmentPlanId, updatedVisits);
-            setTreatmentPlan(updatedPlan[0]);
-        }
+    const onUpdateVisitsInTreatmentPlan = (treatmentPlanId, updatedVisits) => {
+        const updatedPlans = updateVisitsInTreatmentPlan(treatmentPlans, treatmentPlanId, updatedVisits);
+        setTreatmentPlans(updatedPlans);
     };
+
 
 
     return (
@@ -163,19 +164,21 @@ const Dashboard = () => {
                             </div>
                             <div className="treatment-plan-output-section">
                                 <div className="treatment-plan-output-section-inner">
-                                    {treatmentPlan && (
+                                    <div className="large-text">Treatment Plan</div>
+                                    {treatmentPlans.map((plan, index) => (
                                         <TreatmentPlanConfiguration
-                                            treatmentPlan={treatmentPlan}
+                                            key={`treatment-plan-${index}`}
+                                            treatmentPlan={plan}
                                             cdtCodes={cdtCodes}
-                                            onAddVisit={handleAddVisit}
-                                            useImageIconColumn={false}
-                                            hideToothNumber={false}
-                                            onUpdateVisitsInTreatmentPlan={onUpdateVisitsInTreatmentPlan}
-                                            onDeleteVisit={onDeleteVisit}
+                                            onAddVisit={(newVisit) => handleAddVisit(plan.treatmentPlanId, newVisit)}
+                                            onUpdateVisitsInTreatmentPlan={(updatedVisits) => onUpdateVisitsInTreatmentPlan(plan.treatmentPlanId, updatedVisits)}
+                                            onDeleteVisit={(deletedVisitId) => onDeleteVisit(plan.treatmentPlanId, deletedVisitId)}
                                             showToothNumber={true}
+                                        
                                         />
-                                    )}
+                                    ))}
                                 </div>
+
                             </div>
                         </div>
 

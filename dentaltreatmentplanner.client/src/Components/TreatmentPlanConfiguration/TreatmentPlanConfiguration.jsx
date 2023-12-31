@@ -427,6 +427,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                                     }
 
                                     const draggableKey = isTempVisit ? `temp-visit-${index}` : `visit-${visit.visitId}`;
+                                    console.log("Generated draggableKey:", draggableKey, "for visitIdStr:", visitIdStr);
 
                                     const visitRows = allRows[visitIdStr] || [];
 

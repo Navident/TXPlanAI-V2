@@ -88,7 +88,18 @@
         padding-top: 15px;
         padding-bottom: 15px;
     }
-
+.delete-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.edit-button {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+}
 
         .tx-table thead tr th:nth-child(1) {
             width: 10%;
