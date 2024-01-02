@@ -57,7 +57,6 @@
 
 .textbox-label {
     margin-bottom: 10px;
-    color: #666666;
 }
 
 .login-signup-header.large-text {
@@ -167,31 +166,15 @@
 
 
 
-.purple-outline-button {
-    background-color: white;
-    color: #7777a1;
-    border: 1px solid #7777a1;
-    padding: 12px;
-    cursor: pointer;
-    outline: none;
-    width: fit-content;
-    transition: background-color 0.1s;
-}
+
 
 .login-signup-container {
     margin-top: 80px;
     height: calc(100% - 80px);
 }
 
-.green-outline-button {
-    background-color: white;
-    border: 1px solid #A2E1C9;
-    padding: 12px 32px;
-    border-radius: 20px;
-    cursor: pointer;
-    outline: none;
-    width: fit-content;
-    transition: background-color 0.1s;
+.light-grey-text {
+    color: #666666;
 }
 
 .table-inner-header th {
@@ -302,10 +285,6 @@ nav {
     transition: 0.2s;
 }
 
-.navbar-cart-icon {
-    font-size: 1.15rem;
-}
-
 .primary-button:hover {
     background-color: rgb(234, 234, 234);
 }
@@ -366,30 +345,10 @@ nav {
     margin-top: 80px;
 }
 
-.secondary-button {
-    padding: 1rem 2.5rem;
-    background-color: #fe9e0d;
-    outline: none;
-    border: none;
-    border-radius: 5rem;
-    font-size: 1.1rem;
-    cursor: pointer;
-    font-weight: 600;
-    color: white;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+.underlined-text {
+    text-decoration: underline;
 }
-
-    .secondary-button svg {
-        margin-left: 0.75rem;
-        font-size: 1.5rem;
-    }
-
-    .secondary-button:hover {
-        background-color: #e48f0f;
-    }
 
 
 
@@ -407,9 +366,7 @@ nav {
         font-size: 1rem;
     }
 
-    .primary-button {
-        font-size: 1rem;
-    }
+
 
 
 }
@@ -450,12 +407,4 @@ nav {
 
 
 
-}
-
-
-@media (max-width: 600px) {
-    .home-bannerImage-container,
-    .about-background-image-container {
-        display: none;
-    }
 }

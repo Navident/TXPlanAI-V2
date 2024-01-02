@@ -22,7 +22,7 @@ const Signup = () => {
                 <div className="login-signup-content">
                     <div className="login-signup-header large-text">Create an account</div>
                     <div className="login-signup-input-field">
-                        <div className="textbox-label">Email Address or user name</div>
+                        <div className="textbox-label light-grey-text">Email Address or user name</div>
                         <TextField
                             value={inputText}
                             onChange={handleInputChange}
@@ -40,7 +40,7 @@ const Signup = () => {
                         />
                     </div>
                     <div className="login-signup-input-field">
-                        <div className="textbox-label">Phone Number</div>
+                        <div className="textbox-label light-grey-text">Phone Number</div>
                         <TextField
                             value={inputText}
                             onChange={handleInputChange}
@@ -58,7 +58,7 @@ const Signup = () => {
                         />
                     </div>
                     <div className="login-signup-input-field">
-                        <div className="textbox-label">Business Name</div>
+                        <div className="textbox-label light-grey-text">Business Name</div>
                         <TextField
                             value={inputText}
                             onChange={handleInputChange}
@@ -76,7 +76,7 @@ const Signup = () => {
                         />
                     </div>
                     <div className="login-signup-input-field">
-                        <div className="textbox-label">Password</div>
+                        <div className="textbox-label light-grey-text">Password</div>
                         <TextField
                             value={inputText}
                             onChange={handleInputChange}
