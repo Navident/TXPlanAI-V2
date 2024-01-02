@@ -14,3 +14,9 @@
 .procedure-customizer-wrapper .edit-procedures-inner .tx-table {
     border-right: none;
 }
+
+.procedure-customizer-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

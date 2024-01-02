@@ -1,7 +1,7 @@
 .rounded-button {
     display: flex;
     align-items: center;
-    padding: 12.5px 0;
+    padding: 12.5px;
     border-radius: 20px;
     border: 1px solid black;
     cursor: pointer;

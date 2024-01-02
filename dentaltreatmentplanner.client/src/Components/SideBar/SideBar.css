@@ -1,41 +1,62 @@
 .sidebar-container {
-    width: 250px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    
-
-}
-
-.search-patient input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-}
-
-.search-patient {
     background-color: white;
-    width: 320px;
+    height: calc(100vh - 100px);
+    border-bottom-right-radius: 15px;
+}
+
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 260px;
+}
+
+.sidebar-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-.all-patients-container {
-    width: 320px;
-    background-color: white;
+    padding: 18px;
 }
 
-.patients-inner-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 12px;
-    padding: 20px;
+.sidebar-icon {
+    width: 30px; 
+    height: 30px; 
+    margin-right: 10px; 
 }
 
-.all-patients-container .purple-button {
-    width: 100%;
-
+.sidebar-text {
 }
+.sidebar-item {
+    position: relative;
+    overflow: hidden;
+}
+
+    .sidebar-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 0; 
+        background: linear-gradient(90deg, rgba(120, 118, 168, 0.70) 0%, rgba(255, 255, 255, 0.00) 100%);
+        transition: width 0.3s ease; 
+    }
+
+    /* Apply gradient to active item */
+    .sidebar-item.active::after {
+        width: 100%;
+    }
+
+    /* Apply gradient to hovered item */
+    .sidebar-item.hovered::after {
+        width: 100%;
+    }
+
+/* When an item is hovered, remove gradient from active item */
+.sidebar-container.item-hovered .sidebar-item.active:not(.hovered)::after {
+    width: 0;
+}
+
+
+
+
+

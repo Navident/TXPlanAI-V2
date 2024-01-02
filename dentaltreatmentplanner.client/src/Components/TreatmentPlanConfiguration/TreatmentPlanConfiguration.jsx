@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import './TreatmentPlanConfiguration.css';
 import Table from "../Table/Table";
 import { useState, useEffect, useRef } from 'react';
-import DropdownSearch from "../DropdownSearch/DropdownSearch";
+import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
 import { updateTreatmentPlan, createVisit, createNewProcedures } from '../../ClientServices/apiService';
 import { mapToDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';

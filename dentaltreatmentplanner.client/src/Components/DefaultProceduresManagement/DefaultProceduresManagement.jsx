@@ -1,9 +1,10 @@
-import './DefaultProcedures.css';
-import HeaderBar from "../HeaderBar/HeaderBar";
+import './DefaultProceduresManagement.css';
+import HeaderBar from "../Common/HeaderBar/HeaderBar";
 import circleIcon from '../../assets/circle-icon.svg';
 import userIcon from '../../assets/user-icon.svg';
 import editIcon from '../../assets/pencil-edit-icon.svg';
 import { useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 
 import { useState, useEffect } from 'react';
@@ -62,50 +63,45 @@ const DefaultProcedures = () => {
 
 
     const handleEditClick = (subcategoryName) => {
-        navigate(`/ProceduresCustomizer/${subcategoryName}`);
+        navigate(`/dashboard/defaultprocedures/procedurescustomizer/${subcategoryName}`);
     };
 
+
     return (
-        <div className="tx-container">
-            <HeaderBar
-                leftCornerElement={<img src={circleIcon} alt="Circle Icon" />}
-                rightCornerElement={<img src={userIcon} alt="User Icon" />}
-                className="dashboard-header"
-            />
-            <div className="tx-main-content">
-                <div className="tx-content-area">
-                    <div className="large-text">Procedure Defaults</div>
-                    <div className="edit-procedures-container">
-                        <div className="edit-procedures-inner">
-                            <div className="centered-title large-text">Procedure Categories</div>
-                            {categories.map(category => (
-                                <div className="table-container" key={category.procedureCategoryId}>
-                                    <div className="edit-procedures-table-outer-header large-text">{category.name}</div>
-                                    <table className="tx-table">
-                                        <thead>
-                                            <tr className="table-inner-header">
-                                                <th>Sub-Categories</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {category.subCategories?.map(subCategory => (
-                                                <tr key={subCategory.procedureSubCategoryId}>
-                                                    <td>
-                                                        {subCategory.name}
-                                                        <img src={editIcon} className="edit-button" alt="Edit" onClick={() => handleEditClick(subCategory.name)} />
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ))}
+        <div className = "default-procedure-management-wrapper">
+            <Outlet /> 
+            <div className="large-text">Procedure Defaults</div>
+            
+            <div className="edit-procedures-container rounded-box">
+                
+                <div className="edit-procedures-inner">
+                    <div className="centered-title large-text">Procedure Categories</div>
+                    {categories.map(category => (
+                        <div className="table-container" key={category.procedureCategoryId}>
+                            <div className="edit-procedures-table-outer-header large-text">{category.name}</div>
+                            <table className="tx-table">
+                                <thead>
+                                    <tr className="table-inner-header">
+                                        <th>Sub-Categories</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {category.subCategories?.map(subCategory => (
+                                        <tr key={subCategory.procedureSubCategoryId}>
+                                            <td>
+                                                {subCategory.name}
+                                                <img src={editIcon} className="edit-button" alt="Edit" onClick={() => handleEditClick(subCategory.name)} />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </div>
-    );
+);
 };
 
 export default DefaultProcedures;

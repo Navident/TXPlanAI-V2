@@ -1,80 +1,8 @@
-.login-container {
-    display: flex; 
-    flex-direction: column; 
-    height: 100vh; 
+.signup-wrapper .login-signup-header.large-text{
+    text-align: center;
 }
-
-.content-container {
-    display: flex;
-    justify-content: space-between;
-    flex-grow: 1;
-    margin-top: 80px;
-}
-
-.side-container {
-
-    width: 40%; 
-
-}
-
-.side-text {
-    display: flex;
-    flex-direction: column;
-    gap: 26px;
-    color: #ffffff;
-    margin-left: 50px;
-}
-
-    .side-text p {
-        margin-top: 0;
-        margin-bottom: 0;
-        color: #6a6a6a;
-        line-height: 22px;
-        max-width: 400px;
-    }
-
-.side-text h3 {
-     margin-block-start: 0;
-     margin-block-end: 0;
-     font-size: 25px;
-     color: #6a6a6a;
-}
-
-.side-text h2 {
-     margin-top: 80px;
-     margin-block-end: 0px;
-     font-size: 45px;
-}
-
-
-
-.side-container.left-side {
-    width: 45%;
-    background-image: url('../../assets/woman_smiling.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.side-container.right-side {
-    width: 55%;
-    background-color: white;
-}
-
-    .side-container.right-side .side-text {
-        color: black;
-    }
-.signup-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.signup-form input {
-    width: 230px;
-    padding: 15px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 25px;
-    box-sizing: border-box;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+.signup-wrapper .login-signup-content {
+    border: 1px solid #666666;
+    padding: 30px;
+    border-radius: 20px;
 }

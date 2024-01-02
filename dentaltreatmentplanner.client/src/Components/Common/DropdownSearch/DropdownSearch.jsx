@@ -38,7 +38,7 @@ const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
             color: 'black', // Set text color to black
             '&:hover': {
                 backgroundColor: '#eeeef3',
-                color: 'black', // Ensure text color is black on hover
+                color: 'black', 
             },
         }),
     };

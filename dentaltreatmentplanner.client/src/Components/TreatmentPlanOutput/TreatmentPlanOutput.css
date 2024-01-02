@@ -1,39 +1,98 @@
-
-
-.visit-separator td {
-    padding: 10px;
+.create-treatment-plan-section-inner {
+    display: flex;
+    justify-content: center;
+    width: 100%; 
+    padding: 25px;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.visit-section {
+.header-bar.dashboard-header  {
+    background-color: white;
+} 
+
+.create-treatment-plan-section-inner img{
+    width: 22px;
+    margin: 0 auto;
+}
+
+.create-treatment-plan-section-inner .large-text{
+    margin: 0 auto;
+}
+
+.dashboard-top-row{
+    display: flex;
+    flex-direction:row;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.create-treatment-plan-section-inner .rounded-button {
+    margin: 0 auto;
+}
+.dashboard-bottom-row {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: space-between;
+    gap: 20px;
+}
+ .dashboard-bottom-inner-row{
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-
-.visit-number {
-    font-weight: bold;
-    text-align: left;
+    width: 100%;
+    gap: 20px;
 }
 
 
 
-.treatment-plan-output-section {
-    flex-grow: 1;
-    background-color: white;
+.patient-info-section {
+    width: 100%;
 }
 
-.treatment-plan-output-section-inner {
-    padding: 20px;
+
+
+
+.patient-info-inner-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
     height: 100%;
 }
 
-
-.extra-row {
+.grid-item {
+    padding: 15px;
+    text-align: left;
     position: relative;
 }
 
-.dynamic-table-bottom-row {
+    .grid-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%; 
+        transform: translateY(-50%); 
+        height: 50%; 
+        border-right: 1px solid #ccc;
+        width: 1px; 
+    }
+
+.grid-item-2-inner {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+}
+
+.patient-info-inner-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 22px;
     align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.treatment-plan-output-section-inner .large-text{
+    display: flex;
+    justify-content: center;
 }

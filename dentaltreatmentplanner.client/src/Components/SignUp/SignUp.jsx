@@ -1,46 +1,109 @@
-import HeaderBar from "../HeaderBar/HeaderBar";
-import { Link } from 'react-router-dom';
+import { TextField } from "@mui/material";
+import React, { useState } from 'react';
+import HeaderBar from "../Common/HeaderBar/HeaderBar";
+import RoundedButton from "../Common/RoundedButton/RoundedButton";
+import './SignUp.css';
 import logo from '../../assets/navident-logo.svg';
-
-const SignupForm = () => {
+import circleIcon from '../../assets/circle-icon.svg';
+import backButton from '../../assets/back-button.svg';
+const Signup = () => {
+    const [inputText, setInputText] = useState('');
+    const handleInputChange = (event) => {
+        setInputText(event.target.value);
+    };
     return (
-        <div className="login-container">
-            <HeaderBar
-                leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
-                rightCornerElement=
-                {<div className="header-extra-text">
-                    <p>ALREADY HAVE AN ACCOUNT? <Link to="/login" className="link">LOG IN</Link></p>
-                </div>}
-            >
-
-            </HeaderBar>
-            <div className="content-container">
-                <div className="side-container left-side">
-                    <div className="side-text">
-                        <h2>Dentistry</h2>
-                        <h3>Innovation</h3>
+        <div className="signup-wrapper">
+            <div className="login-signup-container">
+                <HeaderBar
+                    leftCornerElement={<img src={backButton} alt="Logo" />}
+                    rightCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
+                    centerLogo={true}
+                />
+                <div className="login-signup-content">
+                    <div className="login-signup-header large-text">Create an account</div>
+                    <div className="login-signup-input-field">
+                        <div className="textbox-label">Email Address or user name</div>
+                        <TextField
+                            value={inputText}
+                            onChange={handleInputChange}
+                            sx={{
+                                width: '100%',
+                                '& label.Mui-focused': {
+                                    color: '#7777a1',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                },
+                            }}
+                        />
                     </div>
-                </div>
-                <div className="side-container right-side">
-                    <div className="side-text">
-                        <h2>Sign Up</h2>
-                        <p>
-                            Join our community and streamline your dental practice with
-                            automated treatment planning. Embrace efficiency and enhance patient
-                            satisfaction with our cutting-edge tools. Let's get started on revolutionizing your workflow!
-                        </p>
-                        <p>Create Your Account</p>
-
-                        <form className="signup-form">
-                            <input type="text" id="username" name="username" placeholder="Username" />
-                            <input type="password" id="password" name="password" placeholder="Password" />
-                            <button type="submit" className="green-button">Sign Up</button>
-                        </form>
+                    <div className="login-signup-input-field">
+                        <div className="textbox-label">Phone Number</div>
+                        <TextField
+                            value={inputText}
+                            onChange={handleInputChange}
+                            sx={{
+                                width: '100%',
+                                '& label.Mui-focused': {
+                                    color: '#7777a1',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                },
+                            }}
+                        />
                     </div>
+                    <div className="login-signup-input-field">
+                        <div className="textbox-label">Business Name</div>
+                        <TextField
+                            value={inputText}
+                            onChange={handleInputChange}
+                            sx={{
+                                width: '100%',
+                                '& label.Mui-focused': {
+                                    color: '#7777a1',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                    <div className="login-signup-input-field">
+                        <div className="textbox-label">Password</div>
+                        <TextField
+                            value={inputText}
+                            onChange={handleInputChange}
+                            sx={{
+                                width: '100%',
+                                '& label.Mui-focused': {
+                                    color: '#7777a1',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                    <RoundedButton
+                        text="Sign up"
+                        backgroundColor="#7777a1"
+                        textColor="white"
+                        border={false}
+                        className="purple-button-hover"
+                    />
                 </div>
             </div>
         </div>
     );
 };
 
-export default SignupForm;
+export default Signup;

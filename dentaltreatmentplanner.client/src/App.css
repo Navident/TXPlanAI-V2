@@ -34,37 +34,43 @@
     background-color: white;
 
 }
+.rounded-box{
+    border-radius: 15px;
+    background-color:white;
+}
 .table-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
-.purple-button {
-    background-color: #7777a1;
-    color: white;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    outline: none;
-    width: fit-content;
-    transition: background-color 0.1s; 
+
+.MuiOutlinedInput-root {
+    border-radius: 15px !important; 
 }
 
-    .purple-button:hover {
-        background-color: #65658a;
+[class*="MuiFormControl-root-MuiTextField-root"] {
+    border-radius: 15px;
+}
+    .purple-button-hover:hover {
+        background-color: #65658a !important;
     }
 
+.textbox-label {
+    margin-bottom: 10px;
+    color: #666666;
+}
 
+.login-signup-header.large-text {
+    font-size: 40px;
+}
 
-
-
-    .tx-table th, .tx-table td {
-        border: none;
-        padding: 12px;
-        text-align: left;
-        box-sizing: border-box;
-        vertical-align: top;
-    }
+.tx-table th, .tx-table td {
+    border: none;
+    padding: 12px;
+    text-align: left;
+    box-sizing: border-box;
+    vertical-align: top;
+}
 
 .tx-table {
     width: 100%;
@@ -99,6 +105,23 @@
     position: absolute;
     right: 12px;
     cursor: pointer;
+}
+.login-signup-container {
+    height: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+.login-signup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 580px;
 }
 
         .tx-table thead tr th:nth-child(1) {
@@ -155,6 +178,11 @@
     transition: background-color 0.1s;
 }
 
+.login-signup-container {
+    margin-top: 80px;
+    height: calc(100% - 80px);
+}
+
 .green-outline-button {
     background-color: white;
     border: 1px solid #A2E1C9;
@@ -171,13 +199,13 @@
     background-color: #eeeef3;
 }
 
-    .purple-outline-button:hover {
-        background-color: #eeeef3;
-    }
-.green-outline-button:hover {
-    background-color: #eeeef3;
+.outline-button-hover:hover {
+    background-color: #eeeef3 !important;
 }
 
+.green-button-hover:hover {
+    background-color: rgb(146, 203, 181) !important;
+}
 
 
 a, .link {
@@ -190,7 +218,7 @@ a, .link {
     margin: 0rem auto;
 }
 
-.home-container {
+.landing-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -291,7 +319,7 @@ nav {
 
 
 
-.home-right-side-container {
+.landing-right-side-container {
     display: flex;
     flex-direction: column;
 }
@@ -411,7 +439,7 @@ nav {
         max-width: 80%;
     }
 
-    .home-left-text-section,
+    .landing-left-text-section,
     .about-section-text-container {
         justify-content: center;
         align-items: center;

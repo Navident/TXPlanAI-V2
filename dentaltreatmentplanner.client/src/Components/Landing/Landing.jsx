@@ -1,15 +1,15 @@
-import './Home.css';
+import './Landing.css';
 import { useNavigate } from 'react-router-dom';
 import dentalHero from "../../assets/home-hero.jpg";
 import { TextField, Button } from "@mui/material";
-import HeaderBar from "../HeaderBar/HeaderBar";
-import RoundedButton from "../RoundedButton/RoundedButton";
+import HeaderBar from "../Common/HeaderBar/HeaderBar";
+import RoundedButton from "../Common/RoundedButton/RoundedButton";
 import logo from '../../assets/navident-logo.svg';
 import googleIcon from '../../assets/google-icon.svg';
 import appleIcon from '../../assets/apple-icon.svg';
 import facebookIcon from '../../assets/facebook-icon.svg';
 
-const Home = () => {
+const Landing = () => {
 	const navigate = useNavigate();
 
 	const handleSignUpClick = () => {
@@ -17,21 +17,31 @@ const Home = () => {
 	};
 
 	const handleLoginClick = () => {
-		navigate("/dashboard"); // This will navigate to the SignUp page
+		navigate("/login"); // This will navigate to the SignUp page
 	};
 
 	return (
-		<div className="home-container">
+		<div className="landing-container">
 			<HeaderBar
 				leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}		
 				rightCornerElement=
-				{<button className="green-outline-button" onClick={handleLoginClick}>
-					Log in
-				</button>}
+				{
+					<RoundedButton
+						text="Log in"
+						backgroundColor="white"
+						textColor="black"
+						border={true}
+                        width="150px" 
+                        borderColor="#A2E1C9"  
+						onClick={handleLoginClick}
+						className="outline-button-hover"
+					/>
+				}
+
 			/>
-			<div className="home-banner-container">
-				<div className="home-left-side-container">
-					<div className="home-left-text-section">
+			<div className="landing-banner-container">
+				<div className="landing-left-side-container">
+					<div className="landing-left-text-section">
 						<h1 className="primary-heading">
 							<span>Treatment Plan <br /> With One Click.</span>
 						</h1>
@@ -41,9 +51,9 @@ const Home = () => {
 						</p>
 					</div>
 					<div className="rounded-login-buttons-container">
-						<RoundedButton icon={googleIcon} text="Continue with Google" />
-						<RoundedButton icon={facebookIcon} text="Continue with Facebook" />
-						<RoundedButton icon={appleIcon} text="Continue with Apple" />
+						<RoundedButton icon={googleIcon} text="Continue with Google" className="outline-button-hover" />
+						<RoundedButton icon={facebookIcon} text="Continue with Facebook" className="outline-button-hover" />
+						<RoundedButton icon={appleIcon} text="Continue with Apple" className="outline-button-hover" />
 					</div>
 					<div className="divider-container">
 						<div className="line"></div>
@@ -55,14 +65,16 @@ const Home = () => {
 						backgroundColor="#7777a1"
 						textColor="white"
 						border={false} 
+						onClick={handleSignUpClick}
+						className="purple-button-hover"
 					/>
-					<div className="home-left-text-bottom">
+					<div className="landing-left-text-bottom">
 						By signing up, you agree to the <u>Terms of Service</u> and <u>Privacy Policy</u>,
 						including <u>cookie use</u>.
 					</div>
 				</div>
-				<div className="home-right-side-container">
-					<div className="home-image-hero">
+				<div className="landing-right-side-container">
+					<div className="landing-image-hero">
 						<img src={dentalHero} alt="" />
 					</div>
 
@@ -72,4 +84,4 @@ const Home = () => {
 	);
 };
 
-export default Home;
+export default Landing;

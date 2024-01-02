@@ -26,13 +26,20 @@
     justify-content: flex-end;
     margin-right: 50px;
 }
+.header-center-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
 
-
-    .header-bar img {
-        height: 37px;
-        width: auto;
-    }
+.header-bar img {
+    height: 37px;
+    width: auto;
+}
 
 .header-bar .navident-logo {
     height: 50px;
 } 
+
+
