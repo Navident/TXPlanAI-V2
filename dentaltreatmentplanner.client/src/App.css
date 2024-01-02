@@ -261,43 +261,6 @@ nav {
     min-height: 90px;
 }
 
-.navbar-menu-container {
-    display: none;
-}
-
-.navbar-links-container a {
-    margin-right: 3rem;
-    text-decoration: none;
-    color: #888989;
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
-.primary-button {
-    padding: 0.9rem 1.75rem;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-radius: 5rem;
-    font-size: 1.1rem;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.2s;
-}
-
-.primary-button:hover {
-    background-color: rgb(234, 234, 234);
-}
-
-.navbar-menu-container svg {
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-
-
-
-
 .landing-right-side-container {
     display: flex;
     flex-direction: column;
@@ -321,7 +284,9 @@ nav {
 }
 
 
-
+.back-btn-arrow{
+    cursor: pointer;
+}
 
 .green-button {
     width: 260px;
@@ -350,8 +315,6 @@ nav {
     text-decoration: underline;
 }
 
-
-
 .primary-subheading {
     font-weight: 700;
     color: #fe9e0d;
@@ -360,24 +323,9 @@ nav {
 
 
 
-@media (max-width: 1000px) {
-    .navbar-links-container a {
-        margin-right: 1rem;
-        font-size: 1rem;
-    }
-
-
-
-
-}
-
 @media (max-width: 800px) {
     .header-left-corner-container {
         max-width: 140px;
-    }
-
-    .navbar-links-container {
-        display: none;
     }
 
     .navbar-menu-container {

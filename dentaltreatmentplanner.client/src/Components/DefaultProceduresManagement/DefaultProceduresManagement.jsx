@@ -16,50 +16,52 @@ const DefaultProcedures = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        getCategories((fetchedCategories) => {
+        getCategories(async (fetchedCategories) => {
             console.log("Fetched Categories with Structure:", fetchedCategories);
-            // Initialize subcategories with a status
             const categoriesWithStatus = fetchedCategories.map(category => ({
                 ...category,
                 subCategories: [],
                 subCategoriesStatus: 'not_fetched'
             }));
-            setCategories(categoriesWithStatus);
+
+            // Fetch subcategories and treatment plans in parallel
+            const categoriesWithSubcategories = await Promise.all(
+                categoriesWithStatus.map(async (category) => {
+                    const subCategories = await fetchSubCategories(category.name);
+                    const subCategoriesWithTreatmentPlans = await fetchTreatmentPlansForSubCategories(subCategories);
+                    return {
+                        ...category,
+                        subCategories: subCategoriesWithTreatmentPlans,
+                        subCategoriesStatus: 'fetched'
+                    };
+                })
+            );
+
+            setCategories(categoriesWithSubcategories);
         });
     }, []);
 
-    useEffect(() => { //we are going to have to make this more efficient, this is using a lot of nested loops.
-        categories.forEach(category => {
-            if (category.subCategoriesStatus === 'not_fetched') {
-                getSubCategoriesByCategoryName(category.name, (subCategories) => {
-                    // Update categories with fetched subcategories and change their status
-                    setCategories(prevCategories => prevCategories.map(cat =>
-                        cat.name === category.name ? {
-                            ...cat,
-                            subCategories: subCategories.map(subCat => ({ ...subCat, treatmentPlansStatus: 'not_fetched' })),
-                            subCategoriesStatus: 'fetched'
-                        } : cat
-                    ));
+    const fetchSubCategories = async (categoryName) => {
+        const subCategories = await getSubCategoriesByCategoryName(categoryName);
+        return subCategories.map(subCat => ({
+            ...subCat,
+            treatmentPlans: [],
+            treatmentPlansStatus: 'not_fetched'
+        }));
+    };
 
-                    // Fetch treatment plans for each subcategory
-                    subCategories.forEach(subCategory => {
-                        if (subCategory.treatmentPlansStatus === 'not_fetched') {
-                            getTreatmentPlansBySubcategory(subCategory.name, (treatmentPlans) => {
-                                setCategories(prevCategories => prevCategories.map(cat =>
-                                    cat.name === category.name ? {
-                                        ...cat,
-                                        subCategories: cat.subCategories.map(subCat =>
-                                            subCat.name === subCategory.name ? { ...subCat, treatmentPlans, treatmentPlansStatus: 'fetched' } : subCat
-                                        )
-                                    } : cat
-                                ));
-                            });
-                        }
-                    });
-                });
-            }
-        });
-    }, [categories]);
+    const fetchTreatmentPlansForSubCategories = async (subCategories) => {
+        return Promise.all(
+            subCategories.map(async (subCategory) => {
+                const treatmentPlans = await getTreatmentPlansBySubcategory(subCategory.name);
+                return {
+                    ...subCategory,
+                    treatmentPlans,
+                    treatmentPlansStatus: treatmentPlans ? 'fetched' : 'not_fetched'
+                };
+            })
+        );
+    };
 
 
 

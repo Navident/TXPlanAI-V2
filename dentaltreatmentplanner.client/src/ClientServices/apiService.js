@@ -119,7 +119,7 @@ export const getCategories = async (setCategories) => {
 };
 
 // Function to get subcategories by category name
-export const getSubCategoriesByCategoryName = async (categoryName, setSubCategories) => {
+export const getSubCategoriesByCategoryName = async (categoryName) => {
     try {
         const response = await fetch(`${PROCEDURES_API_URL}/ProcedureCategory/subcategories/${categoryName}`, {
             method: 'GET',
@@ -132,16 +132,19 @@ export const getSubCategoriesByCategoryName = async (categoryName, setSubCategor
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
                 const data = await response.json();
-                setSubCategories(data);
                 console.log(`Subcategories for category Name ${categoryName}:`, data);
+                return data; // Return data
             } else {
                 console.log(`Received non-JSON response for category Name ${categoryName}`);
+                return []; // Return empty array in case of error
             }
         } else {
             console.error(`Failed to retrieve subcategories for category Name ${categoryName}. Status:`, response.status);
+            return []; // Return empty array in case of error
         }
     } catch (error) {
         console.error(`Error fetching subcategories for category Name ${categoryName}:`, error.message);
+        return []; // Return empty array in case of error
     }
 };
 

@@ -5,7 +5,6 @@ import twitterIconSmall from '../../assets/twitter-small-icon.svg';
 import googleIconSmall from '../../assets/google-small-icon.svg';
 import facebookIconSmall from '../../assets/facebook-small-icon.svg';
 import appleIconSmall from '../../assets/apple-small-icon.svg';
-
 import userIcon from '../../assets/user-icon.svg';
 import { TextField } from "@mui/material";
 import React, { useState } from 'react';
@@ -25,10 +24,14 @@ const Login = () => {
     const handleLoginClick = () => {
         navigate("/dashboard"); 
     };
+    const handleBackClick = () => {
+        navigate("/"); 
+    };
+
     return (
         <div className="login-wrapper">
             <HeaderBar
-                leftCornerElement={<img src={backButton} alt="Logo" />}
+                leftCornerElement={<img src={backButton} alt="Back" className="back-btn-arrow" onClick={handleBackClick} />}
                 rightCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
                 centerLogo={true}
             />

@@ -6,16 +6,24 @@ import './SignUp.css';
 import logo from '../../assets/navident-logo.svg';
 import circleIcon from '../../assets/circle-icon.svg';
 import backButton from '../../assets/back-button.svg';
+import { useNavigate } from 'react-router-dom';
+
 const Signup = () => {
     const [inputText, setInputText] = useState('');
+    const navigate = useNavigate();
+
     const handleInputChange = (event) => {
         setInputText(event.target.value);
     };
+    const handleBackClick = () => {
+        navigate("/");
+    };
+
     return (
         <div className="signup-wrapper">
             <div className="login-signup-container">
                 <HeaderBar
-                    leftCornerElement={<img src={backButton} alt="Logo" />}
+                    leftCornerElement={<img src={backButton} alt="Back" className="back-btn-arrow" onClick={handleBackClick} />}
                     rightCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
                     centerLogo={true}
                 />
