@@ -38,7 +38,7 @@ const DefaultProcedures = () => {
         ? categories.filter(category => category.name.toLowerCase().includes(inputText))
         : categories;
 
-    // Check if the current route is for editing a specific treatment plan
+    // Check if current route is for editing a specific treatment plan
     const isEditingTreatmentPlan = location.pathname.includes("/procedurescustomizer/");
 
     return (
@@ -49,7 +49,7 @@ const DefaultProcedures = () => {
                     <div className="dashboard-right-side-row">
                         <div className="semibold-black-title">Tx Plan Settings</div>
                         <TextField
-                            className="box-shadow"
+                            className="box-shadow rounded-box"
                             placeholder="Search Procedure Categories"
                             value={inputText}
                             onChange={handleInputChange}
