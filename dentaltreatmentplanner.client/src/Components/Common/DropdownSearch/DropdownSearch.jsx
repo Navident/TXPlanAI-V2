@@ -2,26 +2,24 @@ import React from 'react';
 import Select, { components } from 'react-select';
 import PropTypes from 'prop-types';
 
-const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
-    const options = cdtCodes.map(code => ({
-        value: code.code,
-        label: `${code.code} - ${code.longDescription}`,
-        longDescription: code.longDescription
+const DropdownSearch = ({ items, onSelect, selectedItem, valueKey, labelKey, itemLabelFormatter, width = 300, icon }) => {
+    const options = items.map(item => ({
+        value: item[valueKey],
+        label: itemLabelFormatter ? itemLabelFormatter(item) : item[labelKey],
+        ...item
     }));
 
     const handleChange = selectedOption => {
         onSelect(selectedOption ? selectedOption : null);
     };
 
-    // Custom SingleValue component to display only the code
-    const SingleValue = (props) => (
-        <components.SingleValue {...props}>
-            {props.data.value}
-        </components.SingleValue>
+    const SingleValue = ({ children, ...props }) => (
+        <components.SingleValue {...props}>{props.data.label}</components.SingleValue>
     );
 
-    // Find the option that matches the selectedCode
-    const selectedOption = options.find(option => option.value === selectedCode);
+    const selectedOption = selectedItem
+        ? options.find(option => option.value === selectedItem[valueKey])
+        : null;
 
     const customStyles = {
         control: (provided, state) => ({
@@ -35,7 +33,7 @@ const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
         option: (provided, state) => ({
             ...provided,
             backgroundColor: state.isFocused ? '#eeeef3' : provided.backgroundColor,
-            color: 'black', // Set text color to black
+            color: 'black',
             '&:hover': {
                 backgroundColor: '#eeeef3',
                 color: 'black', 
@@ -43,15 +41,20 @@ const DropdownSearch = ({ cdtCodes, onSelect, selectedCode }) => {
         }),
     };
 
-
+    const Control = ({ children, ...props }) => (
+        <components.Control {...props}>
+            {icon && <div className="tx-icon">{icon}</div>}
+            {children}
+        </components.Control>
+    );
 
     return (
-        <div style={{ width: 300 }}>
+        <div style={{ width }}>
             <Select
                 options={options}
                 onChange={handleChange}
-                components={{ SingleValue }}
-                value={selectedOption} // Control the selected value
+                components={{ SingleValue, Control }}
+                value={selectedOption}
                 styles={customStyles}
             />
         </div>

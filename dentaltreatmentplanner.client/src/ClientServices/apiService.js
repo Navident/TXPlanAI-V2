@@ -92,7 +92,7 @@ export const updateTreatmentPlan = async (id, updatedData) => {
 };
 
 // Function to get all categories
-export const getCategories = async (setCategories) => {
+export const getCategories = async () => {
     try {
         const response = await fetch(`${PROCEDURES_API_URL}/ProcedureCategory/categories`, {
             method: 'GET',
@@ -102,21 +102,19 @@ export const getCategories = async (setCategories) => {
         });
 
         if (response.ok) {
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                const data = await response.json();
-                setCategories(data);
-                console.log("Categories:", data);
-            } else {
-                console.log("Received non-JSON response when fetching categories");
-            }
+            const data = await response.json();
+            console.log("Categories:", data);
+            return data; // Return data
         } else {
             console.error("Failed to retrieve categories. Status:", response.status);
+            return []; // Return empty array in case of error
         }
     } catch (error) {
         console.error("Error fetching categories:", error.message);
+        return []; // Return empty array in case of error
     }
 };
+
 
 // Function to get subcategories by category name
 export const getSubCategoriesByCategoryName = async (categoryName) => {

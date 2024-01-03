@@ -1,73 +1,36 @@
 import './DefaultProceduresManagement.css';
-import HeaderBar from "../Common/HeaderBar/HeaderBar";
-import circleIcon from '../../assets/circle-icon.svg';
-import userIcon from '../../assets/user-icon.svg';
-import editIcon from '../../assets/pencil-edit-icon.svg';
-import { useNavigate } from 'react-router-dom';
+import TXicon from '../../assets/tx-icon.svg';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-
-
+import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import { useState, useEffect } from 'react';
-import { getCategories, getTreatmentPlansBySubcategory, getSubCategoriesByCategoryName } from '../../ClientServices/apiService';
+import InputAdornment from '@mui/material/InputAdornment';
+import searchIcon from '../../assets/search-icon.svg';
+import TextField from '@mui/material/TextField';
 
 const DefaultProcedures = () => {
-    const [categories, setCategories] = useState([]);
+    const { categories } = useOutletContext();
+    const [inputText, setInputText] = useState('');
     const navigate = useNavigate();
+    const [selectedSubcategories, setSelectedSubcategories] = useState({});
 
-    useEffect(() => {
-        getCategories(async (fetchedCategories) => {
-            console.log("Fetched Categories with Structure:", fetchedCategories);
-            const categoriesWithStatus = fetchedCategories.map(category => ({
-                ...category,
-                subCategories: [],
-                subCategoriesStatus: 'not_fetched'
-            }));
-
-            // Fetch subcategories and treatment plans in parallel
-            const categoriesWithSubcategories = await Promise.all(
-                categoriesWithStatus.map(async (category) => {
-                    const subCategories = await fetchSubCategories(category.name);
-                    const subCategoriesWithTreatmentPlans = await fetchTreatmentPlansForSubCategories(subCategories);
-                    return {
-                        ...category,
-                        subCategories: subCategoriesWithTreatmentPlans,
-                        subCategoriesStatus: 'fetched'
-                    };
-                })
-            );
-
-            setCategories(categoriesWithSubcategories);
-        });
-    }, []);
-
-    const fetchSubCategories = async (categoryName) => {
-        const subCategories = await getSubCategoriesByCategoryName(categoryName);
-        return subCategories.map(subCat => ({
-            ...subCat,
-            treatmentPlans: [],
-            treatmentPlansStatus: 'not_fetched'
+    const handleEditClick = (categoryId) => {
+        const subcategory = selectedSubcategories[categoryId];
+        if (subcategory) {
+            navigate(`/dashboard/defaultprocedures/procedurescustomizer/${subcategory.name}`);
+        }
+    };
+    
+    const handleInputChange = (event) => {
+        setInputText(event.target.value);
+    };
+    const handleSubcategorySelect = (categoryId, subcategory) => {
+        setSelectedSubcategories(prevSelected => ({
+            ...prevSelected,
+            [categoryId]: subcategory
         }));
     };
 
-    const fetchTreatmentPlansForSubCategories = async (subCategories) => {
-        return Promise.all(
-            subCategories.map(async (subCategory) => {
-                const treatmentPlans = await getTreatmentPlansBySubcategory(subCategory.name);
-                return {
-                    ...subCategory,
-                    treatmentPlans,
-                    treatmentPlansStatus: treatmentPlans ? 'fetched' : 'not_fetched'
-                };
-            })
-        );
-    };
-
-
-
-    const handleEditClick = (subcategoryName) => {
-        navigate(`/dashboard/defaultprocedures/procedurescustomizer/${subcategoryName}`);
-    };
     // Check if the current route is for editing a specific treatment plan
     const isEditingTreatmentPlan = location.pathname.includes("/procedurescustomizer/");
 
@@ -75,32 +38,62 @@ const DefaultProcedures = () => {
         isEditingTreatmentPlan ? (
             <Outlet />
         ) : (
-            <div className="default-procedure-management-wrapper">
-                <div className="large-text">Procedure Defaults</div>
-
-                <div className="edit-procedures-container rounded-box">
+                <div className="default-procedure-management-wrapper">
+                    <div className="dashboard-right-side-row">
+                        <div className="semibold-black-title">Tx Plan Settings</div>
+                        <TextField
+                            className="box-shadow"
+                            placeholder="Search Procedure Categories"
+                            value={inputText}
+                            onChange={handleInputChange}
+                            sx={{
+                                width: '350px',
+                                backgroundColor: 'white',
+                                '& label.Mui-focused': {
+                                    color: '#7777a1',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: 'rgba(0, 0, 0, 0)',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#7777a1',
+                                    },
+                                },
+                            }}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <img src={searchIcon} alt="Search" />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            />
+                    </div>
+                <div className="edit-procedures-container rounded-box box-shadow">
                     <div className="edit-procedures-inner">
-                        <div className="centered-title large-text">Procedure Categories</div>
                         {categories.map(category => (
-                            <div className="table-container" key={category.procedureCategoryId}>
-                                <div className="edit-procedures-table-outer-header large-text">{category.name}</div>
-                                <table className="tx-table">
-                                    <thead>
-                                        <tr className="table-inner-header">
-                                            <th>Sub-Categories</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {category.subCategories?.map(subCategory => (
-                                            <tr key={subCategory.procedureSubCategoryId}>
-                                                <td>
-                                                    {subCategory.name}
-                                                    <img src={editIcon} className="edit-button" alt="Edit" onClick={() => handleEditClick(subCategory.name)} />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="dropdown-container" key={category.procedureCategoryId}>
+                                <div className="dropdown-header large-text">{category.name}</div>
+                                <DropdownSearch
+                                    items={category.subCategories}
+                                    onSelect={(subcategory) => handleSubcategorySelect(category.procedureCategoryId, subcategory)}
+                                    selectedItem={selectedSubcategories[category.procedureCategoryId]}
+                                    valueKey="procedureSubCategoryId"
+                                    labelKey="name"
+                                    width="100%"
+                                    icon={<img src={TXicon} alt="TXicon" /> }
+                                />
+                                <div className="light-grey-text">
+                                    Make a selection, then click <span className="underlined-text" onClick={() => handleEditClick(category.procedureCategoryId)}>Edit</span>
+                                </div>
+
                             </div>
                         ))}
                     </div>
@@ -108,6 +101,7 @@ const DefaultProcedures = () => {
             </div>
         )
     );
-
 };
+
 export default DefaultProcedures;
+

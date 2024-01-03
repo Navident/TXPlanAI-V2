@@ -1,8 +1,5 @@
 
 import './ProceduresCustomizer.css';
-import HeaderBar from '../../Common/HeaderBar/HeaderBar.jsx';
-import circleIcon from '../../../assets/circle-icon.svg';
-import userIcon from '../../../assets/user-icon.svg';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTreatmentPlansBySubcategory } from '../../../ClientServices/apiService';
@@ -67,7 +64,7 @@ const ProceduresCustomizer = () => {
     return (
         <div className="procedure-customizer-wrapper">
             <div className="large-text">Edit Procedure Defaults</div>
-            <div className="edit-procedures-container rounded-box">
+            <div className="edit-procedures-container rounded-box box-shadow">
                 <div className="edit-procedures-inner">
                     <div className="large-text">Procedure Category: Crowns</div>
                     <div className="large-text">Procedure Sub-Category: {subcategory}</div>

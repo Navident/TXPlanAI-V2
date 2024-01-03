@@ -288,6 +288,15 @@ nav {
     cursor: pointer;
 }
 
+
+
+.box-shadow {
+    -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
 .green-button {
     width: 260px;
     padding: 15px;
@@ -310,10 +319,22 @@ nav {
     margin-top: 80px;
 }
 
+.semibold-black-title {
+    font-size: 21px;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
 .underlined-text {
     text-decoration: underline;
+    color: black;
+    
 }
+    .underlined-text:hover {
+        color: #7777a1;
+        cursor:pointer;
+    }
+
 
 .primary-subheading {
     font-weight: 700;

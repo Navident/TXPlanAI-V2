@@ -29,11 +29,12 @@ const Home = () => {
                     </div>
                 </div>
                 <TextField
+                    className="box-shadow"
                     placeholder="Search Patient"
                     value={inputText}
                     onChange={handleInputChange}
                     sx={{
-                        width: '100%',
+                        width: '350px',
                         backgroundColor: 'white',
                         '& label.Mui-focused': {
                             color: '#7777a1',
@@ -64,23 +65,23 @@ const Home = () => {
 
             </div>
             <div className="dashboard-right-side-row">
-                <div className="dashboard-right-side-row-box first-box rounded-box">
+                <div className="dashboard-right-side-row-box first-box rounded-box box-shadow">
                     <div className="large-text">Generate TX Plan</div>
                     <div className="dashboard-right-side-row-box-bottom-section">
                         <img src={createNewButton} alt="Create New TX Plan" onClick={handleGenerateTxButtonClick} />
                     </div>
                 </div>
-                <div className="dashboard-right-side-row-box rounded-box">
+                <div className="dashboard-right-side-row-box rounded-box box-shadow">
                     <div className="large-text">Recent TX Plans</div>
                     <div className="dashboard-right-side-row-box-bottom-section"></div>
                 </div>
-                <div className="dashboard-right-side-row-box rounded-box">
+                <div className="dashboard-right-side-row-box rounded-box box-shadow">
                     <div className="large-text">Providers</div>
                     <div className="dashboard-right-side-row-box-bottom-section"></div>
                 </div>
             </div>
             <div className="dashboard-right-side-row">
-                <div className="dashboard-right-side-row-box rounded-box">
+                <div className="dashboard-right-side-row-box rounded-box box-shadow">
                     <div className="large-text">TX Plans Generated</div>
                     <div className="dashboard-right-side-row-box-bottom-section rounded-box"></div>
                 </div>

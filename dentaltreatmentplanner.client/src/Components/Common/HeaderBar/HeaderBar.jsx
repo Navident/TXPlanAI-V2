@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const HeaderBar = ({ leftCornerElement, rightCornerElement, centerLogo }) => {
     return (
-        <div className="header-bar">
+        <div className="header-bar box-shadow">
             <div className="header-left-corner-container">
                 {leftCornerElement}
             </div>

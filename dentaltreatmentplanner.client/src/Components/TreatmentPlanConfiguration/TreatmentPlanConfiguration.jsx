@@ -39,24 +39,24 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
     };
 
     const createDynamicRow = (visitId, initialRowId) => {
+        const cdtCodeOptions = cdtCodes.map(code => ({
+            id: code.code, // Assuming 'code' is a unique identifier for CDT codes
+            ...code
+        }));
+
+        const dropdownSearchElement = (
+            <DropdownSearch
+                key={initialRowId}
+                items={cdtCodeOptions}
+                selectedItem={''}
+                onSelect={(selectedCode) => handleSelect(selectedCode, visitId, initialRowId)}
+                itemLabelFormatter={(cdtCode) => `${cdtCode.code} - ${cdtCode.longDescription}`}
+            />
+        );
+
         const extraRowInput = showToothNumber
-            ? [
-                treatmentPlan.toothNumber,
-                <DropdownSearch
-                    key={initialRowId}
-                    cdtCodes={cdtCodes}
-                    selectedCode={''}
-                    onSelect={(selectedCode) => handleSelect(selectedCode, visitId, initialRowId)}
-                />
-            ]
-            : [
-                <DropdownSearch
-                    key={initialRowId}
-                    cdtCodes={cdtCodes}
-                    selectedCode={''}
-                    onSelect={(selectedCode) => handleSelect(selectedCode, visitId, initialRowId)}
-                />
-            ];
+            ? [treatmentPlan.toothNumber, dropdownSearchElement]
+            : [dropdownSearchElement];
 
         return {
             id: initialRowId,
@@ -65,6 +65,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
             extraRowInput
         };
     };
+
 
     useEffect(() => {
         if (isInitialLoad.current) {
@@ -460,10 +461,15 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                                                     '', // Placeholder for the "Tooth #" column
                                                     <DropdownSearch
                                                         key={row.id}
-                                                        cdtCodes={cdtCodes}
-                                                        selectedCode={row.selectedCdtCode}
+                                                        items={cdtCodes}
+                                                        selectedItem={row.selectedCdtCode}
                                                         onSelect={(selectedCode) => handleSelect(selectedCode, visit.visitId, row.id)}
-                                                    />,
+                                                        itemLabelFormatter={(cdtCode) => `${cdtCode.code} - ${cdtCode.longDescription}`}
+                                                        valueKey="code" 
+                                                        labelKey="longDescription" 
+                                                    />
+
+,
                                                     row.description
                                                 ];
                                             } else {
@@ -472,10 +478,15 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, cdtCodes, onAddVisit, onUpd
                                                     '', // Placeholder for Tooth number
                                                     <DropdownSearch
                                                         key={dropdownKey}
-                                                        cdtCodes={cdtCodes}
-                                                        selectedCode={row.selectedCdtCode}
+                                                        items={cdtCodes}
+                                                        selectedItem={row.selectedCdtCode}
                                                         onSelect={(selectedCode) => handleSelect(selectedCode, visit.visitId, row.id)}
-                                                    />,
+                                                        itemLabelFormatter={(cdtCode) => `${cdtCode.code} - ${cdtCode.longDescription}`}
+                                                        valueKey="code" 
+                                                        labelKey="longDescription" 
+                                                    />
+
+,
                                                     row.description
                                                 ];
                                             }

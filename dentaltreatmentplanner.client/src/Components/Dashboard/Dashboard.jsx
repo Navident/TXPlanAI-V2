@@ -4,19 +4,50 @@ import logo from '../../assets/navident-logo.svg';
 import circleIcon from '../../assets/circle-icon.svg';
 import userIcon from '../../assets/user-icon.svg';
 
-import SideBar from "../SideBar/SideBar";
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import RoundedButton from "../Common/RoundedButton/RoundedButton";
+import SideBar from "./SideBar/SideBar";
 import './Dashboard.css';
-import { TextField } from "@mui/material";
-import React, { useState } from 'react';
-import InputLabel from '@mui/material/InputLabel';
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { getCategories, getTreatmentPlansBySubcategory, getSubCategoriesByCategoryName } from '../../ClientServices/apiService';
 
 
 const Dashboard = () => {
+    const [categories, setCategories] = useState([]);
 
+    useEffect(() => {
+        const fetchCategoriesAndDetails = async () => {
+            try {
+                const fetchedCategories = await getCategories();
+
+                const categoriesWithSubcategories = await Promise.all(
+                    fetchedCategories.map(async (category) => {
+                        const subCategories = await getSubCategoriesByCategoryName(category.name);
+                        const subCategoriesWithTreatmentPlans = await Promise.all(
+                            subCategories.map(async (subCategory) => {
+                                const treatmentPlans = await getTreatmentPlansBySubcategory(subCategory.name);
+                                return {
+                                    ...subCategory,
+                                    treatmentPlans,
+                                    treatmentPlansStatus: treatmentPlans ? 'fetched' : 'not_fetched'
+                                };
+                            })
+                        );
+                        return {
+                            ...category,
+                            subCategories: subCategoriesWithTreatmentPlans,
+                            subCategoriesStatus: 'fetched'
+                        };
+                    })
+                );
+
+                setCategories(categoriesWithSubcategories);
+            } catch (error) {
+                console.error('Error fetching category data:', error);
+            }
+        };
+
+        fetchCategoriesAndDetails();
+    }, []);
     return (
         <div className="dashboard-wrapper">
             <div className="tx-container">
@@ -28,7 +59,7 @@ const Dashboard = () => {
                 <div className="tx-main-content">
                     <SideBar />
                     <div className="tx-content-area">                       
-                        <Outlet />
+                        <Outlet context={{ categories }} />
                     </div>
                 </div>
             </div>

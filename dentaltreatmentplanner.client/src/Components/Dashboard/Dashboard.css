@@ -38,6 +38,7 @@
 .dashboard-right-side-row-top-text-section {
     color: #4a5759;
     padding-right: 60px;
+    max-width: 600px;
 }
 .dashboard-text-header{
     font-size: 36px;
