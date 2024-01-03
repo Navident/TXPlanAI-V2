@@ -45,6 +45,7 @@
 }
 .dashboard-right-side-row:nth-child(n+2) {
     flex-grow: 1;
+    flex-basis: 0;
 }
 
 .dashboard-right-side-row-box-bottom-section {
