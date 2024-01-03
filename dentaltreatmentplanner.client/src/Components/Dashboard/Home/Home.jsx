@@ -40,6 +40,7 @@ const Home = () => {
                             color: '#7777a1',
                         },
                         '& .MuiOutlinedInput-root': {
+                            borderRadius: '15px', 
                             '& fieldset': {
                                 borderColor: 'rgba(0, 0, 0, 0)',
                             },
@@ -62,6 +63,7 @@ const Home = () => {
                         ),
                     }}
                 />
+
 
             </div>
             <div className="dashboard-right-side-row">
