@@ -36,8 +36,16 @@ const SideBar = () => {
 
     const isActive = (path) => {
         const currentPath = path ? `/dashboard/${path}` : '/dashboard';
-        return location.pathname === currentPath;
+
+        // Check for root path and ensure it's not a part of a longer path
+        if (!path) {
+            return location.pathname === currentPath;
+        }
+
+        // Check if the current path starts with the constructed path and that it's not just the root path
+        return location.pathname.startsWith(currentPath) && location.pathname !== '/dashboard';
     };
+
 
     const handleMouseEnter = (index) => {
         setHoveredItem(index);

@@ -93,7 +93,7 @@ const TreatmentPlanOutput = () => {
                 <div className="tx-content-area">
                     <div className="dashboard-top-row">
 
-                        <div className="patient-info-section rounded-box">
+                        <div className="patient-info-section rounded-box box-shadow">
                             <div className="patient-info-inner-container ">
                                 <div className="grid-item"></div>
                                 <div className="grid-item">
@@ -131,11 +131,12 @@ const TreatmentPlanOutput = () => {
                     <div className="dashboard-bottom-row">
                         <div className="dashboard-bottom-inner-row">
                             <div className="large-text">Create New TX Plan</div>
-                            <div className="create-treatment-plan-section rounded-box">
+                            <div className="create-treatment-plan-section rounded-box box-shadow">
                                 <div className="create-treatment-plan-section-inner">
                                     <img src={PenIcon} alt="Edit" />
                                     <div className="large-text">What can I help you treatment plan today?</div>
                                     <TextField
+                                        className="box-shadow"
                                         label="Input your text"
                                         multiline
                                         minRows={3}
@@ -163,7 +164,7 @@ const TreatmentPlanOutput = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="treatment-plan-output-section rounded-box">
+                            <div className="treatment-plan-output-section rounded-box box-shadow">
                                 <div className="treatment-plan-output-section-inner">
                                     <div className="large-text">Treatment Plan</div>
                                     {treatmentPlans.map((plan, index) => (

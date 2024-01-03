@@ -16,25 +16,24 @@ import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/
 function App() {
     return (
         <div className="App">
-            
-                <Routes>
-                    <Route path="/" element={<Landing />} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
+            <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/login" element={<Login />} />
 
-                    <Route path="/dashboard" element={<Dashboard />}>
-                        <Route index element={<Home />} />
-                        <Route path="defaultprocedures" element={<DefaultProcedures />}>
-                            <Route path="procedurescustomizer/:subcategory" element={<ProceduresCustomizer />}>
-                                <Route path="treatmentplanconfiguration" element={<TreatmentPlanConfiguration />} />
-                            </Route>
-                        </Route>
+                <Route path="/dashboard" element={<Dashboard />}>
+                    <Route index element={<Home />} />
+                    <Route path="defaultprocedures" element={<DefaultProcedures />}>
+                        <Route path="procedurescustomizer/:category/:subcategory" element={<ProceduresCustomizer />} />
+                        <Route path="treatmentplanconfiguration" element={<TreatmentPlanConfiguration />} />
                     </Route>
+                </Route>
 
-                    <Route path="/treatmentplanoutput" element={<TreatmentPlanOutput />} />
-                </Routes>
+                <Route path="/treatmentplanoutput" element={<TreatmentPlanOutput />} />
+            </Routes>
         </div>
     );
 }
 
 export default App;
+

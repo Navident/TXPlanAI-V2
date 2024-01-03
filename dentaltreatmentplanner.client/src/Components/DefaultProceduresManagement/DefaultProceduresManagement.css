@@ -58,10 +58,11 @@
     position:relative;
 }
 
-.default-procedure-management-wrapper{
+.default-procedure-management-wrapper {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    flex-grow: 1;
 }
 
 .tx-icon {

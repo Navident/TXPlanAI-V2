@@ -15,8 +15,9 @@
     border-right: none;
 }
 
-.procedure-customizer-wrapper{
+.procedure-customizer-wrapper {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    flex-grow: 1;
 }

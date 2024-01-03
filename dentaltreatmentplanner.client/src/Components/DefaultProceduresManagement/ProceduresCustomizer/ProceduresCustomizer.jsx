@@ -12,6 +12,7 @@ const ProceduresCustomizer = () => {
     const [cdtCodes, setCdtCodes] = useState([]);
     const params = useParams();
     const subcategory = params.subcategory;
+    const category = params.category;
 
     const getOrderKey = (treatmentPlan) => {
         return treatmentPlan.visits.map(visit => visit.visitId).join('-');
@@ -66,13 +67,12 @@ const ProceduresCustomizer = () => {
             <div className="large-text">Edit Procedure Defaults</div>
             <div className="edit-procedures-container rounded-box box-shadow">
                 <div className="edit-procedures-inner">
-                    <div className="large-text">Procedure Category: Crowns</div>
+                    <div className="large-text">Procedure Category: {category}</div>
                     <div className="large-text">Procedure Sub-Category: {subcategory}</div>
                     <div>
                         {cdtCodes.length > 0 && treatmentPlans.length > 0 &&
                             treatmentPlans.map((plan, index) => {
-                                const key = index; // Or another unique identifier from your plan
-                                console.log(`Rendering TreatmentPlanConfiguration with key: ${key}`);
+                                const key = index; 
                                 return (
                                     <TreatmentPlanConfiguration
                                         key={key}

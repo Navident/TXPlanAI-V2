@@ -18,7 +18,7 @@ const Signup = () => {
     const handleBackClick = () => {
         navigate("/");
     };
-
+    
     return (
         <div className="signup-wrapper">
             <div className="login-signup-container">
@@ -27,7 +27,7 @@ const Signup = () => {
                     rightCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
                     centerLogo={true}
                 />
-                <div className="login-signup-content">
+                <div className="login-signup-content box-shadow">
                     <div className="login-signup-header large-text">Create an account</div>
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Email Address or user name</div>
@@ -40,12 +40,16 @@ const Signup = () => {
                                     color: '#7777a1',
                                 },
                                 '& .MuiOutlinedInput-root': {
+                                    '&:hover fieldset': {
+                                        borderColor: '#7777a1', // Border color on hover
+                                    },
                                     '&.Mui-focused fieldset': {
-                                        borderColor: '#7777a1',
+                                        borderColor: '#7777a1', // Border color on focus
                                     },
                                 },
                             }}
                         />
+
                     </div>
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Phone Number</div>
@@ -58,12 +62,16 @@ const Signup = () => {
                                     color: '#7777a1',
                                 },
                                 '& .MuiOutlinedInput-root': {
+                                    '&:hover fieldset': {
+                                        borderColor: '#7777a1', // Border color on hover
+                                    },
                                     '&.Mui-focused fieldset': {
-                                        borderColor: '#7777a1',
+                                        borderColor: '#7777a1', // Border color on focus
                                     },
                                 },
                             }}
                         />
+
                     </div>
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Business Name</div>
@@ -76,12 +84,16 @@ const Signup = () => {
                                     color: '#7777a1',
                                 },
                                 '& .MuiOutlinedInput-root': {
+                                    '&:hover fieldset': {
+                                        borderColor: '#7777a1', // Border color on hover
+                                    },
                                     '&.Mui-focused fieldset': {
-                                        borderColor: '#7777a1',
+                                        borderColor: '#7777a1', // Border color on focus
                                     },
                                 },
                             }}
                         />
+
                     </div>
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Password</div>
@@ -94,12 +106,16 @@ const Signup = () => {
                                     color: '#7777a1',
                                 },
                                 '& .MuiOutlinedInput-root': {
+                                    '&:hover fieldset': {
+                                        borderColor: '#7777a1', // Border color on hover
+                                    },
                                     '&.Mui-focused fieldset': {
-                                        borderColor: '#7777a1',
+                                        borderColor: '#7777a1', // Border color on focus
                                     },
                                 },
                             }}
                         />
+
                     </div>
                     <RoundedButton
                         text="Sign up"
