@@ -15,6 +15,7 @@ import { loginUser } from '../../ClientServices/apiService';
 import './Login.css'; 
 import Alert from '../Common/Alert/Alert';
 import { useBusiness } from '../../Contexts/useBusiness';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -22,6 +23,8 @@ const Login = () => {
     const navigate = useNavigate();
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const { setBusinessName } = useBusiness(); 
+    const [loading, setLoading] = useState(false); // new state for loading
+
 
     const handleEmailChange = (event) => {
         setEmail(event.target.value);
@@ -32,9 +35,11 @@ const Login = () => {
     };
 
     const handleLoginClick = async () => {
+        setLoading(true); // Start loading
         const credentials = { email, password };
         const response = await loginUser(credentials);
-        console.log("Login response:", response);
+
+        setLoading(false); // Stop loading
 
         if (response.isSuccess) {
             console.log("Calling setBusinessName with:", response.businessName);
@@ -58,6 +63,10 @@ const Login = () => {
 
     return (
         <div className="login-wrapper">
+            <Backdrop open={loading} style={{ zIndex: 100 }}>
+                <CircularProgress style={{ color: 'white' }} />
+            </Backdrop>
+
             {alertInfo.type && (
                 <Alert
                     open={alertInfo.open}

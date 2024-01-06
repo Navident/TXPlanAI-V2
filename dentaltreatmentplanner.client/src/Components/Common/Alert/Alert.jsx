@@ -16,6 +16,7 @@ const Alert = ({ open, handleClose, type, message }) => {
             onClose={handleClose}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             TransitionComponent={SlideTransition}
+            transitionDuration={700}
         >
             <MuiAlert
                 elevation={6}
