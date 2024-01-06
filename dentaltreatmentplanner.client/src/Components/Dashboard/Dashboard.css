@@ -26,6 +26,11 @@
     position: relative;
 
 }
+
+.headerbar-business-name {
+    color: #4a5759;
+    font-size: 20px;
+}
 .dashboard-right-side-row:nth-child(n+2) .large-text::after {
     content: '';
     display: block;

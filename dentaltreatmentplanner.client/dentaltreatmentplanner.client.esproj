@@ -11,6 +11,7 @@
   <ItemGroup>
     <Folder Include="src\Components\Common\HeaderBar\" />
     <Folder Include="src\ClientServices\" />
+    <Folder Include="src\Components\Common\Alert\" />
     <Folder Include="src\Components\Dashboard\Home\" />
     <Folder Include="src\Components\PatientManagement\PatientList\" />
     <Folder Include="src\Components\PatientManagement\SearchPatient\" />

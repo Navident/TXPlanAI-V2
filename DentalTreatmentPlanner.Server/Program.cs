@@ -1,6 +1,8 @@
 using Azure.Identity;
-using DentalTreatmentPlanner.Server.Data; 
+using DentalTreatmentPlanner.Server.Data;
+using DentalTreatmentPlanner.Server.Models;
 using DentalTreatmentPlanner.Server.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -16,12 +18,14 @@ Console.WriteLine($"VaultUri: {vaultUri}");
 var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
 builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
-// Add services to the container.
-
 // Add DbContext using SQL Server Provider
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add ASP.NET Core Identity services
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>() 
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 // Register DentalTreatmentPlanner service
 builder.Services.AddScoped<DentalTreatmentPlannerService>();
@@ -64,6 +68,8 @@ app.UseCors("MyCorsPolicy");
 
 app.UseHttpsRedirection();
 
+// Use Authentication and Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -3,17 +3,69 @@ using DentalTreatmentPlanner.Server.Models;
 using DentalTreatmentPlanner.Server.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace DentalTreatmentPlanner.Server.Services
 {
     public class DentalTreatmentPlannerService
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager; 
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public DentalTreatmentPlannerService(ApplicationDbContext context)
+        public DentalTreatmentPlannerService(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager 
+        )
         {
             _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
+
+        public async Task<IdentityResult> RegisterUserAsync(RegisterUserDto registerUserDto)
+        {
+            if (registerUserDto.Password != registerUserDto.ConfirmPassword)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Passwords do not match" });
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = registerUserDto.Email,
+                Email = registerUserDto.Email,
+                PhoneNumber = string.IsNullOrWhiteSpace(registerUserDto.PhoneNumber) ? null : registerUserDto.PhoneNumber,
+                BusinessName = registerUserDto.BusinessName
+            };
+
+            var result = await _userManager.CreateAsync(user, registerUserDto.Password);
+
+            return result;
+        }
+
+
+
+        public async Task<(SignInResult, ApplicationUser)> LoginUserAsync(LoginUserDto loginUserDto)
+        {
+            var result = await _signInManager.PasswordSignInAsync(loginUserDto.Email, loginUserDto.Password, loginUserDto.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
+                return (result, user); // Return the sign-in result and the user details
+            }
+
+            return (result, null);
+        }
+
+
+        public async Task LogoutUserAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
+
+
 
         // Method to retrieve a treatment plan by a treatment plan id
         public async Task<RetrieveTreatmentPlanDto> GetTreatmentPlanAsync(int treatmentPlanId)

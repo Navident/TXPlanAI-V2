@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
+import { useBusiness } from '../../../Contexts/useBusiness';
 
 const Home = () => {
     const navigate = useNavigate();
     const [inputText, setInputText] = useState('');
+    const { businessName } = useBusiness();
     const handleInputChange = (event) => {
         setInputText(event.target.value);
     };
@@ -21,7 +23,7 @@ const Home = () => {
         <div className="dashboard-right-side">
             <div className="dashboard-right-side-row">
                 <div className="dashboard-right-side-row-top-text-section">
-                    <div className="dashboard-text-header">Hi The Dental Office,</div>
+                    <div className="dashboard-text-header">Hi {businessName || 'The Dental Office'},</div>
                     <div>
                         You can manage your providers, add patients, generate new tx plans,
                         or view/edit existing tx plans.

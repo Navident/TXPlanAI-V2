@@ -11,10 +11,12 @@ import DefaultProcedures from "./Components/DefaultProceduresManagement/DefaultP
 import ProceduresCustomizer from "./Components/DefaultProceduresManagement/ProceduresCustomizer/ProceduresCustomizer";
 import TreatmentPlanOutput from './Components/TreatmentPlanOutput/TreatmentPlanOutput';
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
-
+import { BusinessProvider } from './Contexts/BusinessProvider';
 
 function App() {
+    console.log("App component is rendering");
     return (
+        <BusinessProvider>
         <div className="App">
             <Routes>
                 <Route path="/" element={<Landing />} />
@@ -31,7 +33,8 @@ function App() {
 
                 <Route path="/treatmentplanoutput" element={<TreatmentPlanOutput />} />
             </Routes>
-        </div>
+            </div>
+        </BusinessProvider>
     );
 }
 

@@ -1,10 +1,10 @@
-﻿//using DentalTreatmentPlanner.Server.Models;
-using DentalTreatmentPlanner.Server.Models;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using DentalTreatmentPlanner.Server.Models;
 
 namespace DentalTreatmentPlanner.Server.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -18,8 +18,6 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<Provider> Providers { get; set; }
         public DbSet<TreatmentPlan> TreatmentPlans { get; set; }
         public DbSet<Visit> Visits { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<CdtCode> CdtCodes { get; set; }
         public DbSet<CdtCodeCategory> CdtCodeCategories { get; set; }
         public DbSet<CdtCodeSubcategory> CdtCodeSubcategories { get; set; }
@@ -88,7 +86,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.FacilityProviderMapId).HasColumnName("facility_provider_map_id");
-                entity.Property(e => e.ProcedureSubcategoryId).HasColumnName("procedure_subcategory_id"); // Corrected name
+                entity.Property(e => e.ProcedureSubcategoryId).HasColumnName("procedure_subcategory_id"); 
                 entity.Property(e => e.ToothNumber).HasColumnName("tooth_number");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
@@ -106,20 +104,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
             });
-            modelBuilder.Entity<UserRole>().ToTable("user_role");
-            // Map User entity
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.ToTable("user");
-                entity.Property(e => e.UserId).HasColumnName("user_id");
-                entity.Property(e => e.UserRoleId).HasColumnName("user_role_id");
-                entity.Property(e => e.LastName).HasColumnName("last_name");
-                entity.Property(e => e.FirstName).HasColumnName("first_name");
-                entity.Property(e => e.LastLogin).HasColumnName("last_login");
-                entity.Property(e => e.Disabled).HasColumnName("disabled");
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
-            });
+
             // Map CdtCode entity
             modelBuilder.Entity<CdtCode>(entity =>
             {

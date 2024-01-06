@@ -8,6 +8,72 @@ const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/vis
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 
+export const registerUser = async (userData) => {
+    try {
+        const response = await fetch('https://localhost:7089/api/account/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (response.ok) {
+            console.log('User registered successfully');
+            return await response.json();
+        } else {
+            console.error('Failed to register user. Status:', response.status, response.statusText);
+            return await response.json();
+        }
+    } catch (error) {
+        console.error('Error during user registration:', error);
+    }
+};
+
+export const loginUser = async (credentials) => {
+    try {
+        const response = await fetch('https://localhost:7089/api/account/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials)
+        });
+
+        const data = await response.json(); // Always parse the JSON regardless of the response status
+
+        if (response.ok) {
+            console.log('User logged in successfully');
+            return { isSuccess: true, ...data };
+        } else {
+            console.error('Failed to login user. Status:', response.status, response.statusText);
+            return { isSuccess: false, ...data }; // Return an object that includes the success status
+        }
+    } catch (error) {
+        console.error('Error during user login:', error);
+        return { isSuccess: false, message: error.toString() }; // Return consistent object format for errors
+    }
+};
+
+
+export const logoutUser = async () => {
+    try {
+        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            console.log('User logged out successfully');
+        } else {
+            console.error('Failed to logout user. Status:', response.status, response.statusText);
+        }
+    } catch (error) {
+        console.error('Error during user logout:', error);
+    }
+};
 
 // Function to generate a treatment plan
 export const generateTreatmentPlan = async (parsedData, setTreatmentPlanId) => {

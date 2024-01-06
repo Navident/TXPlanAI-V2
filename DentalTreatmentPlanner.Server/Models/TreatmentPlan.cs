@@ -13,7 +13,7 @@
 
         public FacilityProviderMap FacilityProviderMap { get; set; }
         public ProcedureSubCategory ProcedureSubcategory { get; set; } 
-        public User CreatedUser { get; set; }
+        //public User CreatedUser { get; set; }
         public ICollection<Visit> Visits { get; set; }
     }
 }

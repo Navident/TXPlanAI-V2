@@ -11,25 +11,61 @@ import React, { useState } from 'react';
 import RoundedButton from "../Common/RoundedButton/RoundedButton";
 import { useNavigate } from 'react-router-dom';
 import backButton from '../../assets/back-button.svg';
-
+import { loginUser } from '../../ClientServices/apiService';
 import './Login.css'; 
+import Alert from '../Common/Alert/Alert';
+import { useBusiness } from '../../Contexts/useBusiness';
 
 const Login = () => {
-    const [inputText, setInputText] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
+    const { setBusinessName } = useBusiness(); 
 
-    const handleInputChange = (event) => {
-        setInputText(event.target.value);
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value);
     };
-    const handleLoginClick = () => {
-        navigate("/dashboard"); 
+
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value);
     };
+
+    const handleLoginClick = async () => {
+        const credentials = { email, password };
+        const response = await loginUser(credentials);
+        console.log("Login response:", response);
+
+        if (response.isSuccess) {
+            console.log("Calling setBusinessName with:", response.businessName);
+            setBusinessName(response.businessName);
+            navigate("/dashboard");
+        } else {
+            // Handle failed login
+            console.error('Login failed:', response.message);
+            setAlertInfo({ open: true, type: 'error', message: 'Invalid login' });
+        }
+    };
+
+
+
     const handleBackClick = () => {
         navigate("/"); 
+    };
+    const handleCloseAlert = () => {
+        setAlertInfo({ ...alertInfo, open: false });
     };
 
     return (
         <div className="login-wrapper">
+            {alertInfo.type && (
+                <Alert
+                    open={alertInfo.open}
+                    handleClose={handleCloseAlert}
+                    type={alertInfo.type}
+                    message={alertInfo.message}
+                />
+            )}
             <HeaderBar
                 leftCornerElement={<img src={backButton} alt="Back" className="back-btn-arrow" onClick={handleBackClick} />}
                 rightCornerElement={<img src={logo} alt="Logo" className="navident-logo" />}
@@ -41,8 +77,8 @@ const Login = () => {
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Email Address or user name</div>
                         <TextField
-                            value={inputText}
-                            onChange={handleInputChange}
+                            value={email} 
+                            onChange={handleEmailChange}
                             sx={{
                                 width: '100%',
                                 '& label.Mui-focused': {
@@ -62,8 +98,9 @@ const Login = () => {
                     <div className="login-signup-input-field">
                         <div className="textbox-label light-grey-text">Password</div>
                         <TextField
-                            value={inputText}
-                            onChange={handleInputChange}
+                            value={password}
+                            onChange={handlePasswordChange} 
+                            type="password"
                             sx={{
                                 width: '100%',
                                 '& label.Mui-focused': {
