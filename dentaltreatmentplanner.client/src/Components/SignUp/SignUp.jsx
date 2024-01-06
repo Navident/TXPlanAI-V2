@@ -48,7 +48,6 @@ const Signup = () => {
 
         // Call the registerUser function from apiService.js with the user data
         try {
-            // Inside your handleRegister function
             const result = await registerUser(userData);
             if (result && result.isSuccess) {  
                 console.log('Registration successful', result);
