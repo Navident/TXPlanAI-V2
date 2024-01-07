@@ -1,11 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DentalTreatmentPlanner.Server.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string BusinessName { get; set; }
-        // Other custom properties will be added here as well
+
+        // property for the facility_id foreign key
+        [ForeignKey("Facility")]
+        public int? FacilityId { get; set; }
+
+        // Navigation property for Facility
+        public virtual Facility Facility { get; set; }
+
     }
 
 }

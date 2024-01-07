@@ -38,13 +38,13 @@ namespace DentalTreatmentPlanner.Server.Data
             {
                 entity.ToTable("facility");
                 entity.Property(e => e.FacilityId).HasColumnName("facility_id");
-                entity.Property(e => e.Name).HasColumnName("name");
-                entity.Property(e => e.Street).HasColumnName("street");
-                entity.Property(e => e.Suite).HasColumnName("suite");
-                entity.Property(e => e.ZipCode).HasColumnName("zip_code");
-                entity.Property(e => e.City).HasColumnName("city");
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+                entity.Property(e => e.Name).HasColumnName("name").IsRequired(false);
+                entity.Property(e => e.Street).HasColumnName("street").IsRequired(false);
+                entity.Property(e => e.Suite).HasColumnName("suite").IsRequired(false);
+                entity.Property(e => e.ZipCode).HasColumnName("zip_code").IsRequired(false);
+                entity.Property(e => e.City).HasColumnName("city").IsRequired(false);
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at").IsRequired(false); 
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at").IsRequired(false); 
             });
             // Map FacilityProviderMap entity
             modelBuilder.Entity<FacilityProviderMap>(entity =>

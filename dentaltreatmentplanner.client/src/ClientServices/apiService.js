@@ -10,7 +10,7 @@ const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 
 export const registerUser = async (userData) => {
     try {
-        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/register', {
+        const response = await fetch('https://localhost:7089/api/account/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
     try {
-        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/login', {
+        const response = await fetch('https://localhost:7089/api/account/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,20 +40,30 @@ export const loginUser = async (credentials) => {
             body: JSON.stringify(credentials)
         });
 
-        const data = await response.json(); // Always parse the JSON regardless of the response status
-
-        if (response.ok) {
-            console.log('User logged in successfully');
-            return { isSuccess: true, ...data };
-        } else {
-            console.error('Failed to login user. Status:', response.status, response.statusText);
-            return { isSuccess: false, ...data }; // Return an object that includes the success status
+        if (!response.ok) {
+            // If response status is not OK, it might still have a JSON body with error details
+            try {
+                const errorData = await response.json();
+                console.error('Failed to login user. Status:', response.status, response.statusText, errorData);
+                return { isSuccess: false, ...errorData };
+            } catch (jsonError) {
+                // If there is an error parsing the JSON, return a generic error message
+                console.error('Failed to parse error response JSON', jsonError);
+                return { isSuccess: false, message: 'An error occurred during login.' };
+            }
         }
-    } catch (error) {
-        console.error('Error during user login:', error);
-        return { isSuccess: false, message: error.toString() }; // Return consistent object format for errors
+
+        const data = await response.json();
+        console.log('User logged in successfully', data);
+        return { isSuccess: true, ...data };
+    } catch (networkError) {
+        // This catch block is for network-related errors
+        console.error('Network error during user login:', networkError);
+        return { isSuccess: false, message: networkError.message || 'Network error during login' };
     }
 };
+
+
 
 
 export const logoutUser = async () => {

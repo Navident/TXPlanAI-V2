@@ -42,8 +42,11 @@ const Login = () => {
         setLoading(false); // Stop loading
 
         if (response.isSuccess) {
-            console.log("Calling setBusinessName with:", response.businessName);
-            setBusinessName(response.businessName);
+            console.log("Backend response object:", response);
+            // Extract the facility name from the nested user object
+            const facilityName = response.user?.facility?.name;
+            console.log("Calling setBusinessName with:", facilityName);
+            setBusinessName(facilityName); // Set the business name with the facility name
             navigate("/dashboard");
         } else {
             // Handle failed login
@@ -51,6 +54,7 @@ const Login = () => {
             setAlertInfo({ open: true, type: 'error', message: 'Invalid login' });
         }
     };
+
 
 
 
@@ -63,7 +67,7 @@ const Login = () => {
 
     return (
         <div className="login-wrapper">
-            <Backdrop open={loading} style={{ zIndex: 100 }}>
+            <Backdrop open={loading} style={{ zIndex: 1000 }}>
                 <CircularProgress style={{ color: 'white' }} />
             </Backdrop>
 

@@ -136,7 +136,7 @@ const TreatmentPlanOutput = () => {
                                     <img src={PenIcon} alt="Edit" />
                                     <div className="large-text">What can I help you treatment plan today?</div>
                                     <TextField
-                                        className="box-shadow"
+                                     
                                         label="Input your text"
                                         multiline
                                         minRows={3}

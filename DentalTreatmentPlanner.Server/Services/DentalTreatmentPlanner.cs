@@ -28,36 +28,100 @@ namespace DentalTreatmentPlanner.Server.Services
         {
             if (registerUserDto.Password != registerUserDto.ConfirmPassword)
             {
+                Console.WriteLine("Passwords do not match");
                 return IdentityResult.Failed(new IdentityError { Description = "Passwords do not match" });
             }
 
+            // Create a new facility instance
+            var facility = new Facility
+            {
+                Name = registerUserDto.BusinessName
+            };
+
+            // Save the facility to the database
+            _context.Facilities.Add(facility);
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"Facility created with ID: {facility.FacilityId}");
+
+            // Create a new ApplicationUser instance
             var user = new ApplicationUser
             {
                 UserName = registerUserDto.Email,
                 Email = registerUserDto.Email,
                 PhoneNumber = string.IsNullOrWhiteSpace(registerUserDto.PhoneNumber) ? null : registerUserDto.PhoneNumber,
-                BusinessName = registerUserDto.BusinessName
+                FacilityId = facility.FacilityId
             };
 
+            // Create the user
             var result = await _userManager.CreateAsync(user, registerUserDto.Password);
+
+            if (result.Succeeded)
+            {
+                Console.WriteLine($"User created successfully with email: {user.Email}");
+
+                // Explicitly check and log if the user has a FacilityId
+                var createdUser = await _userManager.FindByEmailAsync(registerUserDto.Email);
+                if (createdUser != null && createdUser.FacilityId.HasValue)
+                {
+                    Console.WriteLine($"User with email {createdUser.Email} is associated with Facility ID: {createdUser.FacilityId}");
+                }
+                else
+                {
+                    Console.WriteLine($"User with email {createdUser.Email} does not have an associated Facility ID.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"User creation failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
 
             return result;
         }
 
 
 
-        public async Task<(SignInResult, ApplicationUser)> LoginUserAsync(LoginUserDto loginUserDto)
+        public async Task<(SignInResult, ApplicationUser, string)> LoginUserAsync(LoginUserDto loginUserDto)
         {
             var result = await _signInManager.PasswordSignInAsync(loginUserDto.Email, loginUserDto.Password, loginUserDto.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
-                return (result, user); // Return the sign-in result and the user details
-            }
 
-            return (result, null);
+                // Log the user's email and FacilityId
+                Console.WriteLine($"User logged in with email: {user?.Email}, FacilityId: {user?.FacilityId}");
+
+                string facilityName = null;
+
+                // Check if the FacilityId is not null
+                if (user?.FacilityId != null)
+                {
+                    var facility = await _context.Facilities.FindAsync(user.FacilityId);
+                    if (facility != null) // Check if the facility is not null
+                    {
+                        facilityName = facility.Name;
+                        Console.WriteLine($"Facility found with ID: {facility.FacilityId}, Name: {facility.Name}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"No facility found for FacilityId: {user.FacilityId}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"FacilityId is null for user with email: {user?.Email}");
+                }
+
+                return (result, user, facilityName); // Return the sign-in result, user details, and facility name
+            }
+            else
+            {
+                Console.WriteLine($"Login failed for user with email: {loginUserDto.Email}");
+                return (result, null, null);
+            }
         }
+
+
 
 
         public async Task LogoutUserAsync()

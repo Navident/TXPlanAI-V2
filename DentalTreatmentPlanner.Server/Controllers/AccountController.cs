@@ -22,8 +22,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
 
             if (result.Succeeded)
             {
-                // Later, you can create a user response DTO to send specific user details
-                // Return camelCase property names for consistency
+                // Later, possibly need to create a user response DTO to send specific user details
                 return Ok(new { isSuccess = true, message = "Registration successful" });
             }
 
@@ -38,26 +37,38 @@ namespace DentalTreatmentPlanner.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
         {
-            var (signInResult, user) = await _dentalTreatmentPlannerService.LoginUserAsync(loginUserDto);
+            try
+            {
+                var (signInResult, user, facilityName) = await _dentalTreatmentPlannerService.LoginUserAsync(loginUserDto);
 
-            if (signInResult.Succeeded)
-            {
-                return Ok(new { isSuccess = true, message = "Login successful", businessName = user?.BusinessName });
-            }
+                if (signInResult.Succeeded)
+                {
+                    return Ok(new { isSuccess = true, User = user, FacilityName = facilityName });
+                }
 
-            if (signInResult.IsLockedOut)
-            {
-                return StatusCode(StatusCodes.Status423Locked, new { isSuccess = false, Message = "User is locked out." });
+                if (signInResult.IsLockedOut)
+                {
+                    return StatusCode(StatusCodes.Status423Locked, new { isSuccess = false, Message = "User is locked out." });
+                }
+                else if (signInResult.IsNotAllowed)
+                {
+                    return BadRequest(new { isSuccess = false, Message = "User is not allowed to log in." });
+                }
+                else
+                {
+                    return Unauthorized(new { isSuccess = false, Message = "Invalid login attempt." });
+                }
             }
-            else if (signInResult.IsNotAllowed)
+            catch (Exception ex)
             {
-                return BadRequest(new { isSuccess = false, Message = "User is not allowed to log in." });
-            }
-            else
-            {
-                return Unauthorized(new { isSuccess = false, Message = "Invalid login attempt." });
+
+                Console.WriteLine(ex.ToString());
+
+                // Return a generic error message to the client
+                return StatusCode(StatusCodes.Status500InternalServerError, new { isSuccess = false, Message = "An error occurred during login." });
             }
         }
+
 
 
 
