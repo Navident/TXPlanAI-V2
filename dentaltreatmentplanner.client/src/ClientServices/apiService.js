@@ -10,7 +10,7 @@ const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 
 export const registerUser = async (userData) => {
     try {
-        const response = await fetch('https://localhost:7089/api/account/register', {
+        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
     try {
-        const response = await fetch('https://localhost:7089/api/account/login', {
+        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
