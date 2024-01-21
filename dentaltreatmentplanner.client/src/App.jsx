@@ -9,34 +9,49 @@ import Login from "./Components/Login/Login";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import DefaultProcedures from "./Components/DefaultProceduresManagement/DefaultProceduresManagement";
 import ProceduresCustomizer from "./Components/DefaultProceduresManagement/ProceduresCustomizer/ProceduresCustomizer";
-import TreatmentPlanOutput from './Components/TreatmentPlanOutput/TreatmentPlanOutput';
+import PatientManagementDashboard from './Components/PatientManagementDashboard/PatientManagementDashboard';
+import GenerateTreatmentPlan from './Components/PatientManagementDashboard/GenerateTreatmentPlan/GenerateTreatmentPlan';
+import CreateNewPatient from './Components/PatientManagementDashboard/CreateNewPatient/CreateNewPatient';
+import SavedPatientTxPlans from './Components/PatientManagementDashboard/SavedPatientTxPlans/SavedPatientTxPlans';
+import PatientTreatmentPlanCustomizer from './Components/PatientManagementDashboard/SavedPatientTxPlans/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
+
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
-import { BusinessProvider } from './Contexts/BusinessProvider';
+import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
+import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
+
 
 function App() {
-    console.log("App component is rendering");
     return (
         <BusinessProvider>
-        <div className="App">
-            <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/login" element={<Login />} />
+            <TreatmentPlanProvider> 
+                <div className="App">
+                    <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/login" element={<Login />} />
 
-                <Route path="/dashboard" element={<Dashboard />}>
-                    <Route index element={<Home />} />
-                    <Route path="defaultprocedures" element={<DefaultProcedures />}>
-                        <Route path="procedurescustomizer/:category/:subcategory" element={<ProceduresCustomizer />} />
-                        <Route path="treatmentplanconfiguration" element={<TreatmentPlanConfiguration />} />
-                    </Route>
-                </Route>
+                        <Route path="/dashboard" element={<Dashboard />}>
+                            <Route index element={<Home />} />
+                            <Route path="defaultprocedures" element={<DefaultProcedures />}>
+                                <Route path="procedurescustomizer/:category/:subcategory" element={<ProceduresCustomizer />} />
+                                <Route path="treatmentplanconfiguration" element={<TreatmentPlanConfiguration />} />
+                            </Route>
+                        </Route>
 
-                <Route path="/treatmentplanoutput" element={<TreatmentPlanOutput />} />
-            </Routes>
-            </div>
+                        <Route path="/PatientManagementDashboard" element={<PatientManagementDashboard />}>
+                            <Route index element={<GenerateTreatmentPlan />} />
+                            <Route path="create-new-patient" element={<CreateNewPatient />} />
+                            <Route path="saved-patient-tx-plans/:patientId" element={<SavedPatientTxPlans />}>
+                                <Route path="customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
+                            </Route>
+                        </Route>
+                    </Routes>
+                </div>
+            </TreatmentPlanProvider>
         </BusinessProvider>
     );
 }
 
 export default App;
+
 

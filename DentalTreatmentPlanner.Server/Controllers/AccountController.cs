@@ -1,6 +1,15 @@
 ﻿using DentalTreatmentPlanner.Server.Dtos;
 using DentalTreatmentPlanner.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Security.Cryptography;
+
 
 namespace DentalTreatmentPlanner.Server.Controllers
 {
@@ -43,8 +52,35 @@ namespace DentalTreatmentPlanner.Server.Controllers
 
                 if (signInResult.Succeeded)
                 {
-                    return Ok(new { isSuccess = true, User = user, FacilityName = facilityName });
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        // ... other claims
+                    };
+
+                    // Generate a random key for HMACSHA256
+                    //var randomKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)); // 256 bits
+                    var randomKey = "HK7RVoSagLhrSkJeNGpOTZTrvqMLboQAX5ZsY7Tv6Cs=";
+                    Console.WriteLine($"Generated Key: {randomKey}");
+
+                    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(randomKey));
+                    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                    var token = new JwtSecurityToken(
+                        issuer: null,
+                        audience: null,
+                        claims: claims,
+                        expires: DateTime.Now.AddMinutes(30),
+                        signingCredentials: creds);
+
+
+                    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                    Console.WriteLine($"Generated JWT token: {tokenString}");
+
+                    return Ok(new { Token = tokenString, User = user, FacilityName = facilityName });
                 }
+
 
                 if (signInResult.IsLockedOut)
                 {
@@ -61,13 +97,11 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(ex.ToString());
-
-                // Return a generic error message to the client
                 return StatusCode(StatusCodes.Status500InternalServerError, new { isSuccess = false, Message = "An error occurred during login." });
             }
         }
+
 
 
 

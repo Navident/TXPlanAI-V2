@@ -7,14 +7,14 @@ import facebookIconSmall from '../../assets/facebook-small-icon.svg';
 import appleIconSmall from '../../assets/apple-small-icon.svg';
 import userIcon from '../../assets/user-icon.svg';
 import { TextField } from "@mui/material";
-import React, { useState } from 'react';
+import { useState } from 'react';
 import RoundedButton from "../Common/RoundedButton/RoundedButton";
 import { useNavigate } from 'react-router-dom';
 import backButton from '../../assets/back-button.svg';
 import { loginUser } from '../../ClientServices/apiService';
 import './Login.css'; 
 import Alert from '../Common/Alert/Alert';
-import { useBusiness } from '../../Contexts/useBusiness';
+import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { Backdrop, CircularProgress } from '@mui/material';
 
 const Login = () => {
@@ -68,7 +68,7 @@ const Login = () => {
     return (
         <div className="login-wrapper">
             <Backdrop open={loading} style={{ zIndex: 1000 }}>
-                <CircularProgress style={{ color: 'white' }} />
+                <CircularProgress style={{ color: 'rgb(162, 225, 201)' }} />
             </Backdrop>
 
             {alertInfo.type && (

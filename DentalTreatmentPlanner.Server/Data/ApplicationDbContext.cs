@@ -13,6 +13,7 @@ namespace DentalTreatmentPlanner.Server.Data
 
         // DbSet properties
         public DbSet<Facility> Facilities { get; set; }
+        public DbSet<Patient> Patients { get; set; }
         public DbSet<FacilityProviderMap> FacilityProviderMaps { get; set; }
         public DbSet<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
         public DbSet<Provider> Providers { get; set; }
@@ -26,12 +27,14 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<ProcedureSubCategory> ProcedureSubCategories { get; set; }
         public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
         public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
-
+        public DbSet<TreatmentPhase> TreatmentPhases { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Patient>().ToTable("Patient");
 
             // Map Facility entity
             modelBuilder.Entity<Facility>(entity =>
@@ -85,7 +88,6 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.ToTable("treatment_plan");
                 entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
                 entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.FacilityProviderMapId).HasColumnName("facility_provider_map_id");
                 entity.Property(e => e.ProcedureSubcategoryId).HasColumnName("procedure_subcategory_id"); 
                 entity.Property(e => e.ToothNumber).HasColumnName("tooth_number");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");

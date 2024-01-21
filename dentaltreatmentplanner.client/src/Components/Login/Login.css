@@ -3,6 +3,9 @@
 
 }
 
+    .login-wrapper .login-signup-container {
+        height: calc( 100vh - 80px);
+    }
 
 .login-bottom-section {
     text-align: center;

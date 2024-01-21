@@ -63,6 +63,8 @@
     padding: 15px;
     text-align: left;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
     .grid-item:not(:last-child)::after {
@@ -83,6 +85,11 @@
     height: 100%;
 }
 
+.grid-item-2-label{
+    display: inline-flex;
+    gap: 10px;
+}
+
 .patient-info-inner-buttons {
     display: flex;
     flex-direction: row;
@@ -90,9 +97,36 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+    width: 100%;
 }
 
 .treatment-plan-output-section-inner .large-text{
     display: flex;
     justify-content: center;
+}
+
+.search-patient {
+    background-color: white;
+    width: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.all-patients-container {
+    width: 320px;
+    background-color: white;
+}
+
+.patients-inner-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+}
+
+.all-patients-container .purple-button {
+    width: 100%;
 }

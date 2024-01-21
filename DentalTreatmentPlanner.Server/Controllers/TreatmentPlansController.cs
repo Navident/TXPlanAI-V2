@@ -2,16 +2,23 @@
 using Microsoft.AspNetCore.Mvc;
 using DentalTreatmentPlanner.Server.Services;
 using DentalTreatmentPlanner.Server.Dtos;
+using DentalTreatmentPlanner.Server.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TreatmentPlansController : ControllerBase
 {
     private readonly DentalTreatmentPlannerService _dentalTreatmentPlannerService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public TreatmentPlansController(DentalTreatmentPlannerService dentalTreatmentPlannerService)
+    public TreatmentPlansController(DentalTreatmentPlannerService dentalTreatmentPlannerService, UserManager<ApplicationUser> userManager)
     {
         _dentalTreatmentPlannerService = dentalTreatmentPlannerService;
+        _userManager = userManager;
     }
 
     // GET: api/TreatmentPlans
@@ -98,12 +105,133 @@ public class TreatmentPlansController : ControllerBase
         }
     }
 
+    // POST: api/TreatmentPlans/newfromdefault
+    [HttpPost("newfromdefault")]
+    public async Task<IActionResult> CreateNewTreatmentPlanFromDefault([FromBody] UpdateTreatmentPlanDto updateTreatmentPlanDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        int? facilityId = user.FacilityId;
+        if (!facilityId.HasValue)
+        {
+            // Handle the case where facilityId is null
+            return BadRequest("User's facility ID is not set.");
+        }
+
+        try
+        {
+            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanFromDefaultAsync(updateTreatmentPlanDto, facilityId.Value);
+            if (newTreatmentPlan == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(newTreatmentPlan);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception details
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
+    }
+
+
+    // POST: api/TreatmentPlans/newCombinedForPatient
+    [HttpPost("newCombinedForPatient")]
+    public async Task<IActionResult> CreateNewCombinedTreatmentPlanForPatient([FromBody] UpdateTreatmentPlanDto updateTreatmentPlanDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        int? facilityId = user.FacilityId;
+        if (!facilityId.HasValue)
+        {
+            // Handle the case where facilityId is null
+            return BadRequest("User's facility ID is not set.");
+        }
+
+        try
+        {
+            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanForPatientFromCombinedAsync(updateTreatmentPlanDto, facilityId.Value);
+            if (newTreatmentPlan == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(newTreatmentPlan);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception details
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
+    }
+
+
+    private string GetUsernameFromToken()
+    {
+        var authorizationHeader = HttpContext.Request.Headers["Authorization"].ToString();
+
+        if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+        {
+            return null;
+        }
+
+        var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtToken = tokenHandler.ReadJwtToken(token);
+
+        var usernameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+        return usernameClaim?.Value;
+    }
+
+
     // GET: api/TreatmentPlans/Subcategory/5
     [HttpGet("Subcategory/{subcategoryName}")]
     public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetTreatmentPlansBySubcategory(string subcategoryName)
     {
-        var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansBySubcategoryAsync(subcategoryName);
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
 
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansBySubcategoryAsync(subcategoryName, user.FacilityId);
         if (treatmentPlans == null || !treatmentPlans.Any())
         {
             return NotFound();
@@ -111,6 +239,32 @@ public class TreatmentPlansController : ControllerBase
 
         return Ok(treatmentPlans);
     }
+
+    // GET: api/TreatmentPlans/Patient/5
+    [HttpGet("Patient/{patientId}")]
+    public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetTreatmentPlansByPatient(int patientId)
+    {
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansByPatientIdAsync(patientId, user.FacilityId);
+        if (treatmentPlans == null || !treatmentPlans.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(treatmentPlans);
+    }
+
 
 }
 

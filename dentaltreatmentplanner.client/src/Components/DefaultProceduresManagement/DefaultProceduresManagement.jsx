@@ -7,9 +7,10 @@ import { useState, useEffect } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../assets/search-icon.svg';
 import TextField from '@mui/material/TextField';
+import { CircularProgress } from '@mui/material';
 
 const DefaultProcedures = () => {
-    const { categories } = useOutletContext();
+    const { categories, isLoading } = useOutletContext();
     const [inputText, setInputText] = useState('');
     const navigate = useNavigate();
     const [selectedSubcategories, setSelectedSubcategories] = useState({});
@@ -41,15 +42,27 @@ const DefaultProcedures = () => {
     // Check if current route is for editing a specific treatment plan
     const isEditingTreatmentPlan = location.pathname.includes("/procedurescustomizer/");
 
+    if (isEditingTreatmentPlan) {
+        return <Outlet />;
+    }
+
+    if (isLoading) {
+        return (
+            <div className="default-procedure-management-wrapper">
+                <div className="loading-spinner">
+                    <CircularProgress style={{ color: 'rgb(119, 119, 161)', margin: 'auto' }} />
+                </div>
+            </div>
+        );
+    }
+
     return (
-        isEditingTreatmentPlan ? (
-            <Outlet />
-        ) : (
+
                 <div className="default-procedure-management-wrapper">
                     <div className="dashboard-right-side-row">
                         <div className="semibold-black-title">Tx Plan Settings</div>
                         <TextField
-                            className="box-shadow rounded-box"
+                            className="rounded-box"
                             placeholder="Search Procedure Categories"
                             value={inputText}
                             onChange={handleInputChange}
@@ -105,7 +118,7 @@ const DefaultProcedures = () => {
                     </div>
                 </div>
             </div>
-        )
+
     );
 };
 

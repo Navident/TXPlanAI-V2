@@ -2,9 +2,12 @@ import './HeaderBar.css';
 import PropTypes from 'prop-types';
 
 const HeaderBar = ({ leftCornerElement, rightCornerElement, centerLogo }) => {
+    // when logo is in center we need to set the leftcornerelement to position absolute
+    const leftCornerStyle = centerLogo ? { position: 'absolute' } : null;
+
     return (
         <div className="header-bar box-shadow">
-            <div className="header-left-corner-container">
+            <div className="header-left-corner-container" style={leftCornerStyle}>
                 {leftCornerElement}
             </div>
             {rightCornerElement && centerLogo ? (

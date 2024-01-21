@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
-import { useBusiness } from '../../../Contexts/useBusiness';
+import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ const Home = () => {
         setInputText(event.target.value);
     };
     const handleGenerateTxButtonClick = () => {
-        navigate("/treatmentplanoutput"); 
+        navigate("/PatientManagementDashboard"); 
 
     };
 
@@ -30,7 +30,7 @@ const Home = () => {
                     </div>
                 </div>
                 <TextField
-                    className="box-shadow rounded-box"
+                    className="rounded-box"
                     placeholder="Search Patient"
                     value={inputText}
                     onChange={handleInputChange}

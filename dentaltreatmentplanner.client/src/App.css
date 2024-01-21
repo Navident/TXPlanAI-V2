@@ -9,6 +9,17 @@
     font-weight: 400;
 }
 
+.large-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.large-text-bold {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 18px;
+}
+
 .tx-content-area {
     flex-grow: 1;
     padding: 20px;
@@ -26,8 +37,10 @@
     background-color: #eeeef3;
     height: 100vh;
     display: flex;
-    max-height: 100vh;
     overflow: hidden;
+}
+.login-signup-header.large-text {
+    line-height: 1;
 }
 
 .tx-container .header-bar{
@@ -43,7 +56,20 @@
     flex-direction: column;
     gap: 20px;
 }
+.sidebar-container {
+    background-color: white;
+    height: calc(100vh - 100px);
+    border-bottom-right-radius: 15px;
+    width: 260px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
 
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 .MuiOutlinedInput-root {
     border-radius: 15px !important; 
 }
@@ -71,9 +97,9 @@
     vertical-align: top;
 }
 
-
-
-
+    .tx-table th{
+        font-weight: 600;
+    }
 
     .tx-table thead tr th {
         background-color: #eeeef3;
@@ -103,17 +129,21 @@
     padding-right: 60px;
 }
 
+.loading-spinner{
+    margin: auto;
+}
 .login-signup-content {
     display: flex;
     flex-direction: column;
     gap: 30px;
-    width: 580px;
+    width: 100%;
+    max-width: 650px;
 }
 .tx-table {
     width: 100%;
     border-spacing: 0;
 }
-.edit-procedures-inner .table-inner-header th {
+.table-inner-header th {
     border-top: 1px solid #7777a1;
 }
     .tx-table th, .tx-table td {
@@ -134,44 +164,55 @@
     }
 
         .tx-table thead tr th:nth-child(2) {
-            width: 15%;
+            width: 10%;
         }
     .tx-table tbody tr td:nth-child(2) {
-        width: 15%;
+        width: 10%;
     }
     .tx-table tbody tr th:nth-child(3) {
-        width: 20%;
+        width: 15%;
 
     }
     .tx-table tbody tr td:nth-child(3) {
-        width: 20%;
+        width: 15%;
     }
 
         .tx-table thead tr th:nth-child(4) {
-            width: 45%;
+            width: 35%;
         }
     .tx-table tbody tr td:nth-child(4) {
-        width: 45%;
+        width: 35%;
     }
 
     .tx-table thead tr th:nth-child(5) {
-        width: 10%;
-        border-right: 1px solid #7777a1;
+        width: 20%;
     }
 
     .tx-table tr td:nth-child(5) {
-        width: 10%;
-        border-right: 1px solid #7777a1;
+        width: 20%;
+
     }
 
+.tx-table thead tr th:nth-child(6) {
+    width: 10%;
+    
+}
 
+.tx-table tr td:nth-child(6) {
+    width: 1%;
+    
+}
+
+.tx-table {
+    border-right: 1px solid #7777a1;
+}
 
 
 
 
 .login-signup-container {
     margin-top: 80px;
-    height: calc(100% - 80px);
+    padding: 60px;
 }
 
 .light-grey-text {

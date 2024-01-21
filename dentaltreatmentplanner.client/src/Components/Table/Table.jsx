@@ -41,6 +41,7 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
         );
     };
 
+
     const renderBody = (provided) => (
         <tbody ref={provided ? provided.innerRef : null} {...(provided ? provided.droppableProps : {})}>
             {rows.map((row, index) => (enableDragDrop ? renderDraggableRow(row, index) : renderRow(row, index)))}
@@ -54,7 +55,6 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                 <thead>
                     <tr className="table-inner-header">
                         <th>
-                            <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />
                         </th>
                         {headers.map((header, index) => (
                             <th key={`header-${index}`}>{header}</th>
@@ -64,6 +64,7 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                         </th>
                     </tr>
                 </thead>
+
                 {enableDragDrop ? (
                     <Droppable droppableId={`droppable-${tableId}`} type="row">
                         {renderBody}

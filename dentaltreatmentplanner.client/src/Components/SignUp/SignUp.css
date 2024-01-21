@@ -3,10 +3,10 @@
 }
 .signup-wrapper .login-signup-content {
     border: 1px solid #666666;
-    padding: 30px;
+    padding: 40px;
     border-radius: 20px;
 }
 
-.signup-wrapper .login-signup-header.large-text{
-    line-height: 1;
+.signup-wrapper .login-signup-header.large-text {
+    margin: 0 auto;
 }

@@ -5,22 +5,13 @@ import { useEffect, useState } from 'react';
 import { getTreatmentPlansBySubcategory } from '../../../ClientServices/apiService';
 import TreatmentPlanConfiguration from "../../TreatmentPlanConfiguration/TreatmentPlanConfiguration";
 import { addVisitToTreatmentPlan, deleteVisitInTreatmentPlan, updateVisitsInTreatmentPlan } from '../../../Utils/helpers';
-import { getCdtCodes } from '../../../ClientServices/apiService';
 
 const ProceduresCustomizer = () => {
     const [treatmentPlans, setTreatmentPlans] = useState([]);
-    const [cdtCodes, setCdtCodes] = useState([]);
     const params = useParams();
     const subcategory = params.subcategory;
     const category = params.category;
 
-    const getOrderKey = (treatmentPlan) => {
-        return treatmentPlan.visits.map(visit => visit.visitId).join('-');
-    };
-
-    useEffect(() => {
-        getCdtCodes(setCdtCodes); // Fetch CDT codes when component mounts    
-    }, []);
 
     useEffect(() => {
         const fetchTreatmentPlans = async () => {
@@ -70,7 +61,7 @@ const ProceduresCustomizer = () => {
                     <div className="large-text">Procedure Category: {category}</div>
                     <div className="large-text">Procedure Sub-Category: {subcategory}</div>
                     <div>
-                        {cdtCodes.length > 0 && treatmentPlans.length > 0 &&
+                        {treatmentPlans.length > 0 &&
                             treatmentPlans.map((plan, index) => {
                                 const key = index; 
                                 return (
@@ -78,12 +69,12 @@ const ProceduresCustomizer = () => {
                                         key={key}
                                         treatmentPlan={plan}
                                         includeExtraRow={true}
-                                        cdtCodes={cdtCodes}
                                         addProcedureElement={<span>+ Add Procedure</span>}
                                         onAddVisit={(newVisit) => handleAddVisitToTreatmentPlan(plan.treatmentPlanId, newVisit)}
                                         onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => handleUpdateVisitsInTreatmentPlan(treatmentPlanId, updatedVisits)}
                                         onDeleteVisit={(treatmentPlanId, deletedVisitId) => handleDeleteVisitInTreatmentPlan(treatmentPlanId, deletedVisitId)}
                                         showToothNumber={false}
+                                        isInGenerateTreatmentPlanContext={false} 
                                     />
                                 );
                             })

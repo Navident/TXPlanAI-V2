@@ -12,11 +12,13 @@
     <Folder Include="src\Components\Common\HeaderBar\" />
     <Folder Include="src\ClientServices\" />
     <Folder Include="src\Components\Common\Alert\" />
+    <Folder Include="src\Components\Common\GoBack\" />
     <Folder Include="src\Components\Dashboard\Home\" />
-    <Folder Include="src\Components\PatientManagement\PatientList\" />
-    <Folder Include="src\Components\PatientManagement\SearchPatient\" />
     <Folder Include="src\Components\DefaultProceduresManagement\ProceduresCustomizer\" />
     <Folder Include="src\Components\Login\" />
+    <Folder Include="src\Components\PatientManagementDashboard\GenerateTreatmentPlan\" />
+    <Folder Include="src\Components\PatientManagementDashboard\PatientInfoSection\" />
+    <Folder Include="src\Contexts\TreatmentPlanContext\" />
     <Folder Include="src\Utils\" />
   </ItemGroup>
 </Project>

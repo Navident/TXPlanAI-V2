@@ -4,6 +4,7 @@ using DentalTreatmentPlanner.Server.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DentalTreatmentPlanner.Server.Services
 {
@@ -22,6 +23,39 @@ namespace DentalTreatmentPlanner.Server.Services
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+        }
+
+        public List<Patient> GetMockPatients()
+        {
+            return new List<Patient>
+            {
+                new Patient { PatientId = 1, FirstName = "John", LastName = "Smith", FacilityId = 1, DateOfBirth = new DateTime(1980, 1, 1) },
+                new Patient { PatientId = 2, FirstName = "Jane", LastName = "Doe", FacilityId = 1, DateOfBirth = new DateTime(1985, 5, 23) },
+
+            };
+        }
+
+        public async Task<Patient> CreatePatientAsync(CreatePatientDto createPatientDto, int facilityId)
+        {
+            var newPatient = new Patient
+            {
+                FirstName = createPatientDto.FirstName,
+                LastName = createPatientDto.LastName,
+                DateOfBirth = createPatientDto.DateOfBirth,
+                FacilityId = facilityId,
+            };
+
+            _context.Patients.Add(newPatient);
+            await _context.SaveChangesAsync();
+
+            return newPatient; // This patient now includes the PatientId set by the database
+        }
+
+
+
+        public async Task<List<Patient>> GetPatientsByFacility(int facilityId)
+        {
+            return await _context.Patients.Where(p => p.FacilityId == facilityId).ToListAsync();
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserDto registerUserDto)
@@ -78,9 +112,7 @@ namespace DentalTreatmentPlanner.Server.Services
             return result;
         }
 
-
-
-        public async Task<(SignInResult, ApplicationUser, string)> LoginUserAsync(LoginUserDto loginUserDto)
+        public async Task<(Microsoft.AspNetCore.Identity.SignInResult, ApplicationUser, string)> LoginUserAsync(LoginUserDto loginUserDto)
         {
             var result = await _signInManager.PasswordSignInAsync(loginUserDto.Email, loginUserDto.Password, loginUserDto.RememberMe, lockoutOnFailure: false);
 
@@ -220,7 +252,6 @@ namespace DentalTreatmentPlanner.Server.Services
                         Description = treatmentPlanDto.Description,
                         ProcedureSubcategoryId = procedureSubCategory.ProcedureSubCategoryId,
                         ToothNumber = treatmentPlanDto.ToothNumber,
-                        FacilityProviderMapId = treatmentPlanDto.FacilityProviderMapId,
                         CreatedUserId = treatmentPlanDto.CreatedUserId
                     };
 
@@ -382,6 +413,114 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
+        public async Task<TreatmentPlan> CreateNewTreatmentPlanFromDefaultAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto, int facilityId)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Create a new treatment plan based on the default
+                    TreatmentPlan newTreatmentPlan = new TreatmentPlan
+                    {
+                        Description = updateTreatmentPlanDto.Description,
+                        ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId,
+                        ToothNumber = updateTreatmentPlanDto.ToothNumber,
+                        FacilityId = facilityId,
+                    };
+
+                    foreach (var visitDto in updateTreatmentPlanDto.Visits)
+                    {
+                        Visit newVisit = new Visit
+                        {
+                            Description = visitDto.Description,
+                            VisitNumber = visitDto.VisitNumber,
+                            VisitCdtCodeMaps = new List<VisitCdtCodeMap>(),
+                            // ... other properties ...
+                        };
+
+                        foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps) 
+                        {
+                            VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
+                            {
+                                CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
+                                Order = visitCdtCodeMapDto.Order,
+                                // ... other properties ...
+                            };
+                            newVisit.VisitCdtCodeMaps.Add(newProcedure);
+                        }
+
+                        newTreatmentPlan.Visits.Add(newVisit);
+                    }
+
+                    // Save the new treatment plan to the database
+                    await _context.TreatmentPlans.AddAsync(newTreatmentPlan);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return newTreatmentPlan;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error occurred: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto, int facilityId)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Create a new treatment plan based on the default
+                    TreatmentPlan newTreatmentPlan = new TreatmentPlan
+                    {
+                        Description = updateTreatmentPlanDto.Description,
+                        ProcedureSubcategoryId = null,
+                        ToothNumber = updateTreatmentPlanDto.ToothNumber,
+                        FacilityId = facilityId,
+                        PatientId = updateTreatmentPlanDto.PatientId,
+                    };
+
+                    foreach (var visitDto in updateTreatmentPlanDto.Visits)
+                    {
+                        Visit newVisit = new Visit
+                        {
+                            Description = visitDto.Description,
+                            VisitNumber = visitDto.VisitNumber,
+                            VisitCdtCodeMaps = new List<VisitCdtCodeMap>(),
+                        };
+
+                        foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps)
+                        {
+                            VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
+                            {
+                                CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
+                                Order = visitCdtCodeMapDto.Order,
+                            };
+                            newVisit.VisitCdtCodeMaps.Add(newProcedure);
+                        }
+
+                        newTreatmentPlan.Visits.Add(newVisit);
+                    }
+
+                    // Save the new treatment plan to the database
+                    await _context.TreatmentPlans.AddAsync(newTreatmentPlan);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return newTreatmentPlan;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error occurred: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+
         private void UpdateVisitCdtCodes(Visit visit, ICollection<VisitCdtCodeMapDto> updatedCdtCodeMaps)
         {
             // Update existing VisitCdtCodeMaps
@@ -391,7 +530,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 if (cdtCodeMap != null)
                 {
                     cdtCodeMap.Order = cdtCodeMapDto.Order;
-                    // Update other fields if necessary
+                    cdtCodeMap.TreatmentPhaseId = cdtCodeMapDto.TreatmentPhaseId; 
                 }
             }
 
@@ -489,10 +628,10 @@ namespace DentalTreatmentPlanner.Server.Services
         }
 
         // Method to retrieve treatment plans by procedure subcategory name
-        public async Task<IEnumerable<RetrieveTreatmentPlanDto>> GetTreatmentPlansBySubcategoryAsync(string subcategoryName)
+        public async Task<IEnumerable<RetrieveTreatmentPlanDto>> GetTreatmentPlansBySubcategoryAsync(string subcategoryName, int? facilityId)
         {
             var subcategory = await _context.ProcedureSubCategories
-                        .FirstOrDefaultAsync(sc => sc.Name == subcategoryName);
+                                            .FirstOrDefaultAsync(sc => sc.Name == subcategoryName);
 
             if (subcategory == null)
             {
@@ -501,16 +640,73 @@ namespace DentalTreatmentPlanner.Server.Services
 
             int subcategoryId = subcategory.ProcedureSubCategoryId;
 
-            return await _context.TreatmentPlans
-                .Where(tp => tp.ProcedureSubcategoryId == subcategoryId)
+            // First, try to get a facility-specific plan if facilityId is not null
+            IQueryable<TreatmentPlan> query = _context.TreatmentPlans
+                .Where(tp => tp.ProcedureSubcategoryId == subcategoryId &&
+                             (facilityId != null && tp.FacilityId == facilityId) &&
+                             tp.PatientId == null);
+
+            // Check if any facility-specific plans are found, if not, get the default plan
+            if (facilityId != null && !await query.AnyAsync())
+            {
+                query = _context.TreatmentPlans
+                    .Where(tp => tp.ProcedureSubcategoryId == subcategoryId &&
+                                 tp.FacilityId == null &&
+                                 tp.PatientId == null);
+            }
+
+            var treatmentPlans = await query
                 .Select(tp => new RetrieveTreatmentPlanDto
                 {
                     TreatmentPlanId = tp.TreatmentPlanId,
                     Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
                     ToothNumber = tp.ToothNumber,
-                    FacilityProviderMapId = tp.FacilityProviderMapId,
+                    FacilityId = tp.FacilityId,
                     CreatedUserId = tp.CreatedUserId,
+
+                    // Mapping each visit of the treatment plan to a RetrieveVisitDto
+                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                    {
+                        VisitId = v.VisitId,
+                        Description = v.Description,
+                        VisitNumber = v.VisitNumber,
+
+                        // Mapping CDT codes associated with each visit
+                        CdtCodes = v.VisitCdtCodeMaps.Select(vc => new VisitCdtCodeMapDto
+                        {
+                            VisitCdtCodeMapId = vc.VisitCdtCodeMapId,
+                            CdtCodeId = vc.CdtCode.CdtCodeId,
+                            Order = vc.Order,
+                            ProcedureTypeId = vc.ProcedureTypeId,
+                            TreatmentPhaseId = vc.TreatmentPhaseId,
+                            TreatmentPhaseLabel = vc.TreatmentPhase != null ? vc.TreatmentPhase.Label : null, // Include TreatmentPhase Label
+                            Code = vc.CdtCode.Code,
+                            LongDescription = vc.CdtCode.LongDescription
+                        }).ToList()
+                    }).ToList()
+                })
+    .ToListAsync();
+            return treatmentPlans;
+        }
+
+
+        // Method to retrieve treatment plans by patient ID
+        public async Task<IEnumerable<RetrievePatientTreatmentPlanDto>> GetTreatmentPlansByPatientIdAsync(int patientId, int? facilityId)
+        {
+            IQueryable<TreatmentPlan> query = _context.TreatmentPlans
+                .Where(tp => tp.PatientId == patientId &&
+                             (facilityId != null && tp.FacilityId == facilityId));
+
+            var treatmentPlans = await query
+                .Select(tp => new RetrievePatientTreatmentPlanDto
+                {
+                    TreatmentPlanId = tp.TreatmentPlanId,
+                    Description = tp.Description,
+                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
+                    ToothNumber = tp.ToothNumber,
+                    CreatedUserId = tp.CreatedUserId,
+                    CreatedAt = tp.CreatedAt,
 
                     // Mapping each visit of the treatment plan to a RetrieveVisitDto
                     Visits = tp.Visits.Select(v => new RetrieveVisitDto
@@ -532,7 +728,9 @@ namespace DentalTreatmentPlanner.Server.Services
                     }).ToList()
                 })
                 .ToListAsync();
+            return treatmentPlans;
         }
+
 
         public async Task<IEnumerable<CdtCodeDto>> GetAllCdtCodesAsync()
         {
@@ -546,7 +744,19 @@ namespace DentalTreatmentPlanner.Server.Services
                 .ToListAsync();
         }
 
-
+        public async Task<IEnumerable<TreatmentPhaseDto>> GetAllTreatmentPhasesAsync()
+        {
+            return await _context.TreatmentPhases
+                .Select(phase => new TreatmentPhaseDto
+                {
+                    Id = phase.Id,
+                    Label = phase.Label,
+                    Description = phase.Description,
+                    CreatedAt = phase.CreatedAt,
+                    ModifiedAt = phase.ModifiedAt
+                })
+                .ToListAsync();
+        }
 
     }
 

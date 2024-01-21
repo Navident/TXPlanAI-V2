@@ -1,0 +1,13 @@
+.patient-name {
+    cursor: pointer;
+    padding: 5px;
+    padding-left: 20px;
+}
+
+    .patient-name:hover, .patient-name.selected-patient {
+        background-color: #eeeef3;
+    }
+
+    .patient-name.selected-patient {
+        color: rgb(119, 119, 161);
+    }

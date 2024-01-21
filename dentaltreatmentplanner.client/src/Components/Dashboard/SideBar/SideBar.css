@@ -1,15 +1,4 @@
-.sidebar-container {
-    background-color: white;
-    height: calc(100vh - 100px);
-    border-bottom-right-radius: 15px;
-}
 
-.sidebar-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 260px;
-}
 
 .sidebar-item {
     display: flex;

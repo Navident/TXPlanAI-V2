@@ -1,4 +1,4 @@
-export const mapToDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, deletedVisitIds) => {
+export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, deletedVisitIds) => {
     const updateVisits = [];
 
     // Iterate over the visit order to maintain the correct order
@@ -16,6 +16,7 @@ export const mapToDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, dele
                     VisitCdtCodeMapId: row.visitCdtCodeMapId,
                     VisitId: visitId,
                     CdtCodeId: cdtCode.cdtCodeId,
+                    TreatmentPhaseId: row.selectedTreatmentPhase ? row.selectedTreatmentPhase.id : null, // Include treatment phase ID
                     Order: idx,
                     Code: cdtCode.code,
                     LongDescription: cdtCode.longDescription,
@@ -46,6 +47,58 @@ export const mapToDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, dele
     };
     console.log('Mapped DTO:', updateTreatmentPlanDto);
     return updateTreatmentPlanDto;
+};
+
+export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows, visitOrder) => {
+    const newPlanVisits = visitOrder.map(visitId => {
+        const visitRows = allRows[visitId];
+        const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
+
+        return {
+            visitId: String(visitId).startsWith('temp-') ? null : visitId,
+            VisitCdtCodeMaps: validRows.map(row => ({
+                CdtCodeId: row.selectedCdtCode.cdtCodeId,
+                Description: row.description,
+                // Include other properties as per your backend requirements
+            })),
+        };
+    });
+
+    const newTreatmentPlanDto = {
+        Description: treatmentPlan.description,
+        ProcedureSubcategoryId: treatmentPlan.procedureSubcategoryId,
+        ToothNumber: treatmentPlan.toothNumber,
+        Visits: newPlanVisits,
+    };
+
+    console.log('Mapped DTO for new treatment plan:', newTreatmentPlanDto);
+    return newTreatmentPlanDto;
+};
+
+export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, allRows, visitOrder) => {
+    const newPlanVisits = visitOrder.map(visitId => {
+        const visitRows = allRows[visitId];
+        const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
+
+        return {
+            visitId: String(visitId).startsWith('temp-') ? null : visitId,
+            VisitCdtCodeMaps: validRows.map(row => ({
+                CdtCodeId: row.selectedCdtCode.cdtCodeId,
+                Description: row.description,
+                // Include other properties as per your backend requirements
+            })),
+        };
+    });
+
+    const newTreatmentPlanDto = {
+        Description: treatmentPlan.description,
+        ProcedureSubcategoryId: null,
+        ToothNumber: treatmentPlan.toothNumber,
+        Visits: newPlanVisits,
+    };
+
+    console.log('Mapped DTO for new treatment plan:', newTreatmentPlanDto);
+    return newTreatmentPlanDto;
 };
 
 

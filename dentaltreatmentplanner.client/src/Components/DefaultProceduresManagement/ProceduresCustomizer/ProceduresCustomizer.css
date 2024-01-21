@@ -11,9 +11,6 @@
     text-align: left;
 }
 
-.procedure-customizer-wrapper .edit-procedures-inner .tx-table {
-    border-right: none;
-}
 
 .procedure-customizer-wrapper {
     display: flex;

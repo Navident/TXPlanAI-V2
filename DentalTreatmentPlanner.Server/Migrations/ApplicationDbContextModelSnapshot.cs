@@ -40,7 +40,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
@@ -49,7 +48,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("type");
 
@@ -148,7 +146,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("cdt_code_subcategory_id");
 
                     b.Property<string>("Code")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("cdt_code");
 
@@ -161,7 +158,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("facility_id");
 
                     b.Property<string>("LongDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("long_description");
 
@@ -170,7 +166,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("ShortDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("short_description");
 
@@ -203,7 +198,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -230,7 +224,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -249,11 +242,10 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FacilityId"));
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("city");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
@@ -262,22 +254,18 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("street");
 
                     b.Property<string>("Suite")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("suite");
 
                     b.Property<string>("ZipCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("zip_code");
 
@@ -320,6 +308,39 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.ToTable("facility_provider_map", (string)null);
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Patient", b =>
+                {
+                    b.Property<int>("PatientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PatientId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FacilityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PatientId");
+
+                    b.HasIndex("FacilityId");
+
+                    b.ToTable("Patient", (string)null);
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureCategory", b =>
                 {
                     b.Property<int>("ProcedureCategoryId")
@@ -334,7 +355,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
@@ -343,7 +363,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -374,7 +393,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -403,7 +421,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
@@ -412,7 +429,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("name");
 
@@ -435,12 +451,10 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_at");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("last_name");
 
@@ -449,13 +463,40 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("modified_at");
 
                     b.Property<string>("Npi")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("npi");
 
                     b.HasKey("ProviderId");
 
                     b.ToTable("provider", (string)null);
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPhase", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TreatmentPhases");
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPlan", b =>
@@ -476,17 +517,18 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_user_id");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
-                    b.Property<int?>("FacilityProviderMapId")
-                        .HasColumnType("int")
-                        .HasColumnName("facility_provider_map_id");
+                    b.Property<int?>("FacilityId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("modified_at");
+
+                    b.Property<int?>("PatientId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ProcedureSubcategoryId")
                         .HasColumnType("int")
@@ -498,7 +540,9 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
                     b.HasKey("TreatmentPlanId");
 
-                    b.HasIndex("FacilityProviderMapId");
+                    b.HasIndex("FacilityId");
+
+                    b.HasIndex("PatientId");
 
                     b.HasIndex("ProcedureSubcategoryId");
 
@@ -523,7 +567,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnName("created_user_id");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
@@ -575,6 +618,9 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnType("int")
                         .HasColumnName("procedure_type_id");
 
+                    b.Property<int?>("TreatmentPhaseId")
+                        .HasColumnType("int");
+
                     b.Property<int>("VisitId")
                         .HasColumnType("int")
                         .HasColumnName("visit_id");
@@ -584,6 +630,8 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.HasIndex("CdtCodeId");
 
                     b.HasIndex("ProcedureTypeId");
+
+                    b.HasIndex("TreatmentPhaseId");
 
                     b.HasIndex("VisitId");
 
@@ -788,7 +836,7 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .IsRequired();
 
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
-                        .WithMany("CdtCodes")
+                        .WithMany()
                         .HasForeignKey("FacilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -803,7 +851,7 @@ namespace DentalTreatmentPlanner.Server.Migrations
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.FacilityProviderMap", b =>
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
-                        .WithMany("FacilityProviderMaps")
+                        .WithMany()
                         .HasForeignKey("FacilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -819,6 +867,17 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("Provider");
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Patient", b =>
+                {
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
+                        .WithMany()
+                        .HasForeignKey("FacilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Facility");
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureSubCategory", b =>
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureCategory", "ProcedureCategory")
@@ -832,15 +891,21 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPlan", b =>
                 {
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.FacilityProviderMap", "FacilityProviderMap")
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
                         .WithMany()
-                        .HasForeignKey("FacilityProviderMapId");
+                        .HasForeignKey("FacilityId");
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Patient", "Patient")
+                        .WithMany("TreatmentPlans")
+                        .HasForeignKey("PatientId");
 
                     b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureSubCategory", "ProcedureSubcategory")
                         .WithMany("TreatmentPlans")
                         .HasForeignKey("ProcedureSubcategoryId");
 
-                    b.Navigation("FacilityProviderMap");
+                    b.Navigation("Facility");
+
+                    b.Navigation("Patient");
 
                     b.Navigation("ProcedureSubcategory");
                 });
@@ -868,6 +933,10 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .WithMany("VisitCdtCodeMaps")
                         .HasForeignKey("ProcedureTypeId");
 
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.TreatmentPhase", "TreatmentPhase")
+                        .WithMany()
+                        .HasForeignKey("TreatmentPhaseId");
+
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Visit", "Visit")
                         .WithMany("VisitCdtCodeMaps")
                         .HasForeignKey("VisitId")
@@ -877,6 +946,8 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("CdtCode");
 
                     b.Navigation("ProcedureType");
+
+                    b.Navigation("TreatmentPhase");
 
                     b.Navigation("Visit");
                 });
@@ -944,11 +1015,9 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("CdtCodes");
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Facility", b =>
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Patient", b =>
                 {
-                    b.Navigation("CdtCodes");
-
-                    b.Navigation("FacilityProviderMaps");
+                    b.Navigation("TreatmentPlans");
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureCategory", b =>

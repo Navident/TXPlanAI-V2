@@ -4,25 +4,34 @@ import logo from '../../assets/navident-logo.svg';
 import circleIcon from '../../assets/circle-icon.svg';
 import userIcon from '../../assets/user-icon.svg';
 import Alert from '../Common/Alert/Alert';
+import { useNavigate } from 'react-router-dom';
 
 import SideBar from "./SideBar/SideBar";
 import './Dashboard.css';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { getCategories, getTreatmentPlansBySubcategory, getSubCategoriesByCategoryName } from '../../ClientServices/apiService';
-import { useBusiness } from '../../Contexts/useBusiness';
+import { getCategories, getTreatmentPlansBySubcategory, getSubCategoriesByCategoryName, getPatientsForUserFacility } from '../../ClientServices/apiService';
+import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 
 
 const Dashboard = () => {
     const [categories, setCategories] = useState([]);
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
+    const [isLoading, setIsLoading] = useState(false);
+    const { businessName } = useBusiness();
+    const navigate = useNavigate();
+
     const handleCloseAlert = () => {
         setAlertInfo({ ...alertInfo, open: false });
     };
-    const { businessName } = useBusiness();
-    console.log("Business Name in Dashboard:", businessName);
+
+    const handleLogoClick = () => {
+        navigate('/'); // Redirects to the root page
+    };
 
     const fetchCategoriesAndDetails = async () => {
+        setIsLoading(true);
+
         try {
             const fetchedCategories = await getCategories();
 
@@ -50,13 +59,20 @@ const Dashboard = () => {
             setCategories(categoriesWithSubcategories);
         } catch (error) {
             console.error('Error fetching category data:', error);
+        } finally {
+            setIsLoading(false);
+
         }
     };
-    useEffect(() => {
-        console.log("Dashboard mounted. Received businessName:", businessName);
 
+    useEffect(() => {
         fetchCategoriesAndDetails();
-        setAlertInfo({ open: true, type: 'success', message: 'You have successfully logged in.' });
+
+        // Check if the alert has been shown in this session
+        if (!sessionStorage.getItem('alertShown')) {
+            setAlertInfo({ open: true, type: 'success', message: 'You have successfully logged in.' });
+            sessionStorage.setItem('alertShown', 'true');
+        }
     }, []);
     return (
         <div className="dashboard-wrapper">
@@ -70,14 +86,14 @@ const Dashboard = () => {
             )}
             <div className="tx-container">
                 <HeaderBar
-                    leftCornerElement={<img src={circleIcon} alt="Logo" />}
+                    leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" onClick={handleLogoClick} />}
                     rightCornerElement={<div className="headerbar-business-name">{businessName}</div>}
                     className="dashboard-header"
                 />
                 <div className="tx-main-content">
                     <SideBar />
                     <div className="tx-content-area">                       
-                        <Outlet context={{ categories }} />
+                        <Outlet context={{ categories, isLoading }} />
                     </div>
                 </div>
             </div>

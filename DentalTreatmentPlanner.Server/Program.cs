@@ -5,15 +5,18 @@ using DentalTreatmentPlanner.Server.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Claims;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 var vaultUri = Environment.GetEnvironmentVariable("VaultUri");
-Console.WriteLine($"VaultUri: {vaultUri}");
 
 var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
 builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
@@ -23,9 +26,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add ASP.NET Core Identity services
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>() 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("HK7RVoSagLhrSkJeNGpOTZTrvqMLboQAX5ZsY7Tv6Cs=")), // Replace with a secure key
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            NameClaimType = ClaimTypes.Name
+        };
+    });
 
 // Register DentalTreatmentPlanner service
 builder.Services.AddScoped<DentalTreatmentPlannerService>();
@@ -70,6 +86,7 @@ app.UseHttpsRedirection();
 
 // Use Authentication and Authorization
 app.UseAuthentication();
+app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
