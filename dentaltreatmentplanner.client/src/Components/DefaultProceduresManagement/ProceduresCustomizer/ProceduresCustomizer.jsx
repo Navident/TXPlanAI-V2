@@ -20,7 +20,6 @@ const ProceduresCustomizer = () => {
                 if (plans) {
                     setTreatmentPlans(plans);
                 } else {
-                    // Handle the case when no treatment plans are returned or an error occurs
                     console.log(`No treatment plans found for subcategory: ${subcategory}`);
                 }
             }

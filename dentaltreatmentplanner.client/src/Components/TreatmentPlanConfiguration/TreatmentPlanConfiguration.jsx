@@ -186,7 +186,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                     selectedTreatmentPhase: treatmentPhaseObj,
                 };
 
-                // Check if both CDT code and treatment phase are selected, then convert to static row
+                // Check if both CDT code and treatment phase are selected then convert to static row
                 if (currentRow.selectedCdtCode && rowIndex === rows.length - 1) {
                     rows[rowIndex] = convertToStaticRow(currentRow, visitId, treatmentPhaseObj, null);
 
@@ -305,7 +305,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             return { ...visit, visitNumber: newOrderIndex + 1 }; 
         });
 
-        // Update parent component's state
         onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
 
         reorderAllRows(newOrder);
@@ -329,7 +328,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         const initialRowId = `initial-${tempVisitId}`;
 
         const newVisit = {
-            visitId: tempVisitId, // Use the temporary ID as a placeholder
+            visitId: tempVisitId, 
             treatment_plan_id: treatmentPlan.treatmentPlanId,
             visit_number: treatmentPlan.visits.length,
             description: "Visit " + (treatmentPlan.visits.length)
@@ -370,7 +369,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     const createNewTreatmentPlanFromDefault = async (treatmentPlan, allRows, visitOrder) => {
         try {
             const newTreatmentPlan = await handleCreateNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
-            // Handle the new treatment plan (e.g., updating state or UI)
             // Show success alert
             setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved successfully!' });
             return newTreatmentPlan;
@@ -382,7 +380,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     const createNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder) => {
         try {
             const newTreatmentPlan = await handleCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder, selectedPatient.patientId);
-            // Handle the new treatment plan (e.g., updating state or UI)
             // Show success alert
             setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved successfully!' });
             return newTreatmentPlan;
@@ -443,7 +440,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                 deepCopyAllRows[visitId].forEach(row => {
                     if (!row.visitCdtCodeMapId && row.selectedCdtCode) {
                         newProcedures.push({
-                            visitId: visitId, // Now using the actual visit ID
+                            visitId: visitId, 
                             CdtCodeId: row.selectedCdtCode.cdtCodeId,
                             Order: 0
                         });
@@ -503,7 +500,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, deepCopyAllRows, updatedVisitOrder, deletedRowIds, deletedVisitIds);
             const updatedTreatmentPlan = await updateTreatmentPlan(treatmentPlan.treatmentPlanId, updateDto);
 
-            // Call parent's callback with the updated treatment plan data
             onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
             console.log('Updated Treatment Plan:', updatedTreatmentPlan);
 
@@ -544,7 +540,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     };
 
     const constructStaticRowData = (row) => {
-        // Treatment phase display logic
         let treatmentPhaseDisplay = row.selectedTreatmentPhase ? row.selectedTreatmentPhase.label : 'No Treatment Phase';
 
         if (showToothNumber) {
