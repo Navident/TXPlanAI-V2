@@ -17,7 +17,6 @@ const PatientList = () => {
         navigate('/PatientManagementDashboard/create-new-patient');
     };
 
-
     return (
         <div className="all-patients-container rounded-box box-shadow">
             <div className="patients-inner-section">

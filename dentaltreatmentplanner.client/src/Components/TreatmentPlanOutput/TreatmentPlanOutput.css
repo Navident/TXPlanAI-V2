@@ -1,0 +1,78 @@
+
+
+.visit-separator td {
+    padding: 10px;
+}
+
+.visit-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.visit-number {
+    font-weight: bold;
+    text-align: left;
+}
+
+
+
+
+.treatment-plan-output-section {
+    flex-grow: 1;
+}
+
+.treatment-plan-output-section-inner {
+    padding: 20px;
+    height: 100%;
+}
+
+
+.extra-row {
+    position: relative;
+}
+
+.dynamic-table-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bottom-tx-plan-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.save-treatment-plan-text-btn {
+    text-decoration: underline;
+    color: #7777a1;
+    cursor: pointer;
+}
+
+.add-visit-btn-container {
+    background-color: #eeeef3;
+    width: 100%;
+    padding: 15px 12px;
+    border: 1px solid #7777a1;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+td, th {
+    position: relative;
+}
+
+.phase-label{
+    font-weight: 600;
+}
+
+.treatment-plan-phase-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

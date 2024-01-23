@@ -11,8 +11,11 @@ export const BusinessProvider = ({ children }) => {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [treatmentPhases, setTreatmentPhases] = useState([]);
 
-    // Fetch patients whenever the businessName changes
     useEffect(() => {
+        const storedBusinessName = localStorage.getItem('businessName');
+        if (storedBusinessName) {
+            setBusinessName(storedBusinessName);
+        }
         fetchPatientsForFacility();
     }, []);
 

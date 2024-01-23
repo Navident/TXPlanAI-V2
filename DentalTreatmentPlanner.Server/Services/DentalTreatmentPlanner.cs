@@ -174,7 +174,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     TreatmentPlanId = tp.TreatmentPlanId,
                     Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
-                    ToothNumber = tp.ToothNumber,
 
                     // Mapping each visit of the treatment plan to a VisitDto
                     Visits = tp.Visits.Select(v => new RetrieveVisitDto
@@ -189,6 +188,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             CdtCodeId = vc.CdtCode.CdtCodeId,
                             Order = vc.Order,
                             ProcedureTypeId = vc.ProcedureTypeId,
+                            ToothNumber = vc.ToothNumber,
                             Code = vc.CdtCode.Code,
                             LongDescription = vc.CdtCode.LongDescription
 
@@ -210,7 +210,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     TreatmentPlanId = tp.TreatmentPlanId,
                     Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
-                    ToothNumber = tp.ToothNumber,
 
                     // Mapping the visits and associated CDT codes for each treatment plan
                     Visits = tp.Visits.Select(v => new RetrieveVisitDto
@@ -225,6 +224,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             CdtCodeId = vc.CdtCode.CdtCodeId,
                             Order = vc.Order,
                             ProcedureTypeId = vc.ProcedureTypeId,
+                            ToothNumber = vc.ToothNumber,
                             Code = vc.CdtCode.Code,
                             LongDescription = vc.CdtCode.LongDescription
                         }).ToList()
@@ -251,7 +251,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     {
                         Description = treatmentPlanDto.Description,
                         ProcedureSubcategoryId = procedureSubCategory.ProcedureSubCategoryId,
-                        ToothNumber = treatmentPlanDto.ToothNumber,
                         CreatedUserId = treatmentPlanDto.CreatedUserId
                     };
 
@@ -268,18 +267,19 @@ namespace DentalTreatmentPlanner.Server.Services
                         };
 
                         _context.Visits.Add(visit);
-                        await _context.SaveChangesAsync(); 
+                        await _context.SaveChangesAsync();
 
                         // For each CDT code in the visit
-                        foreach (var cdtCodeId in visitDto.Description) //foreach (var cdtCodeId in visitDto.CdtCodeIds) - this is the correct logic, adding back later
-
+                        foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps)
                         {
                             var visitCdtCodeMap = new VisitCdtCodeMap
                             {
                                 VisitId = visit.VisitId,
-                                CdtCodeId = cdtCodeId,
-                                Order = 0, // Adding logic for this later
-                                ProcedureTypeId = null //adding logic for this later
+                                CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
+                                Order = visitCdtCodeMapDto.Order,
+                                ProcedureTypeId = visitCdtCodeMapDto.ProcedureTypeId,
+                                TreatmentPhaseId = visitCdtCodeMapDto.TreatmentPhaseId,
+                                ToothNumber = visitCdtCodeMapDto.ToothNumber 
                             };
 
                             _context.VisitCdtCodeMaps.Add(visitCdtCodeMap);
@@ -371,7 +371,6 @@ namespace DentalTreatmentPlanner.Server.Services
 
                     treatmentPlan.Description = updateTreatmentPlanDto.Description;
                     treatmentPlan.ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId;
-                    treatmentPlan.ToothNumber = updateTreatmentPlanDto.ToothNumber;
 
                     foreach (var visitDto in updateTreatmentPlanDto.Visits)
                     {
@@ -424,7 +423,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     {
                         Description = updateTreatmentPlanDto.Description,
                         ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId,
-                        ToothNumber = updateTreatmentPlanDto.ToothNumber,
                         FacilityId = facilityId,
                     };
 
@@ -435,16 +433,18 @@ namespace DentalTreatmentPlanner.Server.Services
                             Description = visitDto.Description,
                             VisitNumber = visitDto.VisitNumber,
                             VisitCdtCodeMaps = new List<VisitCdtCodeMap>(),
-                            // ... other properties ...
                         };
 
-                        foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps) 
+                        foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps)
                         {
                             VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
                             {
                                 CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
                                 Order = visitCdtCodeMapDto.Order,
-                                // ... other properties ...
+                                ProcedureTypeId = visitCdtCodeMapDto.ProcedureTypeId,
+                                TreatmentPhaseId = visitCdtCodeMapDto.TreatmentPhaseId,
+                                ToothNumber = visitCdtCodeMapDto.ToothNumber,
+                                                                             
                             };
                             newVisit.VisitCdtCodeMaps.Add(newProcedure);
                         }
@@ -478,7 +478,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     {
                         Description = updateTreatmentPlanDto.Description,
                         ProcedureSubcategoryId = null,
-                        ToothNumber = updateTreatmentPlanDto.ToothNumber,
                         FacilityId = facilityId,
                         PatientId = updateTreatmentPlanDto.PatientId,
                     };
@@ -498,6 +497,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             {
                                 CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
                                 Order = visitCdtCodeMapDto.Order,
+                                ToothNumber = visitCdtCodeMapDto.ToothNumber, 
                             };
                             newVisit.VisitCdtCodeMaps.Add(newProcedure);
                         }
@@ -520,7 +520,6 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-
         private void UpdateVisitCdtCodes(Visit visit, ICollection<VisitCdtCodeMapDto> updatedCdtCodeMaps)
         {
             // Update existing VisitCdtCodeMaps
@@ -530,10 +529,11 @@ namespace DentalTreatmentPlanner.Server.Services
                 if (cdtCodeMap != null)
                 {
                     cdtCodeMap.Order = cdtCodeMapDto.Order;
-                    cdtCodeMap.TreatmentPhaseId = cdtCodeMapDto.TreatmentPhaseId; 
+                    cdtCodeMap.TreatmentPhaseId = cdtCodeMapDto.TreatmentPhaseId;
+                    cdtCodeMap.ToothNumber = cdtCodeMapDto.ToothNumber;
+                                                                       
                 }
             }
-
             // Remove VisitCdtCodeMaps that are no longer in the updated list
             var cdtCodeMapsToRemove = visit.VisitCdtCodeMaps
                 .Where(c => !updatedCdtCodeMaps.Any(uc => uc.VisitCdtCodeMapId == c.VisitCdtCodeMapId))
@@ -544,6 +544,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 _context.VisitCdtCodeMaps.Remove(cdtCodeMap);
             }
         }
+
 
 
         public async Task<VisitCreationResult> CreateVisitAsync(CreateVisitDto createVisitDto)
@@ -661,9 +662,9 @@ namespace DentalTreatmentPlanner.Server.Services
                     TreatmentPlanId = tp.TreatmentPlanId,
                     Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
-                    ToothNumber = tp.ToothNumber,
                     FacilityId = tp.FacilityId,
                     CreatedUserId = tp.CreatedUserId,
+                    ProcedureCategoryName = tp.ProcedureSubcategory.ProcedureCategory.Name,
 
                     // Mapping each visit of the treatment plan to a RetrieveVisitDto
                     Visits = tp.Visits.Select(v => new RetrieveVisitDto
@@ -680,6 +681,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             Order = vc.Order,
                             ProcedureTypeId = vc.ProcedureTypeId,
                             TreatmentPhaseId = vc.TreatmentPhaseId,
+                            ToothNumber = vc.ToothNumber,
                             TreatmentPhaseLabel = vc.TreatmentPhase != null ? vc.TreatmentPhase.Label : null, // Include TreatmentPhase Label
                             Code = vc.CdtCode.Code,
                             LongDescription = vc.CdtCode.LongDescription
@@ -704,7 +706,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     TreatmentPlanId = tp.TreatmentPlanId,
                     Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
-                    ToothNumber = tp.ToothNumber,
                     CreatedUserId = tp.CreatedUserId,
                     CreatedAt = tp.CreatedAt,
 
@@ -722,6 +723,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             CdtCodeId = vc.CdtCode.CdtCodeId,
                             Order = vc.Order,
                             ProcedureTypeId = vc.ProcedureTypeId,
+                            ToothNumber = vc.ToothNumber,
                             Code = vc.CdtCode.Code,
                             LongDescription = vc.CdtCode.LongDescription
                         }).ToList()

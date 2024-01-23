@@ -16,7 +16,6 @@
         public DateTime? ModifiedAt { get; set; }
 
         public TreatmentPlan TreatmentPlan { get; set; }
-        //public User CreatedUser { get; set; }
         public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
     }
 }

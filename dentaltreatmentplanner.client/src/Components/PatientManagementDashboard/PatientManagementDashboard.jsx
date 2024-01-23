@@ -26,7 +26,6 @@ const PatientManagementDashboard = () => {
     const showGoBack = !location.pathname.includes('/create-new-patient');
 
     const handleBackClick = () => {
-        // Navigate back to the previous page
         navigate(-1); 
     };
     const handleLogoClick = () => {

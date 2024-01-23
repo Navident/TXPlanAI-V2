@@ -4,8 +4,8 @@
     {
         public int TreatmentPlanId { get; set; }
         public string Description { get; set; }
-        public int? ProcedureSubcategoryId { get; set; } 
-        public int? ToothNumber { get; set; } 
+        public int? ProcedureSubcategoryId { get; set; }
+        public string ProcedureCategoryName { get; set; }
         public int? FacilityId { get; set; }
         public int? CreatedUserId { get; set; }
 

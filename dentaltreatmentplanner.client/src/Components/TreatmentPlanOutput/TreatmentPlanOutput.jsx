@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
-import './TreatmentPlanConfiguration.css';
+import './TreatmentPlanOutput.css';
 import Table from "../Table/Table";
 import { useState, useEffect, useRef } from 'react';
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
 import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewCombinedTreatmentPlanForPatient } from '../../ClientServices/apiService';
 import { mapToUpdateTreatmentPlanDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';
-import { sortTreatmentPlan } from '../../Utils/helpers';
+import {sortTreatmentPlanWithPhases } from '../../Utils/helpers';
 import deleteIcon from '../../assets/delete-x.svg';
 import dragIcon from '../../assets/drag-icon.svg';
 import Alert from '../Common/Alert/Alert';
@@ -14,7 +14,7 @@ import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { useContext } from 'react';
 import TreatmentPlanContext from '../../Contexts/TreatmentPlanContext/TreatmentPlanContext';
 
-const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
+const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
     const [allRows, setAllRows] = useState({});
     const [visitOrder, setVisitOrder] = useState([]);
     const [deletedRowIds, setDeletedRowIds] = useState([]);
@@ -36,30 +36,52 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     };
 
     useEffect(() => {
-        if (isInGenerateTreatmentPlanContext) {
-            setCombinedVisits(treatmentPlan.visits);
-        } else {
-            setCombinedVisits(treatmentPlan.visits);
-        }
-    }, [treatmentPlan, isInGenerateTreatmentPlanContext]);
+        let visits = [];
+        // Extract visits from all phases
+        Object.values(treatmentPlan.phases).forEach(phaseVisits => {
+            visits = visits.concat(phaseVisits);
+        });
+
+        console.log('Extracted visits:', visits);
+        setCombinedVisits(visits);
+
+    }, [treatmentPlan]); 
 
     useEffect(() => {
         if (isInitialLoad.current) {
             console.log('Initial treatmentPlan:', treatmentPlan);
-            const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
-            const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
-                const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
-                const initialRowId = `initial-${visitId}`;
-                acc[visitId] = [...staticRows, createDynamicRow(visitId, initialRowId)];
+            const { sortedVisits, sortedCdtCodes } = sortTreatmentPlanWithPhases(treatmentPlan);
+            sortedVisits.forEach(visit => {
+                console.log(`Tooth numbers in sorted visit ${visit.uniqueId}:`, visit.cdtCodes.map(c => c.toothNumber));
+            });
+            console.log("sortedCdtCodes", sortedCdtCodes);
+            const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, uniqueId) => {
+                console.log('Processing uniqueId in sortedCdtCodes:', uniqueId);
+
+                const staticRows = sortedCdtCodes[uniqueId].map(createStaticRows);
+                console.log(`Static rows for uniqueId ${uniqueId}:`, staticRows);
+
+                const initialRowId = `initial-${uniqueId}`;
+                acc[uniqueId] = [...staticRows, createDynamicRow(uniqueId, initialRowId)];
+                console.log(`Accumulated rows for uniqueId ${uniqueId}:`, acc[uniqueId]);
+
                 return acc;
             }, {});
 
+            console.log('New allRows:', newAllRows);
+
             setAllRows(newAllRows);
-            setVisitOrder(sortedVisits.map(visit => visit.visitId));
-            isInitialLoad.current = false; // Set the flag to false after initial setup
+            setVisitOrder(sortedVisits.map(visit => visit.uniqueId));
+            console.log('Visit order:', sortedVisits.map(visit => visit.uniqueId));
+
+            isInitialLoad.current = false;
         }
     }, [treatmentPlan, cdtCodes]);
+
+
+
+
 
     useEffect(() => {
         setLocalUpdatedVisits(treatmentPlan.visits);
@@ -67,12 +89,14 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
 
     const createStaticRows = (visitCdtCodeMap, index) => {
+        console.log(`Creating static row for uniqueId ${visitCdtCodeMap.uniqueId}:`, visitCdtCodeMap);
+
         const extraRowInput = showToothNumber
             ? [visitCdtCodeMap.toothNumber, visitCdtCodeMap.code, visitCdtCodeMap.longDescription]
             : [visitCdtCodeMap.code, visitCdtCodeMap.longDescription];
 
         return {
-            id: `static-${visitCdtCodeMap.visitId}-${index}`,
+            id: `static-${visitCdtCodeMap.uniqueId}-${index}`,  // Using uniqueId here
             visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
             description: visitCdtCodeMap.longDescription,
             selectedCdtCode: visitCdtCodeMap,
@@ -83,6 +107,8 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             extraRowInput
         };
     };
+
+
 
 
     const createTreatmentPhaseDropdown = (visitId, rowId, treatmentPhases) => {
@@ -248,7 +274,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
         if (result.type === "row") {
             const tableId = result.source.droppableId.replace('droppable-table-', '');
-            const rows = allRows[tableId]; 
+            const rows = allRows[tableId];
 
             if (!rows) {
                 return;
@@ -293,7 +319,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         // Update visitNumber for each visit
         const updatedVisits = treatmentPlan.visits.map(visit => {
             const newOrderIndex = newOrder.indexOf(visit.visitId);
-            return { ...visit, visitNumber: newOrderIndex + 1 }; 
+            return { ...visit, visitNumber: newOrderIndex + 1 };
         });
 
         onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
@@ -319,7 +345,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         const initialRowId = `initial-${tempVisitId}`;
 
         const newVisit = {
-            visitId: tempVisitId, 
+            visitId: tempVisitId,
             treatment_plan_id: treatmentPlan.treatmentPlanId,
             visit_number: treatmentPlan.visits.length,
             description: "Visit " + (treatmentPlan.visits.length)
@@ -383,17 +409,9 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     const handleUpdateTreatmentPlan = async () => {
         try {
 
-            // Check if the treatment plan is a default plan
-            if (treatmentPlan.facilityId === null) {
-                // Logic to create a new treatment plan from the default
-                const newTreatmentPlan = await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
-                return; // Exit the function as the rest of the code is for updating existing plans
-            }
+            const newCombinedTreatmentPlan = await createNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder);
 
-            // Identify new visits
             const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith('temp-'));
-
-            // Create new visits and store the responses
             const createVisitPromises = tempVisitIds.map(tempVisitId => {
                 const visitData = mapToCreateVisitDto(treatmentPlan, allRows, tempVisitId);
                 return createVisit(visitData, tempVisitId);
@@ -424,7 +442,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                 deepCopyAllRows[visitId].forEach(row => {
                     if (!row.visitCdtCodeMapId && row.selectedCdtCode) {
                         newProcedures.push({
-                            visitId: visitId, 
+                            visitId: visitId,
                             CdtCodeId: row.selectedCdtCode.cdtCodeId,
                             Order: 0
                         });
@@ -436,9 +454,9 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             const newProcedureResponse = await createNewProcedures(newProcedures);
             newProcedureResponse.forEach(proc => {
                 const { visitId, visitCdtCodeMapId, cdtCodeId } = proc;
-                const rows = deepCopyAllRows[visitId]; 
+                const rows = deepCopyAllRows[visitId];
                 if (!rows) {
-                    return; 
+                    return;
                 }
                 const rowIndex = rows.findIndex(row => row.selectedCdtCode && row.selectedCdtCode.cdtCodeId === cdtCodeId);
                 if (rowIndex > -1) {
@@ -491,7 +509,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
 
     const lockDimensions = () => {
-        
+
         const tables = document.querySelectorAll('.tx-table');
         tables.forEach(table => {
             const rows = table.querySelectorAll('tr');
@@ -508,8 +526,9 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
     const createHeaders = () => {
         let headers = showToothNumber
-            ? ['Tooth #', 'CDT Code', 'Description', 'Treatment Phase']
-            : ['', 'CDT Code', 'Description', 'Treatment Phase'];       
+            ? ['Tooth #', 'CDT Code', 'Description']
+            : ['', 'CDT Code', 'Description'];
+
         return headers;
     };
 
@@ -541,22 +560,9 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             labelKey="longDescription"
         />;
 
-        let treatmentPhaseDropdown = null;
-        if (!isInGenerateTreatmentPlanContext) {
-            const treatmentPhaseDropdownKey = `treatment-phase-dropdown-${row.id}`;
-            treatmentPhaseDropdown = <DropdownSearch
-                key={treatmentPhaseDropdownKey}
-                items={treatmentPhases}
-                selectedItem={row.selectedTreatmentPhase}
-                onSelect={(selectedPhase) => handleTreatmentPhaseSelect(selectedPhase, visitId, row.id)}
-                itemLabelFormatter={(phase) => phase.label} 
-                valueKey="id"
-            />;
-        }
-
         return showToothNumber
-            ? ['', cdtDropdown, row.description, treatmentPhaseDropdown]
-            : ['', cdtDropdown, row.description, treatmentPhaseDropdown];
+            ? ['', cdtDropdown, row.description]
+            : ['', cdtDropdown, row.description];
     };
 
     const createDeleteIconCell = (row, visitId, index, visitRows) => {
@@ -595,34 +601,33 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         };
     };
 
-    const renderVisit = (visitId, index) => {
-        const visitIdStr = String(visitId);
-        const isTempVisit = visitIdStr.startsWith('temp-');
-
-        const visit = isTempVisit
-            ? { visitId: visitIdStr, visit_number: index + 1 }
-            : localUpdatedVisits.find(v => String(v.visitId) === visitIdStr);
+    const renderVisit = (visit, index) => {
+        console.log(`Rendering visit with uniqueId ${visit.uniqueId}:`, visit);
 
         if (!visit) {
+            console.log("No visit data available");
             return null;
         }
-        const draggableKey = isTempVisit ? `temp-visit-${index}` : `visit-${visit.visitId}`;
+
+        const uniqueIdStr = visit.uniqueId;
+        const draggableKey = `visit-${uniqueIdStr}`;
         const headers = createHeaders();
 
-        if (!allRows[visitIdStr]) {
-            return null; 
+        if (!allRows[uniqueIdStr]) {
+            console.log(`No rows found for uniqueId ${uniqueIdStr}`);
+            return null;
         }
 
-        const tableRows = allRows[visitIdStr].map((row, rowIndex) => {
-            return createTableRow(row, visit.visitId, headers, rowIndex, allRows[visitIdStr]);
+        const tableRows = allRows[uniqueIdStr].map((row, rowIndex) => {
+            return createTableRow(row, uniqueIdStr, headers, rowIndex, allRows[uniqueIdStr]);
         });
 
         return (
-            <Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
+            <Draggable key={draggableKey} draggableId={`visit-${uniqueIdStr}`} index={index} type="table">
                 {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
                         <div {...provided.dragHandleProps} className="visit-header">
-                            Visit {index + 1}
+                            Visit {visit.visitNumber} 
                         </div>
                         <Table
                             headers={headers}
@@ -660,7 +665,15 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                     <Droppable droppableId="visits-droppable" type="table" direction="vertical">
                         {(provided) => (
                             <div {...provided.droppableProps} ref={provided.innerRef} className="table-container">
-                                {visitOrder.map((visitId, index) => renderVisit(visitId, index))}
+                                {Object.entries(treatmentPlan.phases).map(([phaseLabel, visits], phaseIndex) => {
+                                    console.log(`Rendering phase: ${phaseLabel} with visits`, visits);
+                                    return (
+                                        <div key={`phase-${phaseIndex}`} className="treatment-plan-phase-section">
+                                            <div className="phase-label">{phaseLabel}</div>
+                                            {visits.map((visit, visitIndex) => renderVisit(visit, visitIndex))}
+                                        </div>
+                                    );
+                                })}
                                 {provided.placeholder}
                             </div>
                         )}
@@ -680,7 +693,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 };
 
 
-TreatmentPlanConfiguration.propTypes = {
+TreatmentPlanOutput.propTypes = {
     treatmentPlan: PropTypes.shape({
         description: PropTypes.string,
         toothNumber: PropTypes.number,
@@ -702,9 +715,9 @@ TreatmentPlanConfiguration.propTypes = {
     hideToothNumber: PropTypes.bool
 };
 
-TreatmentPlanConfiguration.defaultProps = {
+TreatmentPlanOutput.defaultProps = {
     includeExtraRow: false,
     imageIconSrc: false,
 };
 
-export default TreatmentPlanConfiguration;
+export default TreatmentPlanOutput;

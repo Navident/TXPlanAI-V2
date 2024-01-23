@@ -11,7 +11,6 @@
         public int TreatmentPlanId { get; set; }
         public string Description { get; set; }
         public int? ProcedureSubcategoryId { get; set; }
-        public int? ToothNumber { get; set; }
         public DateTime CreatedAt { get; private set; } 
         public int? CreatedUserId { get; set; }
         public DateTime? ModifiedAt { get; set; }

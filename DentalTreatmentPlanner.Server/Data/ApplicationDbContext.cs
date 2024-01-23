@@ -68,6 +68,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
                 entity.Property(e => e.Order).HasColumnName("order");
                 entity.Property(e => e.ProcedureTypeId).HasColumnName("procedure_type_id");
+                entity.Property(e => e.ToothNumber).HasColumnName("tooth_number"); 
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
             });
@@ -89,7 +90,6 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.TreatmentPlanId).HasColumnName("treatment_plan_id");
                 entity.Property(e => e.Description).HasColumnName("description");
                 entity.Property(e => e.ProcedureSubcategoryId).HasColumnName("procedure_subcategory_id"); 
-                entity.Property(e => e.ToothNumber).HasColumnName("tooth_number");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");

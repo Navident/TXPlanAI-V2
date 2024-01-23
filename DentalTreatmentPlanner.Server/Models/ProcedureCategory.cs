@@ -11,7 +11,6 @@ namespace DentalTreatmentPlanner.Server.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ModifiedAt { get; set; }
 
-        // Collection of Subcategories
         public ICollection<ProcedureSubCategory> ProcedureSubCategories { get; set; }
     }
 }

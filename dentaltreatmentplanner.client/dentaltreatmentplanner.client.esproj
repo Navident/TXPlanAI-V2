@@ -16,6 +16,7 @@
     <Folder Include="src\Components\Dashboard\Home\" />
     <Folder Include="src\Components\DefaultProceduresManagement\ProceduresCustomizer\" />
     <Folder Include="src\Components\Login\" />
+    <Folder Include="src\Components\TreatmentPlanOutput\" />
     <Folder Include="src\Components\PatientManagementDashboard\GenerateTreatmentPlan\" />
     <Folder Include="src\Components\PatientManagementDashboard\PatientInfoSection\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />

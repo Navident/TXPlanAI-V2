@@ -35,17 +35,15 @@ const Login = () => {
     };
 
     const handleLoginClick = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         const credentials = { email, password };
         const response = await loginUser(credentials);
 
-        setLoading(false); // Stop loading
+        setLoading(false); 
 
         if (response.isSuccess) {
-            console.log("Backend response object:", response);
-            // Extract the facility name from the nested user object
             const facilityName = response.user?.facility?.name;
-            console.log("Calling setBusinessName with:", facilityName);
+            localStorage.setItem('businessName', facilityName);
             setBusinessName(facilityName); // Set the business name with the facility name
             navigate("/dashboard");
         } else {
