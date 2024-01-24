@@ -2,13 +2,13 @@
 //const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
 //const VISITS_API_URL = 'https://localhost:7089/api/visits';
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
-const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
+const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
 const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
-const VISITS_API_URL = 'https://localhost:7089/api/visits';
+const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
-const PATIENTS_API_URL = 'https://localhost:7089/api/Patient';
-const TREATMENT_PHASES_API_URL = 'https://localhost:7089/api/treatmentphases';
+const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
+const TREATMENT_PHASES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/treatmentphases';
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
@@ -230,7 +230,7 @@ export const updateTreatmentPlan = async (id, updatedData) => {
         }
     } catch (error) {
         console.error('Error updating treatment plan:', error.message);
-        throw error; // Re-throwing the error for the caller to handle it appropriately
+        throw error;
     }
 };
 
@@ -368,7 +368,7 @@ export const getTreatmentPlansBySubcategory = async (subcategoryName) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+                'Authorization': `Bearer ${token}` 
             },
         });
 
