@@ -35,7 +35,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
     try {
-        const response = await fetch('https://localhost:7089/api/account/login', {
+        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
