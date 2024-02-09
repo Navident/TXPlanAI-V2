@@ -26,7 +26,7 @@ const GenerateTreatmentPlan = () => {
     } = useTreatmentPlan(); 
 
     const [inputText, setInputText] = useState('');
-    const { fetchFacilityPayerCdtCodeFees, facilityPayerCdtCodeFees } = useBusiness(); 
+    const { fetchFacilityPayerCdtCodeFees, selectedPatient, facilityPayerCdtCodeFees } = useBusiness(); 
 
     useEffect(() => {
         if (treatmentPlanId) {
@@ -62,7 +62,7 @@ const GenerateTreatmentPlan = () => {
         if (!inputText.trim()) {
             return;
         }
-        if (!selectedPayer) {
+        if (!selectedPatient) {
             showAlert('error', 'Please select a patient before generating a treatment plan.');
             return; 
         }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import RoundedButton from "../Common/RoundedButton/RoundedButton";
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { StyledPatientInfoInnerContainer, StyledGridItem, StyledGridItemLabel } from './index.style'
+import { StyledPatientInfoInnerContainer, StyledGridItem, StyledGridItemLabel, StyledGridItemLabelAndValueText, StyledGridItemValueText } from './index.style'
 import { StyledRoundedBoxContainer } from '../../GlobalStyledComponents';
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
 import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
@@ -59,34 +59,36 @@ const PatientInfoSection = () => {
         );
     };
 
-
-
-
     return (
         <StyledRoundedBoxContainer>
             <StyledPatientInfoInnerContainer>
                 <StyledGridItem>
-                    <div className="grid-item-1-inner large-text">
-                        {selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : "Select a patient"}
-                    </div>
+                    <StyledGridItemLabel>
+                        Name:
+                    </StyledGridItemLabel>
+                    <StyledGridItemValueText>{selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : "Select a patient"}</StyledGridItemValueText>
                 </StyledGridItem>
-                <StyledGridItem>
-                    <div className="grid-item-2-inner">
-                        <StyledGridItemLabel>DOB:
-                            <div>{selectedPatient ? new Date(selectedPatient.dateOfBirth).toLocaleDateString("en-CA") : ""}</div>
+                <StyledGridItem $flexDirection="column" $alignItems="flex-start">
+                    <StyledGridItemLabelAndValueText>
+                        <StyledGridItemLabel>
+                            DOB:
                         </StyledGridItemLabel>
-                        <StyledGridItemLabel>PATIENT ID:
-                            <div> {selectedPatient ? selectedPatient.patientId : ""} </div>
+                        <StyledGridItemValueText>{selectedPatient ? new Date(selectedPatient.dateOfBirth).toLocaleDateString("en-CA") : ""}</StyledGridItemValueText>
+                    </StyledGridItemLabelAndValueText>
+                    <StyledGridItemLabelAndValueText>
+                        <StyledGridItemLabel>
+                            PATIENT ID:
                         </StyledGridItemLabel>
-                    </div>
-                </StyledGridItem>
-                <StyledGridItem>
-                    <div className="grid-item-2-inner">
+                        <StyledGridItemValueText> {selectedPatient ? selectedPatient.patientId : ""} </StyledGridItemValueText>
+                    </StyledGridItemLabelAndValueText>
+                </StyledGridItem> 
+                <StyledGridItem> 
+                    <StyledGridItemLabelAndValueText>
                         <StyledGridItemLabel>
                             Payer:
                             {renderPayerDropdown()}
                         </StyledGridItemLabel>
-                    </div>
+                    </StyledGridItemLabelAndValueText>
                 </StyledGridItem>
                 <StyledGridItem>
                     <div className="patient-info-inner-buttons">
@@ -114,11 +116,11 @@ const PatientInfoSection = () => {
                             />
                         )}
                     </div>
-
                 </StyledGridItem>
             </StyledPatientInfoInnerContainer>
         </StyledRoundedBoxContainer>
     );
+
 };
 
 export default PatientInfoSection;

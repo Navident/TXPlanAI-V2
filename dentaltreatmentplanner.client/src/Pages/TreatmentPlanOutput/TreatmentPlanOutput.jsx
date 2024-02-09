@@ -69,8 +69,8 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     const createInitialStaticRows = (visitCdtCodeMap, index) => {
         const fee = facilityPayerCdtCodeFees.find(f => f.code === visitCdtCodeMap.code);
-        const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
-        const discountFee = fee ? fee.discountFeeDollarAmount : "Not configured";
+        const ucrFee = selectedPayer ? (fee ? fee.ucrDollarAmount : "Not configured") : "No payer selected";
+        const discountFee = selectedPayer ? (fee ? fee.discountFeeDollarAmount : "Not configured") : "No payer selected";
         const extraRowInput = [
             visitCdtCodeMap.toothNumber, 
             visitCdtCodeMap.code,

@@ -28,7 +28,6 @@ const EditFacilityFeeScheduling = () => {
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
 
-
     useEffect(() => {
         fetchFacilityPayerCdtCodeFees(payerId);
     }, [payerId]);
@@ -62,9 +61,6 @@ const EditFacilityFeeScheduling = () => {
         }
     }, [facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, activeCdtCodes]);
 
-
-
-
     const renderStaticRow = (row, index) => ([
         <span key={`code-${index}`}>{row.code}</span>,
         <span key={`description-${index}`}>{row.description}</span>,
@@ -72,8 +68,6 @@ const EditFacilityFeeScheduling = () => {
         <span key={`discountFee-${index}`}>{row.discountFee ? `$${row.discountFee}` : ''}</span>,
         createDeleteAndEditIconCell(row, index)
     ]);
-
-
 
     const renderDynamicRow = (row, index) => {
         const lastCell = (row.id === editingRowId ? renderDoneCancelText(row.id) : null);
@@ -101,13 +95,21 @@ const EditFacilityFeeScheduling = () => {
         ];
     };
 
-    // Active CDT Codes Table Rows
-    const activeTableRows = activeRowsData.map((row, index) => ({
+    // Filter active and inactive rows based on search input text
+    const filteredActiveRowsData = activeRowsData.filter(row =>
+        row.code.toLowerCase().includes(searchInputText) || row.description.toLowerCase().includes(searchInputText)
+    );
+    const filteredInactiveRowsData = inactiveRowsData.filter(row =>
+        row.code.toLowerCase().includes(searchInputText) || row.description.toLowerCase().includes(searchInputText)
+    );
+
+    // Render filtered active CDT Codes Table Rows
+    const activeTableRows = filteredActiveRowsData.map((row, index) => ({
         data: row.isStatic ? renderStaticRow(row, index) : renderDynamicRow(row, index),
     }));
 
-    // Inactive CDT Codes Table Rows
-    const inactiveTableRows = inactiveRowsData.map((row, index) => ({
+    // Render filtered inactive CDT Codes Table Rows
+    const inactiveTableRows = filteredInactiveRowsData.map((row, index) => ({
         data: row.isStatic ? renderStaticRow(row, index) : renderDynamicRow(row, index),
     }));
 
@@ -115,7 +117,6 @@ const EditFacilityFeeScheduling = () => {
     const saveFacilityPayerCdtCodeFeesChanges = async () => {
         // Combine active and inactive rows before filtering and mapping
         const combinedRowsData = [...activeRowsData, ...inactiveRowsData];
-        console.log("Combined Rows Data in saveFacilityPayerCdtCodeFeesChanges:", combinedRowsData);
 
         // New Fees being created
         const newFees = combinedRowsData.filter(row => !row.UcrFeeId && row.isEdited).map(row => ({
@@ -130,8 +131,6 @@ const EditFacilityFeeScheduling = () => {
             UcrDollarAmount: parseFloat(row.ucrFee),
             DiscountFeeDollarAmount: parseFloat(row.discountFee)
         }));
-        console.log("New Fees:", newFees);
-        console.log("Updated Fees:", updatedFees);
 
         const payload = {
             payerId: parseInt(payerId, 10),
@@ -149,8 +148,6 @@ const EditFacilityFeeScheduling = () => {
 
 
     const handleEditRow = (rowId) => {
-        console.log("we went inside the handleEditRow");
-
         // Determine if the row is active or inactive
         let isRowActive = activeRowsData.some(row => row.id === rowId);
         let originalRow;
@@ -241,7 +238,6 @@ const EditFacilityFeeScheduling = () => {
     }
 
     const handleInputChange = (rowId, field, value) => {
-        // Assuming rowId is correctly passed now
         const updateRowData = (rows) => rows.map(row => {
             if (row.id === rowId) {
                 return { ...row, [field]: value };
@@ -256,13 +252,8 @@ const EditFacilityFeeScheduling = () => {
         }
     };
 
-
-    const handleCloseAlert = () => {
-        setAlertInfo({ ...alertInfo, open: false });
-    };
-
     const handleSearchChange = (event) => {
-        setSearchInputText(event.target.value);
+        setSearchInputText(event.target.value.toLowerCase());
     };
 
     return (
@@ -313,7 +304,7 @@ const EditFacilityFeeScheduling = () => {
                         borderColor={UI_COLORS.purple}
                         width="300px"
                     />
-                    <StyledTableLabelText>Active CDT Codes</StyledTableLabelText> 
+                    <StyledTableLabelText>Active CDT Codes</StyledTableLabelText>
                     <UniversalTable headers={headers} rows={activeTableRows} columnWidths={columnWidths} />
                     <StyledTableLabelText>Inactive CDT Codes</StyledTableLabelText>
                     <UniversalTable headers={headers} rows={inactiveTableRows} columnWidths={columnWidths} />

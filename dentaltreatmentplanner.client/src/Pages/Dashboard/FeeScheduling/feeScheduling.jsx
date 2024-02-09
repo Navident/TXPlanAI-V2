@@ -242,7 +242,21 @@ const FeeScheduling = () => {
     };
 
     const handleSearchChange = (event) => {
-        setInputText(event.target.value);
+        setInputText(event.target.value.toLowerCase());
+    };
+
+    // Filter rowsData based on inputText
+    const filteredRowsData = rowsData.filter(row => row.payerName.toLowerCase().includes(inputText));
+
+    const renderRows = () => {
+        // Map over filteredRowsData instead of rowsData
+        return filteredRowsData.map((row, index) => {
+            return {
+                data: row.isStatic ?
+                    renderStaticRow(row, index) :
+                    renderDynamicRow(row, index)
+            };
+        });
     };
 
 
@@ -291,7 +305,7 @@ const FeeScheduling = () => {
                     </div>
                     <StyledRoundedBoxContainer>
                         <StyledRoundedBoxContainerInner>
-                            <UniversalTable headers={headers} rows={rows} />
+                                <UniversalTable headers={headers} rows={renderRows()} />
                             <StyledSaveTextBtn onClick={updatePayers}>
                                 Save
                             </StyledSaveTextBtn>
