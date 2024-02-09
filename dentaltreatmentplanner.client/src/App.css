@@ -20,25 +20,6 @@
     font-size: 18px;
 }
 
-.tx-content-area {
-    flex-grow: 1;
-    padding: 20px;
-    gap: 20px;
-    display: flex;
-    overflow-y: auto;
-    flex-direction: column;
-}
-.tx-main-content {
-    display: flex;
-    flex-grow: 1;
-    padding-top: 80px;
-}
-.tx-container {
-    background-color: #eeeef3;
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
-}
 .login-signup-header.large-text {
     line-height: 1;
 }
@@ -54,7 +35,7 @@
 .table-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 40px;
 }
 .sidebar-container {
     background-color: white;
@@ -94,7 +75,6 @@
     padding: 12px;
     text-align: left;
     box-sizing: border-box;
-    vertical-align: top;
 }
 
     .tx-table th{
@@ -199,7 +179,7 @@
 }
 
 .tx-table tr td:nth-child(6) {
-    width: 1%;
+    width: 10%;
     
 }
 
@@ -325,19 +305,15 @@ nav {
     max-width: 700px;
 }
 
-
 .back-btn-arrow{
     cursor: pointer;
 }
-
-
 
 .box-shadow {
     -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 
 .green-button {
     width: 260px;
@@ -361,12 +337,6 @@ nav {
     margin-top: 80px;
 }
 
-.semibold-black-title {
-    font-size: 21px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
 .underlined-text {
     text-decoration: underline;
     color: black;
@@ -377,15 +347,6 @@ nav {
         cursor:pointer;
     }
 
-
-.primary-subheading {
-    font-weight: 700;
-    color: #fe9e0d;
-    font-size: 1.15rem;
-}
-
-
-
 @media (max-width: 800px) {
     .header-left-corner-container {
         max-width: 140px;
@@ -394,8 +355,6 @@ nav {
     .navbar-menu-container {
         display: flex;
     }
-
-
 
     .primary-heading {
         text-align: center;
@@ -406,16 +365,5 @@ nav {
         text-align: center;
         max-width: 80%;
     }
-
-    .landing-left-text-section,
-    .about-section-text-container {
-        justify-content: center;
-        align-items: center;
-        margin-top: 4rem;
-    }
-
-
-
-
 
 }

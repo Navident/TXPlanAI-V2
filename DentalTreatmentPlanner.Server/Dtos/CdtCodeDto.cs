@@ -4,7 +4,7 @@
     {
         public int CdtCodeId { get; set; }
         public string Code { get; set; }
-        public int FacilityId { get; set; }
+        public int? FacilityId { get; set; }
         public int CdtCodeCategoryId { get; set; }
         public int CdtCodeSubcategoryId { get; set; }
         public string LongDescription { get; set; }

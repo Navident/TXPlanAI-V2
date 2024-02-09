@@ -3,6 +3,8 @@ import './TreatmentPlanConfiguration.css';
 import Table from "../Table/Table";
 import { useState, useEffect, useRef } from 'react';
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
+import StandardTextfield from "../Common/StandardTextfield/StandardTextfield";
+import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
 import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewCombinedTreatmentPlanForPatient } from '../../ClientServices/apiService';
 import { mapToUpdateTreatmentPlanDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';
@@ -11,8 +13,10 @@ import deleteIcon from '../../assets/delete-x.svg';
 import dragIcon from '../../assets/drag-icon.svg';
 import Alert from '../Common/Alert/Alert';
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
-import { useContext } from 'react';
-import TreatmentPlanContext from '../../Contexts/TreatmentPlanContext/TreatmentPlanContext';
+import { useMemo } from 'react';
+import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../GlobalStyledComponents';
+import { UI_COLORS } from '../../Theme';
+import pencilEditIcon from '../../assets/pencil-edit-icon.svg';
 
 const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
     const [allRows, setAllRows] = useState({});
@@ -24,34 +28,28 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [combinedVisits, setCombinedVisits] = useState([]);
-    const { cdtCodes } = useContext(TreatmentPlanContext);
-
-    const { selectedPatient } = useBusiness();
-    const {
-        treatmentPhases,
-    } = useBusiness();
+    const { facilityCdtCodes, defaultCdtCodes } = useBusiness(); 
+    const combinedCdtCodes = useMemo(() => [...defaultCdtCodes, ...facilityCdtCodes], [defaultCdtCodes, facilityCdtCodes]);
+    const [editingRowId, setEditingRowId] = useState(null);
+    const [originalRowData, setOriginalRowData] = useState(null);
+    const [editedRows, setEditedRows] = useState([]);
 
     const handleCloseAlert = () => {
         setAlertInfo({ ...alertInfo, open: false });
     };
 
     useEffect(() => {
-        if (isInGenerateTreatmentPlanContext) {
-            setCombinedVisits(treatmentPlan.visits);
-        } else {
-            setCombinedVisits(treatmentPlan.visits);
-        }
+        setCombinedVisits(treatmentPlan.visits);
     }, [treatmentPlan, isInGenerateTreatmentPlanContext]);
 
     useEffect(() => {
         if (isInitialLoad.current) {
-            console.log('Initial treatmentPlan:', treatmentPlan);
             const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
             const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
                 const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
                 const initialRowId = `initial-${visitId}`;
-                acc[visitId] = [...staticRows, createDynamicRow(visitId, initialRowId)];
+                acc[visitId] = [...staticRows, createDynamicRowv1(visitId, initialRowId)];
                 return acc;
             }, {});
 
@@ -59,7 +57,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             setVisitOrder(sortedVisits.map(visit => visit.visitId));
             isInitialLoad.current = false; // Set the flag to false after initial setup
         }
-    }, [treatmentPlan, cdtCodes]);
+    }, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
 
     useEffect(() => {
         setLocalUpdatedVisits(treatmentPlan.visits);
@@ -76,29 +74,13 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
             description: visitCdtCodeMap.longDescription,
             selectedCdtCode: visitCdtCodeMap,
-            selectedTreatmentPhase: {
-                label: visitCdtCodeMap.treatmentPhaseLabel || "No Treatment Phase",
-                id: visitCdtCodeMap.treatmentPhaseId
-            },
+            isStatic: true,
             extraRowInput
         };
     };
 
-
-    const createTreatmentPhaseDropdown = (visitId, rowId, treatmentPhases) => {
-        return (
-            <DropdownSearch
-                key={`${rowId}-treatment-phase`}
-                items={treatmentPhases}
-                selectedItem={''}
-                onSelect={(selectedPhase) => handleSelect(selectedPhase, visitId, rowId)}
-                itemLabelFormatter={(phase) => phase.label}
-            />
-        );
-    };
-
-    const createCDTCodeDropdown = (rowId, visitId, cdtCodes, handleSelect, selectedCdtCode) => {
-        const cdtCodeOptions = cdtCodes.map(code => ({
+    const createCDTCodeDropdown = (rowId, visitId, combinedCdtCodes, handleSelect, selectedCdtCode) => {
+        const cdtCodeOptions = combinedCdtCodes.map(code => ({
             id: code.code,
             ...code
         }));
@@ -115,17 +97,12 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     };
 
 
-    const createDynamicRow = (visitId, initialRowId) => {
-        const dropdownSearchElement = createCDTCodeDropdown(initialRowId, visitId, cdtCodes, handleSelect);
-
-        let treatmentPhaseDropdown = null;
-        if (!isInGenerateTreatmentPlanContext) {
-            treatmentPhaseDropdown = createTreatmentPhaseDropdown(visitId, initialRowId, treatmentPhases);
-        }
+    const createDynamicRowv1 = (visitId, initialRowId) => {
+        const dropdownSearchElement = createCDTCodeDropdown(initialRowId, visitId, combinedCdtCodes, handleSelect);
 
         const extraRowInput = showToothNumber
-            ? [treatmentPlan.toothNumber, dropdownSearchElement, treatmentPhaseDropdown]
-            : [dropdownSearchElement, treatmentPhaseDropdown];
+            ? [treatmentPlan.toothNumber, dropdownSearchElement]
+            : [dropdownSearchElement];
 
         return {
             id: initialRowId,
@@ -135,69 +112,53 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         };
     };
 
-    const convertToStaticRow = (currentRow, visitId, selectedTreatmentPhase, selectedCdtCode) => {
-        const description = selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description;
+    const convertToStaticRow = (currentRow, visitId, selectedCdtCode, originalDescription) => {
+        // Prioritize using the originalDescription if provided
+        const description = originalDescription || (selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description);
+
+        console.log("selectedcdtcode: ", selectedCdtCode, "originalDescription: ", originalDescription);
 
         return {
             ...currentRow,
             id: `static-${visitId}-${Date.now()}`,
+            isStatic: true,
             visitCdtCodeMapId: null,
             selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
-            selectedTreatmentPhase: selectedTreatmentPhase || currentRow.selectedTreatmentPhase,
+            description, // Use the adjusted description logic here
             extraRowInput: showToothNumber
                 ? [
                     treatmentPlan.toothNumber,
                     selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code,
                     description,
-                    selectedTreatmentPhase ? selectedTreatmentPhase.label : currentRow.selectedTreatmentPhase?.label
                 ]
                 : [
                     selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code,
                     description,
-                    selectedTreatmentPhase ? selectedTreatmentPhase.label : currentRow.selectedTreatmentPhase?.label
                 ]
         };
     };
 
 
+    const convertToDynamicRow = (currentRow, visitId) => {
+        const dropdownSearchElement = createCDTCodeDropdown(currentRow.id, visitId, combinedCdtCodes, handleSelect, currentRow.selectedCdtCode);
 
-    const handleTreatmentPhaseSelect = (selectedPhase, visitId, rowId) => {
-        const treatmentPhaseObj = treatmentPhases.find(phase => phase.id === selectedPhase.value);
+        const extraRowInput = showToothNumber
+            ? [currentRow.selectedCdtCode ? currentRow.selectedCdtCode.toothNumber : '', dropdownSearchElement]
+            : [dropdownSearchElement];
 
-        setAllRows(prevRows => {
-            let rows = [...prevRows[visitId]];
-            let rowIndex = rows.findIndex(row => row.id === rowId);
-
-            if (rowIndex !== -1) {
-                const currentRow = rows[rowIndex];
-
-                // Update the row with the selected treatment phase
-                rows[rowIndex] = {
-                    ...currentRow,
-                    selectedTreatmentPhase: treatmentPhaseObj,
-                };
-
-                // Check if both CDT code and treatment phase are selected then convert to static row
-                if (currentRow.selectedCdtCode && rowIndex === rows.length - 1) {
-                    rows[rowIndex] = convertToStaticRow(currentRow, visitId, treatmentPhaseObj, null);
-
-                    // Add a new dynamic row at the end
-                    const newRowId = `dynamic-${visitId}-${Date.now()}`;
-                    const newRow = createDynamicRow(visitId, newRowId);
-                    rows.push(newRow);
-                }
-            }
-
-            return {
-                ...prevRows,
-                [visitId]: rows
-            };
-        });
+        return {
+            ...currentRow,
+            id: `dynamic-${visitId}-${Date.now()}`,
+            extraRowInput,
+            isStatic: false,
+            isEditing: true // Indicate this row is being edited
+        };
     };
 
 
+
     const handleSelect = (selectedCode, visitId, rowId) => {
-        const cdtCodeObj = cdtCodes.find(cdtCode => cdtCode.code === selectedCode.value);
+        const cdtCodeObj = combinedCdtCodes.find(cdtCode => cdtCode.code === selectedCode.value);
 
         setAllRows(prevRows => {
             let rows = [...prevRows[visitId]];
@@ -212,16 +173,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                     selectedCdtCode: cdtCodeObj,
                     description: cdtCodeObj.longDescription
                 };
-
-                // Check if both CDT code and treatment phase are selected, then convert to static row
-                if (!isInGenerateTreatmentPlanContext && currentRow.selectedTreatmentPhase && rowIndex === rows.length - 1) {
-                    rows[rowIndex] = convertToStaticRow(currentRow, visitId, null, cdtCodeObj);
-
-                    // Add a new dynamic row at the end
-                    const newRowId = `dynamic-${visitId}-${Date.now()}`;
-                    const newRow = createDynamicRow(visitId, newRowId);
-                    rows.push(newRow);
-                }
             }
 
             return {
@@ -231,8 +182,53 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         });
     };
 
+    const createDynamicRowUponAddClick = (visitId) => {
+        return {
+            id: `dynamic-${visitId}-${Date.now()}`,
+            description: '',
+            selectedCdtCode: null,
+            extraRowInput: showToothNumber ? [treatmentPlan.toothNumber, '', ''] : ['', '']
+        };
+    };
 
+    function addNewRow(visitId) {
+        setAllRows(prevAllRows => {
+            const rowsForVisit = prevAllRows[visitId] || [];
+            const lastRow = rowsForVisit.length > 0 ? rowsForVisit[rowsForVisit.length - 1] : null;
 
+            if (lastRow) {
+                // Use convertToStaticRow to convert the last row to static
+                const staticRow = convertToStaticRow(lastRow, visitId, lastRow.selectedCdtCode);
+
+                // Use createDynamicRow to add a new dynamic row
+                const newDynamicRow = createDynamicRowUponAddClick(visitId);
+
+                return {
+                    ...prevAllRows,
+                    [visitId]: [...rowsForVisit.slice(0, -1), staticRow, newDynamicRow]
+                };
+            }
+
+            return prevAllRows;
+        });
+    }
+
+    function createAddButtonCell(visitId) {
+        return (
+            <StyledAddButtonCellContainer>
+                <RoundedButton
+                    text="Add"
+                    backgroundColor={UI_COLORS.purple}
+                    textColor="white"
+                    border={false}
+                    borderRadius="4px"
+                    height="39px"
+                    width="150px"
+                    onClick={() => addNewRow(visitId)}
+                />
+            </StyledAddButtonCellContainer>
+        );
+    }
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -303,58 +299,11 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
 
     const handleDeleteRow = (visitId, rowId) => {
-        console.log("Deleting row:", rowId, "from visit:", visitId);
         setAllRows(prevRows => {
-            console.log("Current rows before deletion:", prevRows);
             const updatedRows = prevRows[visitId].filter(row => row.id !== rowId);
-            console.log("Updated rows after deletion:", updatedRows);
             return { ...prevRows, [visitId]: updatedRows };
         });
         setDeletedRowIds(prevIds => [...prevIds, rowId]);
-    };
-
-
-    const handleAddVisit = () => {
-        const tempVisitId = `temp-${Date.now()}`;
-        const initialRowId = `initial-${tempVisitId}`;
-
-        const newVisit = {
-            visitId: tempVisitId, 
-            treatment_plan_id: treatmentPlan.treatmentPlanId,
-            visit_number: treatmentPlan.visits.length,
-            description: "Visit " + (treatmentPlan.visits.length)
-        };
-        console.log('Adding new visit:', newVisit);
-
-        // update the parent component's state
-        onAddVisit(newVisit);
-
-        // Add a new dynamic row for the visit
-        const newRow = createDynamicRow(tempVisitId, initialRowId);
-
-        // Update visitOrder and allRows
-        setVisitOrder(prevOrder => [...prevOrder, tempVisitId]);
-        setAllRows(prevRows => ({
-            ...prevRows,
-            [tempVisitId]: [newRow]
-        }));
-    };
-
-    const handleDeleteVisit = (visitId) => {
-        // Update the visitOrder to remove the visit
-        setVisitOrder(prevOrder => prevOrder.filter(id => id !== visitId));
-        // Update allRows to remove the rows associated with the visit
-        setAllRows(prevRows => {
-            const updatedRows = { ...prevRows };
-            delete updatedRows[visitId];
-            return updatedRows;
-        });
-        setDeletedVisitIds(prevIds => {
-            const newDeletedVisitIds = [...prevIds, visitId];
-            console.log("Deleted visit added, new deletedVisitIds:", newDeletedVisitIds);
-            return newDeletedVisitIds;
-        });
-        onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
     };
 
     const createNewTreatmentPlanFromDefault = async (treatmentPlan, allRows, visitOrder) => {
@@ -368,21 +317,8 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         }
     };
 
-    const createNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder) => {
-        try {
-            const newTreatmentPlan = await handleCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder, selectedPatient.patientId);
-            // Show success alert
-            setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved successfully!' });
-            return newTreatmentPlan;
-        } catch (error) {
-            console.error('Error in creating new treatment plan:', error);
-        }
-    };
-
-
     const handleUpdateTreatmentPlan = async () => {
         try {
-
             // Check if the treatment plan is a default plan
             if (treatmentPlan.facilityId === null) {
                 // Logic to create a new treatment plan from the default
@@ -460,7 +396,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                                 visitCdtCodeMapId: row.visitCdtCodeMapId,
                                 cdtCodeId: row.selectedCdtCode.cdtCodeId,
                                 description: row.description,
-                                // ...additional properties possibly later
                             };
                         })
                     : visit.procedures;
@@ -476,7 +411,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             setAllRows(deepCopyAllRows);
 
             // update the treatment plan
-            const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, deepCopyAllRows, updatedVisitOrder, deletedRowIds, deletedVisitIds);
+            const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, deepCopyAllRows, updatedVisitOrder, deletedRowIds, deletedVisitIds, editedRows);
             const updatedTreatmentPlan = await updateTreatmentPlan(treatmentPlan.treatmentPlanId, updateDto);
 
             onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
@@ -490,8 +425,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     };
 
 
-    const lockDimensions = () => {
-        
+    const lockDimensions = () => {    
         const tables = document.querySelectorAll('.tx-table');
         tables.forEach(table => {
             const rows = table.querySelectorAll('tr');
@@ -508,32 +442,33 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
     const createHeaders = () => {
         let headers = showToothNumber
-            ? ['Tooth #', 'CDT Code', 'Description', 'Treatment Phase']
-            : ['', 'CDT Code', 'Description', 'Treatment Phase'];       
+            ? ['Tooth #', 'CDT Code', 'Description']
+            : ['', 'CDT Code', 'Description'];
         return headers;
     };
 
+
     const constructStaticRowData = (row) => {
-        let treatmentPhaseDisplay = row.selectedTreatmentPhase ? row.selectedTreatmentPhase.label : 'No Treatment Phase';
 
         if (showToothNumber) {
             if (!isInGenerateTreatmentPlanContext) {
-                return [row.extraRowInput[0], row.extraRowInput[1], row.extraRowInput[2], treatmentPhaseDisplay];
+                return [row.extraRowInput[0], row.extraRowInput[1], row.extraRowInput[2]];
             }
             return [row.extraRowInput[0], row.extraRowInput[1], row.extraRowInput[2]]; // Tooth number, CDT code, Description
         } else {
             if (!isInGenerateTreatmentPlanContext) {
-                return ['', row.extraRowInput[0], row.extraRowInput[1], treatmentPhaseDisplay];
+                return ['', row.extraRowInput[0], row.extraRowInput[1]];
             }
             return ['', row.extraRowInput[0], row.extraRowInput[1]]; // Placeholder for Tooth number, CDT code, Description shifted
         }
     };
 
+
     const constructDynamicRowData = (row, visitId) => {
         const dropdownKey = `dropdown-${row.id}`;
         const cdtDropdown = <DropdownSearch
             key={dropdownKey}
-            items={cdtCodes}
+            items={combinedCdtCodes}
             selectedItem={row.selectedCdtCode}
             onSelect={(selectedCode) => handleSelect(selectedCode, visitId, row.id)}
             itemLabelFormatter={(cdtCode) => `${cdtCode.code} - ${cdtCode.longDescription}`}
@@ -541,59 +476,162 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             labelKey="longDescription"
         />;
 
-        let treatmentPhaseDropdown = null;
-        if (!isInGenerateTreatmentPlanContext) {
-            const treatmentPhaseDropdownKey = `treatment-phase-dropdown-${row.id}`;
-            treatmentPhaseDropdown = <DropdownSearch
-                key={treatmentPhaseDropdownKey}
-                items={treatmentPhases}
-                selectedItem={row.selectedTreatmentPhase}
-                onSelect={(selectedPhase) => handleTreatmentPhaseSelect(selectedPhase, visitId, row.id)}
-                itemLabelFormatter={(phase) => phase.label} 
-                valueKey="id"
-            />;
-        }
-
         return showToothNumber
-            ? ['', cdtDropdown, row.description, treatmentPhaseDropdown]
-            : ['', cdtDropdown, row.description, treatmentPhaseDropdown];
-    };
-
-    const createDeleteIconCell = (row, visitId, index, visitRows) => {
-        // Check if the row is static and not the last row
-        const isStaticRow = row.id.startsWith('static-');
-        const isNotLastRow = index !== visitRows.length - 1;
-
-        return isStaticRow && isNotLastRow ? (
-            <img
-                src={deleteIcon}
-                className="delete-icon"
-                alt="Delete Icon"
-                onClick={() => handleDeleteRow(visitId, row.id)}
-            />
-        ) : null;
+            ? ['', cdtDropdown, row.description]
+            : ['', cdtDropdown, row.description];
     };
 
 
 
-    const createTableRow = (row, visitId, headers, index, visitRows) => {
-        let baseRowData = row.id.startsWith('static-')
-            ? constructStaticRowData(row)
-            : constructDynamicRowData(row, visitId);
 
-        // Ensure number of data cells matches the number of headers
-        while (baseRowData.length < headers.length) {
-            baseRowData.push(''); // Add empty strings for missing cells
+    const handleCancelEdit = (rowId, visitId) => {
+        setEditingRowId(null);
+        setAllRows(prevAllRows => {
+            const rows = prevAllRows[visitId];
+            const updatedRows = rows.map(row => {
+                if (row.id === rowId) {
+                    return originalRowData || row; // Revert to originalRowData if available, otherwise keep the current row
+                }
+                return row;
+            });
+            // Only update the rows for the specific visitId
+            return {
+                ...prevAllRows,
+                [visitId]: updatedRows,
+            };
+        });
+        setOriginalRowData(null); 
+    };
+
+
+    const handleDoneEdit = (rowId, visitId) => {
+        setEditingRowId(null);
+        setAllRows(prevAllRows => {
+            const rows = prevAllRows[visitId];
+            const updatedRows = rows.map(row => {
+                if (row.id === rowId) {
+                    const editedRow = convertToStaticRow(row, visitId, row.selectedCdtCode, row.description);
+                    // This step might require adjustments depending on how you track edits
+                    setEditedRows(prev => [...prev, { ...editedRow, visitId }]); // Storing full row data and visitId
+
+                    return editedRow;
+                }
+                return row;
+            });
+
+            // Update only the rows for the specific visitId
+            return {
+                ...prevAllRows,
+                [visitId]: updatedRows,
+            };
+        });
+        // After successfully saving the edits, clear the originalRowData
+        setOriginalRowData(null);
+    };
+
+
+    function renderDoneCancelText(rowId, visitId) {
+        return (
+            <StyledEditDeleteIconsContainer>
+                <StyledClickableText onClick={() => handleDoneEdit(rowId, visitId)}>
+                    Done
+                </StyledClickableText>
+                <StyledClickableText onClick={() => handleCancelEdit(rowId, visitId)}>
+                    Cancel
+                </StyledClickableText>
+            </StyledEditDeleteIconsContainer>
+        );
+    }
+
+
+    function createDeleteIconCell(row, index, visitId) {
+        console.log("Creating delete icon cell for row:", row.id);
+        const isNotLastRow = index !== allRows.length - 1;
+        if (row.isStatic && isNotLastRow) {
+            return (
+                <StyledEditDeleteIconsContainer>
+                    <StyledEditIcon
+                        src={pencilEditIcon}
+                        alt="Edit Icon"
+                        onClick={() => handleEditRow(row.id, visitId)}
+                    />
+                    <StyledDeleteIcon
+                        src={deleteIcon}
+                        alt="Delete Icon"
+                        onClick={() => handleDeleteRow(visitId, row.id)}
+                    />
+                </StyledEditDeleteIconsContainer>
+            );
         }
+        return null;
+    }
 
-        const deleteIconCell = createDeleteIconCell(row, visitId, index, visitRows);
+
+
+    const padRowData = (rowData, headers) => {
+        while (rowData.length < headers.length - 1) {
+            rowData.push(''); // Add empty strings for missing cells
+        }
+        return rowData;
+    };
+
+    const createTableRow = (row, visitId, headers, index) => {
+        const isStaticRow = row.isStatic;
+        let rowData = isStaticRow ? constructStaticRowData(row) : constructDynamicRowData(row, visitId);
+
+        rowData = padRowData(rowData, headers);
+        let lastCellContent;
+
+        if (isStaticRow) {
+            lastCellContent = createDeleteIconCell(row, index, visitId);
+        } else {
+            // For dynamic rows, check if it is being edited
+            if (row.isEditing) {
+                lastCellContent = renderDoneCancelText(row.id, visitId); // For rows being edited
+            } else {
+                lastCellContent = createAddButtonCell(visitId); // For other dynamic rows
+            }
+        }
+        rowData.push(lastCellContent);
 
         return {
             id: row.id,
-            data: baseRowData,
-            deleteIconCell
+            data: rowData,
         };
     };
+
+    const handleEditRow = (rowId, visitId) => {
+        // Directly access the rows for the specific visitId
+        const rows = allRows[visitId];
+        const rowIndex = rows.findIndex(row => row.id === rowId);
+
+        if (rowIndex !== -1) {
+            const currentRow = rows[rowIndex];
+
+            // Set originalRowData with the current state of the row before making it dynamic for editing
+            setOriginalRowData({ ...currentRow });
+
+            // Convert the current row to a dynamic row for editing
+            const dynamicRow = convertToDynamicRow(currentRow, visitId);
+
+            // Update the rows array with the newly converted dynamic row
+            const updatedRows = [
+                ...rows.slice(0, rowIndex),
+                dynamicRow,
+                ...rows.slice(rowIndex + 1),
+            ];
+            // Update the state to reflect the changes
+            setAllRows(prevAllRows => ({
+                ...prevAllRows,
+                [visitId]: updatedRows, // Only update the rows for the specific visit
+            }));
+        } else {
+            console.error("Row not found with rowId:", rowId, "in visitId:", visitId);
+        }
+    };
+
+
+
 
     const renderVisit = (visitId, index) => {
         const visitIdStr = String(visitId);
@@ -621,9 +659,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             <Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
                 {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
-                        <div {...provided.dragHandleProps} className="visit-header">
-                            Visit {index + 1}
-                        </div>
                         <Table
                             headers={headers}
                             rows={tableRows}
@@ -633,7 +668,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                             deleteImageIconSrc={deleteIcon}
                             deleteImageIconSrcHeader={deleteIcon}
                             dragImageIconSrc={dragIcon}
-                            onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
                         />
                     </div>
                 )}
@@ -668,9 +702,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                 </DragDropContext>
             )}
             <div className="bottom-tx-plan-buttons">
-                <div className="add-visit-btn-container" onClick={handleAddVisit}>
-                    + Add Visit
-                </div>
                 <span onClick={handleUpdateTreatmentPlan} className="save-treatment-plan-text-btn" >
                     Save
                 </span>

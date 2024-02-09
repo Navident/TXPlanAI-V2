@@ -25,16 +25,6 @@ namespace DentalTreatmentPlanner.Server.Services
             _signInManager = signInManager;
         }
 
-        public List<Patient> GetMockPatients()
-        {
-            return new List<Patient>
-            {
-                new Patient { PatientId = 1, FirstName = "John", LastName = "Smith", FacilityId = 1, DateOfBirth = new DateTime(1980, 1, 1) },
-                new Patient { PatientId = 2, FirstName = "Jane", LastName = "Doe", FacilityId = 1, DateOfBirth = new DateTime(1985, 5, 23) },
-
-            };
-        }
-
         public async Task<Patient> CreatePatientAsync(CreatePatientDto createPatientDto, int facilityId)
         {
             var newPatient = new Patient
@@ -48,7 +38,241 @@ namespace DentalTreatmentPlanner.Server.Services
             _context.Patients.Add(newPatient);
             await _context.SaveChangesAsync();
 
-            return newPatient; // This patient now includes the PatientId set by the database
+            return newPatient; 
+        }
+
+        public async Task<CdtCode> CreateCustomCdtCodeAsync(CreateCdtCodeDto createCdtCodeDto, int facilityId)
+        {
+            var newCdtCode = new CdtCode
+            {
+                Code = createCdtCodeDto.Code,
+                LongDescription = createCdtCodeDto.LongDescription,
+                FacilityId = facilityId
+            };
+
+            _context.CdtCodes.Add(newCdtCode);
+            await _context.SaveChangesAsync();
+
+            return newCdtCode;
+        }
+
+        public async Task<bool> UpdateCustomCdtCodesAsync(List<CreateCdtCodeDto> newCdtCodes, List<EditCdtCodeDto> editedCdtCodes, List<int> deletedCdtCodeIds, int facilityId)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // Handle creation of new CDT codes
+                    foreach (var dto in newCdtCodes)
+                    {
+                        var newCdtCode = new CdtCode
+                        {
+                            Code = dto.Code,
+                            LongDescription = dto.LongDescription,
+                            FacilityId = facilityId
+                        };
+                        _context.CdtCodes.Add(newCdtCode);
+                    }
+
+                    // Handle deletion of CDT codes
+                    foreach (var id in deletedCdtCodeIds)
+                    {
+                        var cdtCode = await _context.CdtCodes.FindAsync(id);
+                        if (cdtCode != null)
+                        {
+                            _context.CdtCodes.Remove(cdtCode);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"CDT code with ID: {id} not found for deletion.");
+                        }
+                    }
+
+                    // Handle updating of CDT codes
+                    foreach (var dto in editedCdtCodes)
+                    {
+                        var cdtCode = await _context.CdtCodes.FindAsync(dto.Id);
+                        if (cdtCode != null)
+                        {
+                            cdtCode.Code = dto.Code;
+                            cdtCode.LongDescription = dto.LongDescription;
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred during updating CDT codes: {ex.Message}");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<PayerDto>> GetFacilityPayersAsync(int facilityId)
+        {
+            // Fetching payers that are mapped to the specified facility
+            return await _context.PayerFacilityMaps
+                .Where(pfm => pfm.FacilityId == facilityId)
+                .Include(pfm => pfm.Payer) 
+                .Select(pfm => new PayerDto
+                {
+                    PayerId = pfm.Payer.PayerId,
+                    PayerName = pfm.Payer.PayerName,
+                    CreatedAt = pfm.Payer.CreatedAt,
+                    ModifiedAt = pfm.Payer.ModifiedAt
+                })
+                .ToListAsync();
+        }
+
+
+        public async Task<bool> UpdateFacilityPayersAsync(List<CreatePayerDto> newPayers, List<EditPayerDto> editedPayers, List<int> deletedPayerIds, int facilityId)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // Handle creation of new payers
+                    foreach (var dto in newPayers)
+                    {
+                        var newPayer = new Payer
+                        {
+                            PayerName = dto.PayerName
+                        };
+                        _context.Payers.Add(newPayer);
+                        await _context.SaveChangesAsync();
+
+                        var payerFacilityMap = new PayerFacilityMap
+                        {
+                            PayerId = newPayer.PayerId,
+                            FacilityId = facilityId
+                        };
+                        _context.PayerFacilityMaps.Add(payerFacilityMap);
+                    }
+
+                    // Handle updating of payers
+                    foreach (var dto in editedPayers)
+                    {
+                        var payer = await _context.Payers.FindAsync(dto.Id);
+                        if (payer != null)
+                        {
+                            payer.PayerName = dto.PayerName;
+                            payer.ModifiedAt = DateTime.UtcNow;
+                        }
+                    }
+
+                    // Handle deletion of payers
+                    foreach (var id in deletedPayerIds)
+                    {
+                        var payer = await _context.Payers.FindAsync(id);
+                        if (payer != null)
+                        {
+                            _context.Payers.Remove(payer);
+                            // Also remove associated PayerFacilityMap entries
+                            var payerFacilityMaps = _context.PayerFacilityMaps.Where(pfm => pfm.PayerId == id);
+                            _context.PayerFacilityMaps.RemoveRange(payerFacilityMaps);
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred during updating payers: {ex.Message}");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+        public async Task<bool> UpdateFacilityPayerCdtCodeFeesAsync(UpdateFacilityPayerCdtCodeFeesDto updateRequest, int facilityId)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    // Attempt to find or create a PayerFacilityMap
+                    var payerFacilityMap = await _context.PayerFacilityMaps
+                        .FirstOrDefaultAsync(pfm => pfm.PayerId == updateRequest.PayerId && pfm.FacilityId == facilityId);
+
+                    if (payerFacilityMap == null)
+                    {
+                        payerFacilityMap = new PayerFacilityMap { PayerId = updateRequest.PayerId, FacilityId = facilityId };
+                        _context.PayerFacilityMaps.Add(payerFacilityMap);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    // Handle new fees
+                    foreach (var newFee in updateRequest.NewFees)
+                    {
+                        var existingUcrFee = await _context.UcrFees
+                            .FirstOrDefaultAsync(uf => uf.CdtCodeId == newFee.CdtCodeId && uf.PayerFacilityMapId == payerFacilityMap.PayerFacilityMapId);
+
+                        if (existingUcrFee != null) // If an existing UcrFee is found, update it
+                        {
+                            existingUcrFee.UcrDollarAmount = newFee.UcrDollarAmount;
+                            existingUcrFee.DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount;
+                            existingUcrFee.ModifiedAt = DateTime.UtcNow;
+                        }
+                        else // Otherwise, create a new UcrFee
+                        {
+                            var newUcrFee = new UcrFee
+                            {
+                                PayerFacilityMapId = payerFacilityMap.PayerFacilityMapId,
+                                CdtCodeId = newFee.CdtCodeId,
+                                UcrDollarAmount = newFee.UcrDollarAmount,
+                                DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount,
+                            };
+                            _context.UcrFees.Add(newUcrFee);
+                        }
+                    }
+                    // Handle updated fees
+                    foreach (var updatedFee in updateRequest.UpdatedFees)
+                    {
+                        var existingUcrFee = await _context.UcrFees.FirstOrDefaultAsync(uf => uf.UcrFeeId == updatedFee.UcrFeeId);
+                        if (existingUcrFee != null) // Ensure the UcrFee exists before attempting to update
+                        {
+                            existingUcrFee.UcrDollarAmount = updatedFee.UcrDollarAmount;
+                            existingUcrFee.DiscountFeeDollarAmount = updatedFee.DiscountFeeDollarAmount;
+                            existingUcrFee.ModifiedAt = DateTime.UtcNow;
+                        }
+                        Console.WriteLine($"Error occurred, there was no existing ucr fee found in the database for the updatedFee!!");
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred during updating facility payer CDT code fees: {ex.Message}");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+
+
+
+        public async Task<List<CdtCodeFeeDto>> GetPayerCdtCodesFeesByFacilityAndPayer(int facilityId, int payerId)
+        {
+            return await _context.UcrFees
+                .Where(uf => (uf.CDTCode.FacilityId == null || uf.CDTCode.FacilityId == facilityId) &&
+                             uf.PayerFacilityMap.FacilityId == facilityId &&
+                             uf.PayerFacilityMap.PayerId == payerId) 
+                .Select(uf => new CdtCodeFeeDto
+                {
+                    Code = uf.CDTCode.Code,
+                    CdtCodeId = uf.CDTCode.CdtCodeId,
+                    UcrDollarAmount = uf.UcrDollarAmount,
+                    DiscountFeeDollarAmount = uf.DiscountFeeDollarAmount
+                }).ToListAsync();
         }
 
 
@@ -57,6 +281,16 @@ namespace DentalTreatmentPlanner.Server.Services
         {
             return await _context.Patients.Where(p => p.FacilityId == facilityId).ToListAsync();
         }
+
+        public async Task<List<CdtCode>> GetCustomCdtCodesByFacility(int facilityId)
+        {
+            return await _context.CdtCodes.Where(c => c.FacilityId == facilityId).ToListAsync();
+        }
+
+
+
+
+
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterUserDto registerUserDto)
         {
@@ -307,6 +541,35 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
+        public async Task UpdateProceduresAsync(List<UpdateProcedureDto> updatedProcedures)
+        {
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    foreach (var updateProc in updatedProcedures)
+                    {
+                        var cdtCodeMap = await _context.VisitCdtCodeMaps.FirstOrDefaultAsync(c => c.VisitCdtCodeMapId == updateProc.VisitCdtCodeMapId);
+
+                        if (cdtCodeMap != null)
+                        {
+                            Console.WriteLine($"Updating VisitCdtCodeMap with ID: {updateProc.VisitCdtCodeMapId}, CdtCodeId: {updateProc.CdtCodeId}");
+                            cdtCodeMap.CdtCodeId = updateProc.CdtCodeId;
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error occurred during procedures update: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
         public async Task<List<VisitCdtCodeMapDto>> CreateNewProceduresAsync(List<NewProcedureDto> newProcedures)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -399,6 +662,19 @@ namespace DentalTreatmentPlanner.Server.Services
                         }
                     }
 
+                    if (updateTreatmentPlanDto.UpdatedProcedures != null)
+                    {
+                        foreach (var updatedProc in updateTreatmentPlanDto.UpdatedProcedures)
+                        {
+                            var cdtCodeMap = await _context.VisitCdtCodeMaps.FirstOrDefaultAsync(c => c.VisitCdtCodeMapId == updatedProc.VisitCdtCodeMapId);
+
+                            if (cdtCodeMap != null)
+                            {
+                                cdtCodeMap.CdtCodeId = updatedProc.CdtCodeId;
+                            }
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                     return treatmentPlan;
@@ -467,8 +743,24 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
+        public async Task<bool> DeleteTreatmentPlanByIdAsync(int treatmentPlanId)
+        {
+            var treatmentPlan = await _context.TreatmentPlans.FindAsync(treatmentPlanId);
+            if (treatmentPlan == null)
+            {
+                return false;
+            }
+
+            _context.TreatmentPlans.Remove(treatmentPlan);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+
         public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto, int facilityId)
         {
+            Console.WriteLine($"Received PayerId: {updateTreatmentPlanDto.PayerId}");
+
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -480,6 +772,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         ProcedureSubcategoryId = null,
                         FacilityId = facilityId,
                         PatientId = updateTreatmentPlanDto.PatientId,
+                        PayerId = updateTreatmentPlanDto.PayerId
                     };
 
                     foreach (var visitDto in updateTreatmentPlanDto.Visits)
@@ -708,6 +1001,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
                     CreatedUserId = tp.CreatedUserId,
                     CreatedAt = tp.CreatedAt,
+                    PayerId = tp.PayerId,
 
                     // Mapping each visit of the treatment plan to a RetrieveVisitDto
                     Visits = tp.Visits.Select(v => new RetrieveVisitDto
@@ -734,17 +1028,20 @@ namespace DentalTreatmentPlanner.Server.Services
         }
 
 
-        public async Task<IEnumerable<CdtCodeDto>> GetAllCdtCodesAsync()
+        public async Task<IEnumerable<CdtCodeDto>> GetAllDefaultCdtCodesAsync()
         {
             return await _context.CdtCodes
+                .Where(cdtCode => cdtCode.FacilityId == null) 
                 .Select(cdtCode => new CdtCodeDto
                 {
                     CdtCodeId = cdtCode.CdtCodeId,
                     Code = cdtCode.Code,
+                    FacilityId = cdtCode.FacilityId,
                     LongDescription = cdtCode.LongDescription
                 })
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<TreatmentPhaseDto>> GetAllTreatmentPhasesAsync()
         {

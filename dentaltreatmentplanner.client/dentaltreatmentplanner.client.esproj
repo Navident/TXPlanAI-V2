@@ -13,13 +13,14 @@
     <Folder Include="src\ClientServices\" />
     <Folder Include="src\Components\Common\Alert\" />
     <Folder Include="src\Components\Common\GoBack\" />
-    <Folder Include="src\Components\Dashboard\Home\" />
-    <Folder Include="src\Components\DefaultProceduresManagement\ProceduresCustomizer\" />
-    <Folder Include="src\Components\Login\" />
-    <Folder Include="src\Components\TreatmentPlanOutput\" />
-    <Folder Include="src\Components\PatientManagementDashboard\GenerateTreatmentPlan\" />
-    <Folder Include="src\Components\PatientManagementDashboard\PatientInfoSection\" />
+    <Folder Include="src\Components\Common\StandardTextfield\" />
+    <Folder Include="src\Components\AlertWrapper\" />
+    <Folder Include="src\GlobalStyledComponents\" />
+    <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
+    <Folder Include="src\Pages\Login\" />
+    <Folder Include="src\Pages\TreatmentPlanOutput\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
+    <Folder Include="src\Theme\" />
     <Folder Include="src\Utils\" />
   </ItemGroup>
 </Project>

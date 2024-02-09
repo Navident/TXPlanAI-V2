@@ -15,9 +15,6 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                         {rowData.data.map((cell, cellIndex) => (
                             <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                         ))}
-                        <td>
-                            {!isLastRow && (rowData.deleteIconCell || <span></span>)}
-                        </td>
                     </tr>
                 )}
             </Draggable>
@@ -34,9 +31,6 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                 {rowData.data.map((cell, cellIndex) => (
                     <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
                 ))}
-                <td>
-                    {!isLastRow && (rowData.deleteIconCell || <span></span>)}
-                </td>
             </tr>
         );
     };
@@ -60,7 +54,6 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                             <th key={`header-${index}`}>{header}</th>
                         ))}
                         <th>
-                            <img src={deleteImageIconSrcHeader} className="delete-icon" alt="Delete Icon" onClick={onDeleteVisit} />
                         </th>
                     </tr>
                 </thead>

@@ -28,13 +28,26 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
         public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
         public DbSet<TreatmentPhase> TreatmentPhases { get; set; }
-
+        public DbSet<Payer> Payers { get; set; }
+        public DbSet<PayerFacilityMap> PayerFacilityMaps { get; set; }
+        public DbSet<UcrFee> UcrFees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Patient>().ToTable("Patient");
+            modelBuilder.Entity<Payer>().ToTable("Payer");
+            modelBuilder.Entity<PayerFacilityMap>().ToTable("PayerFacilityMap");
+            modelBuilder.Entity<UcrFee>().ToTable("UcrFee");
+            modelBuilder.Entity<UcrFee>(entity =>
+            {
+                entity.Property(e => e.UcrDollarAmount)
+                      .HasColumnType("decimal(18, 2)");
+
+                entity.Property(e => e.DiscountFeeDollarAmount)
+                      .HasColumnType("decimal(18, 2)"); 
+            });
 
             // Map Facility entity
             modelBuilder.Entity<Facility>(entity =>
@@ -113,13 +126,13 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.ToTable("cdt_code");
                 entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
                 entity.Property(e => e.Code).HasColumnName("cdt_code"); 
-                entity.Property(e => e.FacilityId).HasColumnName("facility_id");
-                entity.Property(e => e.CdtCodeCategoryId).HasColumnName("cdt_code_category_id");
-                entity.Property(e => e.CdtCodeSubcategoryId).HasColumnName("cdt_code_subcategory_id");
+                entity.Property(e => e.FacilityId).HasColumnName("facility_id").IsRequired(false); ;
+                entity.Property(e => e.CdtCodeCategoryId).HasColumnName("cdt_code_category_id").IsRequired(false); ;
+                entity.Property(e => e.CdtCodeSubcategoryId).HasColumnName("cdt_code_subcategory_id").IsRequired(false); ;
                 entity.Property(e => e.LongDescription).HasColumnName("long_description");
-                entity.Property(e => e.ShortDescription).HasColumnName("short_description");
+                entity.Property(e => e.ShortDescription).HasColumnName("short_description").IsRequired(false); ;
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at").IsRequired(false); ;
             });
             // Map CdtCodeCategory entity
             modelBuilder.Entity<CdtCodeCategory>(entity =>

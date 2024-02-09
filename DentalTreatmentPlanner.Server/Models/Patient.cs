@@ -16,7 +16,10 @@
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; set; }
 
+        public int? PayerId { get; set; }
+
         public virtual Facility Facility { get; set; }
         public ICollection<TreatmentPlan> TreatmentPlans { get; set; }
+        public virtual Payer Payer { get; set; }
     }
 }

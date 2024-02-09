@@ -3,12 +3,13 @@
 //const VISITS_API_URL = 'https://localhost:7089/api/visits';
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
 const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
-const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
+
 const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
-const TREATMENT_PHASES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/treatmentphases';
+const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
+const PAYER_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/payer';
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
@@ -175,11 +176,11 @@ export const handleCreateNewTreatmentPlanFromDefault = async (treatmentPlan, all
 
 
 // Function to create a new treatment plan from default
-export const handleCreateNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId) => {
+export const handleCreateNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId, payerId) => {
     try {
         const token = localStorage.getItem('jwtToken');
         const newPlanData = {
-            ...mapToCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder),
+            ...mapToCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder, payerId),
             patientId: selectedPatientId
         };
 
@@ -187,7 +188,7 @@ export const handleCreateNewCombinedTreatmentPlanForPatient = async (treatmentPl
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+                'Authorization': `Bearer ${token}` 
             },
             body: JSON.stringify(newPlanData),
         });
@@ -331,6 +332,97 @@ export const getPatientsForUserFacility = async () => {
     }
 };
 
+export const getCdtCodes = async () => {
+    try {
+        const response = await fetch(`${CDT_CODES_API_URL}/defaultcdtcodes`, {
+            method: 'GET'
+            // Removed 'Content-Type' header
+        });
+
+        if (response.ok) {
+            try {
+                const data = await response.json();
+                console.log('CDT codes fetched successfully:', data);
+                return data;
+            } catch (jsonParseError) {
+                console.error('Failed to parse response as JSON:', jsonParseError);
+                // Handle non-JSON response here
+                return [];
+            }
+        } else {
+            console.error('Failed to fetch CDT codes. Status:', response.status);
+            return [];
+        }
+    } catch (networkError) {
+        console.error('Error fetching CDT codes:', networkError.message);
+        return [];
+    }
+};
+
+export const getPayersForFacility = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${PAYER_API_URL}/facilityPayers`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                console.log(`Payers for user's facility:`, data);
+                return data;
+            } else {
+                console.log(`Received non-JSON response for payers`);
+                return null;
+            }
+        } else {
+            console.error(`Failed to retrieve payers. Status:`, response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching payers:`, error.message);
+        return null;
+    }
+};
+
+
+export const getCustomCdtCodesForFacility = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${CDT_CODES_API_URL}/facilityCdtCodes`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                console.log(`Custom CDT codes for user's facility:`, data);
+                return data;
+            } else {
+                console.log(`Received non-JSON response for CDT codes`);
+                return null;
+            }
+        } else {
+            console.error(`Failed to retrieve CDT codes. Status:`, response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching CDT codes:`, error.message);
+        return null;
+    }
+};
+
+
 // Function to create a new patient
 export const createPatient = async (patientData) => {
     try {
@@ -355,6 +447,88 @@ export const createPatient = async (patientData) => {
     } catch (error) {
         console.error(`Error creating patient:`, error.message);
         return null;
+    }
+};
+
+
+export const updateFacilityPayerCdtCodeFees = async (payload) => {
+    console.log("JSON.stringify(payload) sent from the frontend: ", JSON.stringify(payload));
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${CDT_CODES_API_URL}/updateFacilityPayerCdtCodeFees`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (response.ok) {
+            console.log(`Facility payer CDT code fees updated successfully`);
+            return true;
+        } else {
+            console.error(`Failed to update facility payer CDT code fees. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error updating facility payer CDT code fees:`, error.message);
+        return false;
+    }
+};
+
+
+
+// Function to update custom cdt codes (both create and delete)
+export const updateCustomFacilityCdtCodes = async (updateData) => {
+    console.log("JSON.stringify(updateData):", JSON.stringify(updateData));
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${CDT_CODES_API_URL}/updateCustomCdtCodes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        if (response.ok) {
+            console.log(`CDT codes updated successfully`);
+            return true;
+        } else {
+            console.error(`Failed to update CDT codes. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error updating CDT codes:`, error.message);
+        return false;
+    }
+};
+
+export const updateFacilityPayers = async (updateData) => {
+    console.log("Updating Payers:", JSON.stringify(updateData));
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${PAYER_API_URL}/updateFacilityPayers`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        if (response.ok) {
+            console.log(`Payers updated successfully`);
+            return true;
+        } else {
+            console.error(`Failed to update payers. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error updating payers:`, error.message);
+        return false;
     }
 };
 
@@ -425,27 +599,26 @@ export const getTreatmentPlansByPatient = async (patientId) => {
     }
 };
 
-// In your apiService.js or wherever getCdtCodes is defined
-export const getCdtCodes = async () => {
+export const deleteTreatmentPlanById = async (treatmentPlanId) => {
     try {
-        const response = await fetch(CDT_CODES_API_URL, {
-            method: 'GET',
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${API_BASE_URL}/delete/${treatmentPlanId}`, {
+            method: 'DELETE',
             headers: {
-                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
             },
         });
 
         if (response.ok) {
-            const data = await response.json();
-            console.log('CDT codes fetched successfully:', data);
-            return data; // Return the data
+            console.log('Treatment plan deleted successfully');
+            return true;
         } else {
-            console.error('Failed to fetch CDT codes. Status:', response.status);
-            return [];
+            console.error('Failed to delete treatment plan. Status:', response.status);
+            return false;
         }
     } catch (error) {
-        console.error('Error fetching CDT codes:', error.message);
-        return []; 
+        console.error('Error deleting treatment plan:', error.message);
+        return false;
     }
 };
 
@@ -478,6 +651,7 @@ export const createVisit = async (visitData, tempVisitId) => {
     }
 };
 
+
 export const createNewProcedures = async (newProcedures) => {
     try {
         console.log('Creating new procedures with data:', newProcedures);
@@ -505,27 +679,32 @@ export const createNewProcedures = async (newProcedures) => {
     }
 };
 
-export const getTreatmentPhases = async () => {
+export const getFacilityPayerCdtCodesFeesByPayer = async (payerId) => {
     try {
-        const response = await fetch(TREATMENT_PHASES_API_URL, {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${CDT_CODES_API_URL}/cdtCodesFees?payerId=${payerId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
         });
 
         if (response.ok) {
             const data = await response.json();
-            console.log('Treatment phases fetched successfully:', data);
-            return data; // Return the data
+            console.log(`Fees for CDT codes by payer ${payerId}:`, data);
+            return data;
         } else {
-            console.error('Failed to fetch treatment phases. Status:', response.status);
-            return [];
+            console.error(`Failed to retrieve CDT codes fees for payer ${payerId}. Status:`, response.status);
+            return null;
         }
     } catch (error) {
-        console.error('Error fetching treatment phases:', error.message);
-        return [];
+        console.error(`Error fetching CDT codes fees for payer ${payerId}:`, error.message);
+        return null;
     }
 };
+
+
+
 
 

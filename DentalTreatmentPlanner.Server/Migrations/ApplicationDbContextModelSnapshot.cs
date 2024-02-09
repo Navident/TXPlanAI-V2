@@ -137,11 +137,11 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CdtCodeId"));
 
-                    b.Property<int>("CdtCodeCategoryId")
+                    b.Property<int?>("CdtCodeCategoryId")
                         .HasColumnType("int")
                         .HasColumnName("cdt_code_category_id");
 
-                    b.Property<int>("CdtCodeSubcategoryId")
+                    b.Property<int?>("CdtCodeSubcategoryId")
                         .HasColumnType("int")
                         .HasColumnName("cdt_code_subcategory_id");
 
@@ -153,7 +153,7 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("FacilityId")
+                    b.Property<int?>("FacilityId")
                         .HasColumnType("int")
                         .HasColumnName("facility_id");
 
@@ -334,11 +334,67 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("PayerId")
+                        .HasColumnType("int");
+
                     b.HasKey("PatientId");
 
                     b.HasIndex("FacilityId");
 
+                    b.HasIndex("PayerId");
+
                     b.ToTable("Patient", (string)null);
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Payer", b =>
+                {
+                    b.Property<int>("PayerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayerId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PayerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PayerId");
+
+                    b.ToTable("Payer", (string)null);
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.PayerFacilityMap", b =>
+                {
+                    b.Property<int>("PayerFacilityMapId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PayerFacilityMapId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FacilityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PayerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PayerFacilityMapId");
+
+                    b.HasIndex("FacilityId");
+
+                    b.HasIndex("PayerId");
+
+                    b.ToTable("PayerFacilityMap", (string)null);
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureCategory", b =>
@@ -530,6 +586,9 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Property<int?>("PatientId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PayerId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProcedureSubcategoryId")
                         .HasColumnType("int")
                         .HasColumnName("procedure_subcategory_id");
@@ -540,9 +599,46 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.HasIndex("PayerId");
+
                     b.HasIndex("ProcedureSubcategoryId");
 
                     b.ToTable("treatment_plan", (string)null);
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.UcrFee", b =>
+                {
+                    b.Property<int>("UcrFeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UcrFeeId"));
+
+                    b.Property<int>("CdtCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("DiscountFeeDollarAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PayerFacilityMapId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("UcrDollarAmount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.HasKey("UcrFeeId");
+
+                    b.HasIndex("CdtCodeId");
+
+                    b.HasIndex("PayerFacilityMapId");
+
+                    b.ToTable("UcrFee", (string)null);
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Visit", b =>
@@ -825,21 +921,15 @@ namespace DentalTreatmentPlanner.Server.Migrations
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCodeCategory", "CdtCodeCategory")
                         .WithMany()
-                        .HasForeignKey("CdtCodeCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CdtCodeCategoryId");
 
                     b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCodeSubcategory", "CdtCodeSubcategory")
                         .WithMany("CdtCodes")
-                        .HasForeignKey("CdtCodeSubcategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CdtCodeSubcategoryId");
 
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
                         .WithMany()
-                        .HasForeignKey("FacilityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FacilityId");
 
                     b.Navigation("CdtCodeCategory");
 
@@ -875,7 +965,32 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Payer", "Payer")
+                        .WithMany()
+                        .HasForeignKey("PayerId");
+
                     b.Navigation("Facility");
+
+                    b.Navigation("Payer");
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.PayerFacilityMap", b =>
+                {
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
+                        .WithMany()
+                        .HasForeignKey("FacilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Payer", "Payer")
+                        .WithMany("PayerFacilityMaps")
+                        .HasForeignKey("PayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Facility");
+
+                    b.Navigation("Payer");
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureSubCategory", b =>
@@ -899,6 +1014,10 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .WithMany("TreatmentPlans")
                         .HasForeignKey("PatientId");
 
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.Payer", "Payer")
+                        .WithMany()
+                        .HasForeignKey("PayerId");
+
                     b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureSubCategory", "ProcedureSubcategory")
                         .WithMany("TreatmentPlans")
                         .HasForeignKey("ProcedureSubcategoryId");
@@ -907,7 +1026,28 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
                     b.Navigation("Patient");
 
+                    b.Navigation("Payer");
+
                     b.Navigation("ProcedureSubcategory");
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.UcrFee", b =>
+                {
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "CDTCode")
+                        .WithMany()
+                        .HasForeignKey("CdtCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.PayerFacilityMap", "PayerFacilityMap")
+                        .WithMany()
+                        .HasForeignKey("PayerFacilityMapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CDTCode");
+
+                    b.Navigation("PayerFacilityMap");
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Visit", b =>
@@ -1018,6 +1158,11 @@ namespace DentalTreatmentPlanner.Server.Migrations
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Patient", b =>
                 {
                     b.Navigation("TreatmentPlans");
+                });
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Payer", b =>
+                {
+                    b.Navigation("PayerFacilityMaps");
                 });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureCategory", b =>

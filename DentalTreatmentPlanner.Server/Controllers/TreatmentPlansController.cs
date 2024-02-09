@@ -43,6 +43,9 @@ public class TreatmentPlansController : ControllerBase
         return Ok(treatmentPlan);
     }
 
+
+
+
     // POST: api/TreatmentPlans
     [HttpPost]
     public async Task<ActionResult<CreateTreatmentPlanDto>> CreateTreatmentPlan(CreateTreatmentPlanDto treatmentPlanDto)
@@ -64,7 +67,6 @@ public class TreatmentPlansController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception details
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
@@ -100,7 +102,6 @@ public class TreatmentPlansController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception details
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
@@ -129,7 +130,6 @@ public class TreatmentPlansController : ControllerBase
         int? facilityId = user.FacilityId;
         if (!facilityId.HasValue)
         {
-            // Handle the case where facilityId is null
             return BadRequest("User's facility ID is not set.");
         }
 
@@ -145,7 +145,6 @@ public class TreatmentPlansController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception details
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
@@ -191,10 +190,51 @@ public class TreatmentPlansController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception details
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
+
+    // DELETE: api/TreatmentPlans/delete/{treatmentPlanId}
+    [HttpDelete("delete/{treatmentPlanId}")]
+    public async Task<IActionResult> DeleteTreatmentPlan(int treatmentPlanId)
+    {
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        int? facilityId = user.FacilityId;
+        if (!facilityId.HasValue)
+        {
+            return BadRequest("User's facility ID is not set.");
+        }
+
+        try
+        {
+            bool isDeleted = await _dentalTreatmentPlannerService.DeleteTreatmentPlanByIdAsync(treatmentPlanId);
+
+            if (isDeleted)
+            {
+                return Ok(new { message = "Treatment plan deleted successfully." });
+            }
+            else
+            {
+                return NotFound(new { message = "Treatment plan not found or user does not have permission to delete it." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
+    }
+
 
 
     private string GetUsernameFromToken()

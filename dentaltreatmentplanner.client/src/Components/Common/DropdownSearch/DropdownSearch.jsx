@@ -32,11 +32,11 @@ const DropdownSearch = ({ items, onSelect, selectedItem, valueKey, labelKey, ite
         }),
         option: (provided, state) => ({
             ...provided,
-            backgroundColor: state.isFocused ? '#eeeef3' : provided.backgroundColor,
-            color: 'black',
+            backgroundColor: state.isSelected ? '#eeeef3' : (state.isFocused ? '#eeeef3' : provided.backgroundColor),
+            color: state.isSelected ? 'black' : (state.isFocused ? 'black' : provided.color),
             '&:hover': {
                 backgroundColor: '#eeeef3',
-                color: 'black', 
+                color: 'black',
             },
         }),
     };

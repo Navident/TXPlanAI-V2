@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import RoundedButton from "../Common/RoundedButton/RoundedButton";
+import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { StyledPatientInfoInnerContainer, StyledGridItem, StyledGridItemLabel } from './index.style'
+import { StyledRoundedBoxContainer } from '../../GlobalStyledComponents';
+import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
+import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
+
+
+const PatientInfoSection = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { selectedPatient, payers } = useBusiness();
+    const [selectedPayer, setSelectedPayer] = useState(null);
+    // Determine which button to show based on the current route
+    const showCreateNewTxPlanButton = location.pathname.includes("/saved-patient-tx-plans");
+    const showViewSavedTxPlansButton = location.pathname === "/PatientManagementDashboard";
+    const { updateSelectedPayer } = useTreatmentPlan();
+
+    const handleViewSavedTxPlansClick = () => {
+        if (selectedPatient && selectedPatient.patientId) {
+            navigate(`/PatientManagementDashboard/saved-patient-tx-plans/${selectedPatient.patientId}`);
+        } else {
+            alert('Please select a patient first.');
+        }
+    };
+
+    const handleCreateNewTxPlanClick = () => {
+            navigate(`/PatientManagementDashboard`);
+    };
+
+    const handlePayerSelect = (selectedPayer) => {
+        const adjustedSelectedPayer = {
+            ...selectedPayer,
+            value: selectedPayer.payerId,
+        };
+        setSelectedPayer(adjustedSelectedPayer);
+        updateSelectedPayer(adjustedSelectedPayer);
+    };
+
+
+    const renderPayerDropdown = () => {
+        console.log('Current Selected Payer State in render:', selectedPayer);
+        const payerOptions = payers.map(payer => ({
+            id: payer.id,
+            ...payer
+        }));
+
+        return (
+            <DropdownSearch
+                items={payerOptions}
+                selectedItem={selectedPayer}
+                onSelect={handlePayerSelect}
+                itemLabelFormatter={(payer) => `${payer.payerName}`}
+                valueKey="payerId"
+                labelKey="payerName"
+            />
+        );
+    };
+
+
+
+
+    return (
+        <StyledRoundedBoxContainer>
+            <StyledPatientInfoInnerContainer>
+                <StyledGridItem>
+                    <div className="grid-item-1-inner large-text">
+                        {selectedPatient ? `${selectedPatient.firstName} ${selectedPatient.lastName}` : "Select a patient"}
+                    </div>
+                </StyledGridItem>
+                <StyledGridItem>
+                    <div className="grid-item-2-inner">
+                        <StyledGridItemLabel>DOB:
+                            <div>{selectedPatient ? new Date(selectedPatient.dateOfBirth).toLocaleDateString("en-CA") : ""}</div>
+                        </StyledGridItemLabel>
+                        <StyledGridItemLabel>PATIENT ID:
+                            <div> {selectedPatient ? selectedPatient.patientId : ""} </div>
+                        </StyledGridItemLabel>
+                    </div>
+                </StyledGridItem>
+                <StyledGridItem>
+                    <div className="grid-item-2-inner">
+                        <StyledGridItemLabel>
+                            Payer:
+                            {renderPayerDropdown()}
+                        </StyledGridItemLabel>
+                    </div>
+                </StyledGridItem>
+                <StyledGridItem>
+                    <div className="patient-info-inner-buttons">
+                        {showCreateNewTxPlanButton && (
+                            <RoundedButton
+                                text="Create New TX Plan"
+                                backgroundColor="#7777a1"
+                                textColor="white"
+                                border={false}
+                                width="fit-content"
+                                className="purple-button-hover"
+                                onClick={handleCreateNewTxPlanClick}
+                            />
+                        )}
+                        {showViewSavedTxPlansButton && (
+                            <RoundedButton
+                                text="View Saved TX Plans"
+                                backgroundColor="white"
+                                textColor="#7777a1"
+                                border={true}
+                                width="fit-content"
+                                borderColor="#7777a1"
+                                className="outline-button-hover"
+                                onClick={handleViewSavedTxPlansClick}
+                            />
+                        )}
+                    </div>
+
+                </StyledGridItem>
+            </StyledPatientInfoInnerContainer>
+        </StyledRoundedBoxContainer>
+    );
+};
+
+export default PatientInfoSection;

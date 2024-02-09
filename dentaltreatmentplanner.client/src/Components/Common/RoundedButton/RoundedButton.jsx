@@ -1,26 +1,32 @@
 import React from 'react';
 import './RoundedButton.css';
 
-// The onClick prop is optional here
 const RoundedButton = ({
     icon,
     text,
     backgroundColor,
     textColor,
     border = true,
-    borderColor = 'black',  // Default border color
+    borderColor = 'black',
+    borderRadius = '20px',
+    height, 
     onClick,
     width = '100%',
-    className = ''  // Optional class name
+    className = ''
 }) => {
     const buttonStyle = {
         backgroundColor: backgroundColor || 'white',
         color: textColor || 'black',
         border: border ? `1px solid ${borderColor}` : 'none',
+        borderRadius: borderRadius,
         width: width,
+        height: height, 
     };
 
-    // Combine the default class with any additional classes passed in
+    if (!height) {
+        delete buttonStyle.height;
+    }
+
     const combinedClassName = `rounded-button ${className}`;
 
     return (
@@ -32,5 +38,6 @@ const RoundedButton = ({
 };
 
 export default RoundedButton;
+
 
 
