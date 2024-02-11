@@ -3,7 +3,7 @@ import RoundedButton from "../Common/RoundedButton/RoundedButton";
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { StyledPatientInfoInnerContainer, StyledGridItem, StyledGridItemLabel, StyledGridItemLabelAndValueText, StyledGridItemValueText } from './index.style'
-import { StyledRoundedBoxContainer } from '../../GlobalStyledComponents';
+import { StyledRoundedBoxContainer, StyledUnderlinedText } from '../../GlobalStyledComponents';
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
 import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
 
@@ -26,6 +26,10 @@ const PatientInfoSection = () => {
         }
     };
 
+    const redirectToFeeScheduling = () => {
+        navigate('/dashboard/feescheduling');
+    };
+
     const handleCreateNewTxPlanClick = () => {
             navigate(`/PatientManagementDashboard`);
     };
@@ -39,14 +43,12 @@ const PatientInfoSection = () => {
         updateSelectedPayer(adjustedSelectedPayer);
     };
 
-
     const renderPayerDropdown = () => {
         console.log('Current Selected Payer State in render:', selectedPayer);
         const payerOptions = payers.map(payer => ({
             id: payer.id,
             ...payer
         }));
-
         return (
             <DropdownSearch
                 items={payerOptions}
@@ -82,13 +84,14 @@ const PatientInfoSection = () => {
                         <StyledGridItemValueText> {selectedPatient ? selectedPatient.patientId : ""} </StyledGridItemValueText>
                     </StyledGridItemLabelAndValueText>
                 </StyledGridItem> 
-                <StyledGridItem> 
+                <StyledGridItem $flexDirection="column" $alignItems="flex-start">
                     <StyledGridItemLabelAndValueText>
                         <StyledGridItemLabel>
                             Payer:
                             {renderPayerDropdown()}
                         </StyledGridItemLabel>
                     </StyledGridItemLabelAndValueText>
+                    <StyledUnderlinedText onClick={redirectToFeeScheduling}>Create a new payer</StyledUnderlinedText>
                 </StyledGridItem>
                 <StyledGridItem>
                     <div className="patient-info-inner-buttons">
@@ -120,7 +123,6 @@ const PatientInfoSection = () => {
             </StyledPatientInfoInnerContainer>
         </StyledRoundedBoxContainer>
     );
-
 };
 
 export default PatientInfoSection;

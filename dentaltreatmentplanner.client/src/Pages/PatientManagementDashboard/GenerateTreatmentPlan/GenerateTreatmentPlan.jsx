@@ -20,9 +20,7 @@ const GenerateTreatmentPlan = () => {
         onDeleteVisit,
         onUpdateVisitsInTreatmentPlan,
         selectedPayer,
-        alertInfo,
         showAlert,
-        closeAlert
     } = useTreatmentPlan(); 
 
     const [inputText, setInputText] = useState('');

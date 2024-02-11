@@ -6,6 +6,16 @@ export const StyledLargeText = styled.div`
     font-weight: 600;
 `;
 
+export const StyledUnderlinedText = styled.div`
+    text-decoration: underline;
+    color: black;
+
+    &:hover {
+        color: #7777a1;
+        cursor: pointer;
+    }
+`;
+
 export const StyledTableLabelText = styled.div`
     font-size: 20px;
 `;

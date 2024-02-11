@@ -76,11 +76,10 @@ export const StyledDropdownListItem = styled.li`
 
 `;
 
-
-
 export const StyledItemIcon = styled.img`
-
-    margin-right: 10px;
+    margin-right: 6px;
+    width: 20px;
+    height: auto;
 `;
 
 export const StyledItemText = styled.span`
