@@ -37,7 +37,7 @@ const PatientManagementDashboard = () => {
                 <HeaderBar
                     leftCornerElement={<img src={backButton} alt="Back" className="back-btn-arrow" onClick={handleBackClick} />}
                     rightCornerElement={<div className="headerbar-business-name">{businessName}</div>}
-                    centerLogo={true}
+                    centerLogo={false}
                 />
             ) : (
                 <HeaderBar

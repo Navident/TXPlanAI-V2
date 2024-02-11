@@ -387,9 +387,6 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-
-
-
         public async Task LogoutUserAsync()
         {
             await _signInManager.SignOutAsync();

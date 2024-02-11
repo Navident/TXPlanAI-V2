@@ -35,9 +35,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return Ok(new { isSuccess = true, message = "Registration successful" });
             }
 
-            // Collect the errors into a list or a string
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            // Include an 'isSuccess' flag in the response for consistency
             return BadRequest(new { isSuccess = false, errors = errors });
         }
 
@@ -102,18 +100,11 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
-
-
-
-
-
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await _dentalTreatmentPlannerService.LogoutUserAsync();
             return Ok();
         }
-
-        // Additional actions for password reset, change password, etc. can be added here
     }
 }

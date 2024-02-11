@@ -69,9 +69,6 @@ export const loginUser = async (credentials) => {
     }
 };
 
-
-
-
 export const logoutUser = async () => {
     try {
         const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/logout', {

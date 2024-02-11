@@ -25,6 +25,7 @@
     align-items: center;
     justify-content: flex-end;
     margin-right: 50px;
+    gap: 8px;
 }
 .header-center-container {
     display: flex;
@@ -33,14 +34,14 @@
     flex-grow: 1;
 }
 
-.header-bar img {
-    height: 37px;
-    width: auto;
-}
-
 .header-bar .navident-logo {
     height: 50px;
     cursor: pointer;
-} 
+}
+
+.header-center-container, .header-right-corner-container {
+    position: relative; 
+}
+
 
 

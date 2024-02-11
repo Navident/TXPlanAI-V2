@@ -25,18 +25,20 @@ const CustomCdtCodes = () => {
     const [originalRowData, setOriginalRowData] = useState(null);
 
     useEffect(() => {
+        let staticRows = [];
         if (facilityCdtCodes && facilityCdtCodes.length > 0) {
-            const staticRows = facilityCdtCodes.map(code => ({
+            staticRows = facilityCdtCodes.map(code => ({
                 id: code.cdtCodeId.toString(),
                 code: code.code,
                 description: code.longDescription,
                 isStatic: true
             }));
-
-            const dynamicRow = { id: `dynamic-${Date.now()}`, code: '', description: '', isStatic: false };
-            setRowsData([...staticRows, dynamicRow]);
         }
+        // Always add an empty row for adding new CDT codes, regardless of whether there are existing codes
+        const dynamicRow = { id: `dynamic-${Date.now()}`, code: '', description: '', isStatic: false };
+        setRowsData([...staticRows, dynamicRow]);
     }, [facilityCdtCodes]);
+
 
     const renderStaticRow = (row, index) => ([
         <span key={`code-${index}`}>{row.code}</span>,

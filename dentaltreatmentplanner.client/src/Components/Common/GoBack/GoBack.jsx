@@ -17,7 +17,7 @@ const GoBack = ({ text, customOnClick }) => {
 
     return (
         <div className="go-back-arrow-with-text" onClick={goBackHandler}>
-            <img src={backButton} alt="Back" className="back-btn-arrow" />
+            <img src={backButton} alt="Back" />
             <div className="light-grey-text"> {text} </div>
         </div>
     );

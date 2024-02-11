@@ -1,9 +1,16 @@
 import './HeaderBar.css';
 import PropTypes from 'prop-types';
+import dropdownArrowIcon from '../../../assets/dropdown-arrow.svg';
+import { StyledArrowIcon } from './index.style';
+import { useState } from 'react';
+import DropdownHeaderPopup from '../../DropdownHeaderPopup';
 
-const HeaderBar = ({ leftCornerElement, rightCornerElement, centerLogo }) => {
-    // when logo is in center we need to set the leftcornerelement to position absolute
+const HeaderBar = ({ leftCornerElement, rightCornerElement, centerLogo, showDropdownArrow }) => {
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
     const leftCornerStyle = centerLogo ? { position: 'absolute' } : null;
+
+    const toggleDropdown = () => setIsDropdownVisible(!isDropdownVisible);
 
     return (
         <div className="header-bar box-shadow">
@@ -13,27 +20,49 @@ const HeaderBar = ({ leftCornerElement, rightCornerElement, centerLogo }) => {
             {rightCornerElement && centerLogo ? (
                 <div className="header-center-container">
                     {rightCornerElement}
+                    {showDropdownArrow && (
+                        <StyledArrowIcon
+                            src={dropdownArrowIcon}
+                            alt="Dropdown"
+                            onClick={toggleDropdown}
+                            isVisible={isDropdownVisible} 
+                        />
+                    )}
+                    <DropdownHeaderPopup isVisible={isDropdownVisible}>
+                        popup
+                    </DropdownHeaderPopup>
                 </div>
             ) : rightCornerElement ? (
                 <div className="header-right-corner-container">
                     {rightCornerElement}
+                    {showDropdownArrow && (
+                        <StyledArrowIcon
+                            src={dropdownArrowIcon}
+                            alt="Dropdown"
+                            onClick={toggleDropdown}
+                            isVisible={isDropdownVisible} 
+                        />
+                    )}
+                        <DropdownHeaderPopup isVisible={isDropdownVisible}>
+                            popup
+                        </DropdownHeaderPopup>
                 </div>
             ) : null}
         </div>
     );
 };
 
-// Define the prop types
 HeaderBar.propTypes = {
-    leftCornerElement: PropTypes.node, // Required element for the left corner
-    rightCornerElement: PropTypes.node, // Optional element for the right corner
-    centerLogo: PropTypes.bool // Optional boolean to center the right element
+    leftCornerElement: PropTypes.node,
+    rightCornerElement: PropTypes.node,
+    centerLogo: PropTypes.bool,
+    showDropdownArrow: PropTypes.bool
 };
 
-// Set default props
 HeaderBar.defaultProps = {
-    rightCornerElement: null, // Default to null if not provided
-    centerLogo: false // Default is false
+    rightCornerElement: null,
+    centerLogo: false,
+    showDropdownArrow: false
 };
 
 export default HeaderBar;

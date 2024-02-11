@@ -30,21 +30,18 @@ const FeeScheduling = () => {
     const isEditingFacilityFeeScheduling = location.pathname.includes("/feescheduling/edit");
 
     useEffect(() => {
+        let payerRows = [];
         if (payers && payers.length > 0) {
-            const payerRows = payers.map(payer => {
-                console.log("payer", payer);
-                return {
-                    id: payer.payerId.toString(),
-                    payerName: payer.payerName,
-                    isStatic: true
-                };
-            });
-
-            // Add an empty row for adding new payers
-            const newPayerRow = { id: `dynamic-${Date.now()}`, payerName: '', isStatic: false };
-            setRowsData([...payerRows, newPayerRow]);
+            payerRows = payers.map(payer => ({
+                id: payer.payerId.toString(),
+                payerName: payer.payerName,
+                isStatic: true
+            }));
         }
+        const newPayerRow = { id: `dynamic-${Date.now()}`, payerName: '', isStatic: false };
+        setRowsData([...payerRows, newPayerRow]);
     }, [payers]);
+
 
     const handleEditButtonClick = (payerId, payerName) => {
         navigate(`/dashboard/feescheduling/edit/${payerId}`, { state: { payerName } });
@@ -70,6 +67,7 @@ const FeeScheduling = () => {
                 onChange={(e) => handlePayerNameChange(index, e.target.value)}
                 borderColor={UI_COLORS.purple}
                 width="180px"
+                placeholder="Payer Name"
             />,
             lastCell
         ];
