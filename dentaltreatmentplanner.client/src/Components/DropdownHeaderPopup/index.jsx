@@ -6,14 +6,17 @@ import PopupAlert from '../Common/PopupAlert';
 import { useState } from 'react';
 import { logoutUser } from '../../ClientServices/apiService';
 import { useNavigate } from 'react-router-dom';
+import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 
 const DropdownHeaderPopup = ({ isVisible }) => {
     const [openDialog, setOpenDialog] = useState(false);
     const navigate = useNavigate(); 
+    const { resetAppStates } = useBusiness(); 
 
     const handleLogout = async () => {
         await logoutUser();
-        setOpenDialog(false); 
+        setOpenDialog(false);
+        resetAppStates();
         navigate('/'); 
     };
 

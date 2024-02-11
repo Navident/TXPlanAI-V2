@@ -44,6 +44,7 @@ const PatientManagementDashboard = () => {
                     leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" onClick={handleLogoClick} />}
                     rightCornerElement={<div className="headerbar-business-name">{businessName}</div>}
                     className="dashboard-header"
+                    showDropdownArrow={true}
                 />
             )}
             <StyledMainContentWrapper>

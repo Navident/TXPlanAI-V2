@@ -58,6 +58,27 @@ export const BusinessProvider = ({ children }) => {
         fetchCategoriesAndDetails();
     };
 
+    //method to reset state to fresh
+    const resetAppStates = () => {
+        setBusinessName('');
+        setIsUserLoggedIn(false);
+        setPatients([]);
+        setSearchQuery('');
+        setFilteredPatients([]);
+        setSelectedPatient(null);
+        setDefaultCdtCodes([]);
+        setFacilityCdtCodes([]);
+        setPayers([]);
+        setFacilityPayerCdtCodeFees([]);
+        setActiveCdtCodes([]);
+        setCategories([]);
+        setIsLoading(false);
+
+        // Clear user-specific localStorage items
+        localStorage.removeItem('businessName');
+        localStorage.setItem('isLoggedIn', 'false');
+    };
+
 
     // Defined fetch functions
     const fetchDefaultCdtCodes = async () => {
@@ -189,7 +210,8 @@ export const BusinessProvider = ({ children }) => {
             categories,
             isLoading,
             fetchFacilityPayerCdtCodeFees,
-            activeCdtCodes, setActiveCdtCodes
+            activeCdtCodes, setActiveCdtCodes,
+            resetAppStates
             
         }}>
             {children}

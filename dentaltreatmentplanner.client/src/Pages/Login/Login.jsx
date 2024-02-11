@@ -23,7 +23,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const { setBusinessName, setIsUserLoggedIn } = useBusiness(); 
-    const [loading, setLoading] = useState(false); // new state for loading
+    const [loading, setLoading] = useState(false); 
 
 
     const handleEmailChange = (event) => {
