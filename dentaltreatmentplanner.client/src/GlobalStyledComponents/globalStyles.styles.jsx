@@ -80,7 +80,8 @@ export const StyledRoundedBoxContainer = styled.div`
 export const StyledRoundedBoxContainerInner = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 30px;
+    flex-basis: ${props => props.flexBasisZero ? '0' : 'auto'};
+    padding: ${props => props.padding || '30px'};
     gap: 20px;
     height: 100%;
 `;

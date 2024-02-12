@@ -305,6 +305,37 @@ public class TreatmentPlansController : ControllerBase
         return Ok(treatmentPlans);
     }
 
+    // GET: api/TreatmentPlans/allpatientplansforfacility
+    [HttpGet("allpatientplansforfacility")]
+    public async Task<IActionResult> GetAllTreatmentPlansForFacility()
+    {
+        string username = GetUsernameFromToken();
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized();
+        }
+
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!user.FacilityId.HasValue)
+        {
+            return BadRequest("User's facility ID is not set.");
+        }
+
+        try
+        {
+            var treatmentPlans = await _dentalTreatmentPlannerService.GetAllPatientTreatmentPlansForFacilityAsync(user.FacilityId.Value);
+            return Ok(treatmentPlans);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
+        }
+    }
 
 }
 

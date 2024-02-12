@@ -6,6 +6,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
 import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
+import RecentTxPlans from '../../../Components/RecentTxPlans';
+import { StyledLargeText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
+import { StyledHomeBoxBottomContainer } from '../../Dashboard/index.style'
 
 const Home = () => {
     const navigate = useNavigate();
@@ -66,26 +69,29 @@ const Home = () => {
 
             </div>
             <div className="dashboard-right-side-row">
-                <div className="dashboard-right-side-row-box first-box rounded-box box-shadow">
+                <StyledRoundedBoxContainer>
+                    <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
                     <div className="large-text">Generate TX Plan</div>
-                    <div className="dashboard-right-side-row-box-bottom-section">
+                        <StyledHomeBoxBottomContainer purpleContainer>
                         <img src={createNewButton} alt="Create New TX Plan" onClick={handleGenerateTxButtonClick} />
-                    </div>
-                </div>
-                <div className="dashboard-right-side-row-box rounded-box box-shadow">
-                    <div className="large-text">Recent TX Plans</div>
-                    <div className="dashboard-right-side-row-box-bottom-section"></div>
-                </div>
-                <div className="dashboard-right-side-row-box rounded-box box-shadow">
+                    </StyledHomeBoxBottomContainer>
+                    </StyledRoundedBoxContainerInner>
+                    </StyledRoundedBoxContainer>
+                <RecentTxPlans />
+                <StyledRoundedBoxContainer>
+                    <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
                     <div className="large-text">Providers</div>
-                    <div className="dashboard-right-side-row-box-bottom-section"></div>
-                </div>
+                        <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
+                    </StyledRoundedBoxContainerInner>
+                </StyledRoundedBoxContainer>
             </div>
             <div className="dashboard-right-side-row">
-                <div className="dashboard-right-side-row-box rounded-box box-shadow">
+                <StyledRoundedBoxContainer>
+                    <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
                     <div className="large-text">TX Plans Generated</div>
-                    <div className="dashboard-right-side-row-box-bottom-section rounded-box"></div>
-                </div>
+                        <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
+                    </StyledRoundedBoxContainerInner>
+                </StyledRoundedBoxContainer>
             </div>
         </div>
     );

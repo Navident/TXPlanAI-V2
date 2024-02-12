@@ -57,17 +57,7 @@
     flex-grow: 1;
 
 }
-.first-box .dashboard-right-side-row-box-bottom-section {
-    background-color: #F6F8FE;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px;
-}
 
-.first-box .dashboard-right-side-row-box-bottom-section img{
-    cursor: pointer;
-}
 .dashboard-right-side-row:first-child {
     align-items: center;
 }

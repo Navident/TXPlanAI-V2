@@ -16,6 +16,7 @@
     <Folder Include="src\Components\Common\StandardTextfield\" />
     <Folder Include="src\Components\AlertWrapper\" />
     <Folder Include="src\Components\DropdownHeaderPopup\" />
+    <Folder Include="src\Components\RecentTxPlans\" />
     <Folder Include="src\GlobalStyledComponents\" />
     <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
     <Folder Include="src\Pages\Login\" />

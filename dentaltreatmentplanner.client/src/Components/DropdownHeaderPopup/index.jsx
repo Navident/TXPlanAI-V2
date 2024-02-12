@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types';
 import { StyledDropdownPopup, StyledDropdownList, StyledDropdownListItem, StyledItemIcon, StyledItemText } from './index.style';
-import settingsIcon from '../../assets/tx-plan-settings-icon.svg';
-import settingsIcon2 from '../../assets/tx-plan-settings-icon.svg';
 import PopupAlert from '../Common/PopupAlert';
 import { useState } from 'react';
 import { logoutUser } from '../../ClientServices/apiService';

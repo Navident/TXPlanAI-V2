@@ -3,16 +3,21 @@ import { useContext } from 'react';
 import { BusinessContext } from '../../Contexts/BusinessContext/BusinessContext';
 import './PatientList.css';
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { StyledLargeText } from '../../GlobalStyledComponents';
 
 const PatientList = () => {
     const { filteredPatients } = useContext(BusinessContext);
     const { selectedPatient, setSelectedPatient } = useBusiness();
     const navigate = useNavigate();
+    const location = useLocation(); 
 
     const handlePatientSelection = (patient) => {
         setSelectedPatient(patient);
+        // Check if the current path includes 'saved-patient-tx-plans' before navigating
+        if (location.pathname.includes('/saved-patient-tx-plans')) {
+            navigate(`/PatientManagementDashboard/saved-patient-tx-plans/${patient.patientId}`);
+        }
     };
     const handleNewPatientClick = () => {
         navigate('/PatientManagementDashboard/create-new-patient');
@@ -34,7 +39,6 @@ const PatientList = () => {
                 <div style={{ borderTop: '1px solid #ccc', margin: '5px 0' }}></div>
 
             </div>
-
             {filteredPatients.map((patient) => (
                 <div
                     key={patient.patientId}
@@ -44,8 +48,6 @@ const PatientList = () => {
                     {patient.firstName}
                 </div>
             ))}
-
-
         </div>
     );
 };

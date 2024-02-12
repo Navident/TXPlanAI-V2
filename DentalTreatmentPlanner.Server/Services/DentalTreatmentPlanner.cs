@@ -982,6 +982,50 @@ namespace DentalTreatmentPlanner.Server.Services
             return treatmentPlans;
         }
 
+        public async Task<IEnumerable<RetrievePatientTreatmentPlanDto>> GetAllPatientTreatmentPlansForFacilityAsync(int facilityId)
+        {
+            IQueryable<TreatmentPlan> query = _context.TreatmentPlans
+                .Where(tp => tp.FacilityId == facilityId && tp.PatientId != null)
+                .Include(tp => tp.Patient);
+
+            var treatmentPlans = await query
+                .OrderBy(tp => tp.CreatedAt) // Ensure the treatment plans are ordered by date
+                .Select(tp => new RetrievePatientTreatmentPlanDto
+                {
+                    TreatmentPlanId = tp.TreatmentPlanId,
+                    //Description = tp.Description,
+                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
+                    CreatedUserId = tp.CreatedUserId,
+                    CreatedAt = tp.CreatedAt,
+                    PayerId = tp.PayerId,
+                    PatientName = (tp.Patient.FirstName ?? "") + " " + (tp.Patient.LastName ?? ""),
+
+                    // Mapping each visit of the treatment plan to a RetrieveVisitDto
+                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                    {
+                        VisitId = v.VisitId,
+                        Description = v.Description,
+                        VisitNumber = v.VisitNumber,
+
+                        // Mapping CDT codes associated with each visit
+                        CdtCodes = v.VisitCdtCodeMaps.Select(vc => new VisitCdtCodeMapDto
+                        {
+                            VisitCdtCodeMapId = vc.VisitCdtCodeMapId,
+                            CdtCodeId = vc.CdtCode.CdtCodeId,
+                            Order = vc.Order,
+                            ProcedureTypeId = vc.ProcedureTypeId,
+                            ToothNumber = vc.ToothNumber,
+                            Code = vc.CdtCode.Code,
+                            LongDescription = vc.CdtCode.LongDescription
+                        }).ToList()
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return treatmentPlans;
+        }
+
+
 
         // Method to retrieve treatment plans by patient ID
         public async Task<IEnumerable<RetrievePatientTreatmentPlanDto>> GetTreatmentPlansByPatientIdAsync(int patientId, int? facilityId)

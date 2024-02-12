@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BusinessContext } from './BusinessContext';
 import { getPatientsForUserFacility, getCustomCdtCodesForFacility } from '../../ClientServices/apiService';
-import { getCdtCodes, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
+import { getCdtCodes, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getAllPatientTreatmentPlansForFacility, getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
 
 export const BusinessProvider = ({ children }) => {
     // State hooks for business information
@@ -24,6 +24,9 @@ export const BusinessProvider = ({ children }) => {
     //state hooks for categories and loading
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    //state hooks for treatment plans
+    const [patientTreatmentPlans, setPatientTreatmentPlans] = useState([]);
 
     // Effect hook for initializing business name from localStorage
     useEffect(() => {
@@ -56,6 +59,7 @@ export const BusinessProvider = ({ children }) => {
         fetchPatientsForFacility();
         fetchPayers();
         fetchCategoriesAndDetails();
+        fetchAllPatientTreatmentPlansForFacility();
     };
 
     //method to reset state to fresh
@@ -73,6 +77,7 @@ export const BusinessProvider = ({ children }) => {
         setActiveCdtCodes([]);
         setCategories([]);
         setIsLoading(false);
+        setPatientTreatmentPlans([]);
 
         // Clear user-specific localStorage items
         localStorage.removeItem('businessName');
@@ -93,6 +98,16 @@ export const BusinessProvider = ({ children }) => {
             setFacilityCdtCodes(fetchedCdtCodes || []);
         } catch (error) {
             console.error('Error fetching CDT codes:', error);
+        }
+    };
+
+    const fetchAllPatientTreatmentPlansForFacility = async () => {
+        try {
+            const fetchedPatientTreatmentPlans = await getAllPatientTreatmentPlansForFacility();
+            console.log('Fetched patient treatment plans in businessprovider:', fetchedPatientTreatmentPlans);
+            setPatientTreatmentPlans(fetchedPatientTreatmentPlans || []);
+        } catch (error) {
+            console.error('Error fetching patient treatment plans:', error);
         }
     };
 
@@ -211,7 +226,8 @@ export const BusinessProvider = ({ children }) => {
             isLoading,
             fetchFacilityPayerCdtCodeFees,
             activeCdtCodes, setActiveCdtCodes,
-            resetAppStates
+            resetAppStates,
+            patientTreatmentPlans, setPatientTreatmentPlans
             
         }}>
             {children}

@@ -8,6 +8,7 @@
         public int? ToothNumber { get; set; } 
         public int? FacilityId { get; set; }
         public int? PayerId { get; set; }
+        public string PatientName { get; set; }
         public int? CreatedUserId { get; set; }
         public DateTime CreatedAt { get; set; }
 

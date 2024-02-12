@@ -2,7 +2,7 @@
 //const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
 //const VISITS_API_URL = 'https://localhost:7089/api/visits';
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
-const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
+const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
 
 const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
@@ -232,16 +232,41 @@ export const updateTreatmentPlan = async (id, updatedData) => {
     }
 };
 
+// Function to get all treatment plans for the current user's facility
+export const getAllPatientTreatmentPlansForFacility = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${API_BASE_URL}/allpatientplansforfacility`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Treatment Plans:", data);
+            return data;
+        } else {
+            console.error("Failed to retrieve treatment plans. Status:", response.status);
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching treatment plans:", error.message);
+        return [];
+    }
+};
+
 // Function to get all categories
 export const getCategories = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        console.log("jwttoken: ", token);
         const response = await fetch(`${PROCEDURES_API_URL}/ProcedureCategory/categories`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+                'Authorization': `Bearer ${token}`
             },
         });
 
