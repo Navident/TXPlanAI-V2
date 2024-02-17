@@ -29,7 +29,7 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="dashboard-wrapper">
+
             <StyledAppContainer>
                 <HeaderBar
                     leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" onClick={handleLogoClick} />}
@@ -44,7 +44,6 @@ const Dashboard = () => {
                     </StyledContentArea>
                 </StyledMainContentWrapper>
             </StyledAppContainer>
-        </div>
     );
 };
 

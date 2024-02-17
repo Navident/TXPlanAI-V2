@@ -15,16 +15,18 @@ import PatientManagementDashboard from './Pages/PatientManagementDashboard/Patie
 import GenerateTreatmentPlan from './Pages/PatientManagementDashboard/GenerateTreatmentPlan/GenerateTreatmentPlan';
 import CreateNewPatient from './Pages/PatientManagementDashboard/CreateNewPatient/CreateNewPatient';
 import SavedPatientTxPlans from './Pages/PatientManagementDashboard/SavedPatientTxPlans/SavedPatientTxPlans';
-import PatientTreatmentPlanCustomizer from './Pages/PatientManagementDashboard/SavedPatientTxPlans/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
+import PatientTreatmentPlanCustomizer from './Pages/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
+import AllSavedPatientTxPlans from "./Pages/Dashboard/AllSavedPatientTxPlans/index";
 
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
 import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
 import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
+
 function App() {
     return (
         <BusinessProvider>
-            <TreatmentPlanProvider> 
+            <TreatmentPlanProvider>
                 <div className="App">
                     <Routes>
                         <Route path="/" element={<Landing />} />
@@ -41,15 +43,16 @@ function App() {
                             <Route path="feescheduling" element={<FeeScheduling />}>
                                 <Route path="edit/:payerId" element={<EditFacilityFeeScheduling />} />
                             </Route>
+                            <Route path="all-saved-patient-tx-plans" element={<AllSavedPatientTxPlans />} />
                         </Route>
 
                         <Route path="/PatientManagementDashboard" element={<PatientManagementDashboard />}>
                             <Route index element={<GenerateTreatmentPlan />} />
                             <Route path="create-new-patient" element={<CreateNewPatient />} />
-                            <Route path="saved-patient-tx-plans/:patientId" element={<SavedPatientTxPlans />}>
-                                <Route path="customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
-                            </Route>
+                            <Route path="saved-patient-tx-plans/:patientId" element={<SavedPatientTxPlans />} />
                         </Route>
+
+                        <Route path="/customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
                     </Routes>
                     <AlertWrapper />
                 </div>

@@ -25,6 +25,7 @@ export const StyledContainerWithTableInner = styled.div`
     flex-direction: column;
     padding: 30px;
     gap: 20px;
+    height: 100%;
 `;
 export const StyledAppContainer = styled.div`
     background-color: #eeeef3;
@@ -63,6 +64,16 @@ export const StyledSemiboldBlackTitle = styled.div`
 
 export const StyledLightGreyText = styled.div`
     color: ${UI_COLORS.light_grey};
+`;
+
+export const StyledLightGrey2Text = styled.div`
+  color: ${UI_COLORS.light_grey2};
+  ${props => props.hoverEffect && `
+    &:hover {
+      color: #7777a1;
+      cursor: pointer;
+    }
+  `}
 `;
 
 export const StyledRoundedBoxContainer = styled.div`

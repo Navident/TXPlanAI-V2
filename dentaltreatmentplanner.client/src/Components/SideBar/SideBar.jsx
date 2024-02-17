@@ -21,7 +21,7 @@ const SideBar = () => {
     const items = [
         { imgSrc: homeIcon, imgSrcSelected: homeIconActive, text: "Home", path: "" },
         { imgSrc: newTxPlanIcon, imgSrcSelected: newTxPlanIcon, text: "Fee Schedule", path: "feescheduling" },
-        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIcon, text: "Saved Tx Plans", path: "savedTxPlans" },
+        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIcon, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans" },
         { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers" },
         { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIcon, text: "Custom CDT Codes", path: "customcdtCodes" },
         { imgSrc: settingsIcon, imgSrcSelected: settingsIconActive, text: "TX Plan Settings", path: "defaultprocedures" },

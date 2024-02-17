@@ -31,14 +31,6 @@
     color: #4a5759;
     font-size: 20px;
 }
-.dashboard-right-side-row:nth-child(n+2) .large-text::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background-color: #EAEBEB;
-    width: 100%;
-    margin-top: 15px;
-}
 
 .dashboard-right-side-row-top-text-section {
     color: #4a5759;

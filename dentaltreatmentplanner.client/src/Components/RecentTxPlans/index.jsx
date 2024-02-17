@@ -1,30 +1,56 @@
-import { StyledLargeText, StyledUnderlinedText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../GlobalStyledComponents';
-import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
-import { StyledHomeBoxBottomContainer, StyledItemContainer } from '../../Pages/Dashboard/index.style'
+import {
+	StyledLargeText,
+	StyledUnderlinedText,
+	StyledLightGrey2Text,
+	StyledRoundedBoxContainer,
+	StyledRoundedBoxContainerInner,
+} from "../../GlobalStyledComponents";
+import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
+import {
+	StyledHomeBoxBottomContainer,
+	StyledSeparator,
+	StyledHomeBoxTopContainer,
+	StyledItemContainer,
+} from "../../Pages/Dashboard/index.style";
+import { useNavigate } from "react-router-dom";
 
 const RecentTxPlans = () => {
-    const { patientTreatmentPlans } = useBusiness();
+	const navigate = useNavigate();
+	const { patientTreatmentPlans } = useBusiness();
 
-    // Sort treatment plans by createdAt in descending order and filter out duplicates
-    const sortedPlans = patientTreatmentPlans
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5); 
+	// Sort treatment plans by createdAt in descending order and filter out duplicates
+	const sortedPlans = patientTreatmentPlans
+		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+		.slice(0, 5);
 
-    return (
-        <StyledRoundedBoxContainer>
-            <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                <div className="large-text">Recent TX Plans</div>
-                <StyledHomeBoxBottomContainer itemsList>
-                    {sortedPlans.map((plan, index) => (
-                        <StyledItemContainer key={index}>
-                            <div>{plan.patientName}</div>
-                            <StyledUnderlinedText className="editText">Edit</StyledUnderlinedText>
-                        </StyledItemContainer>
-                    ))}
-                </StyledHomeBoxBottomContainer>
-            </StyledRoundedBoxContainerInner>
-        </StyledRoundedBoxContainer>
-    );
+	// Function to handle redirection
+	const handleViewAllClick = () => {
+		navigate("/dashboard/all-saved-patient-tx-plans");
+	};
+
+	return (
+		<StyledRoundedBoxContainer>
+			<StyledRoundedBoxContainerInner flexBasisZero padding="20px">
+				<StyledHomeBoxTopContainer>
+					<div className="large-text">Recent TX Plans</div>
+					<StyledLightGrey2Text hoverEffect onClick={handleViewAllClick}>
+						View all
+					</StyledLightGrey2Text>
+				</StyledHomeBoxTopContainer>
+				<StyledSeparator />
+				<StyledHomeBoxBottomContainer itemsList>
+					{sortedPlans.map((plan, index) => (
+						<StyledItemContainer key={index}>
+							<div>{plan.patientName}</div>
+							<StyledLightGrey2Text hoverEffect className="editText">
+								Edit
+							</StyledLightGrey2Text>
+						</StyledItemContainer>
+					))}
+				</StyledHomeBoxBottomContainer>
+			</StyledRoundedBoxContainerInner>
+		</StyledRoundedBoxContainer>
+	);
 };
 
 export default RecentTxPlans;

@@ -7,8 +7,8 @@ import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
 import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import RecentTxPlans from '../../../Components/RecentTxPlans';
-import { StyledLargeText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
-import { StyledHomeBoxBottomContainer } from '../../Dashboard/index.style'
+import { StyledLargeText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
+import { StyledHomeBoxBottomContainer, StyledSeparator } from '../../Dashboard/index.style'
 
 const Home = () => {
     const navigate = useNavigate();
@@ -71,7 +71,8 @@ const Home = () => {
             <div className="dashboard-right-side-row">
                 <StyledRoundedBoxContainer>
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                    <div className="large-text">Generate TX Plan</div>
+                        <div className="large-text">Generate TX Plan</div>
+                        <StyledSeparator />
                         <StyledHomeBoxBottomContainer purpleContainer>
                         <img src={createNewButton} alt="Create New TX Plan" onClick={handleGenerateTxButtonClick} />
                     </StyledHomeBoxBottomContainer>
@@ -80,7 +81,8 @@ const Home = () => {
                 <RecentTxPlans />
                 <StyledRoundedBoxContainer>
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                    <div className="large-text">Providers</div>
+                        <div className="large-text">Providers</div>
+                        <StyledSeparator />
                         <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
                 </StyledRoundedBoxContainer>
@@ -88,7 +90,8 @@ const Home = () => {
             <div className="dashboard-right-side-row">
                 <StyledRoundedBoxContainer>
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                    <div className="large-text">TX Plans Generated</div>
+                        <div className="large-text">TX Plans Generated</div>
+                        <StyledSeparator />
                         <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
                 </StyledRoundedBoxContainer>

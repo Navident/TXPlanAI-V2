@@ -9,8 +9,6 @@
         public int Order { get; set; }
         public int? ProcedureTypeId { get; set; }
         public int? ToothNumber { get; set; }
-        public int? TreatmentPhaseId { get; set; }
-        public string TreatmentPhaseLabel { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public string LongDescription { get; set; }

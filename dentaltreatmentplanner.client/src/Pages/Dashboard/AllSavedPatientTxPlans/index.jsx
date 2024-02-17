@@ -9,26 +9,16 @@ import {
 import { useParams } from "react-router-dom";
 import UniversalTable from "../../../Components/Common/UniversalTable/UniversalTable";
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
-import "./SavedPatientTxPlans.css";
-import useTreatmentPlan from "../../../Contexts/TreatmentPlanContext/useTreatmentPlan";
+import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
-import {
-	StyledContainerWithTableInner,
-	StyledRoundedBoxContainer,
-} from "../../../GlobalStyledComponents";
+import { StyledContainerWithTableInner, StyledRoundedBoxContainer } from "../../../GlobalStyledComponents";
 
-const SavedPatientTxPlans = () => {
+const AllSavedPatientTxPlans = () => {
 	const [inputText, setInputText] = useState("");
-	const { patientId } = useParams();
 	const navigate = useNavigate();
-	const [localTreatmentPlans, setLocalTreatmentPlans] = useState([]);
+	const { patientTreatmentPlans, removeTreatmentPlanById } = useBusiness(); 
 
-	useEffect(() => {
-		if (patientId) {
-			fetchTreatmentPlansByPatientId(patientId);
-		}
-	}, [patientId]);
 
 	const handleOpenClick = (planId) => {
 		navigate(`/customize-treatment-plan/${planId}`);
@@ -36,15 +26,6 @@ const SavedPatientTxPlans = () => {
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value.toLowerCase());
-	};
-
-	const fetchTreatmentPlansByPatientId = async (id) => {
-		try {
-			const plans = await getTreatmentPlansByPatient(id);
-			setLocalTreatmentPlans(plans || []);
-		} catch (error) {
-			console.error("Error fetching treatment plans:", error);
-		}
 	};
 
 	const formatDate = (dateString) => {
@@ -60,31 +41,25 @@ const SavedPatientTxPlans = () => {
 	};
 
 	const handleDeleteClick = async (planId) => {
-		const confirmed = window.confirm(
-			"Are you sure you want to delete this treatment plan?"
-		);
-		console.log("selected plan id to delete: ", planId);
+		const confirmed = window.confirm("Are you sure you want to delete this treatment plan?");
 		if (confirmed) {
 			const success = await deleteTreatmentPlanById(planId);
 			if (success) {
-				// Remove the deleted plan from local state to update the UI
-				const updatedPlans = localTreatmentPlans.filter(
-					(plan) => plan.treatmentPlanId !== planId
-				);
-				setLocalTreatmentPlans(updatedPlans);
+				removeTreatmentPlanById(planId); 
 				alert("Treatment plan deleted successfully.");
 			} else {
-				// Handle deletion failure (e.g., display an error message)
 				alert("Failed to delete treatment plan.");
 			}
 		}
 	};
 
-	const headers = ["Date", "Treatment Plan ID", ""];
+	const headers = ["Date", "Patient Name", "Treatment Plan ID", ""];
+
 
 	// Update rows
-	const rows = localTreatmentPlans.map((plan) => {
+	const rows = patientTreatmentPlans.map((plan) => {
 		const date = plan.createdAt ? formatDate(plan.createdAt) : "N/A";
+		const patientName = plan.patientName || "Unknown";
 
 		const buttons = (
 			<div className="savedPatientsTxTableButtons">
@@ -110,14 +85,14 @@ const SavedPatientTxPlans = () => {
 			</div>
 		);
 		return {
-			data: [date, plan.treatmentPlanId, buttons],
+			data: [date, patientName, plan.treatmentPlanId, buttons],
 		};
 	});
 
 	return (
 		<div className="dashboard-bottom-inner-row">
 			<div className="dashboard-right-side-row">
-				<div className="large-text">Saved Tx Plans</div>
+				<div className="large-text">All Saved Patient Tx Plans</div>
 				<TextField
 					className="rounded-box"
 					placeholder="Search By Date"
@@ -156,10 +131,11 @@ const SavedPatientTxPlans = () => {
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
 					<UniversalTable headers={headers} rows={rows} />
+					<Outlet />
 				</StyledContainerWithTableInner>
 			</StyledRoundedBoxContainer>
 		</div>
 	);
 };
 
-export default SavedPatientTxPlans;
+export default AllSavedPatientTxPlans;

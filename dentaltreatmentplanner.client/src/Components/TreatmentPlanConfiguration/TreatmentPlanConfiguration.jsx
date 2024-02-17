@@ -6,7 +6,7 @@ import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import StandardTextfield from "../Common/StandardTextfield/StandardTextfield";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
-import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewCombinedTreatmentPlanForPatient } from '../../ClientServices/apiService';
+import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewTreatmentPlanForPatient } from '../../ClientServices/apiService';
 import { mapToUpdateTreatmentPlanDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';
 import { sortTreatmentPlan } from '../../Utils/helpers';
 import deleteIcon from '../../assets/delete-x.svg';

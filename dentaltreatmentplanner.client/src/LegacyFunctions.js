@@ -63,3 +63,37 @@ export const getTreatmentPhases = async () => {
         return [];
     }
 };
+
+export const sortTreatmentPlanWithPhases = (treatmentPlan) => {
+    // Check if the treatment plan has phases
+    if (!treatmentPlan?.phases) {
+        console.log("No phases in the treatment plan");
+        return { sortedVisits: [], sortedCdtCodes: {} };
+    }
+
+    let visits = [];
+    // Extract visits from each phase
+    Object.values(treatmentPlan.phases).forEach(phaseVisits => {
+        visits = visits.concat(phaseVisits);
+    });
+
+    // Sort visits by uniqueId and then by visitNumber
+    const sortedVisits = visits.sort((a, b) => {
+        if (a.uniqueId !== b.uniqueId) {
+            return a.uniqueId.localeCompare(b.uniqueId);
+        }
+        return a.visitNumber - b.visitNumber;
+    });
+    console.log("Sorted Visits:", sortedVisits);
+
+    // Generate sorted CDT codes for each visit using uniqueId
+    const sortedCdtCodes = sortedVisits.reduce((acc, visit) => {
+        const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+        acc[visit.uniqueId] = cdtCodes.sort((a, b) => a.order - b.order);
+        return acc;
+    }, {});
+
+    console.log("Sorted CDT Codes:", sortedCdtCodes);
+
+    return { sortedVisits, sortedCdtCodes };
+};

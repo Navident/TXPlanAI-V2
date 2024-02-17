@@ -26,6 +26,20 @@ export const StyledHomeBoxBottomContainer = styled.div`
     ${props => props.itemsList && itemsListStyles}
 `;
 
+export const StyledHomeBoxTopContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    justify-content: space-between;
+`;
+
+export const StyledSeparator = styled.div`
+  height: 1px;
+  background-color: #EAEBEB; 
+  width: 100%;
+  margin-top: -5px;
+`;
+
 export const StyledItemContainer = styled.div`
     display: flex;
     flex-direction: row;

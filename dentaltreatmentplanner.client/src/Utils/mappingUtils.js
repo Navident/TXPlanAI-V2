@@ -17,7 +17,6 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, 
                     VisitCdtCodeMapId: row.visitCdtCodeMapId,
                     VisitId: visitId,
                     CdtCodeId: cdtCode.cdtCodeId,
-                    TreatmentPhaseId: row.selectedTreatmentPhase ? row.selectedTreatmentPhase.id : null, // Include treatment phase ID
                     Order: idx,
                     Code: cdtCode.code,
                     LongDescription: cdtCode.longDescription,

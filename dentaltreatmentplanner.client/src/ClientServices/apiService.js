@@ -2,7 +2,7 @@
 //const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
 //const VISITS_API_URL = 'https://localhost:7089/api/visits';
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
-const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
+const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
 
 const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
 const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
@@ -120,7 +120,7 @@ export const generateTreatmentPlan = async (parsedData, setTreatmentPlanId) => {
 };
 
 // Function to get a treatment plan by ID
-export const getTreatmentPlanById = async (id, setTreatmentPlan) => {
+export const getTreatmentPlanById = async (id) => {
     try {
         const response = await fetch(`${API_BASE_URL}/${id}`, {
             method: 'GET',
@@ -132,13 +132,15 @@ export const getTreatmentPlanById = async (id, setTreatmentPlan) => {
         const data = await response.json();
 
         if (response.ok) {
-            setTreatmentPlan(data);
             console.log(`Treatment plan with ID ${id}:`, data);
+            return data;
         } else {
             console.error(`Failed to retrieve treatment plan with ID ${id}. Status:`, response.status);
+            return null; 
         }
     } catch (error) {
         console.error(`Error fetching treatment plan with ID ${id}:`, error.message);
+        return null; 
     }
 };
 
@@ -172,16 +174,17 @@ export const handleCreateNewTreatmentPlanFromDefault = async (treatmentPlan, all
 };
 
 
-// Function to create a new treatment plan from default
-export const handleCreateNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId, payerId) => {
+// Function to create a new treatment plan from for patient
+export const handleCreateNewTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId, payerId, hasEdits) => {
     try {
         const token = localStorage.getItem('jwtToken');
+        const endpoint = hasEdits ? '/newTxWithEditsForPatient' : '/newTxWithoutEditsForPatient';
         const newPlanData = {
             ...mapToCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder, payerId),
             patientId: selectedPatientId
         };
 
-        const response = await fetch(`${API_BASE_URL}/newCombinedForPatient`, {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

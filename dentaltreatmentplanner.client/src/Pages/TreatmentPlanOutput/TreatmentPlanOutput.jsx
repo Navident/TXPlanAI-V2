@@ -4,9 +4,8 @@ import Table from "../../Components/Table/Table";
 import { useState, useEffect, useRef, useMemo } from 'react';
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
 import { Droppable, Draggable, DragDropContext } from 'react-beautiful-dnd';
-import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewCombinedTreatmentPlanForPatient } from '../../ClientServices/apiService';
+import { updateTreatmentPlan, createVisit, createNewProcedures, handleCreateNewTreatmentPlanFromDefault, handleCreateNewTreatmentPlanForPatient } from '../../ClientServices/apiService';
 import { mapToUpdateTreatmentPlanDto, mapToCreateVisitDto } from '../../Utils/mappingUtils';
-import {sortTreatmentPlanWithPhases } from '../../Utils/helpers';
 import deleteIcon from '../../assets/delete-x.svg';
 import dragIcon from '../../assets/drag-icon.svg';
 import Alert from '../../Components/Common/Alert/Alert';
@@ -34,7 +33,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
     const [editedRows, setEditedRows] = useState([]);
-    const { selectedPatient, facilityPayerCdtCodeFees } = useBusiness();
+    const { selectedPatient, refreshPatientTreatmentPlans, facilityPayerCdtCodeFees } = useBusiness();
     const { selectedPayer } = useTreatmentPlan();
     const [hasEdits, setHasEdits] = useState(false);
 
@@ -59,6 +58,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         }
     }, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
 
+
     useEffect(() => {
         setLocalUpdatedVisits(treatmentPlan.visits);
     }, [treatmentPlan.visits]);
@@ -69,10 +69,18 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     const createInitialStaticRows = (visitCdtCodeMap, index) => {
         const fee = facilityPayerCdtCodeFees.find(f => f.code === visitCdtCodeMap.code);
-        const ucrFee = selectedPayer ? (fee ? fee.ucrDollarAmount : "Not configured") : "No payer selected";
-        const discountFee = selectedPayer ? (fee ? fee.discountFeeDollarAmount : "Not configured") : "No payer selected";
+
+        let ucrFee, discountFee;
+        if (isInGenerateTreatmentPlanContext && selectedPayer) {
+            ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
+            discountFee = fee ? fee.discountFeeDollarAmount : "Not configured";
+        } else {
+            ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
+            discountFee = fee ? fee.discountFeeDollarAmount : "Not configured"; 
+        }
+
         const extraRowInput = [
-            visitCdtCodeMap.toothNumber, 
+            visitCdtCodeMap.toothNumber,
             visitCdtCodeMap.code,
             visitCdtCodeMap.longDescription,
             ucrFee,
@@ -318,12 +326,13 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const createNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder) => {
         console.log('Attempting to create a new combined treatment plan...'); 
         try {
-            const newTreatmentPlan = await handleCreateNewCombinedTreatmentPlanForPatient(
+            const newTreatmentPlan = await handleCreateNewTreatmentPlanForPatient(
                 treatmentPlan,
                 allRows,
                 visitOrder,
                 selectedPatient.patientId,
-                selectedPayer.payerId
+                selectedPayer.payerId,
+                hasEdits
             );
             console.log('New treatment plan created successfully:', newTreatmentPlan); 
             return newTreatmentPlan;
@@ -347,6 +356,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
                     proceedToUpdate = true; // Edits were made, so we need to proceed to update logic
                 } else {
                     console.log("no edits we are returning immediately after creating the new treatment plan.")
+                    await refreshPatientTreatmentPlans();
                     return;
                 }
             }
@@ -442,6 +452,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
                 onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
                 console.log('Updated Treatment Plan:', updatedTreatmentPlan);
 
+                await refreshPatientTreatmentPlans();
                 setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved successfully!' });
                 setHasEdits(false); //reset state to false because edits were made
             }
@@ -476,8 +487,8 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         return row.extraRowInput.map((input, index, array) => {
             // UCR Fee and Discount Fee are the last two elements in the array
             if (index === array.length - 2 || index === array.length - 1) {
-                // Replace undefined fees with "NA"
-                return input !== undefined ? input.toString() : "NA";
+                // Replace null or undefined fees with "NA"
+                return input != null ? input.toString() : "NA";
             }
             return input;
         });
@@ -694,7 +705,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     return (
         <>
-            {console.log("Treatment Plan in TreatmentPlanConfiguration:", treatmentPlan)}
+            {console.log("Treatment Plan in TreatmentPlanOutput:", treatmentPlan)}
             {alertInfo.type && (
                 <Alert
                     open={alertInfo.open}

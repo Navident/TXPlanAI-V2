@@ -9,7 +9,7 @@
         }
 
         public int TreatmentPlanId { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public int? ProcedureSubcategoryId { get; set; }
         public DateTime CreatedAt { get; private set; } 
         public int? CreatedUserId { get; set; }

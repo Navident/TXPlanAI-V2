@@ -23,7 +23,14 @@ builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredent
 
 // Add DbContext using SQL Server Provider
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(connectionString);
+
+
+    options.EnableSensitiveDataLogging();
+    
+});
 
 // Add ASP.NET Core Identity services
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

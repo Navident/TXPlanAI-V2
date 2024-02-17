@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback,  useEffect } from 'react';
 import { BusinessContext } from './BusinessContext';
 import { getPatientsForUserFacility, getCustomCdtCodesForFacility } from '../../ClientServices/apiService';
 import { getCdtCodes, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getAllPatientTreatmentPlansForFacility, getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
@@ -121,7 +121,7 @@ export const BusinessProvider = ({ children }) => {
         }
     };
 
-    const fetchFacilityPayerCdtCodeFees = async (payerId) => {
+    const fetchFacilityPayerCdtCodeFees = useCallback(async (payerId) => {
         try {
             const fetchedFacilityPayerCdtCodeFees = await getFacilityPayerCdtCodesFeesByPayer(payerId);
             console.log('Fetched payer specific cdt code fees in businessprovider:', fetchedFacilityPayerCdtCodeFees);
@@ -129,7 +129,29 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching payer specific fees:', error);
         }
+    }, []); // Add any dependencies here. If the function does not depend on anything that changes, you can leave the dependency array empty.
+
+
+    //this function will get the payer fees for a selected treatment plan
+    const fetchFeesForTreatmentPlan = async (treatmentPlanId) => {
+        // Find the treatment plan that matches the treatmentPlanId
+        const matchingTreatmentPlan = patientTreatmentPlans.find(plan => plan.treatmentPlanId === Number(treatmentPlanId));
+
+        if (!matchingTreatmentPlan) {
+            console.error('No matching treatment plan found for the given ID:', treatmentPlanId);
+            return;
+        }
+
+        const payerId = matchingTreatmentPlan.payerId;
+        if (!payerId) {
+            console.error('No PayerId found for the treatment plan ID:', treatmentPlanId);
+            return;
+        }
+
+        // Use the found payerId to fetch facility payer CDT code fees
+        await fetchFacilityPayerCdtCodeFees(payerId);
     };
+
 
 
     const fetchPatientsForFacility = async () => {
@@ -199,7 +221,7 @@ export const BusinessProvider = ({ children }) => {
     };
 
 
-    // Refreshing patients data
+    // Refresh functions
     const refreshPatients = async () => {
         try {
             const fetchedPatients = await getPatientsForUserFacility();
@@ -207,6 +229,13 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error refreshing patients:', error);
         }
+    };
+    const refreshPatientTreatmentPlans = async () => {
+        await fetchAllPatientTreatmentPlansForFacility();
+    };
+
+    const removeTreatmentPlanById = (planId) => {
+        setPatientTreatmentPlans(currentPlans => currentPlans.filter(plan => plan.treatmentPlanId !== planId));
     };
 
     return (
@@ -217,6 +246,7 @@ export const BusinessProvider = ({ children }) => {
             filteredPatients, setFilteredPatients,
             selectedPatient, setSelectedPatient,
             refreshPatients,
+            removeTreatmentPlanById,
             facilityCdtCodes, setFacilityCdtCodes, 
             defaultCdtCodes, setDefaultCdtCodes,
             isUserLoggedIn, setIsUserLoggedIn,
@@ -227,7 +257,9 @@ export const BusinessProvider = ({ children }) => {
             fetchFacilityPayerCdtCodeFees,
             activeCdtCodes, setActiveCdtCodes,
             resetAppStates,
-            patientTreatmentPlans, setPatientTreatmentPlans
+            patientTreatmentPlans, setPatientTreatmentPlans,
+            fetchFeesForTreatmentPlan,
+            refreshPatientTreatmentPlans
             
         }}>
             {children}

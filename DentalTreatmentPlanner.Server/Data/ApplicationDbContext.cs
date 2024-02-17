@@ -27,7 +27,6 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<ProcedureSubCategory> ProcedureSubCategories { get; set; }
         public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
         public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
-        public DbSet<TreatmentPhase> TreatmentPhases { get; set; }
         public DbSet<Payer> Payers { get; set; }
         public DbSet<PayerFacilityMap> PayerFacilityMaps { get; set; }
         public DbSet<UcrFee> UcrFees { get; set; }

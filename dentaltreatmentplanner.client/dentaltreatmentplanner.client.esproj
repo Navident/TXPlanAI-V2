@@ -19,6 +19,7 @@
     <Folder Include="src\Components\RecentTxPlans\" />
     <Folder Include="src\GlobalStyledComponents\" />
     <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
+    <Folder Include="src\Pages\Dashboard\AllSavedPatientTxPlans\" />
     <Folder Include="src\Pages\Login\" />
     <Folder Include="src\Pages\TreatmentPlanOutput\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />

@@ -8,6 +8,7 @@
         public string ProcedureCategoryName { get; set; }
         public int? FacilityId { get; set; }
         public int? CreatedUserId { get; set; }
+        public int? PayerId { get; set; }
 
         public ICollection<RetrieveVisitDto> Visits { get; set; }
     }
