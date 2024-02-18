@@ -39,6 +39,10 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const [hasEdits, setHasEdits] = useState(false);
 
     useEffect(() => {
+        console.log("Received treatmentPlan:", treatmentPlan);
+    }, [treatmentPlan]);
+
+    useEffect(() => {
         setCombinedVisits(treatmentPlan.visits);
     }, [treatmentPlan, isInGenerateTreatmentPlanContext]);
 
@@ -88,7 +92,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
             ucrFee,
             discountFee
         ];
-
+        console.log(`Creating row for visitId ${visitId}, index ${index}, toothNumber:`, visitCdtCodeMap.toothNumber);
         return {
             id: `static-${visitId}-${index}`, 
             visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
@@ -472,7 +476,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
                 await refreshPatientTreatmentPlans();
                 setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved successfully!' });
-                setHasEdits(false); //reset state to false because edits were made
+                setHasEdits(false); 
             }
         } catch (error) {
             console.error('Error updating treatment plan:', error);
@@ -574,7 +578,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         });
         // After successfully saving the edits, clear the originalRowData
         setOriginalRowData(null);
-        setHasEdits(true);
+        setHasEdits(true); // we may need to add one of these when creating a new row also
     };
     
 
@@ -680,9 +684,10 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
 
     const renderVisit = (visitId, index) => {
+        console.log(`Rendering visit: visitId=${visitId}, index=${index}`);
         const visitIdStr = String(visitId);
         const isTempVisit = visitIdStr.startsWith('temp-');
-
+        
         const visit = isTempVisit
             ? { visitId: visitIdStr, visit_number: index + 1 }
             : localUpdatedVisits.find(v => String(v.visitId) === visitIdStr);

@@ -339,11 +339,11 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
     const handleUpdateTreatmentPlan = async () => {
         try {
-            // Check if the treatment plan is a default plan
+            // Check if the treatment plan is a default plan, we only create one if its a default, otherwise we already have one
             if (treatmentPlan.facilityId === null) {
                 // Logic to create a new treatment plan from the default
-                const newTreatmentPlan = await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
-                return; // Exit the function as the rest of the code is for updating existing plans
+                await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
+                return;
             }
 
             // Identify new visits

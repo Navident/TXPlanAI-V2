@@ -704,7 +704,7 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-        public async Task<TreatmentPlan> CreateNewTreatmentPlanFromDefaultAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto, int facilityId)
+        public async Task<TreatmentPlan> CreateNewTreatmentPlanFromDefaultAsync(CreateNewTxPlanFromDefaultDto createNewTxPlanFromDefaultDto, int facilityId)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -713,16 +713,16 @@ namespace DentalTreatmentPlanner.Server.Services
                     // Create a new treatment plan based on the default
                     TreatmentPlan newTreatmentPlan = new TreatmentPlan
                     {
-                        Description = updateTreatmentPlanDto.Description,
-                        ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId,
+                        Description = createNewTxPlanFromDefaultDto.Description,
+                        ProcedureSubcategoryId = createNewTxPlanFromDefaultDto.ProcedureSubcategoryId,
                         FacilityId = facilityId,
                     };
 
-                    foreach (var visitDto in updateTreatmentPlanDto.Visits)
+                    foreach (var visitDto in createNewTxPlanFromDefaultDto.Visits)
                     {
                         Visit newVisit = new Visit
                         {
-                            Description = visitDto.Description,
+                            //Description = visitDto.Description,
                             VisitNumber = visitDto.VisitNumber,
                             VisitCdtCodeMaps = new List<VisitCdtCodeMap>(),
                         };
@@ -733,7 +733,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             {
                                 CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
                                 Order = visitCdtCodeMapDto.Order,
-                                ProcedureTypeId = visitCdtCodeMapDto.ProcedureTypeId,
+                                //ProcedureTypeId = visitCdtCodeMapDto.ProcedureTypeId,
                                 ToothNumber = visitCdtCodeMapDto.ToothNumber,
                                                                              
                             };

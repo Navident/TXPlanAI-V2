@@ -108,7 +108,7 @@ public class TreatmentPlansController : ControllerBase
 
     // POST: api/TreatmentPlans/newfromdefault
     [HttpPost("newfromdefault")]
-    public async Task<IActionResult> CreateNewTreatmentPlanFromDefault([FromBody] UpdateTreatmentPlanDto updateTreatmentPlanDto)
+    public async Task<IActionResult> CreateNewTreatmentPlanFromDefault([FromBody] CreateNewTxPlanFromDefaultDto createNewTxPlanFromDefaultDto)
     {
         if (!ModelState.IsValid)
         {
@@ -135,7 +135,7 @@ public class TreatmentPlansController : ControllerBase
 
         try
         {
-            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanFromDefaultAsync(updateTreatmentPlanDto, facilityId.Value);
+            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanFromDefaultAsync(createNewTxPlanFromDefaultDto, facilityId.Value);
             if (newTreatmentPlan == null)
             {
                 return NotFound();

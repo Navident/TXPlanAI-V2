@@ -86,30 +86,38 @@ const GenerateTreatmentPlan = () => {
 			const lines = aiResponsePreprocessedInputText.split("\n");
 			const planPromises = lines.map((line, index) => parseLineToPlan(line, index));
 			let newTreatmentPlans = (await Promise.all(planPromises)).filter(plan => plan !== null);
+			newTreatmentPlans.forEach(plan => {
+				console.log(`Visits for plan with subcategory before combination ${plan.subcategory} and toothNumber ${plan.toothNumber}:`, plan.visits);
+			});
 
-			if (newTreatmentPlans.length > 0) {
-				const combinedTreatmentPlan = newTreatmentPlans.reduce((acc, currPlan, currPlanIndex) => {
-					const visitsWithOrigin = currPlan.visits.map(visit => ({
-						...visit,
-						originLineIndex: currPlan.lineIndex, // Use lineIndex to track origin
-					})).map(visit => {
-						// Insert tooth number into each cdtCodeMap where it's null
-						const updatedCdtCodes = visit.cdtCodes.map(cdtCodeMap => {
-							return { ...cdtCodeMap, toothNumber: cdtCodeMap.toothNumber ?? currPlan.toothNumber };
-						});
-						return { ...visit, cdtCodes: updatedCdtCodes };
-					});
+			let visitIdCounter = 0;
+			let allVisits = [];
+			newTreatmentPlans.forEach(plan => {
+				plan.visits.forEach(visit => {
+					visit.visitId = `custom-${visitIdCounter++}`; 
+					visit.cdtCodes = visit.cdtCodes.map(cdtCodeMap => ({
+						...cdtCodeMap,
+						// This ensures each cdtCode has the correct toothNumber
+						toothNumber: cdtCodeMap.toothNumber ?? plan.toothNumber
+					}));
+					// Adding lineIndex to each visit for sorting
+					visit.originLineIndex = plan.lineIndex;
+				});
+				// Collecting all visits together
+				allVisits.push(...plan.visits);
+			});
 
-					acc.visits = [...acc.visits, ...visitsWithOrigin];
-					return acc;
-				}, { visits: [] });
+			// Sort all visits by originLineIndex and then by visitNumber
+			allVisits.sort((a, b) => a.originLineIndex - b.originLineIndex || a.visitNumber - b.visitNumber);
 
-				// Sort the combined visits by their origin line index before setting the plan
-				combinedTreatmentPlan.visits.sort((a, b) => a.originLineIndex - b.originLineIndex || a.visitNumber - b.visitNumber);
+			// Creating a single combined treatment plan
+			let combinedTreatmentPlan = {
+				visits: allVisits
+			};
+			console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
 
-				// Now set the combined plan as the only treatment plan
-				setTreatmentPlans([combinedTreatmentPlan]);
-			}
+			// Setting the combined plan as the treatment plan
+			setTreatmentPlans([combinedTreatmentPlan]);
 		} catch (error) {
 			showAlert("error", "An error occurred while generating the treatment plan.");
 			console.error(error);
@@ -117,8 +125,6 @@ const GenerateTreatmentPlan = () => {
 			setIsLoading(false);
 		}
 	};
-
-
 
 	return (
 		<div className="dashboard-bottom-inner-row">
