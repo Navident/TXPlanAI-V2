@@ -12,6 +12,7 @@
     <Folder Include="src\ClientServices\" />
     <Folder Include="src\Components\Common\Alert\" />
     <Folder Include="src\Components\Common\GoBack\" />
+    <Folder Include="src\Components\Common\SaveButtonRow\" />
     <Folder Include="src\Components\Common\PopupAlert\" />
     <Folder Include="src\Components\Common\StandardTextfield\" />
     <Folder Include="src\Components\AlertWrapper\" />

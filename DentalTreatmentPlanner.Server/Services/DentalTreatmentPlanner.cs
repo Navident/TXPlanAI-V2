@@ -200,6 +200,19 @@ namespace DentalTreatmentPlanner.Server.Services
             {
                 try
                 {
+                    var payer = await _context.Payers.FindAsync(updateRequest.PayerId);
+                    if (payer == null)
+                    {
+                        Console.WriteLine($"Error occurred, payer with ID {updateRequest.PayerId} not found.");
+                        return false;
+                    }
+
+                    // Update the payer name if it has been edited and provided in the request
+                    if (updateRequest.EditedPayer != null)
+                    {
+                        payer.PayerName = updateRequest.EditedPayer.PayerName;
+                    }
+
                     // Attempt to find or create a PayerFacilityMap
                     var payerFacilityMap = await _context.PayerFacilityMaps
                         .FirstOrDefaultAsync(pfm => pfm.PayerId == updateRequest.PayerId && pfm.FacilityId == facilityId);
@@ -245,7 +258,9 @@ namespace DentalTreatmentPlanner.Server.Services
                             existingUcrFee.DiscountFeeDollarAmount = updatedFee.DiscountFeeDollarAmount;
                             existingUcrFee.ModifiedAt = DateTime.UtcNow;
                         }
-                        Console.WriteLine($"Error occurred, there was no existing ucr fee found in the database for the updatedFee!!");
+                        {
+                            Console.WriteLine($"Error occurred, there was no existing UCR fee found in the database for the updatedFee with ID {updatedFee.UcrFeeId}.");
+                        }
                     }
 
                     await _context.SaveChangesAsync();

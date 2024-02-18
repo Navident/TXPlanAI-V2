@@ -17,6 +17,7 @@ import pencilEditIcon from '../../assets/pencil-edit-icon.svg';
 import { sortTreatmentPlan } from '../../Utils/helpers';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
+import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 
 const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
     const [allRows, setAllRows] = useState({});
@@ -46,7 +47,8 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
             const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
             const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
-                const staticRows = sortedCdtCodes[visitId].map(createInitialStaticRows);
+                const staticRows = sortedCdtCodes[visitId].map((visitCdtCodeMap, index) =>
+                    createInitialStaticRows(visitCdtCodeMap, visitId, index));
                 const initialRowId = `initial-${visitId}`;
                 acc[visitId] = [...staticRows, createDynamicRowv1(visitId, initialRowId)];
                 return acc;
@@ -67,7 +69,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         setAlertInfo({ ...alertInfo, open: false });
     };
 
-    const createInitialStaticRows = (visitCdtCodeMap, index) => {
+    const createInitialStaticRows = (visitCdtCodeMap, visitId, index) => {
         const fee = facilityPayerCdtCodeFees.find(f => f.code === visitCdtCodeMap.code);
 
         let ucrFee, discountFee;
@@ -88,7 +90,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         ];
 
         return {
-            id: `static-${visitCdtCodeMap.visitId}-${index}`,
+            id: `static-${visitId}-${index}`, 
             visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
             description: visitCdtCodeMap.longDescription,
             selectedCdtCode: visitCdtCodeMap,
@@ -322,6 +324,22 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         setDeletedRowIds(prevIds => [...prevIds, rowId]);
     };
 
+    const handleDeleteVisit = (visitId) => {
+        // Update the visitOrder to remove the visit
+        setVisitOrder(prevOrder => prevOrder.filter(id => id !== visitId));
+        // Update allRows to remove the rows associated with the visit
+        setAllRows(prevRows => {
+            const updatedRows = { ...prevRows };
+            delete updatedRows[visitId];
+            return updatedRows;
+        });
+        setDeletedVisitIds(prevIds => {
+            const newDeletedVisitIds = [...prevIds, visitId];
+            console.log("Deleted visit added, new deletedVisitIds:", newDeletedVisitIds);
+            return newDeletedVisitIds;
+        });
+        onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
+    };
 
     const createNewCombinedTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder) => {
         console.log('Attempting to create a new combined treatment plan...'); 
@@ -696,6 +714,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
                             deleteImageIconSrc={deleteIcon}
                             deleteImageIconSrcHeader={deleteIcon}
                             dragImageIconSrc={dragIcon}
+                            onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
                         />
                     </div>
                 )}
@@ -705,7 +724,8 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     return (
         <>
-            {console.log("Treatment Plan in TreatmentPlanOutput:", treatmentPlan)}
+            <SaveButtonRow onSave={handleUpdateTreatmentPlan} />
+
             {alertInfo.type && (
                 <Alert
                     open={alertInfo.open}
@@ -729,11 +749,6 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
                     </Droppable>
                 </DragDropContext>
             )}
-            <div className="bottom-tx-plan-buttons">
-                <span onClick={handleUpdateTreatmentPlan} className="save-treatment-plan-text-btn" >
-                    Save
-                </span>
-            </div>
         </>
     );
 };

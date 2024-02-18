@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { StyledDeleteIcon } from '../../GlobalStyledComponents';
 
 const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, deleteImageIconSrcHeader, dragImageIconSrc, onDeleteRow, onDeleteVisit }) => {
     const renderDraggableRow = (rowData, rowIndex) => {
@@ -54,6 +55,7 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
                             <th key={`header-${index}`}>{header}</th>
                         ))}
                         <th>
+                            <StyledDeleteIcon src={deleteImageIconSrcHeader} className="delete-icon" alt="Delete Icon" onClick={onDeleteVisit} />
                         </th>
                     </tr>
                 </thead>

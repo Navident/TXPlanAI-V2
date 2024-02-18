@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import backButton from '../../../assets/grey-back-button.svg';
 import './GoBack.css'; 
+import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 
 const GoBack = ({ text, customOnClick }) => {
     const navigate = useNavigate();

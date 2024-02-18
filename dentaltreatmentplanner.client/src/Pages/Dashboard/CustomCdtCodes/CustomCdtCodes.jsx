@@ -13,6 +13,7 @@ import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
 import { UI_COLORS } from '../../../Theme';
 import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import Alert from "../../../Components/Common/Alert/Alert";
+import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 
 const CustomCdtCodes = () => {
     const { facilityCdtCodes } = useBusiness(); 
@@ -282,15 +283,14 @@ const CustomCdtCodes = () => {
             </div>
             <StyledRoundedBoxContainer>
                 <StyledRoundedBoxContainerInner>
-                    <StyledLightGreyText>
-                        Custom CDT codes are CDT codes that are not a part of the
-                        standard CDT codes used by the American Dental Association
-                        but rather, made up codes that your facility creates to fill up an appointment slot.
-                    </StyledLightGreyText>
+                    <SaveButtonRow onSave={updateCustomCdtCodes} gap="120px">
+                        <StyledLightGreyText>
+                            Custom CDT codes are CDT codes that are not a part of the
+                            standard CDT codes used by the American Dental Association
+                            but rather, made up codes that your facility creates to fill up an appointment slot.
+                        </StyledLightGreyText>
+                    </SaveButtonRow>
                     <UniversalTable headers={headers} rows={rows} />
-                    <StyledSaveTextBtn onClick={updateCustomCdtCodes} >
-                        Save
-                    </StyledSaveTextBtn>
                 </StyledRoundedBoxContainerInner>
             </StyledRoundedBoxContainer>
             {alertInfo.type && (

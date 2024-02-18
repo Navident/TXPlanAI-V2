@@ -11,6 +11,7 @@ import UniversalTable from '../../../../Components/Common/UniversalTable/Univers
 import { useBusiness } from '../../../../Contexts/BusinessContext/useBusiness';
 import pencilEditIcon from '../../../../assets/pencil-edit-icon.svg';
 import { updateFacilityPayerCdtCodeFees } from '../../../../ClientServices/apiService';
+import SaveButtonRow from "../../../../Components/Common/SaveButtonRow/index";
 
 const EditFacilityFeeScheduling = () => {
     const { payerId } = useParams();
@@ -24,7 +25,7 @@ const EditFacilityFeeScheduling = () => {
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
-    const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchFacilityPayerCdtCodeFees, activeCdtCodes } = useBusiness(); 
+    const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchPayers , fetchFacilityPayerCdtCodeFees, activeCdtCodes } = useBusiness(); 
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
 
@@ -132,15 +133,25 @@ const EditFacilityFeeScheduling = () => {
             DiscountFeeDollarAmount: parseFloat(row.discountFee)
         }));
 
+        let editedPayer = null;
+        if (initialPayerName !== payerNameInputText) {
+            editedPayer = {
+                Id: parseInt(payerId, 10),
+                PayerName: payerNameInputText,
+            };
+        }
+
         const payload = {
             payerId: parseInt(payerId, 10),
             newFees: newFees,
             updatedFees: updatedFees,
+            editedPayer: editedPayer,
         };
 
         const response = await updateFacilityPayerCdtCodeFees(payload);
         if (response) {
             setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved' });
+            fetchPayers();
         } else {
             setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
         }
@@ -298,19 +309,19 @@ const EditFacilityFeeScheduling = () => {
             </div>
             <StyledRoundedBoxContainer>
                 <StyledRoundedBoxContainerInner>
-                    <StandardTextfield
-                        value={payerNameInputText}
-                        //onChange={handleSearchChange}
-                        borderColor={UI_COLORS.purple}
-                        width="300px"
-                    />
+                        <SaveButtonRow onSave={saveFacilityPayerCdtCodeFeesChanges}>
+                            <StandardTextfield
+                                value={payerNameInputText}
+                                onChange={(e) => setPayerNameInputText(e.target.value)}
+                                borderColor={UI_COLORS.purple}
+                                width="300px"
+                            />
+                        </SaveButtonRow>
                     <StyledTableLabelText>Active CDT Codes</StyledTableLabelText>
                     <UniversalTable headers={headers} rows={activeTableRows} columnWidths={columnWidths} />
                     <StyledTableLabelText>Inactive CDT Codes</StyledTableLabelText>
                     <UniversalTable headers={headers} rows={inactiveTableRows} columnWidths={columnWidths} />
-                    <StyledSaveTextBtn onClick={saveFacilityPayerCdtCodeFeesChanges}>
-                        Save
-                    </StyledSaveTextBtn>
+
                 </StyledRoundedBoxContainerInner>
             </StyledRoundedBoxContainer>
         </div>

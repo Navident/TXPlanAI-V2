@@ -40,7 +40,7 @@ const FeeScheduling = () => {
         }
         const newPayerRow = { id: `dynamic-${Date.now()}`, payerName: '', isStatic: false };
         setRowsData([...payerRows, newPayerRow]);
-    }, [payers]);
+    }, [payers, location.key]);
 
 
     const handleEditButtonClick = (payerId, payerName) => {
@@ -256,7 +256,6 @@ const FeeScheduling = () => {
             };
         });
     };
-
 
     return (
         <div className="default-procedure-management-wrapper">

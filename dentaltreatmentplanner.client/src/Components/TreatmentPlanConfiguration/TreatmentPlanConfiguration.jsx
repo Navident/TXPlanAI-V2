@@ -17,6 +17,7 @@ import { useMemo } from 'react';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../GlobalStyledComponents';
 import { UI_COLORS } from '../../Theme';
 import pencilEditIcon from '../../assets/pencil-edit-icon.svg';
+import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 
 const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
     const [allRows, setAllRows] = useState({});
@@ -46,10 +47,11 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
         if (isInitialLoad.current) {
             const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
 
-            const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
-                const staticRows = sortedCdtCodes[visitId].map(createStaticRows);
-                const initialRowId = `initial-${visitId}`;
-                acc[visitId] = [...staticRows, createDynamicRowv1(visitId, initialRowId)];
+            const newAllRows = sortedVisits.reduce((acc, visit) => {
+                const staticRows = sortedCdtCodes[visit.visitId].map((cdtCode, index) =>
+                    createStaticRows(cdtCode, visit.visitId, index));
+                const initialRowId = `initial-${visit.visitId}`;
+                acc[visit.visitId] = [...staticRows, createDynamicRowv1(visit.visitId, initialRowId)];
                 return acc;
             }, {});
 
@@ -64,20 +66,21 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
     }, [treatmentPlan.visits]);
 
 
-    const createStaticRows = (visitCdtCodeMap, index) => {
+    const createStaticRows = (cdtCode, visitId, index) => {
         const extraRowInput = showToothNumber
-            ? [visitCdtCodeMap.toothNumber, visitCdtCodeMap.code, visitCdtCodeMap.longDescription]
-            : [visitCdtCodeMap.code, visitCdtCodeMap.longDescription];
+            ? [cdtCode.toothNumber, cdtCode.code, cdtCode.longDescription]
+            : [cdtCode.code, cdtCode.longDescription];
 
         return {
-            id: `static-${visitCdtCodeMap.visitId}-${index}`,
-            visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
-            description: visitCdtCodeMap.longDescription,
-            selectedCdtCode: visitCdtCodeMap,
+            id: `static-${visitId}-${index}`, 
+            visitCdtCodeMapId: cdtCode.visitCdtCodeMapId,
+            description: cdtCode.longDescription,
+            selectedCdtCode: cdtCode,
             isStatic: true,
             extraRowInput
         };
     };
+
 
     const createCDTCodeDropdown = (rowId, visitId, combinedCdtCodes, handleSelect, selectedCdtCode) => {
         const cdtCodeOptions = combinedCdtCodes.map(code => ({
@@ -271,6 +274,23 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
             }
         });
         setAllRows(reorderedRows);
+    };
+
+    const handleDeleteVisit = (visitId) => {
+        // Update the visitOrder to remove the visit
+        setVisitOrder(prevOrder => prevOrder.filter(id => id !== visitId));
+        // Update allRows to remove the rows associated with the visit
+        setAllRows(prevRows => {
+            const updatedRows = { ...prevRows };
+            delete updatedRows[visitId];
+            return updatedRows;
+        });
+        setDeletedVisitIds(prevIds => {
+            const newDeletedVisitIds = [...prevIds, visitId];
+            console.log("Deleted visit added, new deletedVisitIds:", newDeletedVisitIds);
+            return newDeletedVisitIds;
+        });
+        onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
     };
 
     const onTableDragEnd = (result) => {
@@ -668,6 +688,7 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
                             deleteImageIconSrc={deleteIcon}
                             deleteImageIconSrcHeader={deleteIcon}
                             dragImageIconSrc={dragIcon}
+                            onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
                         />
                     </div>
                 )}
@@ -677,7 +698,6 @@ const TreatmentPlanConfiguration = ({ treatmentPlan, treatmentPlans, onAddVisit,
 
     return (
         <>
-            {console.log("Treatment Plan in TreatmentPlanConfiguration:", treatmentPlan)}
             {alertInfo.type && (
                 <Alert
                     open={alertInfo.open}

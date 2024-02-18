@@ -206,10 +206,10 @@ export const BusinessProvider = ({ children }) => {
         const uniqueCdtCodeIds = new Set();
 
         categoriesData.forEach(category => {
-            category.subCategories.forEach(subCategory => {
-                subCategory.treatmentPlans.forEach(treatmentPlan => {
-                    treatmentPlan.visits.forEach(visit => {
-                        visit.cdtCodes.forEach(cdtCode => {
+            category.subCategories?.forEach(subCategory => {
+                subCategory.treatmentPlans?.forEach(treatmentPlan => {
+                    treatmentPlan.visits?.forEach(visit => {
+                        visit.cdtCodes?.forEach(cdtCode => {
                             uniqueCdtCodeIds.add(cdtCode.cdtCodeId);
                         });
                     });
@@ -219,6 +219,7 @@ export const BusinessProvider = ({ children }) => {
 
         return Array.from(uniqueCdtCodeIds);
     };
+
 
 
     // Refresh functions
@@ -259,7 +260,8 @@ export const BusinessProvider = ({ children }) => {
             resetAppStates,
             patientTreatmentPlans, setPatientTreatmentPlans,
             fetchFeesForTreatmentPlan,
-            refreshPatientTreatmentPlans
+            refreshPatientTreatmentPlans,
+            fetchPayers
             
         }}>
             {children}
