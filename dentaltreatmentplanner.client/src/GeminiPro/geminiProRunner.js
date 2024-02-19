@@ -12,7 +12,7 @@ export async function runGeminiPro(userInput) {
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
         const generationConfig = {
-            temperature: 0.9,
+            temperature: 0.2,
             topK: 1,
             topP: 1,
             maxOutputTokens: 2048,

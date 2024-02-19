@@ -57,20 +57,47 @@ const GenerateTreatmentPlan = () => {
 		setInputText(event.target.value);
 	};
 
-	const parseLineToPlan = async (line, lineIndex) => {
-		// Splitting the line based on " - " to separate the tooth number and subcategory
-		const [toothNumberPart, subcategory] = line
-			.split(" - ")
-			.map((part) => part.trim());
-		const toothNumber = parseInt(toothNumberPart.replace("#", ""));
 
-		const plans = await getTreatmentPlansBySubcategory(subcategory);
-		if (plans && plans.length > 0) {
-			return { ...plans[0], toothNumber, lineIndex };
+	// Utility function to preprocess input text and maintain order
+	async function preprocessInputText(inputText) {
+		console.log("inputText sent to ai", inputText);
+		const aiResponse = await runGeminiPro(inputText);
+		console.log("aiResponsePreprocessedInputText", aiResponse);
+		const parsedResponse = JSON.parse(aiResponse);
+		// Convert to array of [toothNumber, treatments, originalOrder] to maintain original input order
+		return Object.entries(parsedResponse).map((entry, index) => [...entry, index]);
+	}
+
+	// Utility function to fetch and process treatments with order maintained
+	async function fetchAndProcessTreatments(treatmentEntries) {
+		let allVisits = [];
+		let visitIdCounter = 0;
+
+		for (const [toothNumber, treatments, originalOrder] of treatmentEntries) {
+			for (const treatment of treatments) {
+				const plans = await getTreatmentPlansBySubcategory(treatment);
+				if (plans && plans.length > 0) {
+					const plan = plans[0];
+					plan.visits.forEach(visit => {
+						visit.visitId = `custom-${visitIdCounter++}`;
+						visit.cdtCodes = visit.cdtCodes.map(cdtCode => ({
+							...cdtCode,
+							toothNumber: toothNumber
+						}));
+						visit.originLineIndex = originalOrder; // Use the original order for sorting
+					});
+					allVisits.push(...plan.visits);
+				}
+			}
 		}
-		return null;
-	};
 
+		// Sort visits by originLineIndex and then by visitNumber
+		allVisits.sort((a, b) => a.originLineIndex - b.originLineIndex || a.visitNumber - b.visitNumber);
+		return allVisits;
+	}
+
+
+	// Main function to generate treatment plan
 	const handleGenerateTreatmentPlan = async () => {
 		if (!inputText.trim()) {
 			showAlert("error", "Please enter some text to generate a treatment plan.");
@@ -81,42 +108,12 @@ const GenerateTreatmentPlan = () => {
 			return;
 		}
 		setIsLoading(true);
+
 		try {
-			const aiResponsePreprocessedInputText = await runGeminiPro(inputText);
-			const lines = aiResponsePreprocessedInputText.split("\n");
-			const planPromises = lines.map((line, index) => parseLineToPlan(line, index));
-			let newTreatmentPlans = (await Promise.all(planPromises)).filter(plan => plan !== null);
-			newTreatmentPlans.forEach(plan => {
-				console.log(`Visits for plan with subcategory before combination ${plan.subcategory} and toothNumber ${plan.toothNumber}:`, plan.visits);
-			});
-
-			let visitIdCounter = 0;
-			let allVisits = [];
-			newTreatmentPlans.forEach(plan => {
-				plan.visits.forEach(visit => {
-					visit.visitId = `custom-${visitIdCounter++}`; 
-					visit.cdtCodes = visit.cdtCodes.map(cdtCodeMap => ({
-						...cdtCodeMap,
-						// This ensures each cdtCode has the correct toothNumber
-						toothNumber: cdtCodeMap.toothNumber ?? plan.toothNumber
-					}));
-					// Adding lineIndex to each visit for sorting
-					visit.originLineIndex = plan.lineIndex;
-				});
-				// Collecting all visits together
-				allVisits.push(...plan.visits);
-			});
-
-			// Sort all visits by originLineIndex and then by visitNumber
-			allVisits.sort((a, b) => a.originLineIndex - b.originLineIndex || a.visitNumber - b.visitNumber);
-
-			// Creating a single combined treatment plan
-			let combinedTreatmentPlan = {
-				visits: allVisits
-			};
+			const treatmentEntries = await preprocessInputText(inputText);
+			const allVisits = await fetchAndProcessTreatments(treatmentEntries);
+			const combinedTreatmentPlan = { visits: allVisits };
 			console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
-
-			// Setting the combined plan as the treatment plan
 			setTreatmentPlans([combinedTreatmentPlan]);
 		} catch (error) {
 			showAlert("error", "An error occurred while generating the treatment plan.");
@@ -125,6 +122,7 @@ const GenerateTreatmentPlan = () => {
 			setIsLoading(false);
 		}
 	};
+
 
 	return (
 		<div className="dashboard-bottom-inner-row">
