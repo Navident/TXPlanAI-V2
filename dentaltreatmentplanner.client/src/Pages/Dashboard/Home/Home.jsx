@@ -9,6 +9,7 @@ import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import RecentTxPlans from '../../../Components/RecentTxPlans';
 import { StyledLargeText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
 import { StyledHomeBoxBottomContainer, StyledSeparator } from '../../Dashboard/index.style'
+import TxPlansBoxLinesChart from '../../../Components/TxPlansBoxLinesChart';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -75,9 +76,9 @@ const Home = () => {
                         <StyledSeparator />
                         <StyledHomeBoxBottomContainer purpleContainer>
                         <img src={createNewButton} alt="Create New TX Plan" onClick={handleGenerateTxButtonClick} />
-                    </StyledHomeBoxBottomContainer>
+                        </StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
-                    </StyledRoundedBoxContainer>
+                </StyledRoundedBoxContainer>
                 <RecentTxPlans />
                 <StyledRoundedBoxContainer>
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
@@ -88,13 +89,7 @@ const Home = () => {
                 </StyledRoundedBoxContainer>
             </div>
             <div className="dashboard-right-side-row">
-                <StyledRoundedBoxContainer>
-                    <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                        <div className="large-text">TX Plans Generated</div>
-                        <StyledSeparator />
-                        <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
-                    </StyledRoundedBoxContainerInner>
-                </StyledRoundedBoxContainer>
+                <TxPlansBoxLinesChart />
             </div>
         </div>
     );
