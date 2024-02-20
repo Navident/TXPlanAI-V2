@@ -586,7 +586,7 @@ export const examples =
             "text": "input: #10 rct"
         },
         {
-            "text": "output: [{\"toothNumber\":\"#10\",\"treatments\":[\Root Canal Anterior\"]
+            "text": "output: [{\"toothNumber\":\"#10\",\"treatments\":[\"Root Canal Anterior\"]}]"
         },
         {
             "text": "input: "
