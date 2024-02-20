@@ -2,11 +2,9 @@ import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButto
 import { TextField } from "@mui/material";
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
-import { getTreatmentPlansBySubcategory } from "../../../ClientServices/apiService";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
 import useTreatmentPlan from "../../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import {
-	generateTreatmentPlan,
 	getTreatmentPlanById,
 } from "../../../ClientServices/apiService";
 import { useBusiness } from "../../../Contexts/BusinessContext/useBusiness";
@@ -19,7 +17,6 @@ const GenerateTreatmentPlan = () => {
 		treatmentPlans,
 		setTreatmentPlans,
 		treatmentPlanId,
-		setTreatmentPlanId,
 		setTreatmentPlan,
 		cdtCodes,
 		handleAddVisit,
@@ -33,7 +30,6 @@ const GenerateTreatmentPlan = () => {
 	const {
 		fetchFacilityPayerCdtCodeFees,
 		selectedPatient,
-		facilityPayerCdtCodeFees,
 		subcategoryTreatmentPlans 
 	} = useBusiness();
 	const [isLoading, setIsLoading] = useState(false);
@@ -65,13 +61,12 @@ const GenerateTreatmentPlan = () => {
 		const aiResponse = await runGeminiPro(inputText);
 		console.log("aiResponsePreprocessedInputText", aiResponse);
 		const parsedResponse = JSON.parse(aiResponse);
-		// Convert to array of [toothNumber, treatments, originalOrder] to maintain original input order
 		return Object.entries(parsedResponse).map((entry, index) => [...entry, index]);
 	}
 
 	// Utility function to fetch and process treatments with order maintained
 	async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
-		console.log("SubcategoryTreatmentPlans at fetchAndProcess:", subcategoryTreatmentPlans); // Step 2
+		console.log("SubcategoryTreatmentPlans at fetchAndProcess:", subcategoryTreatmentPlans); 
 
 		let allVisits = [];
 		let visitIdCounter = 0;
@@ -129,7 +124,6 @@ const GenerateTreatmentPlan = () => {
 			setIsLoading(false);
 		}
 	};
-
 
 	return (
 		<div className="dashboard-bottom-inner-row">
