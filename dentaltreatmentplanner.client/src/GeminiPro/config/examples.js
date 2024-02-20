@@ -583,6 +583,12 @@ export const examples =
             "text": "output: [{\"toothNumber\":\"#3\",\"treatments\":[\"3 Surface Posterior Composite Filling\"]},{\"toothNumber\":\"#6\",\"treatments\":[\"Root Canal Anterior\",\"Build Up w/ Post\",\"PFM Retainer Crown\"]},{\"toothNumber\":\"#7\",\"treatments\":[\"PFM Pontic\"]},{\"toothNumber\":\"#8\",\"treatments\":[\"PFM Pontic\"]},{\"toothNumber\":\"#9\",\"treatments\":[\"PFM Pontic\"]},{\"toothNumber\":\"#10\",\"treatments\":[\"PFM Pontic\"]},{\"toothNumber\":\"#11\",\"treatments\":[\"Root Canal Anterior\",\"Build Up w/o Post\",\"PFM Retainer Crown\"]}]"
         },
         {
+            "text": "input: #10 rct"
+        },
+        {
+            "text": "output: [{\"toothNumber\":\"#10\",\"treatments\":[\Root Canal Anterior\"]
+        },
+        {
             "text": "input: "
         },
         {
