@@ -13,34 +13,27 @@ import {
 	StyledRoundedBoxContainer,
 } from "../../../../GlobalStyledComponents";
 import GoBack from "../../../../Components/Common/GoBack/GoBack";
+import { useBusiness } from '../../../../Contexts/BusinessContext/useBusiness';
+
 
 const ProceduresCustomizer = () => {
 	const [treatmentPlans, setTreatmentPlans] = useState([]);
 	const params = useParams();
-	const subcategory = params.subcategory;
-	const category = params.category;
+	console.log("params", params);
+	// Ensure paramsSubcategoryId is a number for accurate comparison
+	const paramsSubcategoryId = Number(params.subcategory);
+	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
+	const { subcategoryTreatmentPlans } = useBusiness();
 
 	useEffect(() => {
-		const fetchTreatmentPlans = async () => {
-			if (subcategory) {
-				const plans = await getTreatmentPlansBySubcategory(subcategory);
-				if (plans) {
-					setTreatmentPlans(plans);
-				} else {
-					console.log(
-						`No treatment plans found for subcategory: ${subcategory}`
-					);
-				}
-			}
-		};
-
-		fetchTreatmentPlans();
-	}, [subcategory]);
+		// Filter out any null values 
+		const filteredPlans = subcategoryTreatmentPlans.filter(plan => plan && plan.procedureSubcategoryId === paramsSubcategoryId);
+		setTreatmentPlans(filteredPlans);
+	}, [paramsSubcategoryId, subcategoryTreatmentPlans]); 
 
 	useEffect(() => {
 		console.log("treatmentPlans updated:", treatmentPlans);
 	}, [treatmentPlans]);
-
 	const handleAddVisitToTreatmentPlan = (treatmentPlanId, newVisit) => {
 		setTreatmentPlans((prevPlans) =>
 			addVisitToTreatmentPlan(prevPlans, treatmentPlanId, newVisit)
@@ -75,9 +68,10 @@ const ProceduresCustomizer = () => {
 			<GoBack text="Go Back" />
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
-					<StyledLargeText>Procedure Category: {category}</StyledLargeText>
+					<StyledLargeText>Procedure Category: {treatmentPlans.procedureCategoryName}</StyledLargeText>
 					<StyledLargeText>
-						Procedure Sub-Category: {subcategory}
+						Procedure Sub-Category: {treatmentPlans.procedureCategoryName}
+
 					</StyledLargeText>
 					<div>
 						{treatmentPlans.length > 0 &&

@@ -27,6 +27,7 @@ export const BusinessProvider = ({ children }) => {
 
     //state hooks for treatment plans
     const [patientTreatmentPlans, setPatientTreatmentPlans] = useState([]);
+    const [subcategoryTreatmentPlans, setSubcategoryTreatmentPlans] = useState([]);
 
     // Effect hook for initializing business name from localStorage
     useEffect(() => {
@@ -51,6 +52,10 @@ export const BusinessProvider = ({ children }) => {
     useEffect(() => {
         setFilteredPatients(searchQuery ? patients.filter(patient => patient.name.toLowerCase().includes(searchQuery.toLowerCase())) : patients);
     }, [searchQuery, patients]);
+
+    useEffect(() => {
+        console.log("Updated subcategory treatment plans: ", subcategoryTreatmentPlans);
+    }, [subcategoryTreatmentPlans]);
 
     // Fetching initial data required by the application
     const fetchInitialData = async () => {
@@ -169,16 +174,24 @@ export const BusinessProvider = ({ children }) => {
         try {
             const fetchedCategories = await getCategories();
 
+            let allTreatmentPlans = []; // Initialize an array to hold all treatment plans
+
             const categoriesWithSubcategories = await Promise.all(
                 fetchedCategories.map(async (category) => {
                     const subCategories = await getSubCategoriesByCategoryName(category.name);
                     const subCategoriesWithTreatmentPlans = await Promise.all(
                         subCategories.map(async (subCategory) => {
                             const treatmentPlans = await getTreatmentPlansBySubcategory(subCategory.name);
+                            // Here, include the subcategory name in each treatment plan
+                            const treatmentPlansWithSubCategoryName = (treatmentPlans || []).map(plan => ({
+                                ...plan,
+                                subCategoryName: subCategory.name,
+                            }));
+                            allTreatmentPlans = allTreatmentPlans.concat(treatmentPlansWithSubCategoryName); // Use the modified list
                             return {
                                 ...subCategory,
-                                treatmentPlans,
-                                treatmentPlansStatus: treatmentPlans ? 'fetched' : 'not_fetched'
+                                treatmentPlans: treatmentPlansWithSubCategoryName,
+                                treatmentPlansStatus: (treatmentPlans || []).length ? 'fetched' : 'not_fetched'
                             };
                         })
                     );
@@ -193,8 +206,11 @@ export const BusinessProvider = ({ children }) => {
             setCategories(categoriesWithSubcategories);
             console.log("categoriesWithSubcategories", categoriesWithSubcategories);
             const extractedCdtCodeIds = extractUniqueCdtCodeIds(categoriesWithSubcategories);
-            setActiveCdtCodes(extractedCdtCodeIds); 
+            setActiveCdtCodes(extractedCdtCodeIds);
             console.log("extractedCdtCodeIds: ", extractedCdtCodeIds);
+
+            // Update the global state with all treatment plans
+            setSubcategoryTreatmentPlans(allTreatmentPlans);
         } catch (error) {
             console.error('Error fetching category data:', error);
         } finally {
@@ -261,7 +277,8 @@ export const BusinessProvider = ({ children }) => {
             patientTreatmentPlans, setPatientTreatmentPlans,
             fetchFeesForTreatmentPlan,
             refreshPatientTreatmentPlans,
-            fetchPayers
+            fetchPayers,
+            subcategoryTreatmentPlans, setSubcategoryTreatmentPlans
             
         }}>
             {children}

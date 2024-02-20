@@ -23,12 +23,14 @@ const DefaultProcedures = () => {
 
 	const handleEditClick = (categoryId) => {
 		const subcategory = selectedSubcategories[categoryId];
+		console.log("subcategory in handleeditclick", subcategory);
+		console.log("subcategory.procedureSubcategoryId in handleeditclick", subcategory.procedureSubCategoryId); 
 		const category = categories.find(
 			(cat) => cat.procedureCategoryId === categoryId
 		)?.name;
 		if (subcategory && category) {
 			navigate(
-				`/dashboard/defaultprocedures/procedurescustomizer/${category}/${subcategory.name}`
+				`/dashboard/defaultprocedures/procedurescustomizer/${category}/${subcategory.procedureSubCategoryId}`
 			);
 		}
 	};

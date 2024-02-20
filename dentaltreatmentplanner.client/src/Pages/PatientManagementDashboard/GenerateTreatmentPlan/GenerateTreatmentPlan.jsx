@@ -34,6 +34,7 @@ const GenerateTreatmentPlan = () => {
 		fetchFacilityPayerCdtCodeFees,
 		selectedPatient,
 		facilityPayerCdtCodeFees,
+		subcategoryTreatmentPlans 
 	} = useBusiness();
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -69,15 +70,21 @@ const GenerateTreatmentPlan = () => {
 	}
 
 	// Utility function to fetch and process treatments with order maintained
-	async function fetchAndProcessTreatments(treatmentEntries) {
+	async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
+		console.log("SubcategoryTreatmentPlans at fetchAndProcess:", subcategoryTreatmentPlans); // Step 2
+
 		let allVisits = [];
 		let visitIdCounter = 0;
 
 		for (const [toothNumber, treatments, originalOrder] of treatmentEntries) {
 			for (const treatment of treatments) {
-				const plans = await getTreatmentPlansBySubcategory(treatment);
-				if (plans && plans.length > 0) {
-					const plan = plans[0];
+				const treatmentSubcategoryName = treatment; 
+				const filteredPlans = subcategoryTreatmentPlans.filter(plan =>
+					plan && plan.procedureSubCategoryName.toLowerCase() === treatmentSubcategoryName.toLowerCase()
+				);
+
+				if (filteredPlans.length > 0) {
+					const plan = filteredPlans[0];
 					plan.visits.forEach(visit => {
 						visit.visitId = `custom-${visitIdCounter++}`;
 						visit.cdtCodes = visit.cdtCodes.map(cdtCode => ({
@@ -111,7 +118,7 @@ const GenerateTreatmentPlan = () => {
 
 		try {
 			const treatmentEntries = await preprocessInputText(inputText);
-			const allVisits = await fetchAndProcessTreatments(treatmentEntries);
+			const allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
 			const combinedTreatmentPlan = { visits: allVisits };
 			console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
 			setTreatmentPlans([combinedTreatmentPlan]);
