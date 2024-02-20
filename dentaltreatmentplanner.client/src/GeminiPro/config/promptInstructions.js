@@ -1,10 +1,10 @@
 export const instructions = {
     "text": `
 Response Format:
-- Respond in JSON format.
-- Use tooth numbers (#) as keys.
-- List treatments in exact order received.
-- If input is off-topic, respond with "Error: Invalid Input Type".
+- Respond in JSON format as an array of objects.
+- Each object should contain a 'toothNumber' field prefixed with '#' and a 'treatments' field with an array of treatments.
+- Maintain the sequence of treatments as they appear in the input.
+- If the input is off-topic or cannot be processed, respond with {"error": "Invalid Input Type"}.
 
 Fillings:
 - Posterior teeth: #1-5, 12-21, 28-32.

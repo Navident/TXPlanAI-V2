@@ -43,16 +43,20 @@ export async function runGeminiPro(userInput) {
             { text: `input: ${userInput}` },
             { text: "output: " },
         ];
+        console.log("Parts for generation:", parts);
 
         const result = await model.generateContent({
             contents: [{ role: "user", parts }],
             generationConfig,
             safetySettings,
         });
+        console.log("Raw generation result:", result);
 
         generatedText = await result.response.text();
+        console.log("Generated text:", generatedText);
     } catch (error) {
-        generatedText = "An error occurred while generating content."; 
+        console.error("Error during content generation:", error);
+        generatedText = "An error occurred while generating content.";
     }
 
     return generatedText;
