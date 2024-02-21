@@ -592,7 +592,7 @@ export const examples =
             "text": "input: #5-7 implant bridge with acc"
         },
         {
-            "text": "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Single Implant\", \"ACC Pontic\"]}, {\"toothNumber\": \"#7\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
+            "text": "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"ACC Pontic\"]}, {\"toothNumber\": \"#7\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
         },
         {
             "text": "input: "
