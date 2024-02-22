@@ -48,19 +48,20 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     useEffect(() => {
         if (isInitialLoad.current) {
-            const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
-
-            const newAllRows = Object.keys(sortedCdtCodes).reduce((acc, visitId) => {
-                const staticRows = sortedCdtCodes[visitId].map((visitCdtCodeMap, index) =>
-                    createInitialStaticRows(visitCdtCodeMap, visitId, index));
+            const visits = treatmentPlan.visits || [];
+            const newAllRows = visits.reduce((acc, visit, index) => {
+                const visitId = visit.visitId;
+                const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+                const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
+                    createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex));
                 const initialRowId = `initial-${visitId}`;
                 acc[visitId] = [...staticRows, createDynamicRowv1(visitId, initialRowId)];
                 return acc;
             }, {});
 
             setAllRows(newAllRows);
-            setVisitOrder(sortedVisits.map(visit => visit.visitId));
-            isInitialLoad.current = false; // Set the flag to false after initial setup
+            setVisitOrder(visits.map(visit => visit.visitId));
+            isInitialLoad.current = false;
         }
     }, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
 

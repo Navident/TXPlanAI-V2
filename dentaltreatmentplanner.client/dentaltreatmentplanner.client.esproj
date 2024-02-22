@@ -12,6 +12,8 @@
     <Folder Include="src\ClientServices\" />
     <Folder Include="src\Components\Common\Alert\" />
     <Folder Include="src\Components\Common\GoBack\" />
+    <Folder Include="src\Components\Common\Checkbox\" />
+    <Folder Include="src\Components\Common\ToggleButton\" />
     <Folder Include="src\Components\Common\SaveButtonRow\" />
     <Folder Include="src\Components\Common\PopupAlert\" />
     <Folder Include="src\Components\Common\StandardTextfield\" />
@@ -19,6 +21,7 @@
     <Folder Include="src\Components\DropdownHeaderPopup\" />
     <Folder Include="src\Components\TxPlansBoxLinesChart\" />
     <Folder Include="src\Components\RecentTxPlans\" />
+    <Folder Include="src\Components\TxViewCustomizationToolbar\CategoryFilters\" />
     <Folder Include="src\GlobalStyledComponents\" />
     <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
     <Folder Include="src\Pages\Dashboard\AllSavedPatientTxPlans\" />

@@ -4,7 +4,16 @@ import { UI_COLORS } from '../Theme';
 export const StyledLargeText = styled.div`
     font-size: 18px;
     font-weight: 600;
+    text-align: ${props => props.textAlign || 'inherit'};
 `;
+
+export const StyledSeparator = styled.div`
+  height: 1px;
+  background-color: #EAEBEB; 
+  width: 100%;
+  margin-top: ${props => props.customMarginTop || '-5px'};
+`;
+
 
 export const StyledUnderlinedText = styled.div`
     text-decoration: underline;

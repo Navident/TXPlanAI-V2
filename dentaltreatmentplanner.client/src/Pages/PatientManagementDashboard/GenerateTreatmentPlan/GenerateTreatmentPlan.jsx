@@ -1,4 +1,6 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
+import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
+
 import { TextField } from "@mui/material";
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
@@ -6,7 +8,7 @@ import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
 import useTreatmentPlan from "../../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import { getTreatmentPlanById } from "../../../ClientServices/apiService";
 import { useBusiness } from "../../../Contexts/BusinessContext/useBusiness";
-import { StyledContainerWithTableInner } from "../../../GlobalStyledComponents";
+import { StyledContainerWithTableInner, StyledLargeText, StyledSeparator } from "../../../GlobalStyledComponents";
 import { runGeminiPro } from "../../../GeminiPro/geminiProRunner";
 import { CircularProgress } from "@mui/material";
 
@@ -103,6 +105,31 @@ const GenerateTreatmentPlan = () => {
     }
 
 
+    function combineVisitsIntoOne(allVisits) {
+        let combinedCdtCodes = [];
+
+        allVisits.forEach(visit => {
+            visit.cdtCodes.forEach(cdtCode => {
+                combinedCdtCodes.push({
+                    ...cdtCode,
+                    originLineIndex: visit.originLineIndex,
+                    visitNumber: visit.visitNumber,
+                    orderWithinVisit: cdtCode.order
+                });
+            });
+        });
+
+        // Sort combinedCdtCodes by originLineIndex, visitNumber, and then by orderWithinVisit
+        combinedCdtCodes.sort((a, b) =>
+            a.originLineIndex - b.originLineIndex ||
+            a.visitNumber - b.visitNumber ||
+            a.orderWithinVisit - b.orderWithinVisit
+        );
+
+        return { visitId: 'combined', description: 'Combined Visit', cdtCodes: combinedCdtCodes, originLineIndex: 0 };
+    }
+
+
     // Main function to generate treatment plan
     const handleGenerateTreatmentPlan = async () => {
         if (!inputText.trim()) {
@@ -117,8 +144,10 @@ const GenerateTreatmentPlan = () => {
 
         try {
             const treatmentEntries = await preprocessInputText(inputText);
-            const allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
-            const combinedTreatmentPlan = { visits: allVisits };
+            let allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
+            const combinedVisit = combineVisitsIntoOne(allVisits);
+            console.log("combinedVisit", combinedVisit);
+            const combinedTreatmentPlan = { visits: [combinedVisit] };
             console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
             setTreatmentPlans([combinedTreatmentPlan]);
         } catch (error) {
@@ -175,9 +204,12 @@ const GenerateTreatmentPlan = () => {
                 </div>
             </div>
             <div className="treatment-plan-output-section rounded-box box-shadow">
-                <div className="treatment-plan-output-section-inner">
+
+                <TxViewCustomizationToolbar />
+                <StyledSeparator customMarginTop="0px" />
                     <StyledContainerWithTableInner>
-                        <div className="large-text">Treatment Plan</div>
+
+                    <StyledLargeText textAlign="center">Treatment Plan</StyledLargeText>
                         {isLoading ? (
                             <div
                                 style={{
@@ -214,7 +246,7 @@ const GenerateTreatmentPlan = () => {
                             ))
                         )}
                     </StyledContainerWithTableInner>
-                </div>
+
             </div>
         </div>
     );
