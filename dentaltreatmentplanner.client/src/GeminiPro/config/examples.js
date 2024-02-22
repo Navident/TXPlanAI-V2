@@ -332,7 +332,7 @@
 
       {text: "input: #5-7 implant bridge with acc\n#9-11 routine exts with implant bridge and acc crowns"},
       {text: "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Routine Extraction\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"},
-        
+      
       {text: "input: "},
       {text: "output: "},
     ];
