@@ -10,14 +10,13 @@ import deleteIcon from '../../assets/delete-x.svg';
 import dragIcon from '../../assets/drag-icon.svg';
 import Alert from '../../Components/Common/Alert/Alert';
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
-import TreatmentPlanContext from '../../Contexts/TreatmentPlanContext/TreatmentPlanContext';
-import { StyledContainerWithTableInner, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../GlobalStyledComponents';
+import { StyledContainerWithTableInner, StyledTableLabelText, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../GlobalStyledComponents';
 import { UI_COLORS } from '../../Theme';
 import pencilEditIcon from '../../assets/pencil-edit-icon.svg';
-import { sortTreatmentPlan } from '../../Utils/helpers';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
+import useSortContext from '../../Contexts/SortContext/useSortContext';
 
 const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpdateVisitsInTreatmentPlan, onDeleteVisit, showToothNumber, isInGenerateTreatmentPlanContext }) => {
     const [allRows, setAllRows] = useState({});
@@ -26,7 +25,6 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const [deletedVisitIds, setDeletedVisitIds] = useState([]);
     const isInitialLoad = useRef(true);
     const [localUpdatedVisits, setLocalUpdatedVisits] = useState([]);
-    const [alertOpen, setAlertOpen] = useState(false);
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [combinedVisits, setCombinedVisits] = useState([]);
     const { facilityCdtCodes, defaultCdtCodes } = useBusiness(); 
@@ -37,6 +35,9 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const { selectedPatient, refreshPatientTreatmentPlans, facilityPayerCdtCodeFees } = useBusiness();
     const { selectedPayer } = useTreatmentPlan();
     const [hasEdits, setHasEdits] = useState(false);
+    const { alignment } = useSortContext();
+    const prevAlignmentRef = useRef();
+    const [initialRenderComplete, setInitialRenderComplete] = useState(false);
 
     useEffect(() => {
         console.log("Received treatmentPlan:", treatmentPlan);
@@ -45,6 +46,12 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     useEffect(() => {
         setCombinedVisits(treatmentPlan.visits);
     }, [treatmentPlan, isInGenerateTreatmentPlanContext]);
+
+    useEffect(() => {
+        if (treatmentPlan && treatmentPlan.visits && treatmentPlan.visits.length > 0) {
+            setInitialRenderComplete(true);
+        }
+    }, [treatmentPlan]);
 
     useEffect(() => {
         if (isInitialLoad.current) {
@@ -69,6 +76,156 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     useEffect(() => {
         setLocalUpdatedVisits(treatmentPlan.visits);
     }, [treatmentPlan.visits]);
+
+    const sortVisitsByCategory = (visits) => {
+        let categoryGroups = {};
+
+        visits.forEach(visit => {
+            // Check if the visit is a combined visit with original categories information
+            if (visit.originalCategories) {
+                // Handle combined visit: Distribute CDT codes based on their original categories
+                visit.cdtCodes.forEach(cdtCode => {
+                    const categoryName = cdtCode.procedureCategoryName; 
+                    if (!categoryGroups[categoryName]) {
+                        categoryGroups[categoryName] = {
+                            visitId: `combined-${categoryName}`,
+                            description: `Combined Visit for ${categoryName}`,
+                            cdtCodes: [],
+                            originLineIndex: [],
+                            procedureCategoryName: categoryName
+                        };
+                    }
+                    categoryGroups[categoryName].cdtCodes.push(cdtCode);
+                    if (!categoryGroups[categoryName].originLineIndex.includes(cdtCode.originLineIndex)) {
+                        categoryGroups[categoryName].originLineIndex.push(cdtCode.originLineIndex);
+                    }
+                });
+            } else {
+                // Handle regular visit: Group by existing procedureCategoryName
+                const categoryName = visit.procedureCategoryName;
+                if (!categoryGroups[categoryName]) {
+                    categoryGroups[categoryName] = {
+                        visitId: `combined-${categoryName}`,
+                        description: `Combined Visit for ${categoryName}`,
+                        cdtCodes: [],
+                        originLineIndex: [],
+                        procedureCategoryName: categoryName
+                    };
+                }
+                visit.cdtCodes.forEach(cdtCode => {
+                    categoryGroups[categoryName].cdtCodes.push(cdtCode);
+                    if (!categoryGroups[categoryName].originLineIndex.includes(visit.originLineIndex)) {
+                        categoryGroups[categoryName].originLineIndex.push(visit.originLineIndex);
+                    }
+                });
+            }
+        });
+
+        // Convert grouped CDT codes into format for combined visits by category
+        const combinedVisitsByCategory = Object.values(categoryGroups).map(category => {
+            // Sort combinedCdtCodes within each category
+            category.cdtCodes.sort((a, b) =>
+                a.originLineIndex - b.originLineIndex ||
+                a.visitNumber - b.visitNumber ||
+                a.orderWithinVisit - b.orderWithinVisit
+            );
+            category.originLineIndex = Math.min(...category.originLineIndex);
+
+            return category;
+        });
+
+        return combinedVisitsByCategory;
+    };
+
+
+
+
+    const sortVisitsIntoOne = (allVisits) => {
+        let combinedCdtCodes = [];
+
+        console.log("Before sorting, allVisits:", JSON.parse(JSON.stringify(allVisits)));
+
+
+        allVisits.forEach(visit => {
+            visit.cdtCodes.forEach(cdtCode => {
+                combinedCdtCodes.push({
+                    ...cdtCode,
+                    originLineIndex: visit.originLineIndex,
+                    visitNumber: visit.visitNumber,
+                    orderWithinVisit: cdtCode.order
+                });
+            });
+        });
+        console.log("Before sort, combinedCdtCodes:", JSON.parse(JSON.stringify(combinedCdtCodes)));
+
+/*        // Sort combinedCdtCodes by originLineIndex, visitNumber, and then by orderWithinVisit
+        combinedCdtCodes.sort((a, b) =>
+            a.originLineIndex - b.originLineIndex ||
+            a.visitNumber - b.visitNumber ||
+            a.orderWithinVisit - b.orderWithinVisit
+        );
+        console.log("After sort, combinedCdtCodes:", JSON.parse(JSON.stringify(combinedCdtCodes)));*/
+
+        return [{
+            visitId: 'combined',
+            description: 'Combined Visit',
+            cdtCodes: combinedCdtCodes,
+            originLineIndex: 0
+        }];
+    };
+
+    const updateStateWithSortedVisits = (sortedVisits) => {
+
+        console.log("sortedVisits in updateStateWithSortedVisits:", JSON.parse(JSON.stringify(sortedVisits)));
+
+
+        // Update `localUpdatedVisits` with sorted visits
+        setLocalUpdatedVisits(sortedVisits);
+
+        // Recalculate `allRows` and `visitOrder` based on `sortedVisits`
+        const newAllRows = {};
+        const newVisitOrder = [];
+        sortedVisits.forEach((visit, index) => {
+            const visitId = visit.visitId;
+            newVisitOrder.push(visitId);
+            console.log(`Processing visitId: ${visitId}, index: ${index}`);
+
+            const staticRows = visit.cdtCodes.map((cdtCode, cdtIndex) =>
+                createInitialStaticRows(cdtCode, visitId, cdtIndex));
+            const initialRowId = `initial-${visitId}`;
+            newAllRows[visitId] = [...staticRows, createDynamicRowv1(visitId, initialRowId)];
+        });
+
+        console.log("newAllRows after processing:", JSON.parse(JSON.stringify(newAllRows)));
+        console.log("newVisitOrder after processing:", newVisitOrder);
+
+        setAllRows(newAllRows);
+        setVisitOrder(newVisitOrder);
+    };
+
+    useEffect(() => {
+        if (!alignment || !treatmentPlan.visits || !initialRenderComplete) return;
+
+        let sortedVisits;
+        if (alignment === 'category') {
+            // Logic for sorting by category
+            sortedVisits = sortVisitsByCategory(treatmentPlan.visits);
+        } else if (alignment === 'default') {
+            // Only execute sortVisitsIntoOne if previous alignment was 'category'
+            sortedVisits = sortVisitsIntoOne(treatmentPlan.visits);
+        } else {
+            // If not changing from 'category' to another value, maintain the current visits without re-sorting
+            sortedVisits = treatmentPlan.visits;
+        }
+
+        // Update the state with these sorted visits
+        updateStateWithSortedVisits(sortedVisits);
+
+        // Update the previous alignment value for the next render
+        prevAlignmentRef.current = alignment;
+    }, [alignment, treatmentPlan.visits]);
+
+
 
     const handleCloseAlert = () => {
         setAlertInfo({ ...alertInfo, open: false });
@@ -706,11 +863,12 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         const tableRows = allRows[visitIdStr].map((row, rowIndex) => {
             return createTableRow(row, visit.visitId, headers, rowIndex, allRows[visitIdStr]);
         });
-
+        const categoryName = visit.procedureCategoryName;
         return (
             <Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
                 {(provided) => (
                     <div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
+                        {categoryName && <StyledTableLabelText>{categoryName}</StyledTableLabelText>}
                         <Table
                             headers={headers}
                             rows={tableRows}

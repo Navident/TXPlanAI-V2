@@ -11,6 +11,7 @@ import { useBusiness } from "../../../Contexts/BusinessContext/useBusiness";
 import { StyledContainerWithTableInner, StyledLargeText, StyledSeparator } from "../../../GlobalStyledComponents";
 import { runGeminiPro } from "../../../GeminiPro/geminiProRunner";
 import { CircularProgress } from "@mui/material";
+import useSortContext from '../../../Contexts/SortContext/useSortContext';
 
 const GenerateTreatmentPlan = () => {
     const {
@@ -25,6 +26,7 @@ const GenerateTreatmentPlan = () => {
         selectedPayer,
         showAlert,
     } = useTreatmentPlan();
+    const { alignment } = useSortContext();
 
     const [inputText, setInputText] = useState("");
 
@@ -35,6 +37,8 @@ const GenerateTreatmentPlan = () => {
     } = useBusiness();
 
     const [isLoading, setIsLoading] = useState(false);
+    
+
 
     useEffect(() => {
         if (treatmentPlanId) {
@@ -74,6 +78,7 @@ const GenerateTreatmentPlan = () => {
     // Utility function to fetch and process treatments with order maintained
     async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
         console.log("Treatment entries (with original order):", treatmentEntries);
+        console.log("subcategoryTreatmentPlans:", subcategoryTreatmentPlans);
         let allVisits = [];
         let globalVisitIdCounter = 0;
 
@@ -93,6 +98,7 @@ const GenerateTreatmentPlan = () => {
                         visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
                         cdtCodes: visit.cdtCodes.map(cdtCode => ({ ...cdtCode, toothNumber })),
                         originLineIndex: originalOrder,
+                        procedureCategoryName: plan.procedureCategoryName,
                     }));
 
                     allVisits.push(...clonedVisits);
@@ -107,15 +113,22 @@ const GenerateTreatmentPlan = () => {
 
     function combineVisitsIntoOne(allVisits) {
         let combinedCdtCodes = [];
-
+        let originalCategories = {};
         allVisits.forEach(visit => {
             visit.cdtCodes.forEach(cdtCode => {
-                combinedCdtCodes.push({
+                let cdtCodeWithCategory = {
                     ...cdtCode,
                     originLineIndex: visit.originLineIndex,
                     visitNumber: visit.visitNumber,
-                    orderWithinVisit: cdtCode.order
-                });
+                    orderWithinVisit: cdtCode.order,
+                    procedureCategoryName: visit.procedureCategoryName // Store the category name with each code
+                };
+                combinedCdtCodes.push(cdtCodeWithCategory);
+
+                // Map each CDT code to its original category
+                if (!originalCategories[cdtCode.visitCdtCodeMapId]) {
+                    originalCategories[cdtCode.visitCdtCodeMapId] = visit.procedureCategoryName;
+                }
             });
         });
 
@@ -126,7 +139,64 @@ const GenerateTreatmentPlan = () => {
             a.orderWithinVisit - b.orderWithinVisit
         );
 
-        return { visitId: 'combined', description: 'Combined Visit', cdtCodes: combinedCdtCodes, originLineIndex: 0 };
+        return {
+            visitId: 'combined',
+            description: 'Combined Visit',
+            cdtCodes: combinedCdtCodes,
+            originLineIndex: 0,
+            originalCategories 
+        };
+    }
+
+    function combineVisitsByCategory(allVisits) {
+        // Step 1: Group visits by procedureCategoryName
+        const categoryGroups = allVisits.reduce((acc, visit) => {
+            const categoryName = visit.procedureCategoryName;
+            if (!acc[categoryName]) {
+                acc[categoryName] = [];
+            }
+            acc[categoryName].push(visit);
+            return acc;
+        }, {});
+
+        // Step 2: Combine cdtCodes within each category group into a single visit
+        const combinedVisitsByCategory = Object.keys(categoryGroups).map((categoryName, index) => {
+            let combinedCdtCodes = [];
+            let originLineIndexes = [];
+
+            categoryGroups[categoryName].forEach(visit => {
+                visit.cdtCodes.forEach(cdtCode => {
+                    combinedCdtCodes.push({
+                        ...cdtCode,
+                        originLineIndex: visit.originLineIndex,
+                        visitNumber: visit.visitNumber,
+                        orderWithinVisit: cdtCode.order
+                    });
+                    if (!originLineIndexes.includes(visit.originLineIndex)) {
+                        originLineIndexes.push(visit.originLineIndex);
+                    }
+                });
+            });
+
+            // Sort combinedCdtCodes
+            combinedCdtCodes.sort((a, b) =>
+                a.originLineIndex - b.originLineIndex ||
+                a.visitNumber - b.visitNumber ||
+                a.orderWithinVisit - b.orderWithinVisit
+            );
+
+            const combinedOriginLineIndex = Math.min(...originLineIndexes);
+
+            return {
+                visitId: `combined-${categoryName}-${index}`,
+                description: `Combined Visit for ${categoryName}`,
+                cdtCodes: combinedCdtCodes,
+                originLineIndex: combinedOriginLineIndex,
+                procedureCategoryName: categoryName
+            };
+        });
+
+        return combinedVisitsByCategory; 
     }
 
 
@@ -140,14 +210,21 @@ const GenerateTreatmentPlan = () => {
             showAlert("error", "Please select a patient before generating a treatment plan.");
             return;
         }
+
         setIsLoading(true);
 
         try {
             const treatmentEntries = await preprocessInputText(inputText);
-            let allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
-            const combinedVisit = combineVisitsIntoOne(allVisits);
-            console.log("combinedVisit", combinedVisit);
-            const combinedTreatmentPlan = { visits: [combinedVisit] };
+            const allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
+            let combinedTreatmentPlan;
+            if (alignment === 'category') {
+                const combinedVisits = combineVisitsByCategory(allVisits);
+                combinedTreatmentPlan = { visits: combinedVisits };
+            } else {
+                const combinedVisit = combineVisitsIntoOne(allVisits);
+                combinedTreatmentPlan = { visits: [combinedVisit] }; 
+            }
+
             console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
             setTreatmentPlans([combinedTreatmentPlan]);
         } catch (error) {
@@ -158,6 +235,46 @@ const GenerateTreatmentPlan = () => {
         }
     };
 
+    const renderTextField = () => (
+        <TextField
+            label="Input your text"
+            multiline
+            minRows={3}
+            value={inputText}
+            onChange={handleInputChange}
+            sx={{
+                width: "100%",
+                backgroundColor: "white",
+                "& label.Mui-focused": {
+                    color: "#7777a1",
+                },
+                "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                        borderColor: "#ccc",
+                    },
+                    "&:hover fieldset": {
+                        borderColor: "#7777a1",
+                    },
+                    "&.Mui-focused fieldset": {
+                        borderColor: "#7777a1",
+                    },
+                },
+            }}
+        />
+    );
+
+    const renderRoundedButton = () => (
+        <RoundedButton
+            text="Generate Treatment Plan"
+            backgroundColor="#7777a1"
+            textColor="white"
+            border={false}
+            width="fit-content"
+            onClick={handleGenerateTreatmentPlan}
+            className="purple-button-hover"
+        />
+    );
+
     return (
         <div className="dashboard-bottom-inner-row">
             <div className="large-text">Create New TX Plan</div>
@@ -167,40 +284,8 @@ const GenerateTreatmentPlan = () => {
                     <div className="large-text">
                         What can I help you treatment plan today?
                     </div>
-                    <TextField
-                        label="Input your text"
-                        multiline
-                        minRows={3}
-                        value={inputText}
-                        onChange={handleInputChange}
-                        sx={{
-                            width: "100%",
-                            backgroundColor: "white",
-                            "& label.Mui-focused": {
-                                color: "#7777a1",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                                "& fieldset": {
-                                    borderColor: "#ccc",
-                                },
-                                "&:hover fieldset": {
-                                    borderColor: "#7777a1",
-                                },
-                                "&.Mui-focused fieldset": {
-                                    borderColor: "#7777a1",
-                                },
-                            },
-                        }}
-                    />
-                    <RoundedButton
-                        text="Generate Treatment Plan"
-                        backgroundColor="#7777a1"
-                        textColor="white"
-                        border={false}
-                        width="fit-content"
-                        onClick={handleGenerateTreatmentPlan}
-                        className="purple-button-hover"
-                    />
+                    {renderTextField()}
+                    {renderRoundedButton()}
                 </div>
             </div>
             <div className="treatment-plan-output-section rounded-box box-shadow">

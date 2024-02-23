@@ -11,6 +11,7 @@ import {
 	StyledLargeText,
 	StyledContainerWithTableInner,
 	StyledRoundedBoxContainer,
+	StyledTableLabelText
 } from "../../../../GlobalStyledComponents";
 import GoBack from "../../../../Components/Common/GoBack/GoBack";
 import { useBusiness } from '../../../../Contexts/BusinessContext/useBusiness';
@@ -68,11 +69,10 @@ const ProceduresCustomizer = () => {
 			<GoBack text="Go Back" />
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
-					<StyledLargeText>Procedure Category: {treatmentPlans.procedureCategoryName}</StyledLargeText>
-					<StyledLargeText>
-						Procedure Sub-Category: {treatmentPlans.procedureCategoryName}
+					<StyledTableLabelText>Procedure Category: {treatmentPlans[0].procedureCategoryName}</StyledTableLabelText>
+					
+					<StyledTableLabelText>Procedure Sub-Category: {treatmentPlans[0].procedureSubCategoryName}</StyledTableLabelText>
 
-					</StyledLargeText>
 					<div>
 						{treatmentPlans.length > 0 &&
 							treatmentPlans.map((plan, index) => {

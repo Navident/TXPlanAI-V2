@@ -20,6 +20,7 @@ import AllSavedPatientTxPlans from "./Pages/Dashboard/AllSavedPatientTxPlans/ind
 
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
 import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
+import { SortProvider } from './Contexts/SortContext/SortProvider';
 import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
 
@@ -27,6 +28,7 @@ function App() {
     return (
         <BusinessProvider>
             <TreatmentPlanProvider>
+                <SortProvider>
                 <div className="App">
                     <Routes>
                         <Route path="/" element={<Landing />} />
@@ -55,7 +57,8 @@ function App() {
                         <Route path="/customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
                     </Routes>
                     <AlertWrapper />
-                </div>
+                    </div>
+                </SortProvider>
             </TreatmentPlanProvider>
         </BusinessProvider>
     );

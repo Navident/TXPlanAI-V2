@@ -6,7 +6,7 @@ import CategoryFilters from "./CategoryFilters/index";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { UI_COLORS } from '../../Theme';
 import { useState, useEffect, useRef } from 'react';
-import CustomToggleButton from "../../Components/Common/ToggleButton/index";
+import ToggleButtonGroup from "../../Components/Common/ToggleButtonGroup/index";
 
 const TxViewCustomizationToolbar = () => {
     const [isSticky, setIsSticky] = useState(false);
@@ -36,15 +36,11 @@ const TxViewCustomizationToolbar = () => {
     }, []);
 
 
-    const handleSortSelect = (selectedOption) => {
-        console.log('Selected sort option:', selectedOption);
-    };
-
     return (
         <>
         <div ref={sentinelRef} style={{ height: '1px' }}></div>
         <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
-                <CustomToggleButton />
+                <ToggleButtonGroup  />
             <CategoryFilters />
             <RoundedButton
                 text="Group"
