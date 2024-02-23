@@ -26,7 +26,7 @@ const CustomToggleButtonGroup = () => {
                     // Remove border radius where buttons meet
                     borderRadius: 0,
                     height: '39px',
-                    width: '136px',
+                    width: '180px',
                     textTransform: 'none',
                     '&.Mui-selected': {
                         backgroundColor: UI_COLORS.light_grey2, 
@@ -40,6 +40,8 @@ const CustomToggleButtonGroup = () => {
                         backgroundColor: UI_COLORS.light_grey5, // Slightly lighter on hover for unselected buttons
                         
                     },
+                    fontFamily: 'Poppins, sans-serif', 
+                    fontSize: '16px',
                 },
 
                 '& .MuiToggleButtonGroup-grouped:not(:last-of-type)': {

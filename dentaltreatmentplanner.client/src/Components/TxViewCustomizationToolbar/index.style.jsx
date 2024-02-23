@@ -18,3 +18,15 @@ export const StyledTxToolbarContainer = styled.div`
         border-top-right-radius: 0px;
     }
 `;
+
+export const StyledToggleButtonGroupWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    flex: 1;
+`;
+
+export const StyledCategoryFiltersWrapper = styled.div`
+    flex: 1;
+    display: flex;
+    justify-content: end;
+`;

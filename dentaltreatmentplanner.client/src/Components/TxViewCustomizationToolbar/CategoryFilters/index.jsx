@@ -1,19 +1,36 @@
-import {
-    StyledFiltersContainer
-} from "./index.style";
-import Checkbox from "../../Common/Checkbox/index";
+import React from 'react';
+import { StyledFiltersContainer } from "./index.style";
+import CustomCheckbox from "../../../Components/Common/Checkbox/index";
+import useSortContext from '../../../Contexts/SortContext/useSortContext';
 
 const CategoryFilters = () => {
+    const { activeTxCategories, selectedCategories, updateSelectedCategories, toggleSelectAll } = useSortContext();
+
+    const isAllSelected = selectedCategories.size === activeTxCategories.length;
+
     const filters = [
-        { label: 'Crowns', checked: false },
-        { label: 'Fillings', checked: false },
-        { label: 'Select All', checked: false },
+        ...activeTxCategories.map(category => ({ label: category, checked: selectedCategories.has(category) })),
+        { label: 'Select All', checked: isAllSelected },
     ];
+
+    const handleCheckboxChange = (event, label) => {
+        if (label === 'Select All') {
+            toggleSelectAll(!isAllSelected);
+        } else {
+            updateSelectedCategories(label);
+        }
+    };
+
 
     return (
         <StyledFiltersContainer>
             {filters.map((filter, index) => (
-                <Checkbox key={index} label={filter.label} defaultChecked={filter.checked} />
+                <CustomCheckbox
+                    key={index}
+                    label={filter.label}
+                    checked={filter.checked}
+                    onChange={(e) => handleCheckboxChange(e, filter.label)} 
+                />
             ))}
         </StyledFiltersContainer>
     );

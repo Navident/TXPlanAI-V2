@@ -35,7 +35,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const { selectedPatient, refreshPatientTreatmentPlans, facilityPayerCdtCodeFees } = useBusiness();
     const { selectedPayer } = useTreatmentPlan();
     const [hasEdits, setHasEdits] = useState(false);
-    const { alignment } = useSortContext();
+    const { alignment, selectedCategories } = useSortContext();
     const prevAlignmentRef = useRef();
     const [initialRenderComplete, setInitialRenderComplete] = useState(false);
 
@@ -77,7 +77,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         setLocalUpdatedVisits(treatmentPlan.visits);
     }, [treatmentPlan.visits]);
 
-    const sortVisitsByCategory = (visits) => {
+    const sortVisitsByCategory = (visits, selectedCategories) => {
         let categoryGroups = {};
 
         visits.forEach(visit => {
@@ -122,7 +122,9 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         });
 
         // Convert grouped CDT codes into format for combined visits by category
-        const combinedVisitsByCategory = Object.values(categoryGroups).map(category => {
+        const combinedVisitsByCategory = Object.values(categoryGroups)
+            .filter(category => selectedCategories.has(category.procedureCategoryName)) // Filter based on selected categories
+            .map(category => {
             // Sort combinedCdtCodes within each category
             category.cdtCodes.sort((a, b) =>
                 a.originLineIndex - b.originLineIndex ||
@@ -175,9 +177,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     };
 
     const updateStateWithSortedVisits = (sortedVisits) => {
-
         console.log("sortedVisits in updateStateWithSortedVisits:", JSON.parse(JSON.stringify(sortedVisits)));
-
 
         // Update `localUpdatedVisits` with sorted visits
         setLocalUpdatedVisits(sortedVisits);
@@ -204,12 +204,12 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     };
 
     useEffect(() => {
-        if (!alignment || !treatmentPlan.visits || !initialRenderComplete) return;
+        if (!alignment || !treatmentPlan.visits || !initialRenderComplete || !selectedCategories) return;
 
         let sortedVisits;
         if (alignment === 'category') {
             // Logic for sorting by category
-            sortedVisits = sortVisitsByCategory(treatmentPlan.visits);
+            sortedVisits = sortVisitsByCategory(treatmentPlan.visits, selectedCategories);
         } else if (alignment === 'default') {
             // Only execute sortVisitsIntoOne if previous alignment was 'category'
             sortedVisits = sortVisitsIntoOne(treatmentPlan.visits);
@@ -221,9 +221,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         // Update the state with these sorted visits
         updateStateWithSortedVisits(sortedVisits);
 
-        // Update the previous alignment value for the next render
-        prevAlignmentRef.current = alignment;
-    }, [alignment, treatmentPlan.visits]);
+    }, [alignment, treatmentPlan.visits, selectedCategories]); 
 
 
 

@@ -1,5 +1,7 @@
 import {
-    StyledTxToolbarContainer
+    StyledTxToolbarContainer,
+    StyledCategoryFiltersWrapper,
+    StyledToggleButtonGroupWrapper
 } from "./index.style";
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import CategoryFilters from "./CategoryFilters/index";
@@ -38,20 +40,25 @@ const TxViewCustomizationToolbar = () => {
 
     return (
         <>
-        <div ref={sentinelRef} style={{ height: '1px' }}></div>
-        <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
-                <ToggleButtonGroup  />
-            <CategoryFilters />
-            <RoundedButton
-                text="Group"
-                backgroundColor={UI_COLORS.light_grey2}
-                textColor="white"
-                border={false}
-                borderRadius="4px"
-                height="39px"
-                width="280px"
-                //onClick={() => addNewRow(visitId)}
-            />
+            <div ref={sentinelRef} style={{ height: '1px' }}></div>
+            <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
+                <div style={{ flex: 1 }}>
+                    <RoundedButton
+                        text="Group"
+                        backgroundColor={UI_COLORS.light_grey2}
+                        textColor="white"
+                        border={false}
+                        borderRadius="4px"
+                        height="39px"
+                        width="200px"
+                    />
+                </div>
+                <StyledToggleButtonGroupWrapper>
+                    <ToggleButtonGroup />
+                </StyledToggleButtonGroupWrapper>
+                <StyledCategoryFiltersWrapper>
+                    <CategoryFilters />
+                </StyledCategoryFiltersWrapper>
             </StyledTxToolbarContainer>
         </>
     );

@@ -26,7 +26,7 @@ const GenerateTreatmentPlan = () => {
         selectedPayer,
         showAlert,
     } = useTreatmentPlan();
-    const { alignment } = useSortContext();
+    const { alignment, initActiveTxCategories } = useSortContext();
 
     const [inputText, setInputText] = useState("");
 
@@ -38,18 +38,6 @@ const GenerateTreatmentPlan = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     
-
-
-    useEffect(() => {
-        if (treatmentPlanId) {
-            getTreatmentPlanById(treatmentPlanId).then((fetchedPlan) => {
-                if (fetchedPlan) {
-                    setTreatmentPlan(fetchedPlan);
-                }
-            });
-        }
-    }, [treatmentPlanId, setTreatmentPlans]);
-
     useEffect(() => {
         if (selectedPayer) {
             fetchFacilityPayerCdtCodeFees(selectedPayer.payerId);
@@ -199,6 +187,15 @@ const GenerateTreatmentPlan = () => {
         return combinedVisitsByCategory; 
     }
 
+    function extractActiveTxCategories(visits) {
+        const uniqueCategories = visits.reduce((acc, visit) => {
+            acc.add(visit.procedureCategoryName);
+            return acc;
+        }, new Set());
+
+        return Array.from(uniqueCategories);
+    }
+
 
     // Main function to generate treatment plan
     const handleGenerateTreatmentPlan = async () => {
@@ -216,6 +213,12 @@ const GenerateTreatmentPlan = () => {
         try {
             const treatmentEntries = await preprocessInputText(inputText);
             const allVisits = await fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans);
+            //extract all of the unique categories into an array/list 
+            console.log("allVisits in handleGenerateTreatmentPlan", allVisits);
+            const activeTxCategories = extractActiveTxCategories(allVisits);
+            console.log("activeTxCategories", activeTxCategories);
+            initActiveTxCategories(activeTxCategories);
+
             let combinedTreatmentPlan;
             if (alignment === 'category') {
                 const combinedVisits = combineVisitsByCategory(allVisits);
