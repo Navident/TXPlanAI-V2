@@ -6,6 +6,7 @@ export const SortProvider = ({ children }) => {
     const [alignment, setAlignment] = useState('default');
     const [activeTxCategories, setActiveTxCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState(new Set());
+    const [initialRenderComplete, setInitialRenderComplete] = useState(false); 
 
     useEffect(() => { //select all categories when they are fetched / updated
         setSelectedCategories(new Set(activeTxCategories));
@@ -43,12 +44,17 @@ export const SortProvider = ({ children }) => {
         });
     };
 
+    const setRenderComplete = (value) => {
+        setInitialRenderComplete(value);
+    };
+
     return (
         <SortContext.Provider value={{
             alignment, setAlignment,
             handleAlignmentChange,
             activeTxCategories, initActiveTxCategories,
-            selectedCategories, updateSelectedCategories, toggleSelectAll
+            selectedCategories, updateSelectedCategories, toggleSelectAll,
+            initialRenderComplete, setRenderComplete
         }}>
             {children}
         </SortContext.Provider>

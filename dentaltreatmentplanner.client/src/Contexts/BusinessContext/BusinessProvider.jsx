@@ -134,7 +134,7 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching payer specific fees:', error);
         }
-    }, []); // Add any dependencies here. If the function does not depend on anything that changes, you can leave the dependency array empty.
+    }, []); 
 
 
     //this function will get the payer fees for a selected treatment plan

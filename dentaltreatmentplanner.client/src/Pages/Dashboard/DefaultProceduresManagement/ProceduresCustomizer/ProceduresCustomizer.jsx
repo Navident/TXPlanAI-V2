@@ -69,9 +69,9 @@ const ProceduresCustomizer = () => {
 			<GoBack text="Go Back" />
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
-					<StyledTableLabelText>Procedure Category: {treatmentPlans[0].procedureCategoryName}</StyledTableLabelText>
+					<StyledTableLabelText>Procedure Category: {treatmentPlans.length > 0 ? treatmentPlans[0].procedureCategoryName : 'N/A'}</StyledTableLabelText>
 					
-					<StyledTableLabelText>Procedure Sub-Category: {treatmentPlans[0].procedureSubCategoryName}</StyledTableLabelText>
+					<StyledTableLabelText>Procedure Sub-Category: {treatmentPlans.length > 0 ? treatmentPlans[0].procedureSubCategoryName : 'N/A'}</StyledTableLabelText>
 
 					<div>
 						{treatmentPlans.length > 0 &&

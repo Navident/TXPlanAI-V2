@@ -35,9 +35,8 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
     const { selectedPatient, refreshPatientTreatmentPlans, facilityPayerCdtCodeFees } = useBusiness();
     const { selectedPayer } = useTreatmentPlan();
     const [hasEdits, setHasEdits] = useState(false);
-    const { alignment, selectedCategories } = useSortContext();
-    const prevAlignmentRef = useRef();
-    const [initialRenderComplete, setInitialRenderComplete] = useState(false);
+    const { alignment, selectedCategories, initialRenderComplete, setRenderComplete  } = useSortContext();
+    
 
     useEffect(() => {
         console.log("Received treatmentPlan:", treatmentPlan);
@@ -49,7 +48,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
 
     useEffect(() => {
         if (treatmentPlan && treatmentPlan.visits && treatmentPlan.visits.length > 0) {
-            setInitialRenderComplete(true);
+            setRenderComplete(true);
         }
     }, [treatmentPlan]);
 
@@ -838,6 +837,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
         }
     };
 
+    const columnWidths = ['5%', '10%', '10%', '45%', '15%', '15%', '5%'];
 
     const renderVisit = (visitId, index) => {
         console.log(`Rendering visit: visitId=${visitId}, index=${index}`);
@@ -877,6 +877,7 @@ const TreatmentPlanOutput = ({ treatmentPlan, treatmentPlans, onAddVisit, onUpda
                             deleteImageIconSrcHeader={deleteIcon}
                             dragImageIconSrc={dragIcon}
                             onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
+                            columnWidths={columnWidths} 
                         />
                     </div>
                 )}

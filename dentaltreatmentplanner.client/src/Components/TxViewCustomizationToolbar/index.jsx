@@ -9,11 +9,13 @@ import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { UI_COLORS } from '../../Theme';
 import { useState, useEffect, useRef } from 'react';
 import ToggleButtonGroup from "../../Components/Common/ToggleButtonGroup/index";
+import useSortContext from '../../Contexts/SortContext/useSortContext';
 
 const TxViewCustomizationToolbar = () => {
     const [isSticky, setIsSticky] = useState(false);
     const toolbarRef = useRef(null);
     const sentinelRef = useRef(null); 
+    const { alignment, initialRenderComplete } = useSortContext();
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -56,9 +58,13 @@ const TxViewCustomizationToolbar = () => {
                 <StyledToggleButtonGroupWrapper>
                     <ToggleButtonGroup />
                 </StyledToggleButtonGroupWrapper>
+                
                 <StyledCategoryFiltersWrapper>
-                    <CategoryFilters />
+                    {alignment === 'category' && initialRenderComplete && (
+                        <CategoryFilters />
+                    )}
                 </StyledCategoryFiltersWrapper>
+                
             </StyledTxToolbarContainer>
         </>
     );

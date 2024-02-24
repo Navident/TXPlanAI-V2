@@ -12,6 +12,7 @@ import { useBusiness } from '../../../../Contexts/BusinessContext/useBusiness';
 import pencilEditIcon from '../../../../assets/pencil-edit-icon.svg';
 import { updateFacilityPayerCdtCodeFees } from '../../../../ClientServices/apiService';
 import SaveButtonRow from "../../../../Components/Common/SaveButtonRow/index";
+import { CircularProgress } from "@mui/material";
 
 const EditFacilityFeeScheduling = () => {
     const { payerId } = useParams();
@@ -19,7 +20,6 @@ const EditFacilityFeeScheduling = () => {
     const initialPayerName = location.state?.payerName || 'Unknown Payer';
     const [payerNameInputText, setPayerNameInputText] = useState(initialPayerName);
     const [searchInputText, setSearchInputText] = useState('');
-    const [rowsData, setRowsData] = useState([]);
     const headers = ["CDT Code", "Description", "UCR Fee", "Discount Fee", ""];
     const columnWidths = ['20%', '45%', '15%', '15%', '5%'];
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
@@ -28,8 +28,9 @@ const EditFacilityFeeScheduling = () => {
     const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchPayers , fetchFacilityPayerCdtCodeFees, activeCdtCodes } = useBusiness(); 
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
-
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
+        setIsLoading(true);
         fetchFacilityPayerCdtCodeFees(payerId);
     }, [payerId]);
 
@@ -56,7 +57,7 @@ const EditFacilityFeeScheduling = () => {
                     _inactiveRowsData.push(rowData);
                 }
             });
-
+            setIsLoading(false);
             setActiveRowsData(_activeRowsData);
             setInactiveRowsData(_inactiveRowsData);
         }
@@ -271,7 +272,6 @@ const EditFacilityFeeScheduling = () => {
         <div className="procedure-customizer-wrapper">
             <div className="dashboard-right-side-row">
                 <GoBack text="Go Back" />
-
                 <TextField
                     className="rounded-box"
                     placeholder="Search CDT Codes"
@@ -308,7 +308,12 @@ const EditFacilityFeeScheduling = () => {
                 />
             </div>
             <StyledRoundedBoxContainer>
-                <StyledRoundedBoxContainerInner>
+                {isLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <CircularProgress style={{ color: "rgb(119, 119, 161)" }} />
+                    </div>
+                ) : (
+                    <StyledRoundedBoxContainerInner>
                         <SaveButtonRow onSave={saveFacilityPayerCdtCodeFeesChanges}>
                             <StandardTextfield
                                 value={payerNameInputText}
@@ -317,15 +322,16 @@ const EditFacilityFeeScheduling = () => {
                                 width="300px"
                             />
                         </SaveButtonRow>
-                    <StyledTableLabelText>Active CDT Codes</StyledTableLabelText>
-                    <UniversalTable headers={headers} rows={activeTableRows} columnWidths={columnWidths} />
-                    <StyledTableLabelText>Inactive CDT Codes</StyledTableLabelText>
-                    <UniversalTable headers={headers} rows={inactiveTableRows} columnWidths={columnWidths} />
-
-                </StyledRoundedBoxContainerInner>
+                        <StyledTableLabelText>Active CDT Codes</StyledTableLabelText>
+                        <UniversalTable headers={headers} rows={activeTableRows} columnWidths={columnWidths} />
+                        <StyledTableLabelText>Inactive CDT Codes</StyledTableLabelText>
+                        <UniversalTable headers={headers} rows={inactiveTableRows} columnWidths={columnWidths} />
+                    </StyledRoundedBoxContainerInner>
+                )}
             </StyledRoundedBoxContainer>
         </div>
     );
+
 };
 
 export default EditFacilityFeeScheduling;

@@ -3,18 +3,32 @@ import PropTypes from 'prop-types';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { StyledDeleteIcon } from '../../GlobalStyledComponents';
 
-const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, deleteImageIconSrcHeader, dragImageIconSrc, onDeleteRow, onDeleteVisit }) => {
+const Table = ({
+    headers,
+    rows,
+    tableId,
+    enableDragDrop,
+    deleteImageIconSrc,
+    deleteImageIconSrcHeader,
+    dragImageIconSrc,
+    onDeleteRow,
+    onDeleteVisit,
+    columnWidths = [] // Step 1: Add columnWidths prop
+}) => {
     const renderDraggableRow = (rowData, rowIndex) => {
         const isLastRow = rowIndex === rows.length - 1;
         return (
             <Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">
                 {(provided, snapshot) => (
                     <tr ref={provided.innerRef} {...provided.draggableProps} style={{ ...provided.draggableProps.style, borderBottom: snapshot.isDragging ? '1px solid #7777a1' : '' }}>
-                        <td>
+                        <td style={columnWidths[0] ? { width: columnWidths[0] } : {}}> {/* Apply width to the drag icon cell if defined */}
                             {!isLastRow && <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />}
                         </td>
                         {rowData.data.map((cell, cellIndex) => (
-                            <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
+                            // Step 2: Apply width to body cells
+                            <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`} style={columnWidths[cellIndex + 1] ? { width: columnWidths[cellIndex + 1] } : {}}>
+                                {cell}
+                            </td>
                         ))}
                     </tr>
                 )}
@@ -26,16 +40,18 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
         const isLastRow = rowIndex === rows.length - 1;
         return (
             <tr key={`row-${tableId}-${rowIndex}`}>
-                <td>
+                <td style={columnWidths[0] ? { width: columnWidths[0] } : {}}> {/* Apply width to the drag icon cell if defined */}
                     {!isLastRow && <img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" />}
                 </td>
                 {rowData.data.map((cell, cellIndex) => (
-                    <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`}>{cell}</td>
+                    // Apply width to body cells
+                    <td key={`cell-${tableId}-${rowIndex}-${cellIndex}`} style={columnWidths[cellIndex + 1] ? { width: columnWidths[cellIndex + 1] } : {}}>
+                        {cell}
+                    </td>
                 ))}
             </tr>
         );
     };
-
 
     const renderBody = (provided) => (
         <tbody ref={provided ? provided.innerRef : null} {...(provided ? provided.droppableProps : {})}>
@@ -49,12 +65,15 @@ const Table = ({ headers, rows, tableId, enableDragDrop, deleteImageIconSrc, del
             <table className="tx-table">
                 <thead>
                     <tr className="table-inner-header">
-                        <th>
+                        <th style={columnWidths[0] ? { width: columnWidths[0] } : {}}> {/* Apply width to the drag icon column if defined */}
                         </th>
                         {headers.map((header, index) => (
-                            <th key={`header-${index}`}>{header}</th>
+                            // Step 2: Apply width to header cells
+                            <th key={`header-${index}`} style={columnWidths[index + 1] ? { width: columnWidths[index + 1] } : {}}>
+                                {header}
+                            </th>
                         ))}
-                        <th>
+                        <th style={columnWidths[headers.length + 1] ? { width: columnWidths[headers.length + 1] } : {}}> {/* Apply width to the delete icon column if defined */}
                             <StyledDeleteIcon src={deleteImageIconSrcHeader} className="delete-icon" alt="Delete Icon" onClick={onDeleteVisit} />
                         </th>
                     </tr>
