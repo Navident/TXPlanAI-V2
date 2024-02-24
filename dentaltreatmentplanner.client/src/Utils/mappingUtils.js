@@ -71,14 +71,14 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
             visitId: String(visitId).startsWith('temp-') ? null : visitId,
             VisitCdtCodeMaps: validRows.map(row => ({
                 CdtCodeId: row.selectedCdtCode.cdtCodeId,
-                Description: row.description,
+                Description: row.description || null,
                 // Include other properties as per your backend requirements
             })),
         };
     });
 
     const newTreatmentPlanDto = {
-        Description: treatmentPlan.description,
+        Description: treatmentPlan.description || null,
         ProcedureSubcategoryId: treatmentPlan.procedureSubcategoryId,
         ToothNumber: treatmentPlan.toothNumber,
         Visits: newPlanVisits,

@@ -713,7 +713,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     // Create a new treatment plan based on the default
                     TreatmentPlan newTreatmentPlan = new TreatmentPlan
                     {
-                        Description = createNewTxPlanFromDefaultDto.Description,
+                        //Description = createNewTxPlanFromDefaultDto.Description,
                         ProcedureSubcategoryId = createNewTxPlanFromDefaultDto.ProcedureSubcategoryId,
                         FacilityId = facilityId,
                     };
