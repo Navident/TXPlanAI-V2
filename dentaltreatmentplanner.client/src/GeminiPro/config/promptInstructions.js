@@ -4,7 +4,7 @@ Response Format:
 - Respond in JSON format as an array of objects.
 - Each object should contain a 'toothNumber' field prefixed with '#' and a 'treatments' field with an array of treatments.
 - Maintain the sequence of treatments as they appear in the input.
-- If the input is off-topic or cannot be processed, respond with {"error": "Invalid Input Type"}.
+- If the input is off-topic or cannot be processed, respond with [{error: Invalid input - [insert reason that the input is invalid here]}].
 
 Fillings:
 - Posterior teeth: #1-5, 12-21, 28-32.
