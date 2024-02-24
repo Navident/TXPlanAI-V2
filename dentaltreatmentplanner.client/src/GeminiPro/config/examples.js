@@ -1,11 +1,12 @@
-    export const examples = [
+
+    const parts = [
     
       {text: "input: #5 MOD composite"},
       {text: "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"},
-
+      
       {text: "input: #8 DOB5 composite"},
       {text: "output: [{\"toothNumber\": \"#8\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"},
-
+      
       {text: "input: #7 DO composite\n#9 MOB5 composite\n#12 DOL/5 composite"},
       {text: "output: [{\"toothNumber\": \"#7\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#9\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#12\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"},
       
@@ -319,7 +320,7 @@
       {text: "output: [{\"toothNumber\": \"#12\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Crown\"]},\n {\"toothNumber\": \"#29\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Crown\"]}, \n {\"toothNumber\": \"#30\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Crown\"]}]"},
       
       {text: "input: #2 DO comp\n#3 MO comp\n#4 MOD comp\n#6 DF comp\n#7-11 acc crowns\n#11 rct\n#14 MOD comp\n#16-17 surgical ext\n#20 MOD comp\n#24 DL comp\n#25 acc\n#26 DL comp"},
-      {text: "output: [{\"toothNumber\": \"#2\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#3\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Root Canal Anterior\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#16\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#17\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#20\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#25\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#26\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"},
+      {text: "output: [{\"toothNumber\": \"#2\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#3\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Root Canal Pre-Molar\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#16\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#17\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#20\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#25\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#26\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"},
       
       {text: "input: #3 implant with acc\n#19 rct, build up with post, pfm crown"},
       {text: "output: [{\"toothNumber\": \"#3\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Crown\"]}, \n{\"toothNumber\": \"#19\", \"treatments\": [\"Root Canal Molar\", \"Build Up w/ Post\", \"PFM Crown\"]}]"},
@@ -329,8 +330,44 @@
       
       {text: "input: #2 o comp\n#3 acc\n#4 MOD comp\n#5 MOD comp\n#6 DL comp\n#7 MLDL comp\n#11 implant with pfm\n#12 MOD comp\n#13 rct with acc\n#14 RCT with acc\n#15 MO comp\n#18 acc\n#19 acc\n#20 MOD comp\n#21 DO comp\n#28 DO comp\n#29 acc\n#30 rct with acc\n#31 acc"},
       {text: "output: [{\"toothNumber\": \"#2\", \"treatments\": [\"1 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#3\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"4 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]},  {\"toothNumber\": \"#12\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Root Canal Pre-Molar\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Root Canal Molar\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#18\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#19\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#20\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#21\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#28\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#29\", \"treatments\": [\"ACC Crown\"]}, \n{\"toothNumber\": \"#30\", \"treatments\": [\"Root Canal Molar\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#31\", \"treatments\": [\"ACC Crown\"]}]"},
-
+      
+      {text: "input: #5-7 implant bridge with acc\n#9-11 routine exts with implant bridge and acc crowns"},
+      {text: "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Routine Extraction\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"},
+      
+      {text: "input: #5 pfm crown\n#6 MOD comp\n#7-9 pfm bridge"},
+      {text: "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"PFM Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"PFM Retainer Crown\"]}]"},
+      
+      {text: "input: #6 O amal"},
+      {text: "output: [{\"toothNumber\": \"#6\", \"treatments\": [\"1 Surface Amalgam Filling\"]}]"},
+      
+      {text: "input: #12 MO amal"},
+      {text: "output: [{\"toothNumber\": \"#12\", \"treatments\": [\"2 Surface Amalgam Filling\"]}]"},
+      
+      {text: "input: #6 MO comp"},
+      {text: "output: [{\"toothNumber\": \"#6\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #10 MO comp"},
+      {text: "output: [{\"toothNumber\": \"#10\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #23 MOD comp"},
+      {text: "output: [{\"toothNumber\": \"#23\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #25 MO composite"},
+      {text: "output: [{\"toothNumber\": \"#25\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #26 DOB5 comp"},
+      {text: "output: [{\"toothNumber\": \"#26\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #26 DOB5 amal"},
+      {text: "output: [{\"toothNumber\": \"#26\", \"treatments\": [\"3 Surface Amalgam Filling\"]}]"},
+      
+      {text: "input: #27 DOL-5 comp"},
+      {text: "output: [{\"toothNumber\": \"#27\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"},
+      
+      {text: "input: #28 DOL5B5 amal"},
+      {text: "output: [{\"toothNumber\": \"#28\", \"treatments\": [\"4 Surface Amalgam Filling\"]}]"},
+      
       {text: "input: "},
       {text: "output: "},
     ];
-        
+    
