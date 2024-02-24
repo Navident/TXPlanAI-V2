@@ -2,14 +2,14 @@
 //const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
 //const VISITS_API_URL = 'https://localhost:7089/api/visits';
 //const PROCEDURES_API_URL = 'https://localhost:7089/api';
-const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
+const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
 
-const VISITS_API_URL = 'https://localhost:7089/api/visits';
-const PROCEDURES_API_URL = 'https://localhost:7089/api';
+const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
+const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
-const PATIENTS_API_URL = 'https://localhost:7089/api/Patient';
-const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
-const PAYER_API_URL = 'https://localhost:7089/api/payer';
+const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
+const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
+const PAYER_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/payer';
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
