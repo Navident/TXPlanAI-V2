@@ -1,5 +1,5 @@
-
-    const parts = [
+export const examples =
+    [
     
       {text: "input: #5 MOD composite"},
       {text: "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"},
