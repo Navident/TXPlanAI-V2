@@ -23,12 +23,15 @@ import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
 import { SortProvider } from './Contexts/SortContext/SortProvider';
 import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
+import { Provider } from 'react-redux';
+import { store } from './Redux/ReduxStore/store';
 
 function App() {
     return (
         <BusinessProvider>
             <TreatmentPlanProvider>
                 <SortProvider>
+                    <Provider store={store}>
                 <div className="App">
                     <Routes>
                         <Route path="/" element={<Landing />} />
@@ -57,7 +60,8 @@ function App() {
                         <Route path="/customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
                     </Routes>
                     <AlertWrapper />
-                    </div>
+                        </div>
+                    </Provider>
                 </SortProvider>
             </TreatmentPlanProvider>
         </BusinessProvider>

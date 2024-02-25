@@ -63,7 +63,7 @@ export const BusinessProvider = ({ children }) => {
         fetchCustomCdtCodesForFacility();
         fetchPatientsForFacility();
         fetchPayers();
-        fetchCategoriesAndDetails();
+        fetchCategoriesSubcategoriesAndTxPlans();
         fetchAllPatientTreatmentPlansForFacility();
     };
 
@@ -168,7 +168,7 @@ export const BusinessProvider = ({ children }) => {
         }
     };
 
-    const fetchCategoriesAndDetails = async () => {
+    const fetchCategoriesSubcategoriesAndTxPlans = async () => {
         setIsLoading(true);
 
         try {
@@ -187,7 +187,7 @@ export const BusinessProvider = ({ children }) => {
                                 ...plan,
                                 subCategoryName: subCategory.name,
                             }));
-                            allTreatmentPlans = allTreatmentPlans.concat(treatmentPlansWithSubCategoryName); // Use the modified list
+                            allTreatmentPlans = allTreatmentPlans.concat(treatmentPlansWithSubCategoryName);
                             return {
                                 ...subCategory,
                                 treatmentPlans: treatmentPlansWithSubCategoryName,

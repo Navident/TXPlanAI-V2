@@ -7,21 +7,23 @@ import './Dashboard.css';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
+import { useDispatch } from 'react-redux';
+import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import { StyledAppContainer, StyledMainContentWrapper, StyledContentArea  } from '../../GlobalStyledComponents';
-import useTreatmentPlan from '../../Contexts/TreatmentPlanContext/useTreatmentPlan';
 
 const Dashboard = () => {
     const { businessName, categories, isLoading } = useBusiness();
     const navigate = useNavigate();
-    const { showAlert } = useTreatmentPlan(); 
+    const dispatch = useDispatch()
 
     useEffect(() => {
         // Check if the alert has been shown in this session
         if (!sessionStorage.getItem('alertShown')) {
-            showAlert('success', 'Welcome back!');
+            // Dispatch showAlert action with the appropriate payload
+            dispatch(showAlert({ type: 'success', message: 'Welcome back!' }));
             sessionStorage.setItem('alertShown', 'true');
         }
-    },[]);
+    }, [dispatch]);
 
 
     const handleLogoClick = () => {

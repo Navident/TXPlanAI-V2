@@ -13,7 +13,7 @@ Fillings:
 - Material: composite or amalgam.
 
 Crowns:
-- Materials: Porcelain Fused to Metal (PFM), All Ceramic Crown (ACC), Full Metal Crown (FMC).
+- Materials: Porcelain Fused to Metal (pfm), All Ceramic Crown (acc), Full Metal Crown (fmc).
 
 Root Canals:
 - Anterior: #6-11, 22-27.
@@ -31,7 +31,7 @@ CBCT:
 
 Crown Bridges:
 - Components: Retainer Crown, Pontic, Retainer Crown.
-- Retainer Crowns: materials - ACC, PFM, or FMC.
+- Retainer Crowns: materials - acc, pfm, or fmc.
 - If no implant and a bridge is needed, use Retainer Crown.
 - If pontic is between two crowns without specified implants, treat as Retainer Crown.
 - Notation: FPD for bridges.

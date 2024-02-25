@@ -29,7 +29,14 @@
     <Folder Include="src\Pages\Login\" />
     <Folder Include="src\Pages\TreatmentPlanOutput\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
+    <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Theme\" />
     <Folder Include="src\Utils\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptConfiguration Remove="src\ReduxSlices\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="src\ReduxSlices\**" />
   </ItemGroup>
 </Project>
