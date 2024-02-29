@@ -361,7 +361,6 @@ export const getCdtCodes = async () => {
     try {
         const response = await fetch(`${CDT_CODES_API_URL}/defaultcdtcodes`, {
             method: 'GET'
-            // Removed 'Content-Type' header
         });
 
         if (response.ok) {
@@ -371,7 +370,6 @@ export const getCdtCodes = async () => {
                 return data;
             } catch (jsonParseError) {
                 console.error('Failed to parse response as JSON:', jsonParseError);
-                // Handle non-JSON response here
                 return [];
             }
         } else {

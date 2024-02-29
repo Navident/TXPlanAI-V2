@@ -9,13 +9,24 @@ import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { UI_COLORS } from '../../Theme';
 import { useState, useEffect, useRef } from 'react';
 import ToggleButtonGroup from "../../Components/Common/ToggleButtonGroup/index";
-import useSortContext from '../../Contexts/SortContext/useSortContext';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    selectSortBy,
+    selectInitialRenderComplete,
+    toggleGroupActive
+} from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
 
 const TxViewCustomizationToolbar = () => {
+    const dispatch = useDispatch();
     const [isSticky, setIsSticky] = useState(false);
     const toolbarRef = useRef(null);
     const sentinelRef = useRef(null); 
-    const { alignment, initialRenderComplete } = useSortContext();
+    const sortBy = useSelector(selectSortBy);
+    const initialRenderComplete = useSelector(selectInitialRenderComplete);
+
+    const handleGroupClick = () => {
+        dispatch(toggleGroupActive());
+    };
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -44,9 +55,9 @@ const TxViewCustomizationToolbar = () => {
         <>
             <div ref={sentinelRef} style={{ height: '1px' }}></div>
             <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
-                <div style={{ flex: 1 }}>
                     <RoundedButton
                         text="Group"
+                        onClick={handleGroupClick}
                         backgroundColor={UI_COLORS.light_grey2}
                         textColor="white"
                         border={false}
@@ -54,16 +65,6 @@ const TxViewCustomizationToolbar = () => {
                         height="39px"
                         width="200px"
                     />
-                </div>
-                <StyledToggleButtonGroupWrapper>
-                    <ToggleButtonGroup />
-                </StyledToggleButtonGroupWrapper>
-                
-                <StyledCategoryFiltersWrapper>
-                    {alignment === 'category' && initialRenderComplete && (
-                        <CategoryFilters />
-                    )}
-                </StyledCategoryFiltersWrapper>
                 
             </StyledTxToolbarContainer>
         </>

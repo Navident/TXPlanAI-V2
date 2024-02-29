@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer } from '../../ClientServices/apiService';
-
+import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer } from '../../../ClientServices/apiService';
 
 const initialState = {
     defaultCdtCodes: [],
@@ -32,7 +31,9 @@ export const fetchDefaultCdtCodes = createAsyncThunk(
 export const fetchPayersForFacility = createAsyncThunk(
     'cdtCodeAndPayers/fetchPayersForFacility',
     async () => {
+        console.log('Fetching payers for facility...');
         const response = await getPayersForFacility();
+        console.log('Response received:', response);
         return response;
     }
 );
@@ -45,7 +46,6 @@ export const fetchFacilityPayerCdtCodeFeesByPayer = createAsyncThunk(
     }
 );
 
-// Slice definition
 export const cdtCodeAndPayersSlice = createSlice({
     name: 'cdtCodeAndPayers',
     initialState,
@@ -91,6 +91,30 @@ export const cdtCodeAndPayersSlice = createSlice({
     },
 });
 
-export const { resetState } = cdtCodeAndPayersSlice.actions;
+export const { resetState, setSelectedPayer } = cdtCodeAndPayersSlice.actions;
+
+// Selector to get the default CDT codes
+export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;
+
+// Selector to get the facility-specific CDT codes
+export const selectFacilityCdtCodes = (state) => state.cdtCodeAndPayers.facilityCdtCodes;
+
+// Selector to get the payers for the facility
+export const selectPayersForFacility = (state) => state.cdtCodeAndPayers.payers;
+
+// Selector to get the CDT code fees for the selected payer
+export const selectFacilityPayerCdtCodeFees = (state) => state.cdtCodeAndPayers.facilityPayerCdtCodeFees;
+
+// Selector to get the active CDT codes
+export const selectActiveCdtCodes = (state) => state.cdtCodeAndPayers.activeCdtCodes;
+
+// Selector to get the selected payer
+export const selectSelectedPayer = (state) => state.cdtCodeAndPayers.selectedPayer;
+
+// Selector to get the loading state
+export const selectIsLoading = (state) => state.cdtCodeAndPayers.isLoading;
+
+// Selector to get any errors
+export const selectError = (state) => state.cdtCodeAndPayers.error;
 
 export default cdtCodeAndPayersSlice.reducer;

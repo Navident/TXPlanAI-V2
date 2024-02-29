@@ -15,19 +15,28 @@ import {
 } from "../../GlobalStyledComponents";
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
 import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
+import { useSelector, useDispatch } from 'react-redux';
+import {
+	selectPayersForFacility,
+	selectSelectedPayer,
+	setSelectedPayer as setReduxSelectedPayer
+} from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const PatientInfoSection = () => {
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { selectedPatient, payers } = useBusiness();
-	const [selectedPayer, setSelectedPayer] = useState(null);
+	const { selectedPatient } = useBusiness();
+	const payers = useSelector(selectPayersForFacility);
+	console.log("Payers in PatientInfoSection: ", payers);
+	const selectedPayer = useSelector(selectSelectedPayer);
+
 	// Determine which button to show based on the current route
 	const showCreateNewTxPlanButton = location.pathname.includes(
 		"/saved-patient-tx-plans"
 	);
 	const showViewSavedTxPlansButton =
 		location.pathname === "/PatientManagementDashboard";
-	const { updateSelectedPayer } = useTreatmentPlan();
 
 	const handleViewSavedTxPlansClick = () => {
 		if (selectedPatient && selectedPatient.patientId) {
@@ -47,13 +56,12 @@ const PatientInfoSection = () => {
 		navigate(`/PatientManagementDashboard`);
 	};
 
-	const handlePayerSelect = (selectedPayer) => {
+	const handlePayerSelect = (payer) => {
 		const adjustedSelectedPayer = {
-			...selectedPayer,
-			value: selectedPayer.payerId,
+			...payer,
+			value: payer.payerId,
 		};
-		setSelectedPayer(adjustedSelectedPayer);
-		updateSelectedPayer(adjustedSelectedPayer);
+		dispatch(setReduxSelectedPayer(adjustedSelectedPayer));
 	};
 
 	const renderPayerDropdown = () => {
@@ -91,8 +99,8 @@ const PatientInfoSection = () => {
 						<StyledGridItemValueText>
 							{selectedPatient
 								? new Date(selectedPatient.dateOfBirth).toLocaleDateString(
-										"en-CA"
-								  )
+									"en-CA"
+								)
 								: ""}
 						</StyledGridItemValueText>
 					</StyledGridItemLabelAndValueText>

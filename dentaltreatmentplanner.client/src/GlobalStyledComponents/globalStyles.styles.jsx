@@ -47,6 +47,8 @@ export const StyledMainContentWrapper = styled.div`
     display: flex;
     flex-grow: 1;
     padding-top: 80px;
+    max-width: 100vw;
+    width: 100%;
 `;
 
 export const StyledContentArea = styled.div`

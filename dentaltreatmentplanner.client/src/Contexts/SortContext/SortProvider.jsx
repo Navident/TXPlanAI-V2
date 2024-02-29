@@ -3,7 +3,7 @@ import { SortContext } from './SortContext';
 
 export const SortProvider = ({ children }) => {
 
-    const [alignment, setAlignment] = useState('default');
+    const [sortBy, setSortBy] = useState('default');
     const [activeTxCategories, setActiveTxCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState(new Set());
     const [initialRenderComplete, setInitialRenderComplete] = useState(false); 
@@ -12,8 +12,8 @@ export const SortProvider = ({ children }) => {
         setSelectedCategories(new Set(activeTxCategories));
     }, [activeTxCategories]);
 
-    const handleAlignmentChange = (newAlignment) => {
-        setAlignment(newAlignment);
+    const handleSortByChange = (newSortBy) => {
+        setSortBy(newSortBy);
     };
 
     const initActiveTxCategories = (categories) => {
@@ -50,8 +50,8 @@ export const SortProvider = ({ children }) => {
 
     return (
         <SortContext.Provider value={{
-            alignment, setAlignment,
-            handleAlignmentChange,
+            sortBy, setSortBy,
+            handleSortByChange,
             activeTxCategories, initActiveTxCategories,
             selectedCategories, updateSelectedCategories, toggleSelectAll,
             initialRenderComplete, setRenderComplete

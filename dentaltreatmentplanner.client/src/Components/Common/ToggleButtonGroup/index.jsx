@@ -2,21 +2,27 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useState } from "react";
 import { UI_COLORS } from '../../../Theme';
-import useSortContext from '../../../Contexts/SortContext/useSortContext';
+import {
+    setSortBy,
+    selectSortBy
+} from '../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
+import { useDispatch, useSelector } from 'react-redux';
+
 
 const CustomToggleButtonGroup = () => {
-    const { alignment, handleAlignmentChange } = useSortContext();
+    const dispatch = useDispatch();
+    const sortBy = useSelector(selectSortBy);
 
-    const handleChange = (event, newAlignment) => {
-        if (newAlignment !== null) {
-            handleAlignmentChange(newAlignment);
-            console.log("new alignment is: ", newAlignment);
+    const handleChange = (event, newSortBy) => {
+        if (newSortBy !== null) {
+            dispatch(setSortBy(newSortBy));
+            console.log("new sortBy is: ", newSortBy);
         }
     };
 
     return (
         <ToggleButtonGroup
-            value={alignment}
+            value={sortBy}
             exclusive
             onChange={handleChange}
             aria-label="Platform"

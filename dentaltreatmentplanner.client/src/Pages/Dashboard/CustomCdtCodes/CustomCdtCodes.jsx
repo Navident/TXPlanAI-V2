@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import TextField from '@mui/material/TextField';
-import { CircularProgress } from '@mui/material';
 import StandardTextfield from '../../../Components/Common/StandardTextfield/StandardTextfield';
 import UniversalTable from '../../../Components/Common/UniversalTable/UniversalTable';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
@@ -12,8 +11,9 @@ import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
 import { UI_COLORS } from '../../../Theme';
 import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
-import Alert from "../../../Components/Common/Alert/Alert";
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
+import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
+import { useDispatch } from 'react-redux';
 
 const CustomCdtCodes = () => {
     const { facilityCdtCodes } = useBusiness(); 
@@ -24,6 +24,7 @@ const CustomCdtCodes = () => {
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
+    const dispatch = useDispatch()
 
     useEffect(() => {
         let staticRows = [];
@@ -232,16 +233,11 @@ const CustomCdtCodes = () => {
         };
         const response = await updateCustomFacilityCdtCodes(updateData);
         if (response) { 
-            setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved' });
+            dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
         } else {
-            setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
+            dispatch(showAlert({ type: 'error', message: 'Failed to save changes' }));
         }
     };
-
-    const handleCloseAlert = () => {
-        setAlertInfo({ ...alertInfo, open: false });
-    };
-
     return (
         <div className="default-procedure-management-wrapper">
             <div className="dashboard-right-side-row">
@@ -293,14 +289,6 @@ const CustomCdtCodes = () => {
                     <UniversalTable headers={headers} rows={rows} />
                 </StyledRoundedBoxContainerInner>
             </StyledRoundedBoxContainer>
-            {alertInfo.type && (
-                <Alert
-                    open={alertInfo.open}
-                    handleClose={handleCloseAlert}
-                    type={alertInfo.type}
-                    message={alertInfo.message}
-                />
-            )}
         </div>
     );
 };

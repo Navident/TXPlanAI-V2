@@ -11,13 +11,17 @@ import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButto
 import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
 import { UI_COLORS } from '../../../Theme';
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
+import { useSelector, useDispatch } from 'react-redux';
 import Alert from "../../../Components/Common/Alert/Alert";
 import { Outlet } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
+import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
+import { selectPayersForFacility, fetchPayersForFacility } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
+import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const FeeScheduling = () => {
-    const { payers } = useBusiness();
+    const dispatch = useDispatch();
+    const payers = useSelector(selectPayersForFacility);
     const [inputText, setInputText] = useState('');
     const [rowsData, setRowsData] = useState([]);
     const headers = ["Payer", ""];
@@ -229,7 +233,9 @@ const FeeScheduling = () => {
         };
         const response = await updateFacilityPayers(updateData);
         if (response) {
-            setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved' });
+            dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
+            // Re-fetch payers to refresh the global state after successful update
+            dispatch(fetchPayersForFacility());
         } else {
             setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
         }
@@ -301,11 +307,10 @@ const FeeScheduling = () => {
                         />
                     </div>
                     <StyledRoundedBoxContainer>
-                        <StyledRoundedBoxContainerInner>
+                            <StyledRoundedBoxContainerInner>
+                                <SaveButtonRow onSave={updatePayers} gap="120px">
+                                </SaveButtonRow>
                                 <UniversalTable headers={headers} rows={renderRows()} />
-                            <StyledSaveTextBtn onClick={updatePayers}>
-                                Save
-                            </StyledSaveTextBtn>
                         </StyledRoundedBoxContainerInner>
                     </StyledRoundedBoxContainer>
                     {alertInfo.type && (

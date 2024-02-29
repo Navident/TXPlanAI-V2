@@ -1,7 +1,18 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../../ClientServices/apiService';
-import { setCategoriesAndSubcategories } from './categoriesSubcategoriesSlice';
-import { setAllSubcategoryTreatmentPlans } from './treatmentPlansSlice';
+import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../ClientServices/apiService';
+import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
+import { setAllSubcategoryTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { fetchPayersForFacility, } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+
+export const fetchInitialDataIfLoggedIn = createAsyncThunk(
+    'shared/fetchInitialDataIfLoggedIn',
+    async (_, { dispatch }) => {
+        const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        if (isUserLoggedIn) {
+            await dispatch(fetchPayersForFacility());
+        }
+    }
+);
 
 export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
     'shared/fetchCategoriesSubcategoriesAndTxPlans',

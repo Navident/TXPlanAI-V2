@@ -19,6 +19,7 @@
     <Folder Include="src\Components\Common\StandardTextfield\" />
     <Folder Include="src\Components\AlertWrapper\" />
     <Folder Include="src\Components\DropdownHeaderPopup\" />
+    <Folder Include="src\Components\InitialDataLoader\" />
     <Folder Include="src\Components\TxPlansBoxLinesChart\" />
     <Folder Include="src\Components\RecentTxPlans\" />
     <Folder Include="src\Components\TxViewCustomizationToolbar\CategoryFilters\" />
@@ -30,6 +31,7 @@
     <Folder Include="src\Pages\TreatmentPlanOutput\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
+    <Folder Include="src\Redux\ReduxSlices\User\" />
     <Folder Include="src\Theme\" />
     <Folder Include="src\Utils\" />
   </ItemGroup>

@@ -11,10 +11,32 @@ const addVisitToTreatmentPlan = (treatmentPlans, treatmentPlanId, newVisit) => {
 };
 
 const deleteVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, deletedVisitId) => {
+    console.log(`Starting deletion of visit with ID ${deletedVisitId} from treatment plan ${treatmentPlanId}.`);
     return treatmentPlans.map(plan => {
         if (plan.treatmentPlanId === treatmentPlanId) {
             const updatedVisits = plan.visits.filter(visit => visit.visitId !== deletedVisitId);
+            console.log(`Deleted visit ${deletedVisitId}. Updated visits:`, updatedVisits);
             return { ...plan, visits: updatedVisits };
+        }
+        return plan;
+    });
+};
+
+const addCdtCodeToVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visitId, newCdtCode) => {
+    return treatmentPlans.map(plan => {
+        if (plan.treatmentPlanId === treatmentPlanId) {
+            return {
+                ...plan,
+                visits: plan.visits.map(visit => {
+                    if (visit.visitId === visitId) {
+                        return {
+                            ...visit,
+                            cdtCodes: [...visit.cdtCodes, newCdtCode],
+                        };
+                    }
+                    return visit;
+                }),
+            };
         }
         return plan;
     });
@@ -78,6 +100,10 @@ export const treatmentPlansSlice = createSlice({
             const { treatmentPlanId, updatedVisits } = action.payload;
             state.treatmentPlans = updateVisitsInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, updatedVisits);
         },
+        handleAddCdtCode: (state, action) => {
+            const { treatmentPlanId, visitId, newCdtCode } = action.payload;
+            state.treatmentPlans = addCdtCodeToVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, newCdtCode);
+        },
     },
 });
 
@@ -87,7 +113,8 @@ export const {
     setTreatmentPlanId,
     handleAddVisit,
     onDeleteVisit,
-    onUpdateVisitsInTreatmentPlan
+    onUpdateVisitsInTreatmentPlan,
+    handleAddCdtCode
 } = treatmentPlansSlice.actions;
 
 export default treatmentPlansSlice.reducer;

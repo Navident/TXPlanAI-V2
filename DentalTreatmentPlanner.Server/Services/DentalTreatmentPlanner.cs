@@ -1194,13 +1194,16 @@ namespace DentalTreatmentPlanner.Server.Services
         public async Task<IEnumerable<CdtCodeDto>> GetAllDefaultCdtCodesAsync()
         {
             return await _context.CdtCodes
-                .Where(cdtCode => cdtCode.FacilityId == null) 
+                .Where(cdtCode => cdtCode.FacilityId == null)
                 .Select(cdtCode => new CdtCodeDto
                 {
                     CdtCodeId = cdtCode.CdtCodeId,
                     Code = cdtCode.Code,
                     FacilityId = cdtCode.FacilityId,
-                    LongDescription = cdtCode.LongDescription
+                    LongDescription = cdtCode.LongDescription,
+                    CdtCodeSubcategoryId = cdtCode.CdtCodeSubcategoryId,
+                    CdtCodeCategoryId = cdtCode.CdtCodeCategoryId,
+                    CdtCodeCategoryName = cdtCode.CdtCodeCategory.Name 
                 })
                 .ToListAsync();
         }

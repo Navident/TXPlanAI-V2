@@ -1,10 +1,18 @@
 import React from 'react';
 import { StyledFiltersContainer } from "./index.style";
 import CustomCheckbox from "../../../Components/Common/Checkbox/index";
-import useSortContext from '../../../Contexts/SortContext/useSortContext';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    selectActiveTxCategories,
+    selectSelectedCategories,
+    toggleSelectAll,
+    updateSelectedCategories,
+} from '../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
 
 const CategoryFilters = () => {
-    const { activeTxCategories, selectedCategories, updateSelectedCategories, toggleSelectAll } = useSortContext();
+    const dispatch = useDispatch();
+    const activeTxCategories = useSelector(selectActiveTxCategories);
+    const selectedCategories = useSelector(selectSelectedCategories);
 
     const isAllSelected = selectedCategories.size === activeTxCategories.length;
 
@@ -15,9 +23,9 @@ const CategoryFilters = () => {
 
     const handleCheckboxChange = (event, label) => {
         if (label === 'Select All') {
-            toggleSelectAll(!isAllSelected);
+            dispatch(toggleSelectAll(!isAllSelected));
         } else {
-            updateSelectedCategories(label);
+            dispatch(updateSelectedCategories(label));
         }
     };
 

@@ -17,21 +17,22 @@ import CreateNewPatient from './Pages/PatientManagementDashboard/CreateNewPatien
 import SavedPatientTxPlans from './Pages/PatientManagementDashboard/SavedPatientTxPlans/SavedPatientTxPlans';
 import PatientTreatmentPlanCustomizer from './Pages/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
 import AllSavedPatientTxPlans from "./Pages/Dashboard/AllSavedPatientTxPlans/index";
-
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
 import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
-import { SortProvider } from './Contexts/SortContext/SortProvider';
 import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
 import { Provider } from 'react-redux';
 import { store } from './Redux/ReduxStore/store';
-
+import InitialDataLoader from './Components/InitialDataLoader';
+import { enableMapSet } from 'immer';
 function App() {
+
+    enableMapSet();
     return (
         <BusinessProvider>
             <TreatmentPlanProvider>
-                <SortProvider>
-                    <Provider store={store}>
+                <Provider store={store}>
+                    <InitialDataLoader />
                 <div className="App">
                     <Routes>
                         <Route path="/" element={<Landing />} />
@@ -62,7 +63,6 @@ function App() {
                     <AlertWrapper />
                         </div>
                     </Provider>
-                </SortProvider>
             </TreatmentPlanProvider>
         </BusinessProvider>
     );
