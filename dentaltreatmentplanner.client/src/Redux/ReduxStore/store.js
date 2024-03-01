@@ -4,9 +4,11 @@ import treatmentPlansReducer from '../ReduxSlices/TreatmentPlans/treatmentPlansS
 import alertReducer from '../ReduxSlices/Alerts/alertSlice';
 import cdtCodeAndPayersReducer from '../ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import tableViewControlReducer from '../ReduxSlices/TableViewControls/tableViewControlSlice';
+import categoriesSubcategoriesReducer from '../ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 
 export const store = configureStore({
     reducer: {
+        categoriesSubcategories: categoriesSubcategoriesReducer,
         patients: patientsReducer,
         treatmentPlans: treatmentPlansReducer, 
         cdtCodeAndPayers: cdtCodeAndPayersReducer,

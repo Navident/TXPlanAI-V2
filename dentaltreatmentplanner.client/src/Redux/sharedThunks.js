@@ -2,17 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { fetchPayersForFacility, } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { fetchPayersForFacility, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
-export const fetchInitialDataIfLoggedIn = createAsyncThunk(
-    'shared/fetchInitialDataIfLoggedIn',
-    async (_, { dispatch }) => {
-        const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isUserLoggedIn) {
-            await dispatch(fetchPayersForFacility());
-        }
-    }
-);
 
 export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
     'shared/fetchCategoriesSubcategoriesAndTxPlans',
@@ -27,7 +18,7 @@ export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
                     const subCategoriesWithTreatmentPlans = await Promise.all(
                         subCategories.map(async (subCategory) => {
                             const treatmentPlans = await getTreatmentPlansBySubcategory(subCategory.name);
-                            const treatmentPlansWithSubCategoryName = treatmentPlans.map(plan => ({
+                            const treatmentPlansWithSubCategoryName = (treatmentPlans || []).map(plan => ({
                                 ...plan,
                                 subCategoryName: subCategory.name,
                             }));
@@ -35,7 +26,7 @@ export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
                             return {
                                 ...subCategory,
                                 treatmentPlans: treatmentPlansWithSubCategoryName,
-                                treatmentPlansStatus: treatmentPlans.length ? 'fetched' : 'not_fetched',
+                                treatmentPlansStatus: (treatmentPlans || []).length ? 'fetched' : 'not_fetched'
                             };
                         })
                     );
@@ -47,14 +38,51 @@ export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
                 })
             );
 
+            console.log("categoriesWithSubcategories", categoriesWithSubcategories);
             // Dispatch actions to slices with the fetched data
             dispatch(setCategoriesAndSubcategories(categoriesWithSubcategories));
+
+            const extractedCdtCodeIds = extractUniqueCdtCodeIds(categoriesWithSubcategories);
+            dispatch(setActiveCdtCodes(extractedCdtCodeIds));
+            console.log("extractedCdtCodeIds: ", extractedCdtCodeIds);
+
             dispatch(setAllSubcategoryTreatmentPlans(allTreatmentPlans));
 
             return { categoriesWithSubcategories, allTreatmentPlans };
         } catch (error) {
             console.error('Error fetching category data:', error);
             throw error;
+        }
+    }
+);
+
+const extractUniqueCdtCodeIds = (categoriesData) => {
+        const uniqueCdtCodeIds = new Set();
+
+        categoriesData.forEach(category => {
+            category.subCategories?.forEach(subCategory => {
+                subCategory.treatmentPlans?.forEach(treatmentPlan => {
+                    treatmentPlan.visits?.forEach(visit => {
+                        visit.cdtCodes?.forEach(cdtCode => {
+                            uniqueCdtCodeIds.add(cdtCode.cdtCodeId);
+                        });
+                    });
+                });
+            });
+        });
+
+        return Array.from(uniqueCdtCodeIds);
+};
+
+export const fetchInitialDataIfLoggedIn = createAsyncThunk(
+    'shared/fetchInitialDataIfLoggedIn',
+    async (_, { dispatch }) => {
+        const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        if (isUserLoggedIn) {
+            await Promise.all([
+                dispatch(fetchPayersForFacility()),
+                dispatch(fetchCategoriesSubcategoriesAndTxPlans())
+            ]);
         }
     }
 );

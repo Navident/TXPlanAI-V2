@@ -41,6 +41,8 @@ const Table = ({
 
 	const renderDraggableRow = (rowData, rowIndex) => {
 		const isLastRow = rowIndex === rows.length - 1;
+		const rowBackgroundColor = rowData.backgroundColor || "transparent";
+		console.log("rowBackgroundColor", rowBackgroundColor);
 		return (
 			<Draggable
 				key={`row-${tableId}-${rowIndex}`}
@@ -55,6 +57,7 @@ const Table = ({
 						style={{
 							...provided.draggableProps.style,
 							borderBottom: snapshot.isDragging ? "1px solid #7777a1" : "",
+							backgroundColor: rowBackgroundColor,
 						}}
 					>
 						<td style={columnWidths[0] ? { width: columnWidths[0] } : {}}>

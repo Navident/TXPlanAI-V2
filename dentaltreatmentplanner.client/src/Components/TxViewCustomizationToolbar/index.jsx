@@ -65,7 +65,7 @@ const TxViewCustomizationToolbar = () => {
                         height="39px"
                         width="200px"
                     />
-                
+                <CategoryFilters />
             </StyledTxToolbarContainer>
         </>
     );

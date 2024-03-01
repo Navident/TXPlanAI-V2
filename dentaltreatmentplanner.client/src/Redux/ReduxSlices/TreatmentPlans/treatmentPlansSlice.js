@@ -66,6 +66,16 @@ export const treatmentPlansSlice = createSlice({
         setAllSubcategoryTreatmentPlans: (state, action) => {
             state.allSubcategoryTreatmentPlans = action.payload;
         },
+        updateSubcategoryTreatmentPlan: (state, action) => {
+            const updatedPlan = action.payload;
+            // Loop through all subcategory treatment plans to find and update the specific plan
+            state.allSubcategoryTreatmentPlans = state.allSubcategoryTreatmentPlans.map(plan => {
+                if (plan.treatmentPlanId === updatedPlan.treatmentPlanId) {
+                    return updatedPlan; // Replace with the updated plan
+                }
+                return plan;
+            });
+        },
         // Action to set patient treatment plans
         setPatientTreatmentPlans: (state, action) => {
             state.patientTreatmentPlans = action.payload;
@@ -108,13 +118,30 @@ export const treatmentPlansSlice = createSlice({
 });
 
 export const {
-    setAllSubcategoryTreatmentPlans,
+    setAllSubcategoryTreatmentPlans, updateSubcategoryTreatmentPlan,
     setTreatmentPlans,
     setTreatmentPlanId,
     handleAddVisit,
     onDeleteVisit,
     onUpdateVisitsInTreatmentPlan,
-    handleAddCdtCode
+    handleAddCdtCode,
 } = treatmentPlansSlice.actions;
+
+// Selector to get all treatment plans
+export const selectAllTreatmentPlans = (state) => state.treatmentPlans.treatmentPlans;
+
+// Selector to get a specific treatment plan by ID
+export const selectTreatmentPlanById = (state, treatmentPlanId) =>
+    state.treatmentPlans.treatmentPlans.find(plan => plan.treatmentPlanId === treatmentPlanId);
+
+// Selector to get the loading state
+export const selectLoadingState = (state) => state.treatmentPlans.isLoading;
+
+// Selector to get patient treatment plans
+export const selectPatientTreatmentPlans = (state) => state.treatmentPlans.patientTreatmentPlans;
+
+// Selector to get all subcategory treatment plans
+export const selectAllSubcategoryTreatmentPlans = (state) => state.treatmentPlans.allSubcategoryTreatmentPlans;
+
 
 export default treatmentPlansSlice.reducer;

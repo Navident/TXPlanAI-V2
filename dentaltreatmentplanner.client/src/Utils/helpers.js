@@ -16,10 +16,13 @@ export const sortTreatmentPlan = (treatmentPlan) => {
     console.log("Sorted Visits:", sortedVisits);
 
     const sortedCdtCodes = sortedVisits.reduce((acc, visit) => {
-        const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+        // Make a copy of cdtCodes before sorting to avoid mutating the original array
+        const cdtCodes = Array.isArray(visit.cdtCodes) ? [...visit.cdtCodes] : [];
+        // Now sorting the copy, which won't throw an error
         acc[visit.visitId] = cdtCodes.sort((a, b) => a.order - b.order);
         return acc;
     }, {});
+
 
     console.log("Sorted CDT Codes:", sortedCdtCodes);
 

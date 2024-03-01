@@ -19,7 +19,7 @@ export const BusinessProvider = ({ children }) => {
     const [facilityCdtCodes, setFacilityCdtCodes] = useState([]);
     const [payers, setPayers] = useState([]);
     const [facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees] = useState([]);
-    const [activeCdtCodes, setActiveCdtCodes] = useState([]);
+    //const [activeCdtCodes, setActiveCdtCodes] = useState([]);
 
     //state hooks for categories and loading
     const [categories, setCategories] = useState([]);
@@ -27,7 +27,7 @@ export const BusinessProvider = ({ children }) => {
 
     //state hooks for treatment plans
     const [patientTreatmentPlans, setPatientTreatmentPlans] = useState([]);
-    const [subcategoryTreatmentPlans, setSubcategoryTreatmentPlans] = useState([]);
+    //const [subcategoryTreatmentPlans, setSubcategoryTreatmentPlans] = useState([]);
 
     // Effect hook for initializing business name from localStorage
     useEffect(() => {
@@ -53,9 +53,7 @@ export const BusinessProvider = ({ children }) => {
         setFilteredPatients(searchQuery ? patients.filter(patient => patient.name.toLowerCase().includes(searchQuery.toLowerCase())) : patients);
     }, [searchQuery, patients]);
 
-    useEffect(() => {
-        console.log("Updated subcategory treatment plans: ", subcategoryTreatmentPlans);
-    }, [subcategoryTreatmentPlans]);
+
 
     // Fetching initial data required by the application
     const fetchInitialData = async () => {
@@ -63,7 +61,7 @@ export const BusinessProvider = ({ children }) => {
         fetchCustomCdtCodesForFacility();
         fetchPatientsForFacility();
         fetchPayers();
-        fetchCategoriesSubcategoriesAndTxPlans();
+        //fetchCategoriesSubcategoriesAndTxPlans();
         fetchAllPatientTreatmentPlansForFacility();
     };
 
@@ -79,7 +77,7 @@ export const BusinessProvider = ({ children }) => {
         setFacilityCdtCodes([]);
         setPayers([]);
         setFacilityPayerCdtCodeFees([]);
-        setActiveCdtCodes([]);
+        //setActiveCdtCodes([]);
         setCategories([]);
         setIsLoading(false);
         setPatientTreatmentPlans([]);
@@ -168,7 +166,7 @@ export const BusinessProvider = ({ children }) => {
         }
     };
 
-    const fetchCategoriesSubcategoriesAndTxPlans = async () => {
+/*    const fetchCategoriesSubcategoriesAndTxPlans = async () => {
         setIsLoading(true);
 
         try {
@@ -216,9 +214,9 @@ export const BusinessProvider = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    };*/
 
-    const extractUniqueCdtCodeIds = (categoriesData) => {
+/*    const extractUniqueCdtCodeIds = (categoriesData) => {
         const uniqueCdtCodeIds = new Set();
 
         categoriesData.forEach(category => {
@@ -234,7 +232,7 @@ export const BusinessProvider = ({ children }) => {
         });
 
         return Array.from(uniqueCdtCodeIds);
-    };
+    };*/
 
 
 
@@ -272,13 +270,13 @@ export const BusinessProvider = ({ children }) => {
             categories,
             isLoading,
             fetchFacilityPayerCdtCodeFees,
-            activeCdtCodes, setActiveCdtCodes,
+            //activeCdtCodes, setActiveCdtCodes,
             resetAppStates,
             patientTreatmentPlans, setPatientTreatmentPlans,
             fetchFeesForTreatmentPlan,
             refreshPatientTreatmentPlans,
             fetchPayers,
-            subcategoryTreatmentPlans, setSubcategoryTreatmentPlans
+            //subcategoryTreatmentPlans, setSubcategoryTreatmentPlans
             
         }}>
             {children}

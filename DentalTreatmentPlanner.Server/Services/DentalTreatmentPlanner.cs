@@ -641,7 +641,9 @@ namespace DentalTreatmentPlanner.Server.Services
                     var treatmentPlan = await _context.TreatmentPlans
                         .Include(tp => tp.Visits)
                             .ThenInclude(v => v.VisitCdtCodeMaps)
+                                .ThenInclude(vcm => vcm.CdtCode) 
                         .FirstOrDefaultAsync(tp => tp.TreatmentPlanId == updateTreatmentPlanDto.TreatmentPlanId);
+
 
                     if (treatmentPlan == null)
                     {

@@ -17,7 +17,6 @@ import {
 } from "../../Utils/mappingUtils";
 import deleteIcon from "../../assets/delete-x.svg";
 import dragIcon from "../../assets/drag-icon.svg";
-import Alert from "../../Components/Common/Alert/Alert";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import TreatmentPlanContext from "../../Contexts/TreatmentPlanContext/TreatmentPlanContext";
 import {
@@ -34,7 +33,6 @@ import {
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
-import { sortTreatmentPlan } from "../../Utils/helpers";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
@@ -42,10 +40,14 @@ import {
 	selectCheckedRows,
 	selectIsGroupActive,
 	toggleGroupActive,
-	clearCheckedRows
+	clearCheckedRows,
+	selectSelectedCategories,
+	updateCheckedRows
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
+import { handleAddCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import categoryColorMapping from '../../Utils/categoryColorMapping';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -88,6 +90,20 @@ const TreatmentPlanOutput = ({
 
 	const checkedRows = useSelector(selectCheckedRows);
 	const isGroupActive = useSelector(selectIsGroupActive);
+	const selectedCategories = useSelector(selectSelectedCategories); 
+
+	useEffect(() => {
+		const newCheckedRows = [];
+		Object.values(allRows).forEach(visitRows => {
+			visitRows.forEach(row => {
+				if (row.selectedCdtCode && selectedCategories.has(row.selectedCdtCode.originalVisitCategory)) {
+					newCheckedRows.push(row.id); 
+				}
+			});
+		});
+		dispatch(updateCheckedRows(newCheckedRows)); 
+	}, [selectedCategories, allRows, dispatch]);
+
 
 	useEffect(() => {
 		if (isGroupActive) {
@@ -97,7 +113,7 @@ const TreatmentPlanOutput = ({
 	}, [isGroupActive, checkedRows]); 
 
 	useEffect(() => {
-		console.log("Received treatmentPlan:", treatmentPlan);
+		console.log("current treatmentPlan:", treatmentPlan);
 	}, [treatmentPlan]);
 
 	useEffect(() => {
@@ -288,6 +304,21 @@ const TreatmentPlanOutput = ({
 		};
 	};
 
+	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
+		return {
+			cdtCodeId: selectedCdtCode.cdtCodeId,
+			code: selectedCdtCode.code,
+			longDescription: selectedCdtCode.longDescription,
+			order: 0, 
+			orderWithinVisit: 0, 
+			originLineIndex: 0, 
+			procedureTypeId: null, 
+			toothNumber: null, 
+			visitId: visitId, 
+		};
+	};
+
+
 	const convertToStaticRow = (
 		currentRow,
 		visitId,
@@ -302,6 +333,13 @@ const TreatmentPlanOutput = ({
 				: currentRow.description);
 		const ucrFee = currentRow.extraRowInput[2];
 		const discountFee = currentRow.extraRowInput[3];
+
+		const newCdtCode = createNewCdtCodeObject(selectedCdtCode, visitId);
+		console.log('treatment plan just before dispatch', treatmentPlan );
+
+		console.log('Dispatching action to add CDT code', { treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode });
+
+		dispatch(handleAddCdtCode({ treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode }));
 
 		return {
 			...currentRow,
@@ -876,9 +914,16 @@ const TreatmentPlanOutput = ({
 		}
 		rowData.push(lastCellContent);
 
+		// Determine if the row is checked
+		const isRowChecked = checkedRows.includes(row.id);
+		// Determine the category and corresponding background color
+		const category = row.selectedCdtCode?.originalVisitCategory; // Adjust based on your data structure
+		const backgroundColor = isRowChecked && category ? categoryColorMapping[category] : null;
+
 		return {
 			id: row.id,
 			data: rowData,
+			backgroundColor,
 		};
 	};
 

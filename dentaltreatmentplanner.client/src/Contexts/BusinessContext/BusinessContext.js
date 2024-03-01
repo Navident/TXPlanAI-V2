@@ -21,6 +21,6 @@ export const BusinessContext = createContext({
     setPayers: () => { },
     facilityPayerCdtCodeFees: [],
     setFacilityPayerCdtCodeFees: () => { },
-    activeCdtCodes: [],
-    setActiveCdtCodes: () => { },
+    //activeCdtCodes: [],
+    //setActiveCdtCodes: () => { },
 });

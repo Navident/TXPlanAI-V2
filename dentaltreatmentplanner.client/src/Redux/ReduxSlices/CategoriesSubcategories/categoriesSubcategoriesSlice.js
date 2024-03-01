@@ -13,4 +13,6 @@ export const categoriesSubcategoriesSlice = createSlice({
 
 export const { setCategoriesAndSubcategories } = categoriesSubcategoriesSlice.actions;
 
+export const selectCategoriesAndSubcategories = (state) => state.categoriesSubcategories.categories;
+
 export default categoriesSubcategoriesSlice.reducer;

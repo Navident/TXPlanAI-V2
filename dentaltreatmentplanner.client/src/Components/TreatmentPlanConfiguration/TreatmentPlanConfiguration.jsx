@@ -37,7 +37,8 @@ import {
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
-import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
+import { handleAddCdtCode, updateSubcategoryTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useSelector, useDispatch } from "react-redux";
 
 const TreatmentPlanConfiguration = ({
 	treatmentPlan,
@@ -48,6 +49,8 @@ const TreatmentPlanConfiguration = ({
 	showToothNumber,
 	isInGenerateTreatmentPlanContext,
 }) => {
+	const dispatch = useDispatch();
+
 	const [allRows, setAllRows] = useState({});
 	const [visitOrder, setVisitOrder] = useState([]);
 	const [deletedRowIds, setDeletedRowIds] = useState([]);
@@ -59,7 +62,6 @@ const TreatmentPlanConfiguration = ({
 		type: "",
 		message: "",
 	});
-	const [combinedVisits, setCombinedVisits] = useState([]);
 	const { facilityCdtCodes, defaultCdtCodes } = useBusiness();
 	const combinedCdtCodes = useMemo(
 		() => [...defaultCdtCodes, ...facilityCdtCodes],
@@ -75,13 +77,18 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	useEffect(() => {
-		setCombinedVisits(treatmentPlan.visits);
-	}, [treatmentPlan, isInGenerateTreatmentPlanContext]);
+		console.log("treatmentPlans updated:", treatmentPlans);
+	}, [treatmentPlans]);
+
+	useEffect(() => {
+		console.log("cdtcodes state:", combinedCdtCodes);
+	}, [combinedCdtCodes]);
+
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
 			const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
-
+			console.log("sortedCdtCodes", sortedCdtCodes);
 			const newAllRows = sortedVisits.reduce((acc, visit) => {
 				const staticRows = sortedCdtCodes[visit.visitId].map((cdtCode, index) =>
 					createStaticRows(cdtCode, visit.visitId, index)
@@ -164,6 +171,20 @@ const TreatmentPlanConfiguration = ({
 		};
 	};
 
+	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
+		return {
+			cdtCodeId: selectedCdtCode.cdtCodeId,
+			code: selectedCdtCode.code,
+			longDescription: selectedCdtCode.longDescription,
+			order: 0,
+			orderWithinVisit: 0,
+			originLineIndex: 0,
+			procedureTypeId: null,
+			toothNumber: null,
+			visitId: visitId,
+		};
+	};
+
 	const convertToStaticRow = (
 		currentRow,
 		visitId,
@@ -176,13 +197,6 @@ const TreatmentPlanConfiguration = ({
 			(selectedCdtCode
 				? selectedCdtCode.longDescription
 				: currentRow.description);
-
-		console.log(
-			"selectedcdtcode: ",
-			selectedCdtCode,
-			"originalDescription: ",
-			originalDescription
-		);
 
 		return {
 			...currentRow,
@@ -435,7 +449,13 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
+	const getCodeByCdtCodeId = (cdtCodeId) => {
+		const cdtCode = combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
+		return cdtCode ? cdtCode.code : null;
+	};
+
 	const handleUpdateTreatmentPlan = async () => {
+		console.log("Treatment Plan before updating:", treatmentPlan);
 		try {
 			// Check if the treatment plan is a default plan, we only create one if its a default, otherwise we already have one
 			if (treatmentPlan.facilityId === null) {
@@ -561,6 +581,10 @@ const TreatmentPlanConfiguration = ({
 				updateDto
 			);
 
+			adjustUpdatedTreatmentPlanStructure(updatedTreatmentPlan, treatmentPlan);
+
+			dispatch(updateSubcategoryTreatmentPlan(updatedTreatmentPlan));
+
 			onUpdateVisitsInTreatmentPlan(
 				treatmentPlan.treatmentPlanId,
 				updatedVisits
@@ -576,6 +600,40 @@ const TreatmentPlanConfiguration = ({
 			console.error("Error updating treatment plan:", error);
 		}
 	};
+
+	const getCdtCodeDetailsByCdtCodeId = (cdtCodeId) => {
+		return combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
+	};
+
+	const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
+		return visit.visitCdtCodeMaps.map(cdtCodeMap => {
+			const cdtCodeDetails = getCdtCodeDetailsByCdtCodeId(cdtCodeMap.cdtCodeId);
+			return {
+				cdtCodeId: cdtCodeMap.cdtCodeId,
+				code: cdtCodeDetails?.code,
+				longDescription: cdtCodeDetails?.longDescription,
+				createdAt: cdtCodeMap.createdAt,
+				modifiedAt: cdtCodeMap.modifiedAt,
+				order: cdtCodeMap.order,
+				procedureTypeId: cdtCodeMap.procedureTypeId,
+				toothNumber: cdtCodeMap.toothNumber,
+				visitCdtCodeMapId: cdtCodeMap.visitCdtCodeMapId,
+				visitId: cdtCodeMap.visitId,
+			};
+		});
+	};
+
+	const adjustUpdatedTreatmentPlanStructure = (updatedTreatmentPlan, originalTreatmentPlan) => {
+		// Reinsert the category names from the original treatment plan
+		updatedTreatmentPlan.procedureCategoryName = originalTreatmentPlan.procedureCategoryName;
+		updatedTreatmentPlan.procedureSubCategoryName = originalTreatmentPlan.procedureSubCategoryName;
+
+		updatedTreatmentPlan.visits.forEach(visit => {
+			visit.cdtCodes = transformVisitCdtCodeMapsToCdtCodes(visit);
+			delete visit.visitCdtCodeMaps;
+		});
+	};
+
 
 	const lockDimensions = () => {
 		const tables = document.querySelectorAll(".tx-table");

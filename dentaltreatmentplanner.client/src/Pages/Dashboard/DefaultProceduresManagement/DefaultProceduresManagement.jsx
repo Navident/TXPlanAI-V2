@@ -8,6 +8,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import searchIcon from "../../../assets/search-icon.svg";
 import TextField from "@mui/material/TextField";
 import { CircularProgress } from "@mui/material";
+import { useSelector } from 'react-redux';
+import { selectCategoriesAndSubcategories } from '../../../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import {
 	StyledRoundedBoxContainer,
 	StyledLightGreyText,
@@ -16,7 +18,8 @@ import {
 } from "../../../GlobalStyledComponents";
 
 const DefaultProcedures = () => {
-	const { categories, isLoading } = useOutletContext();
+	const { isLoading } = useOutletContext();
+	const categories = useSelector(selectCategoriesAndSubcategories);
 	const [inputText, setInputText] = useState("");
 	const navigate = useNavigate();
 	const [selectedSubcategories, setSelectedSubcategories] = useState({});

@@ -16,8 +16,7 @@ export const tableViewControlSlice = createSlice({
         },
         setActiveTxCategories: (state, action) => {
             state.activeTxCategories = action.payload;
-            // Automatically select all categories upon updating them
-            state.selectedCategories = new Set(action.payload);
+
         },
         toggleSelectAll: (state, action) => {
             if (action.payload) {
@@ -62,6 +61,9 @@ export const tableViewControlSlice = createSlice({
             // Automatically select the new category
             state.selectedCategories.add(newCategory);
         },
+        updateCheckedRows: (state, action) => {
+            state.checkedRows = new Set(action.payload);
+        },
     },
 });
 
@@ -74,7 +76,8 @@ export const {
     toggleRowChecked, clearCheckedRows,
     setInitialRenderComplete,
     toggleGroupActive,
-    addCategory
+    addCategory,
+    updateCheckedRows,
 } = tableViewControlSlice.actions;
 
 //selectors

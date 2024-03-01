@@ -13,6 +13,8 @@ import pencilEditIcon from '../../../../assets/pencil-edit-icon.svg';
 import { updateFacilityPayerCdtCodeFees } from '../../../../ClientServices/apiService';
 import SaveButtonRow from "../../../../Components/Common/SaveButtonRow/index";
 import { CircularProgress } from "@mui/material";
+import { useSelector } from 'react-redux';
+import { selectActiveCdtCodes } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const EditFacilityFeeScheduling = () => {
     const { payerId } = useParams();
@@ -25,10 +27,12 @@ const EditFacilityFeeScheduling = () => {
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
-    const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchPayers , fetchFacilityPayerCdtCodeFees, activeCdtCodes } = useBusiness(); 
+    const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchPayers , fetchFacilityPayerCdtCodeFees } = useBusiness(); 
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const activeCdtCodes = useSelector(selectActiveCdtCodes);
+
     useEffect(() => {
         setIsLoading(true);
         fetchFacilityPayerCdtCodeFees(payerId);

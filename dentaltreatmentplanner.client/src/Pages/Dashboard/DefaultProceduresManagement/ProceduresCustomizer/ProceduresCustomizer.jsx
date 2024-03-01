@@ -14,17 +14,15 @@ import {
 	StyledTableLabelText
 } from "../../../../GlobalStyledComponents";
 import GoBack from "../../../../Components/Common/GoBack/GoBack";
-import { useBusiness } from '../../../../Contexts/BusinessContext/useBusiness';
-
+import { useSelector } from 'react-redux';
+import { selectAllSubcategoryTreatmentPlans } from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 
 const ProceduresCustomizer = () => {
 	const [treatmentPlans, setTreatmentPlans] = useState([]);
 	const params = useParams();
-	console.log("params", params);
-	// Ensure paramsSubcategoryId is a number for accurate comparison
 	const paramsSubcategoryId = Number(params.subcategory);
 	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
-	const { subcategoryTreatmentPlans } = useBusiness();
+	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
 
 	useEffect(() => {
 		// Filter out any null values 

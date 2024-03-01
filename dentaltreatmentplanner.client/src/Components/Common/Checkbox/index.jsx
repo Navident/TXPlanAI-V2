@@ -1,11 +1,9 @@
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { UI_COLORS } from '../../../Theme';
 
-const CustomCheckbox = ({ label, checked, onChange }) => {
-    const grey = UI_COLORS.light_grey2;
 
+const CustomCheckbox = ({ label, checked, onChange, color }) => {
     return (
         <FormGroup>
             <FormControlLabel
@@ -14,9 +12,9 @@ const CustomCheckbox = ({ label, checked, onChange }) => {
                         checked={checked}
                         onChange={onChange}
                         sx={{
-                            color: grey,
+                            color: color,
                             '&.Mui-checked': {
-                                color: grey,
+                                color: color, 
                             },
                         }}
                     />
@@ -26,5 +24,6 @@ const CustomCheckbox = ({ label, checked, onChange }) => {
         </FormGroup>
     );
 };
+
 
 export default CustomCheckbox;

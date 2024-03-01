@@ -54,6 +54,9 @@ export const cdtCodeAndPayersSlice = createSlice({
         setSelectedPayer: (state, action) => {
             state.selectedPayer = action.payload;
         },
+        setActiveCdtCodes: (state, action) => {
+            state.activeCdtCodes = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -91,7 +94,7 @@ export const cdtCodeAndPayersSlice = createSlice({
     },
 });
 
-export const { resetState, setSelectedPayer } = cdtCodeAndPayersSlice.actions;
+export const { resetState, setSelectedPayer, setActiveCdtCodes } = cdtCodeAndPayersSlice.actions;
 
 // Selector to get the default CDT codes
 export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;

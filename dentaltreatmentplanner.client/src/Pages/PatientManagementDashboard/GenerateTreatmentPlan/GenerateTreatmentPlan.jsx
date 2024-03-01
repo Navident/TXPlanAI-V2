@@ -22,17 +22,20 @@ import {
 } from "../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { onDeleteVisit } from "../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice";
+import { selectSelectedPayer } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
+import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
+import { selectAllSubcategoryTreatmentPlans } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 
 const GenerateTreatmentPlan = () => {
 	const {
 		treatmentPlans,
 		setTreatmentPlans,
-		cdtCodes,
 		handleAddVisit,
 		onUpdateVisitsInTreatmentPlan,
-		selectedPayer,
-		showAlert,
 	} = useTreatmentPlan();
+
+	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
+	const selectedPayer = useSelector(selectSelectedPayer);
 
 	const [inputText, setInputText] = useState("");
 	const dispatch = useDispatch();
@@ -40,7 +43,6 @@ const GenerateTreatmentPlan = () => {
 	const {
 		fetchFacilityPayerCdtCodeFees,
 		selectedPatient,
-		subcategoryTreatmentPlans,
 	} = useBusiness();
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +56,15 @@ const GenerateTreatmentPlan = () => {
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);
 	};
+
+	function extractActiveTxCategories(visits) {
+		const uniqueCategories = visits.reduce((acc, visit) => {
+			acc.add(visit.procedureCategoryName);
+			return acc;
+		}, new Set());
+
+		return Array.from(uniqueCategories);
+	}
 
 	// Utility function to preprocess input text and maintain order
 	async function preprocessInputText(inputText) {
@@ -98,8 +109,10 @@ const GenerateTreatmentPlan = () => {
 						cdtCodes: visit.cdtCodes.map((cdtCode) => ({
 							...cdtCode,
 							toothNumber,
+							originalVisitCategory: plan.procedureCategoryName,
 						})),
 						originLineIndex: originalOrder,
+						procedureCategoryName: plan.procedureCategoryName,
 					}));
 
 					allVisits.push(...clonedVisits);
@@ -165,6 +178,9 @@ const GenerateTreatmentPlan = () => {
 				treatmentEntries,
 				subcategoryTreatmentPlans
 			);
+			const activeTxCategories = extractActiveTxCategories(allVisits);
+			dispatch(setActiveTxCategories(activeTxCategories));
+
 			const combinedVisit = combineVisitsIntoOne(allVisits);
 			console.log("combinedVisit", combinedVisit);
 			const combinedTreatmentPlan = { visits: [combinedVisit] };
@@ -248,7 +264,6 @@ const GenerateTreatmentPlan = () => {
 								key={`treatment-plan-${index}`}
 								treatmentPlan={plan}
 								treatmentPlans={treatmentPlans}
-								cdtCodes={cdtCodes}
 								onAddVisit={(newVisit) =>
 									handleAddVisit(plan.treatmentPlanId, newVisit)
 								}
