@@ -768,6 +768,12 @@ export const examples = [
         "text": "output: [{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, {\"toothNumber\": \"#4\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, {\"toothNumber\": \"#7\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"ACC Pontic\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"ACC Pontic\"]}, {\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, {\"toothNumber\": \"#12\", \"treatments\": [\"Root Canal Pre-Molar\", \"PFM Crown\"]}, {\"toothNumber\": \"#29\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, {\"toothNumber\": \"#30\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
     },
     {
+        "text": "input: #5 MOD comp\n#6-8 routine extractions with pfm implant bridge\n#12 rct, build up with post, acc crown\n#20 pfm crown\n#21 acc crown\n#27 DL comp\n#28 MOB5 comp\n#29 DO comp\nmaxillary cbct\ncomplete denture"
+    },
+    {
+        "text": "output: [{\"toothNumber\": \"#5\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}, {\"toothNumber\": \"#7\", \"treatments\": [\"Routine Extraction\", \"PFM Pontic\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}, {\"toothNumber\": \"#12\", \"treatments\": [\"Root Canal Pre-Molar\", \"Build Up with Post\", \"ACC Crown\"]}, {\"toothNumber\": \"#20\", \"treatments\": [\"PFM Crown\"]}, {\"toothNumber\": \"#21\", \"treatments\": [\"ACC Crown\"]}, {\"toothNumber\": \"#27\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}, {\"toothNumber\": \"#28\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, {\"toothNumber\": \"#29\", \"treatments\": [\"2 Surface Posterior Composite Filling\"]}, {\"toothNumber\": \"NA\", \"treatments\": [\"Maxillary CBCT\", \"Complete Denture\"]}]"
+    },
+    {
         "text": "input: "
     },
     {
