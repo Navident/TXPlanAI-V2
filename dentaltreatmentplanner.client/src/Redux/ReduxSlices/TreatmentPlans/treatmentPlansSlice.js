@@ -10,6 +10,19 @@ const addVisitToTreatmentPlan = (treatmentPlans, treatmentPlanId, newVisit) => {
     });
 };
 
+const deleteTemporaryVisit = (treatmentPlans, deletedVisitId) => {
+    console.log(`Before deletion, treatmentPlans:`, treatmentPlans);
+    console.log(`Starting deletion of temporary visit with ID ${deletedVisitId}.`);
+    return treatmentPlans.map(plan => {
+        // Filter out the temporary visit from each treatment plan
+        const updatedVisits = plan.visits.filter(visit => visit.visitId !== deletedVisitId);
+        console.log(`Deleted temporary visit ${deletedVisitId}. Updated visits:`, updatedVisits);
+        return { ...plan, visits: updatedVisits };
+    });
+};
+
+
+
 const deleteVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, deletedVisitId) => {
     console.log(`Starting deletion of visit with ID ${deletedVisitId} from treatment plan ${treatmentPlanId}.`);
     return treatmentPlans.map(plan => {
@@ -114,6 +127,10 @@ export const treatmentPlansSlice = createSlice({
             const { treatmentPlanId, visitId, newCdtCode } = action.payload;
             state.treatmentPlans = addCdtCodeToVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, newCdtCode);
         },
+        onDeleteTemporaryVisit: (state, action) => {
+            const { deletedVisitId } = action.payload;
+            state.treatmentPlans = deleteTemporaryVisit(current(state.treatmentPlans), deletedVisitId);
+        },
     },
 });
 
@@ -125,6 +142,9 @@ export const {
     onDeleteVisit,
     onUpdateVisitsInTreatmentPlan,
     handleAddCdtCode,
+    onDeleteTemporaryVisit,
+    addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById
+    
 } = treatmentPlansSlice.actions;
 
 // Selector to get all treatment plans

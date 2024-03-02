@@ -18,7 +18,6 @@ import {
 import deleteIcon from "../../assets/delete-x.svg";
 import dragIcon from "../../assets/drag-icon.svg";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
-import TreatmentPlanContext from "../../Contexts/TreatmentPlanContext/TreatmentPlanContext";
 import {
 	StyledContainerWithTableInner,
 	StyledAddButtonCellContainer,
@@ -46,7 +45,7 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { handleAddCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { onDeleteTemporaryVisit, setTreatmentPlanId, addTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 
 const TreatmentPlanOutput = ({
@@ -65,11 +64,7 @@ const TreatmentPlanOutput = ({
 	const [deletedVisitIds, setDeletedVisitIds] = useState([]);
 	const isInitialLoad = useRef(true);
 	const [localUpdatedVisits, setLocalUpdatedVisits] = useState([]);
-	const [alertInfo, setAlertInfo] = useState({
-		open: false,
-		type: "",
-		message: "",
-	});
+
 	const [combinedVisits, setCombinedVisits] = useState([]);
 	const { facilityCdtCodes, defaultCdtCodes } = useBusiness();
 	const combinedCdtCodes = useMemo(
@@ -81,7 +76,6 @@ const TreatmentPlanOutput = ({
 	const [editedRows, setEditedRows] = useState([]);
 	const {
 		selectedPatient,
-		refreshPatientTreatmentPlans,
 		facilityPayerCdtCodeFees,
 	} = useBusiness();
 	const { selectedPayer } = useTreatmentPlan();
@@ -160,7 +154,7 @@ const TreatmentPlanOutput = ({
 			return;
 		}
 		// Generate a new visit ID for the grouped rows
-		const newGroupVisitId = `grouped-${Date.now()}`;
+		const newGroupVisitId = `temp-grouped-${Date.now()}`;
 
 		let newAllRows = { ...allRows }; // Make a shallow copy of allRows to modify
 		let groupedRows = [];
@@ -171,7 +165,7 @@ const TreatmentPlanOutput = ({
 			groupedRows = groupedRows.concat(rows.filter(row => checkedRows.includes(row.id)));
 
 			// Update newAllRows with the remaining rows for the current visit
-			if (remainingRows.length > 0) {
+			if (remainingRows.length > 1) {
 				newAllRows[visitId] = remainingRows;
 			} else {
 				delete newAllRows[visitId]; 
@@ -189,14 +183,14 @@ const TreatmentPlanOutput = ({
 
 
 	const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
-		const visitId = customVisitId || `temp-${Date.now()}`;
+		const visitId = `temp-${Date.now()}`;
 		const initialRowId = `initial-${visitId}`;
 
 		const newVisit = {
 			visitId: visitId,
 			treatment_plan_id: treatmentPlan.treatmentPlanId,
 			visit_number: treatmentPlan.visits.length,
-			description: "Visit " + (treatmentPlan.visits.length + 1)
+			description: "Table " + (treatmentPlan.visits.length + 1)
 		};
 		console.log('Adding new visit:', newVisit);
 
@@ -221,11 +215,6 @@ const TreatmentPlanOutput = ({
 		}
 	};
 
-
-
-	const handleCloseAlert = () => {
-		setAlertInfo({ ...alertInfo, open: false });
-	};
 
 	const createInitialStaticRows = (visitCdtCodeMap, visitId, index) => {
 		const fee = facilityPayerCdtCodeFees.find(
@@ -304,21 +293,6 @@ const TreatmentPlanOutput = ({
 		};
 	};
 
-	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
-		return {
-			cdtCodeId: selectedCdtCode.cdtCodeId,
-			code: selectedCdtCode.code,
-			longDescription: selectedCdtCode.longDescription,
-			order: 0, 
-			orderWithinVisit: 0, 
-			originLineIndex: 0, 
-			procedureTypeId: null, 
-			toothNumber: null, 
-			visitId: visitId, 
-		};
-	};
-
-
 	const convertToStaticRow = (
 		currentRow,
 		visitId,
@@ -333,14 +307,7 @@ const TreatmentPlanOutput = ({
 				: currentRow.description);
 		const ucrFee = currentRow.extraRowInput[2];
 		const discountFee = currentRow.extraRowInput[3];
-
-		const newCdtCode = createNewCdtCodeObject(selectedCdtCode, visitId);
-		console.log('treatment plan just before dispatch', treatmentPlan );
-
-		console.log('Dispatching action to add CDT code', { treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode });
-
-		dispatch(handleAddCdtCode({ treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode }));
-
+		setHasEdits(true);
 		return {
 			...currentRow,
 			id: `static-${visitId}-${Date.now()}`,
@@ -547,24 +514,40 @@ const TreatmentPlanOutput = ({
 	};
 
 	const handleDeleteVisit = (visitId) => {
+		// Check if the visitId starts with "temp-" to identify temporary visits
+		const isTemporaryVisit = visitId.startsWith("temp-");
+
 		// Update the visitOrder to remove the visit
-		setVisitOrder((prevOrder) => prevOrder.filter((id) => id !== visitId));
+		setVisitOrder(prevOrder => prevOrder.filter(id => id !== visitId));
+
 		// Update allRows to remove the rows associated with the visit
-		setAllRows((prevRows) => {
+		setAllRows(prevRows => {
 			const updatedRows = { ...prevRows };
 			delete updatedRows[visitId];
 			return updatedRows;
 		});
-		setDeletedVisitIds((prevIds) => {
-			const newDeletedVisitIds = [...prevIds, visitId];
-			console.log(
-				"Deleted visit added, new deletedVisitIds:",
-				newDeletedVisitIds
-			);
-			return newDeletedVisitIds;
-		});
-		onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
+
+		// If the visit is not temporary
+		if (!isTemporaryVisit) {
+			setDeletedVisitIds(prevIds => {
+				const newDeletedVisitIds = [...prevIds, visitId];
+				console.log("Deleted visit added, new deletedVisitIds:", newDeletedVisitIds);
+				return newDeletedVisitIds;
+			});
+
+			if (treatmentPlan.treatmentPlanId) {
+				onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
+			}
+
+		}
+
+		else {
+			// here the visit is temporary
+			dispatch(onDeleteTemporaryVisit({ deletedVisitId: visitId }));
+
+		}
 	};
+
 
 	const createNewCombinedTreatmentPlanForPatient = async (
 		treatmentPlan,
@@ -573,12 +556,14 @@ const TreatmentPlanOutput = ({
 	) => {
 		console.log("Attempting to create a new combined treatment plan...");
 		try {
+			const payerId = selectedPayer ? selectedPayer.payerId : null;
+
 			const newTreatmentPlan = await handleCreateNewTreatmentPlanForPatient(
 				treatmentPlan,
 				allRows,
 				visitOrder,
 				selectedPatient.patientId,
-				selectedPayer.payerId,
+				payerId, 
 				hasEdits
 			);
 			console.log("New treatment plan created successfully:", newTreatmentPlan);
@@ -588,39 +573,32 @@ const TreatmentPlanOutput = ({
 		}
 	};
 
-	const handleUpdateTreatmentPlan = async () => {
-		let proceedToUpdate = false; // Flag to determine if update logic should be executed
 
+	const handleUpdateTreatmentPlan = async () => {
 		try {
+			// Check if in generate treatment plan context and no treatment plan ID exists
 			if (isInGenerateTreatmentPlanContext) {
-				const newCombinedTreatmentPlan =
-					await createNewCombinedTreatmentPlanForPatient(
-						treatmentPlan,
-						allRows,
-						visitOrder
-					);
-				setAlertInfo({
-					open: true,
-					type: "success",
-					message: "New treatment plan created successfully!",
-				});
-				//if no edits were made we return immediately
-				if (hasEdits) {
-					console.log(
-						"edits were made, we are going to create the treatment plan and then perform the update logic."
-					);
-					proceedToUpdate = true; // Edits were made, so we need to proceed to update logic
-				} else {
-					console.log(
-						"no edits we are returning immediately after creating the new treatment plan."
-					);
-					await refreshPatientTreatmentPlans();
-					return;
+				// Logic for creating a new treatment plan
+				const newTreatmentPlanResponse = await createNewCombinedTreatmentPlanForPatient(
+					treatmentPlan,
+					allRows,
+					visitOrder
+				);
+				console.log("New treatment plan created successfully:", newTreatmentPlanResponse);
+
+				if (newTreatmentPlanResponse && newTreatmentPlanResponse.treatmentPlanId) {
+					adjustUpdatedTreatmentPlanStructure(newTreatmentPlanResponse, treatmentPlan);
+
+					dispatch(setTreatmentPlanId(newTreatmentPlanResponse.treatmentPlanId));
+					dispatch(addTreatmentPlan(newTreatmentPlanResponse));
 				}
-			}
-			//if we are not in the generate treatment plan context we always go inside update logic
-			if (!isInGenerateTreatmentPlanContext || proceedToUpdate) {
-				console.log("we correctly proceeded with the update logic.");
+
+				dispatch(showAlert({ type: 'success', message: 'New treatment plan created successfully' }));
+
+			
+
+			} else { 
+				console.log("Proceeding with the update logic.");
 				const tempVisitIds = visitOrder.filter((visitId) =>
 					String(visitId).startsWith("temp-")
 				);
@@ -738,20 +716,45 @@ const TreatmentPlanOutput = ({
 				);
 				console.log("Updated Treatment Plan:", updatedTreatmentPlan);
 
-				await refreshPatientTreatmentPlans();
-				setAlertInfo({
-					open: true,
-					type: "success",
-					message: "Your changes have been saved successfully!",
-				});
-				setHasEdits(false);
+				dispatch(showAlert({ type: 'success', message: 'Treatment plan updated successfully' }));
 			}
 		} catch (error) {
 			console.error("Error updating treatment plan:", error);
 		}
 	};
 
+	const getCdtCodeDetailsByCdtCodeId = (cdtCodeId) => {
+		return combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
+	};
 
+	const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
+		return visit.visitCdtCodeMaps.map(cdtCodeMap => {
+			const cdtCodeDetails = getCdtCodeDetailsByCdtCodeId(cdtCodeMap.cdtCodeId);
+			return {
+				cdtCodeId: cdtCodeMap.cdtCodeId,
+				code: cdtCodeDetails?.code,
+				longDescription: cdtCodeDetails?.longDescription,
+				createdAt: cdtCodeMap.createdAt,
+				modifiedAt: cdtCodeMap.modifiedAt,
+				order: cdtCodeMap.order,
+				procedureTypeId: cdtCodeMap.procedureTypeId,
+				toothNumber: cdtCodeMap.toothNumber,
+				visitCdtCodeMapId: cdtCodeMap.visitCdtCodeMapId,
+				visitId: cdtCodeMap.visitId,
+			};
+		});
+	};
+
+	const adjustUpdatedTreatmentPlanStructure = (updatedTreatmentPlan, originalTreatmentPlan) => {
+		// Reinsert the category names from the original treatment plan
+		updatedTreatmentPlan.procedureCategoryName = originalTreatmentPlan.procedureCategoryName;
+		updatedTreatmentPlan.procedureSubCategoryName = originalTreatmentPlan.procedureSubCategoryName;
+
+		updatedTreatmentPlan.visits.forEach(visit => {
+			visit.cdtCodes = transformVisitCdtCodeMapsToCdtCodes(visit);
+			delete visit.visitCdtCodeMaps;
+		});
+	};
 
 
 	const createHeaders = () => {
@@ -832,7 +835,6 @@ const TreatmentPlanOutput = ({
 						row.selectedCdtCode,
 						row.description
 					);
-					// This step might require adjustments depending on how you track edits
 					setEditedRows((prev) => [...prev, { ...editedRow, visitId }]); // Storing full row data and visitId
 
 					return editedRow;
@@ -966,22 +968,23 @@ const TreatmentPlanOutput = ({
 		});
 	};
 
+
 	const renderVisit = (visitId, index) => {
 		console.log(`Rendering visit: visitId=${visitId}, index=${index}`);
 		const visitIdStr = String(visitId);
-		const isGroupedVisit = visitIdStr.startsWith("grouped-");
-		const isTempVisit = visitIdStr.startsWith("temp-");
 
-		const visit = isTempVisit || isGroupedVisit
-			? { visitId: visitIdStr, visit_number: index + 1 }
-			: localUpdatedVisits.find((v) => String(v.visitId) === visitIdStr);
+		// Attempt to find the visit in either localUpdatedVisits or directly in treatmentPlan.visits
+		const visit = localUpdatedVisits.find(v => String(v.visitId) === visitIdStr) ||
+			treatmentPlan.visits.find(v => String(v.visitId) === visitIdStr);
 
 		if (!visit) {
 			return null;
 		}
-		const draggableKey = isTempVisit
-			? `temp-visit-${index}`
-			: `visit-${visit.visitId}`;
+
+		// Use the existing description from the visit object
+		const visitDescription = visit.description;
+
+		const draggableKey = `visit-${visit.visitId}`;
 		const headers = createHeaders();
 
 		if (!allRows[visitIdStr]) {
@@ -997,13 +1000,13 @@ const TreatmentPlanOutput = ({
 				allRows[visitIdStr]
 			);
 		});
-
+		console.log("Visit before return", visit);
 		return (
 			<Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
 				{(provided) => (
 					<div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
 						<div {...provided.dragHandleProps} className="visit-header">
-							Table {index + 1}
+							{visitDescription}
 						</div>
 						<Table
 							headers={headers}

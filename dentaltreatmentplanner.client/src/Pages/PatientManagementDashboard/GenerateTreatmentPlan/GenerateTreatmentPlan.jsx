@@ -5,7 +5,6 @@ import { TextField } from "@mui/material";
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
-import useTreatmentPlan from "../../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import { useBusiness } from "../../../Contexts/BusinessContext/useBusiness";
 import {
 	StyledContainerWithTableInner,
@@ -15,27 +14,26 @@ import {
 import { runGeminiPro } from "../../../GeminiPro/geminiProRunner";
 import { CircularProgress } from "@mui/material";
 import {
-	setSortBy,
 	setActiveTxCategories,
-	selectSortBy,
-	selectActiveTxCategories,
+
 } from "../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { onDeleteVisit } from "../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice";
 import { selectSelectedPayer } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
-import { selectAllSubcategoryTreatmentPlans } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import {
+	selectAllSubcategoryTreatmentPlans,
+	setTreatmentPlans,
+	handleAddVisit,
+	onUpdateVisitsInTreatmentPlan,
+	onDeleteVisit,
+	selectAllTreatmentPlans
+} from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 
 const GenerateTreatmentPlan = () => {
-	const {
-		treatmentPlans,
-		setTreatmentPlans,
-		handleAddVisit,
-		onUpdateVisitsInTreatmentPlan,
-	} = useTreatmentPlan();
 
 	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
 	const selectedPayer = useSelector(selectSelectedPayer);
+	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 
 	const [inputText, setInputText] = useState("");
 	const dispatch = useDispatch();
@@ -150,8 +148,8 @@ const GenerateTreatmentPlan = () => {
 		);
 
 		return {
-			visitId: "combined",
-			description: "Combined Visit",
+			visitId: `temp-${Date.now()}`,
+			description: "Table 1",
 			cdtCodes: combinedCdtCodes,
 			originLineIndex: 0,
 		};
@@ -183,9 +181,9 @@ const GenerateTreatmentPlan = () => {
 
 			const combinedVisit = combineVisitsIntoOne(allVisits);
 			console.log("combinedVisit", combinedVisit);
-			const combinedTreatmentPlan = { visits: [combinedVisit] };
+			const combinedTreatmentPlan = { treatmentPlanId: null, visits: [combinedVisit] };
 			console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
-			setTreatmentPlans([combinedTreatmentPlan]);
+			dispatch(setTreatmentPlans([combinedTreatmentPlan]));
 		} catch (error) {
 			showAlert(
 				"error",
@@ -265,16 +263,13 @@ const GenerateTreatmentPlan = () => {
 								treatmentPlan={plan}
 								treatmentPlans={treatmentPlans}
 								onAddVisit={(newVisit) =>
-									handleAddVisit(plan.treatmentPlanId, newVisit)
+									dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
 								}
 								onUpdateVisitsInTreatmentPlan={(updatedVisits) =>
-									onUpdateVisitsInTreatmentPlan(
-										plan.treatmentPlanId,
-										updatedVisits
-									)
+									dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId: plan.treatmentPlanId, updatedVisits }))
 								}
 								onDeleteVisit={(deletedVisitId) =>
-									onDeleteVisit(plan.treatmentPlanId, deletedVisitId)
+									dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
 								}
 								showToothNumber={true}
 								isInGenerateTreatmentPlanContext={true}

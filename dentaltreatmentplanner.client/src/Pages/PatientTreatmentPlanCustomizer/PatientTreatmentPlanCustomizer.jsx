@@ -21,13 +21,16 @@ import logo from "../../assets/navident-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { CircularProgress } from "@mui/material";
+import { selectPatientTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
 const PatientTreatmentPlanCustomizer = () => {
 	const { treatmentPlanId } = useParams();
 	const [plan, setPlan] = useState(null);
-	const { businessName, fetchFacilityPayerCdtCodeFees, patientTreatmentPlans } = useBusiness();
+	const { businessName, fetchFacilityPayerCdtCodeFees } = useBusiness();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
+	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 
 	const {
 		treatmentPlans,

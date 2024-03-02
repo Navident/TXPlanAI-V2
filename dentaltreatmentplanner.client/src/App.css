@@ -258,28 +258,26 @@ body {
         height: 40px;
     }
 
+
 .custom-contained-button {
     background-color: #A2E1C9 !important;
     box-shadow: none !important;
-    &:hover
-
-{
-    background-color: #91d6b8 !important;
 }
 
+.custom-contained-button:hover {
+    background-color: #91d6b8 !important;
 }
 
 .custom-outlined-button {
     color: #A2E1C9 !important;
     border-color: #A2E1C9 !important;
-    &:hover
+}
 
-{
-    background-color: rgba(162, 225, 201, 0.04);
+.custom-outlined-button:hover {
+    background-color: rgba(162, 225, 201, 0.04) !important;
     border-color: #91d6b8 !important;
 }
 
-}
 
 
 nav {

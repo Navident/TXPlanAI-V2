@@ -5,7 +5,7 @@
     public class NewProcedureDto
     {
         [JsonPropertyName("visitId")]
-        public int VisitId { get; set; }
+        public int? VisitId { get; set; }
 
         [JsonPropertyName("cdtCodeId")]
         public int CdtCodeId { get; set; }

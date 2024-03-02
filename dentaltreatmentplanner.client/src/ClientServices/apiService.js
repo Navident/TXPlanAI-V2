@@ -175,10 +175,10 @@ export const handleCreateNewTreatmentPlanFromDefault = async (treatmentPlan, all
 
 
 // Function to create a new treatment plan from for patient
-export const handleCreateNewTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId, payerId, hasEdits) => {
+export const handleCreateNewTreatmentPlanForPatient = async (treatmentPlan, allRows, visitOrder, selectedPatientId, payerId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const endpoint = hasEdits ? '/newTxWithEditsForPatient' : '/newTxWithoutEditsForPatient';
+        const endpoint = '/newTxForPatient';
         const newPlanData = {
             ...mapToCreateNewCombinedTreatmentPlanForPatient(treatmentPlan, allRows, visitOrder, payerId),
             patientId: selectedPatientId

@@ -1,11 +1,8 @@
 import {
-	StyledLargeText,
-	StyledUnderlinedText,
 	StyledLightGrey2Text,
 	StyledRoundedBoxContainer,
 	StyledRoundedBoxContainerInner,
 } from "../../GlobalStyledComponents";
-import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import {
 	StyledHomeBoxBottomContainer,
 	StyledSeparator,
@@ -13,13 +10,15 @@ import {
 	StyledItemContainer,
 } from "../../Pages/Dashboard/index.style";
 import { useNavigate } from "react-router-dom";
+import { selectPatientTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useSelector } from 'react-redux';
 
 const RecentTxPlans = () => {
 	const navigate = useNavigate();
-	const { patientTreatmentPlans } = useBusiness();
+	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 
 	// Sort treatment plans by createdAt in descending order and filter out duplicates
-	const sortedPlans = patientTreatmentPlans
+	const sortedPlans = [...patientTreatmentPlans]
 		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 		.slice(0, 5);
 

@@ -3,7 +3,7 @@
     public class VisitCdtCodeMapDto
     {
         public int VisitCdtCodeMapId { get; set; }
-        public int VisitId { get; set; }
+        public int? VisitId { get; set; }
         public int CdtCodeId { get; set; }
         public string Code { get; set; } 
         public int Order { get; set; }

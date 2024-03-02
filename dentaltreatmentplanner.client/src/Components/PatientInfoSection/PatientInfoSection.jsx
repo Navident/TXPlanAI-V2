@@ -66,10 +66,10 @@ const PatientInfoSection = () => {
 
 	const renderPayerDropdown = () => {
 		console.log("Current Selected Payer State in render:", selectedPayer);
-		const payerOptions = payers.map((payer) => ({
+		const payerOptions = payers ? payers.map((payer) => ({
 			id: payer.id,
 			...payer,
-		}));
+		})) : [];
 		return (
 			<DropdownSearch
 				items={payerOptions}

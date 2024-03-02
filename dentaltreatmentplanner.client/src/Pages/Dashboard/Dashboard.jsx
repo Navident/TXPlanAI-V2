@@ -1,6 +1,5 @@
 import HeaderBar from "../../Components/Common/HeaderBar/HeaderBar";
 import logo from '../../assets/navident-logo.svg';
-import Alert from "../../Components/Common/Alert/Alert";
 import { useNavigate } from 'react-router-dom';
 import SideBar from "../../Components/SideBar/SideBar";
 import './Dashboard.css';

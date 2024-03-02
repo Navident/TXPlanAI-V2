@@ -90,23 +90,39 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
 
 export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, allRows, visitOrder, payerId) => {
     const newPlanVisits = visitOrder.map(visitId => {
+        const visit = treatmentPlan.visits.find(v => v.visitId === visitId);
         const visitRows = allRows[visitId];
         const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
 
+        const visitCdtCodeMaps = validRows.map(row => {
+            // Extract numeric part from toothNumber using regex
+            const toothNumberMatch = row.selectedCdtCode.toothNumber.match(/\d+/);
+            const toothNumberNumeric = toothNumberMatch ? parseInt(toothNumberMatch[0]) : null;
+
+            return {
+                CdtCodeId: row.selectedCdtCode.cdtCodeId,
+                Code: row.selectedCdtCode.code,
+                LongDescription: row.selectedCdtCode.longDescription,
+                ToothNumber: toothNumberNumeric,
+            };
+        });
+
+        const cdtCodeIds = validRows.map(row => row.selectedCdtCode.cdtCodeId);
+
         return {
             visitId: String(visitId).startsWith('temp-') ? null : visitId,
-            VisitCdtCodeMaps: validRows.map(row => ({
-                CdtCodeId: row.selectedCdtCode.cdtCodeId,
-                Description: row.description,
-                ToothNumber: row.selectedCdtCode.toothNumber
-            })),
+            description: visit?.description,
+            CdtCodeIds: cdtCodeIds,
+            VisitCdtCodeMaps: visitCdtCodeMaps,
         };
     });
 
     const newTreatmentPlanDto = {
+        UpdatedProcedures: [],
+        DeletedVisitIds: [],
         Description: treatmentPlan.description,
         ProcedureSubcategoryId: null,
-        ToothNumber: treatmentPlan.toothNumber,
+        ToothNumber: treatmentPlan.toothNumber ? parseInt(treatmentPlan.toothNumber.match(/\d+/)[0]) : null,
         Visits: newPlanVisits,
         PayerId: payerId,
     };
@@ -116,13 +132,15 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
 };
 
 
+
+
 export const mapToCreateVisitDto = (treatmentPlan) => {
     const newVisitDto = {
         TreatmentPlanId: treatmentPlan.treatmentPlanId,
-        Description: "Visit " + (treatmentPlan.visits.length),
+        Description: "Table " + (treatmentPlan.visits.length),
         VisitNumber: treatmentPlan.visits.length 
     };
-
+    console.log('Mapped DTO for new visit in tx:', newVisitDto);
     return newVisitDto;
 };
 

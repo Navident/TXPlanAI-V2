@@ -599,7 +599,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         Console.Write($"Creating new VisitCdtCodeMap with VisitId: {newProc.VisitId}, CdtCodeId: {newProc.CdtCodeId}, Order: {newProc.Order}");
                         var newCdtCodeMap = new VisitCdtCodeMap
                         {
-                            VisitId = newProc.VisitId,
+                            VisitId = newProc.VisitId.Value,
                             CdtCodeId = newProc.CdtCodeId,
                             Order = newProc.Order
                         };
@@ -823,10 +823,9 @@ namespace DentalTreatmentPlanner.Server.Services
 
 
 
-
-        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(UpdateTreatmentPlanDto updateTreatmentPlanDto, int facilityId)
+        //with edits
+        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
         {
-            Console.WriteLine($"Received PayerId: {updateTreatmentPlanDto.PayerId}");
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -835,14 +834,14 @@ namespace DentalTreatmentPlanner.Server.Services
                     // Create a new treatment plan based on the default
                     TreatmentPlan newTreatmentPlan = new TreatmentPlan
                     {
-                        Description = updateTreatmentPlanDto.Description,
+                        //Description = createUnmodifiedPatientTxDto.Description,
                         ProcedureSubcategoryId = null,
                         FacilityId = facilityId,
-                        PatientId = updateTreatmentPlanDto.PatientId,
-                        PayerId = updateTreatmentPlanDto.PayerId
+                        PatientId = createUnmodifiedPatientTxDto.PatientId,
+                        PayerId = createUnmodifiedPatientTxDto.PayerId
                     };
 
-                    foreach (var visitDto in updateTreatmentPlanDto.Visits)
+                    foreach (var visitDto in createUnmodifiedPatientTxDto.Visits)
                     {
                         Visit newVisit = new Visit
                         {
@@ -880,7 +879,8 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
+        //without edits
+/*        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
         {
             Console.WriteLine($"Received PayerId: {createUnmodifiedPatientTxDto.PayerId}");
 
@@ -934,7 +934,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     throw;
                 }
             }
-        }
+        }*/
 
         private void UpdateVisitCdtCodes(Visit visit, ICollection<VisitCdtCodeMapDto> updatedCdtCodeMaps)
         {

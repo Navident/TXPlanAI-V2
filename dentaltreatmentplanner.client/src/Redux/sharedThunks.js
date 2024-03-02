@@ -1,9 +1,23 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory } from '../ClientServices/apiService';
+import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
-import { setAllSubcategoryTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { fetchPayersForFacility, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
+export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
+    'shared/fetchAllPatientTreatmentPlansForFacility',
+    async (_, { dispatch }) => {
+        try {
+            const fetchedPatientTreatmentPlans = await getAllPatientTreatmentPlansForFacility();
+            console.log('Fetched patient treatment plans:', fetchedPatientTreatmentPlans);
+            dispatch(setPatientTreatmentPlans(fetchedPatientTreatmentPlans));
+            return fetchedPatientTreatmentPlans;
+        } catch (error) {
+            console.error('Error fetching patient treatment plans:', error);
+            throw error;
+        }
+    }
+);
 
 export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
     'shared/fetchCategoriesSubcategoriesAndTxPlans',
@@ -81,7 +95,8 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
         if (isUserLoggedIn) {
             await Promise.all([
                 dispatch(fetchPayersForFacility()),
-                dispatch(fetchCategoriesSubcategoriesAndTxPlans())
+                dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
+                dispatch(fetchAllPatientTreatmentPlansForFacility()) 
             ]);
         }
     }

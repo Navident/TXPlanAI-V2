@@ -13,13 +13,14 @@ import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { StyledContainerWithTableInner, StyledRoundedBoxContainer } from "../../../GlobalStyledComponents";
+import { selectPatientTreatmentPlans, removeTreatmentPlanById } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
 const AllSavedPatientTxPlans = () => {
+	const dispatch = useDispatch();
 	const [inputText, setInputText] = useState("");
 	const navigate = useNavigate();
-	const { patientTreatmentPlans, removeTreatmentPlanById } = useBusiness(); 
-
-
+	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 	const handleOpenClick = (planId) => {
 		navigate(`/customize-treatment-plan/${planId}`);
 	};
@@ -45,7 +46,7 @@ const AllSavedPatientTxPlans = () => {
 		if (confirmed) {
 			const success = await deleteTreatmentPlanById(planId);
 			if (success) {
-				removeTreatmentPlanById(planId); 
+				dispatch(removeTreatmentPlanById(planId));
 				alert("Treatment plan deleted successfully.");
 			} else {
 				alert("Failed to delete treatment plan.");

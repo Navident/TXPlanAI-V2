@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Newtonsoft.Json;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -150,54 +151,14 @@ public class TreatmentPlansController : ControllerBase
     }
 
 
-    // POST: api/TreatmentPlans/newTxWithEditsForPatient
-    [HttpPost("newTxWithEditsForPatient")]
-    public async Task<IActionResult> CreateNewTreatmentPlanWithEditsForPatient([FromBody] UpdateTreatmentPlanDto updateTreatmentPlanDto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
 
-        string username = GetUsernameFromToken();
-        if (string.IsNullOrEmpty(username))
-        {
-            return Unauthorized();
-        }
 
-        var user = await _userManager.FindByNameAsync(username);
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        int? facilityId = user.FacilityId;
-        if (!facilityId.HasValue)
-        {
-            // Handle the case where facilityId is null
-            return BadRequest("User's facility ID is not set.");
-        }
-
-        try
-        {
-            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanForPatientFromCombinedAsync(updateTreatmentPlanDto, facilityId.Value);
-            if (newTreatmentPlan == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(newTreatmentPlan);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { error = "Internal server error", details = ex.Message });
-        }
-    }
-
-    // POST: api/TreatmentPlans/newTxWithoutEditsForPatient
-    [HttpPost("newTxWithoutEditsForPatient")]
+    // POST: api/TreatmentPlans/newTxForPatient
+    [HttpPost("newTxForPatient")]
     public async Task<IActionResult> CreateNewTreatmentPlanWithoutEditsForPatient([FromBody] CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto)
     {
+        Console.WriteLine($"Received treatment plan DTO: {JsonConvert.SerializeObject(createUnmodifiedPatientTxDto)}");
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
