@@ -72,7 +72,6 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
             VisitCdtCodeMaps: validRows.map(row => ({
                 CdtCodeId: row.selectedCdtCode.cdtCodeId,
                 Description: row.description || null,
-                // Include other properties as per your backend requirements
             })),
         };
     });

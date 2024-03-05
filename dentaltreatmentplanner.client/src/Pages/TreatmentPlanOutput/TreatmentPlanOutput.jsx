@@ -29,6 +29,7 @@ import {
 	StyledLightGreyText,
 	StyledRoundedBoxContainerInner,
 	StyledSemiboldBlackTitle,
+	TableHeader
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
@@ -45,8 +46,9 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { onDeleteTemporaryVisit, setTreatmentPlanId, addTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
+import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -59,7 +61,6 @@ const TreatmentPlanOutput = ({
 }) => {
 	const dispatch = useDispatch();
 	const [allRows, setAllRows] = useState({});
-	const [visitOrder, setVisitOrder] = useState([]);
 	const [deletedRowIds, setDeletedRowIds] = useState([]);
 	const [deletedVisitIds, setDeletedVisitIds] = useState([]);
 	const isInitialLoad = useRef(true);
@@ -85,7 +86,9 @@ const TreatmentPlanOutput = ({
 	const checkedRows = useSelector(selectCheckedRows);
 	const isGroupActive = useSelector(selectIsGroupActive);
 	const selectedCategories = useSelector(selectSelectedCategories); 
-
+	const visitOrder = useSelector(selectVisitOrder);
+	const [editTableNameMode, setEditTableNameMode] = useState(null); 
+	const [editTableNameValue, setEditTableNameValue] = useState(''); 
 	useEffect(() => {
 		const newCheckedRows = [];
 		Object.values(allRows).forEach(visitRows => {
@@ -121,6 +124,7 @@ const TreatmentPlanOutput = ({
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
+			console.log("we went in the initial load conditional");
 			const visits = treatmentPlan.visits || [];
 			const newAllRows = visits.reduce((acc, visit, index) => {
 				const visitId = visit.visitId;
@@ -137,7 +141,7 @@ const TreatmentPlanOutput = ({
 			}, {});
 
 			setAllRows(newAllRows);
-			setVisitOrder(visits.map((visit) => visit.visitId));
+			dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
 			isInitialLoad.current = false;
 		}
 	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
@@ -182,38 +186,39 @@ const TreatmentPlanOutput = ({
 
 
 
-	const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
-		const visitId = `temp-${Date.now()}`;
-		const initialRowId = `initial-${visitId}`;
+const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
+    const visitId = `temp-${Date.now()}`;
+    const initialRowId = `initial-${visitId}`;
 
-		const newVisit = {
-			visitId: visitId,
-			treatment_plan_id: treatmentPlan.treatmentPlanId,
-			visit_number: treatmentPlan.visits.length,
-			description: "Table " + (treatmentPlan.visits.length + 1)
-		};
-		console.log('Adding new visit:', newVisit);
+    const newVisit = {
+        visitId: visitId,
+        treatment_plan_id: treatmentPlan.treatmentPlanId,
+        visit_number: treatmentPlan.visits.length + 1, // Fixed to correctly increment visit_number
+        description: "Table " + (treatmentPlan.visits.length + 1),
+    };
+    console.log('Adding new visit:', newVisit);
 
-		// Update the parent component's state
-		onAddVisit(newVisit);
+    // Update the parent component's state
+    onAddVisit(newVisit);
 
-		const dynamicRow = createDynamicRowv1(visitId, initialRowId);
-		const newRows = [...groupedRows, dynamicRow]
+    const dynamicRow = createDynamicRowv1(visitId, initialRowId);
+    const newRows = [...groupedRows, dynamicRow];
 
-		// If updatedAllRows is provided, use it; otherwise, update allRows normally
-		const finalAllRows = updatedAllRows ? { ...updatedAllRows, [visitId]: newRows } : null;
+    // Directly use the visitOrder from useSelector to update the visitOrder in Redux
+    const newVisitOrder = [...visitOrder, visitId];
+    dispatch(setVisitOrder(newVisitOrder));
 
-		// Update visitOrder and allRows
-		setVisitOrder(prevOrder => [...prevOrder, visitId]);
-		if (finalAllRows) {
-			setAllRows(finalAllRows);
-		} else {
-			setAllRows(prevRows => ({
-				...prevRows,
-				[visitId]: newRows
-			}));
-		}
-	};
+    // Handling updatedAllRows
+    const finalAllRows = updatedAllRows ? { ...updatedAllRows, [visitId]: newRows } : null;
+    if (finalAllRows) {
+        setAllRows(finalAllRows);
+    } else {
+        setAllRows(prevRows => ({
+            ...prevRows,
+            [visitId]: newRows,
+        }));
+    }
+};
 
 
 	const createInitialStaticRows = (visitCdtCodeMap, visitId, index) => {
@@ -481,6 +486,7 @@ const TreatmentPlanOutput = ({
 		setAllRows(reorderedRows);
 	};
 
+
 	const onTableDragEnd = (result) => {
 		if (!result.destination || result.type !== "table") {
 			return;
@@ -490,19 +496,19 @@ const TreatmentPlanOutput = ({
 			result.source.index,
 			result.destination.index
 		);
-
-		// Update visit order
-		setVisitOrder(newOrder);
-
+		dispatch(setVisitOrder(newOrder));
+		console.log("New order set, re-rendering with:", newOrder);
+		reorderAllRows(newOrder);
 		// Update visitNumber for each visit
 		const updatedVisits = treatmentPlan.visits.map((visit) => {
 			const newOrderIndex = newOrder.indexOf(visit.visitId);
 			return { ...visit, visitNumber: newOrderIndex + 1 };
 		});
 
+		console.log("Updated visits before dispatch:", updatedVisits);
 		onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
 
-		reorderAllRows(newOrder);
+		
 	};
 
 	const handleDeleteRow = (visitId, rowId) => {
@@ -518,7 +524,8 @@ const TreatmentPlanOutput = ({
 		const isTemporaryVisit = visitId.startsWith("temp-");
 
 		// Update the visitOrder to remove the visit
-		setVisitOrder(prevOrder => prevOrder.filter(id => id !== visitId));
+		const newVisitOrder = visitOrder.filter(id => id !== visitId);
+		dispatch(setVisitOrder(newVisitOrder));
 
 		// Update allRows to remove the rows associated with the visit
 		setAllRows(prevRows => {
@@ -693,7 +700,8 @@ const TreatmentPlanOutput = ({
 				setLocalUpdatedVisits(updatedVisits);
 
 				// Update allRows and visitOrder in state
-				setVisitOrder(updatedVisitOrder);
+				dispatch(setVisitOrder(updatedVisitOrder));
+
 				setAllRows(deepCopyAllRows);
 
 				// update the treatment plan
@@ -968,16 +976,43 @@ const TreatmentPlanOutput = ({
 		});
 	};
 
+	const handleEditClick = (visitId, currentDescription) => {
+		setEditTableNameMode(visitId);
+		setEditTableNameValue(currentDescription);
+	};
+
+	const handleEditChange = (e) => {
+		setEditTableNameValue(e.target.value);
+	};
+
+	const handleEditBlur = (visitId) => {
+		return () => {
+			dispatch(onUpdateVisitDescription({
+				visitId: visitId,
+				newDescription: editTableNameValue
+			}));
+			// After saving, exit edit mode
+			setEditTableNameMode(null);
+		};
+	};
+
 
 	const renderVisit = (visitId, index) => {
-		console.log(`Rendering visit: visitId=${visitId}, index=${index}`);
+		console.log("Visit order when we get in renderVisit", visitOrder);
 		const visitIdStr = String(visitId);
 
+		// Ensure localUpdatedVisits and treatmentPlan.visits are treated as arrays even if they're null/undefined
+		//const safeLocalUpdatedVisits = Array.isArray(localUpdatedVisits) ? localUpdatedVisits : [];
+		const safeTreatmentPlanVisits = Array.isArray(treatmentPlan.visits) ? treatmentPlan.visits : [];
+
 		// Attempt to find the visit in either localUpdatedVisits or directly in treatmentPlan.visits
-		const visit = localUpdatedVisits.find(v => String(v.visitId) === visitIdStr) ||
-			treatmentPlan.visits.find(v => String(v.visitId) === visitIdStr);
+		//const visit = safeLocalUpdatedVisits.find(v => String(v.visitId) === visitIdStr) ||
+			//safeTreatmentPlanVisits.find(v => String(v.visitId) === visitIdStr);
+
+		const visit = safeTreatmentPlanVisits.find(v => String(v.visitId) === visitIdStr);
 
 		if (!visit) {
+			console.log("Visit not found:", visitId);
 			return null;
 		}
 
@@ -1005,9 +1040,29 @@ const TreatmentPlanOutput = ({
 			<Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
 				{(provided) => (
 					<div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
-						<div {...provided.dragHandleProps} className="visit-header">
-							{visitDescription}
-						</div>
+						<TableHeader {...provided.dragHandleProps}>
+							{editTableNameMode === visit.visitId ? (
+								<StandardTextfield
+									value={editTableNameValue}
+									onChange={handleEditChange}
+									inputProps={{
+										onBlur: handleEditBlur(visit.visitId),
+									}}
+									borderColor={UI_COLORS.purple}
+									width="300px"
+									autoFocus 
+								/>
+							) : (
+								<>
+									{visitDescription}
+									<StyledEditIcon
+										src={pencilEditIcon}
+										alt="Edit Icon"
+										onClick={() => handleEditClick(visit.visitId, visitDescription)}
+									/>
+								</>
+							)}
+						</TableHeader>
 						<Table
 							headers={headers}
 							rows={tableRows}
@@ -1034,7 +1089,7 @@ const TreatmentPlanOutput = ({
 					onDragEnd={(result) =>
 						result.type === "table" ? onTableDragEnd(result) : onDragEnd(result)
 					}
-					onBeforeDragStart={lockDimensions}
+
 				>
 					<Droppable
 						droppableId="visits-droppable"
@@ -1058,7 +1113,7 @@ const TreatmentPlanOutput = ({
 			)}
 			<div className="bottom-tx-plan-buttons">
 				<div className="add-visit-btn-container" onClick={handleAddVisit}>
-					+ Add Visit
+					+ Add Treatment Table
 				</div>
 			</div>
 		</>

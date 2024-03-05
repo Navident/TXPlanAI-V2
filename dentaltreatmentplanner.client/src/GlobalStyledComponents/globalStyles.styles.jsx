@@ -25,6 +25,13 @@ export const StyledUnderlinedText = styled.div`
     }
 `;
 
+export const TableHeader = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+`;
+
 export const StyledTableLabelText = styled.div`
     font-size: 20px;
 `;

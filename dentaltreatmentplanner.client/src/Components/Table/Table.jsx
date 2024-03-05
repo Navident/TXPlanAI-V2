@@ -11,6 +11,7 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
+import { UI_COLORS } from '../../Theme';
 
 const Table = ({
 	headers,
@@ -75,6 +76,7 @@ const Table = ({
 												label=""
 												checked={isRowChecked(rowData.id)}
 												onChange={() => handleCheckboxChange(rowData.id)}
+												color= {UI_COLORS.purple}
 											/>
 										)}
 									</>

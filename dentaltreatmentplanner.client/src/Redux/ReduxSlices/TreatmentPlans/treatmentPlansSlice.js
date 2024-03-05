@@ -56,13 +56,39 @@ const addCdtCodeToVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visit
 };
 
 const updateVisitsInTreatmentPlan = (treatmentPlans, treatmentPlanId, updatedVisits) => {
-    return treatmentPlans.map(plan => {
+    const updatedTreatmentPlans = treatmentPlans.map(plan => {
         if (plan.treatmentPlanId === treatmentPlanId) {
             return { ...plan, visits: updatedVisits };
         }
         return plan;
     });
+
+
+
+    return updatedTreatmentPlans;
 };
+
+const updateVisitDescriptionInTreatmentPlan = (treatmentPlans, visitId, newDescription) => {
+    if (treatmentPlans.length === 0) {
+        console.error("Treatment plan array is empty.");
+        return treatmentPlans;
+    }
+
+    const treatmentPlan = treatmentPlans[0]; 
+
+    const updatedVisits = treatmentPlan.visits.map(visit => {
+        if (visit.visitId === visitId) {
+            return { ...visit, description: newDescription };
+        }
+        return visit;
+    });
+
+    return [{ ...treatmentPlan, visits: updatedVisits }];
+};
+
+
+
+
 
 export const treatmentPlansSlice = createSlice({
     name: 'treatmentPlans',
@@ -73,6 +99,7 @@ export const treatmentPlansSlice = createSlice({
         treatmentPlanId: null,
         isLoading: false,
         error: null,
+        visitOrder: [],
     },
     reducers: {
         // Action to set all subcategory treatment plans
@@ -121,8 +148,19 @@ export const treatmentPlansSlice = createSlice({
         },
         onUpdateVisitsInTreatmentPlan: (state, action) => {
             const { treatmentPlanId, updatedVisits } = action.payload;
+            console.log(`Updating visits for treatmentPlanId: ${treatmentPlanId} with visits:`, updatedVisits);
+
             state.treatmentPlans = updateVisitsInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, updatedVisits);
+            console.log(`Updated treatmentPlans state:`, state.treatmentPlans);
+
         },
+        onUpdateVisitDescription: (state, action) => {
+            const { visitId, newDescription } = action.payload;
+            state.treatmentPlans = updateVisitDescriptionInTreatmentPlan(current(state.treatmentPlans), visitId, newDescription); 
+            console.log(`Updated visit description for visitId: ${visitId} to: ${newDescription}`);
+        },
+
+
         handleAddCdtCode: (state, action) => {
             const { treatmentPlanId, visitId, newCdtCode } = action.payload;
             state.treatmentPlans = addCdtCodeToVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, newCdtCode);
@@ -130,6 +168,9 @@ export const treatmentPlansSlice = createSlice({
         onDeleteTemporaryVisit: (state, action) => {
             const { deletedVisitId } = action.payload;
             state.treatmentPlans = deleteTemporaryVisit(current(state.treatmentPlans), deletedVisitId);
+        },
+        setVisitOrder: (state, action) => {
+            state.visitOrder = action.payload;
         },
     },
 });
@@ -143,7 +184,9 @@ export const {
     onUpdateVisitsInTreatmentPlan,
     handleAddCdtCode,
     onDeleteTemporaryVisit,
-    addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById
+    addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById,
+    setVisitOrder,
+    onUpdateVisitDescription,
     
 } = treatmentPlansSlice.actions;
 
@@ -162,6 +205,9 @@ export const selectPatientTreatmentPlans = (state) => state.treatmentPlans.patie
 
 // Selector to get all subcategory treatment plans
 export const selectAllSubcategoryTreatmentPlans = (state) => state.treatmentPlans.allSubcategoryTreatmentPlans;
+
+// Selector to get visit order
+export const selectVisitOrder = (state) => state.treatmentPlans.visitOrder;
 
 
 export default treatmentPlansSlice.reducer;

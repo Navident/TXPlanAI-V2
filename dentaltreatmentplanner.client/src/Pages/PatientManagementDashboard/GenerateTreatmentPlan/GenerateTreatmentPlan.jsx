@@ -46,6 +46,12 @@ const GenerateTreatmentPlan = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		if (treatmentPlans) {
+			console.log("treatmentPlans state in parent", treatmentPlans);
+		}
+	}, [treatmentPlans]);
+
+	useEffect(() => {
 		if (selectedPayer) {
 			fetchFacilityPayerCdtCodeFees(selectedPayer.payerId);
 		}
@@ -265,9 +271,10 @@ const GenerateTreatmentPlan = () => {
 								onAddVisit={(newVisit) =>
 									dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
 								}
-								onUpdateVisitsInTreatmentPlan={(updatedVisits) =>
-									dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId: plan.treatmentPlanId, updatedVisits }))
-								}
+								onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
+									console.log("Dispatching updated visits:", updatedVisits);
+									dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
+								}}
 								onDeleteVisit={(deletedVisitId) =>
 									dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
 								}
