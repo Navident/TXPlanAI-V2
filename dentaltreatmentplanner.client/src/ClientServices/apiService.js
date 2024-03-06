@@ -9,7 +9,7 @@ const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
 const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
-const PAYER_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/payer';
+const PAYER_API_URL = 'https://localhost:7089/api/payer';
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
@@ -412,6 +412,32 @@ export const getPayersForFacility = async () => {
         return null;
     }
 };
+
+export const getFacilityPayersWithCdtCodesFees = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${PAYER_API_URL}/facilityPayersWithCdtCodesFees`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log(`Payers with CDT codes fees for facility:`, data);
+            return data;
+        } else {
+            console.error(`Failed to retrieve payers with CDT codes fees. Status:`, response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching payers with CDT codes fees:`, error.message);
+        return null;
+    }
+};
+
 
 
 export const getCustomCdtCodesForFacility = async () => {

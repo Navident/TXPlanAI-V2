@@ -93,6 +93,28 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
+        [HttpGet("facilityPayersWithCdtCodesFees")]
+        public async Task<IActionResult> GetFacilityPayersWithCdtCodesFees()
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var payersWithFees = await _dentalService.GetFacilityPayersWithCdtCodesFeesAsync(facilityId.Value);
+                return Ok(payersWithFees);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred during fetching facility payers with CDT codes fees: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+
 
     }
 

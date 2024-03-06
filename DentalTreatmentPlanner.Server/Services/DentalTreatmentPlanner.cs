@@ -233,7 +233,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         if (existingUcrFee != null) // If an existing UcrFee is found, update it
                         {
                             existingUcrFee.UcrDollarAmount = newFee.UcrDollarAmount;
-                            existingUcrFee.DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount;
+                            existingUcrFee.CoveragePercent = newFee.CoveragePercent;
                             existingUcrFee.ModifiedAt = DateTime.UtcNow;
                         }
                         else // Otherwise, create a new UcrFee
@@ -243,7 +243,7 @@ namespace DentalTreatmentPlanner.Server.Services
                                 PayerFacilityMapId = payerFacilityMap.PayerFacilityMapId,
                                 CdtCodeId = newFee.CdtCodeId,
                                 UcrDollarAmount = newFee.UcrDollarAmount,
-                                DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount,
+                                CoveragePercent = newFee.CoveragePercent,
                             };
                             _context.UcrFees.Add(newUcrFee);
                         }
@@ -255,7 +255,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         if (existingUcrFee != null) // Ensure the UcrFee exists before attempting to update
                         {
                             existingUcrFee.UcrDollarAmount = updatedFee.UcrDollarAmount;
-                            existingUcrFee.DiscountFeeDollarAmount = updatedFee.DiscountFeeDollarAmount;
+                            existingUcrFee.CoveragePercent = updatedFee.CoveragePercent;
                             existingUcrFee.ModifiedAt = DateTime.UtcNow;
                         }
                         {
@@ -284,16 +284,48 @@ namespace DentalTreatmentPlanner.Server.Services
             return await _context.UcrFees
                 .Where(uf => (uf.CDTCode.FacilityId == null || uf.CDTCode.FacilityId == facilityId) &&
                              uf.PayerFacilityMap.FacilityId == facilityId &&
-                             uf.PayerFacilityMap.PayerId == payerId) 
+                             uf.PayerFacilityMap.PayerId == payerId)
                 .Select(uf => new CdtCodeFeeDto
                 {
                     Code = uf.CDTCode.Code,
                     CdtCodeId = uf.CDTCode.CdtCodeId,
                     UcrDollarAmount = uf.UcrDollarAmount,
-                    DiscountFeeDollarAmount = uf.DiscountFeeDollarAmount
+                    CoveragePercent = uf.CoveragePercent,
+                    // Calculate CoPay 
+                    CoPay = uf.UcrDollarAmount.HasValue && uf.CoveragePercent.HasValue
+                        ? uf.UcrDollarAmount.Value - (uf.UcrDollarAmount.Value * (uf.CoveragePercent.Value / 100))
+                        : (decimal?)null 
                 }).ToListAsync();
         }
 
+
+        public async Task<IEnumerable<PayerWithCdtCodeFeesDto>> GetFacilityPayersWithCdtCodesFeesAsync(int facilityId)
+        {
+            var payersWithFees = await _context.PayerFacilityMaps
+                .Where(pfm => pfm.FacilityId == facilityId)
+                .Include(pfm => pfm.Payer)
+                .Select(pfm => new PayerWithCdtCodeFeesDto
+                {
+                    PayerId = pfm.Payer.PayerId,
+                    PayerName = pfm.Payer.PayerName,
+                    CdtCodeFees = _context.UcrFees
+                        .Where(uf => (uf.CDTCode.FacilityId == null || uf.CDTCode.FacilityId == facilityId) &&
+                                     uf.PayerFacilityMapId == pfm.PayerFacilityMapId)
+                        .Select(uf => new CdtCodeFeeDto
+                        {
+                            Code = uf.CDTCode.Code,
+                            CdtCodeId = uf.CDTCode.CdtCodeId,
+                            UcrDollarAmount = uf.UcrDollarAmount,
+                            CoveragePercent = uf.CoveragePercent,
+                            CoPay = uf.UcrDollarAmount.HasValue && uf.CoveragePercent.HasValue
+                                ? uf.UcrDollarAmount.Value - (uf.UcrDollarAmount.Value * (uf.CoveragePercent.Value / 100))
+                                : (decimal?)null
+                        }).ToList()
+                })
+                .ToListAsync();
+
+            return payersWithFees;
+        }
 
 
         public async Task<List<Patient>> GetPatientsByFacility(int facilityId)

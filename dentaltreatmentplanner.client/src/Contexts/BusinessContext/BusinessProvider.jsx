@@ -17,8 +17,8 @@ export const BusinessProvider = ({ children }) => {
     // State hooks for CDT codes and payers
     const [defaultCdtCodes, setDefaultCdtCodes] = useState([]);
     const [facilityCdtCodes, setFacilityCdtCodes] = useState([]);
-    const [payers, setPayers] = useState([]);
-    const [facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees] = useState([]);
+    //const [payers, setPayers] = useState([]);
+    //const [facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees] = useState([]);
     //const [activeCdtCodes, setActiveCdtCodes] = useState([]);
 
     //state hooks for categories and loading
@@ -60,7 +60,7 @@ export const BusinessProvider = ({ children }) => {
         fetchDefaultCdtCodes();
         fetchCustomCdtCodesForFacility();
         fetchPatientsForFacility();
-        fetchPayers();
+        //fetchPayers();
         //fetchCategoriesSubcategoriesAndTxPlans();
         fetchAllPatientTreatmentPlansForFacility();
     };
@@ -75,8 +75,8 @@ export const BusinessProvider = ({ children }) => {
         setSelectedPatient(null);
         setDefaultCdtCodes([]);
         setFacilityCdtCodes([]);
-        setPayers([]);
-        setFacilityPayerCdtCodeFees([]);
+        //setPayers([]);
+        //setFacilityPayerCdtCodeFees([]);
         //setActiveCdtCodes([]);
         setCategories([]);
         setIsLoading(false);
@@ -118,7 +118,7 @@ export const BusinessProvider = ({ children }) => {
         try {
             const fetchedPayers = await getPayersForFacility();
             console.log('Fetched payers in businessprovider:', fetchedPayers);
-            setPayers(fetchedPayers || []);
+            //setPayers(fetchedPayers || []);
         } catch (error) {
             console.error('Error fetching CDT codes:', error);
         }
@@ -128,7 +128,7 @@ export const BusinessProvider = ({ children }) => {
         try {
             const fetchedFacilityPayerCdtCodeFees = await getFacilityPayerCdtCodesFeesByPayer(payerId);
             console.log('Fetched payer specific cdt code fees in businessprovider:', fetchedFacilityPayerCdtCodeFees);
-            setFacilityPayerCdtCodeFees(fetchedFacilityPayerCdtCodeFees || []);
+            //setFacilityPayerCdtCodeFees(fetchedFacilityPayerCdtCodeFees || []);
         } catch (error) {
             console.error('Error fetching payer specific fees:', error);
         }
@@ -265,11 +265,11 @@ export const BusinessProvider = ({ children }) => {
             facilityCdtCodes, setFacilityCdtCodes, 
             defaultCdtCodes, setDefaultCdtCodes,
             isUserLoggedIn, setIsUserLoggedIn,
-            payers, setPayers,
-            facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees,
+            //payers, setPayers,
+            //facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees,
             categories,
             isLoading,
-            fetchFacilityPayerCdtCodeFees,
+            //fetchFacilityPayerCdtCodeFees,
             //activeCdtCodes, setActiveCdtCodes,
             resetAppStates,
             patientTreatmentPlans, setPatientTreatmentPlans,

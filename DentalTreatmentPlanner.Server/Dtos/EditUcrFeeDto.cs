@@ -6,6 +6,6 @@
         public int CdtCodeId { get; set; }
         public int UcrFeeId { get; set; }
         public decimal? UcrDollarAmount { get; set; }
-        public decimal? DiscountFeeDollarAmount { get; set; }
+        public decimal? CoveragePercent { get; set; }
     }
 }

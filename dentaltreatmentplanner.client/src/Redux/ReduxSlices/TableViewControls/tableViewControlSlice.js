@@ -64,6 +64,12 @@ export const tableViewControlSlice = createSlice({
         updateCheckedRows: (state, action) => {
             state.checkedRows = new Set(action.payload);
         },
+        requestUpdateTreatmentPlan: (state) => {
+            state.updateRequested = true;
+        },
+        clearUpdateRequest: (state) => {
+            state.updateRequested = false;
+        },
     },
 });
 
@@ -78,6 +84,7 @@ export const {
     toggleGroupActive,
     addCategory,
     updateCheckedRows,
+    requestUpdateTreatmentPlan, clearUpdateRequest
 } = tableViewControlSlice.actions;
 
 //selectors
@@ -87,5 +94,5 @@ export const selectSelectedCategories = (state) => state.tableViewControl.select
 export const selectInitialRenderComplete = (state) => state.tableViewControl.initialRenderComplete;
 export const selectCheckedRows = (state) => Array.from(state.tableViewControl.checkedRows);
 export const selectIsGroupActive = (state) => state.tableViewControl.isGroupActive;
-
+export const selectUpdateRequested = (state) => state.tableViewControl.updateRequested;
 export default tableViewControlSlice.reducer;

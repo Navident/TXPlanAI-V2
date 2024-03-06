@@ -29,7 +29,6 @@ const Table = ({
 	const dispatch = useDispatch();
 	const checkedRows = useSelector(selectCheckedRows);
 	const isRowChecked = (rowId) => checkedRows.includes(rowId);
-	const isGroupActive = useSelector(selectIsGroupActive);
 
 	const handleCheckboxChange = (rowId) => {
 		dispatch(toggleRowChecked(rowId));

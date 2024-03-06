@@ -23,6 +23,7 @@ import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { CircularProgress } from "@mui/material";
 import { selectPatientTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { selectPayersForFacility } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const PatientTreatmentPlanCustomizer = () => {
 	const { treatmentPlanId } = useParams();
@@ -31,6 +32,7 @@ const PatientTreatmentPlanCustomizer = () => {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
 	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
+	const payers = useSelector(selectPayersForFacility);
 
 	const {
 		treatmentPlans,
@@ -46,9 +48,7 @@ const PatientTreatmentPlanCustomizer = () => {
 				const id = parseInt(treatmentPlanId, 10);
 				const foundPlan = patientTreatmentPlans.find(plan => parseInt(plan.treatmentPlanId, 10) === id);
 				setPlan(foundPlan);
-				if (foundPlan && foundPlan.payerId) {
-					await fetchFacilityPayerCdtCodeFees(foundPlan.payerId);
-				}
+
 				setIsLoading(false); 
 			} else {
 				setIsLoading(false); 
@@ -56,7 +56,7 @@ const PatientTreatmentPlanCustomizer = () => {
 		};
 
 		fetchPlanAndFees();
-	}, [treatmentPlanId, patientTreatmentPlans, fetchFacilityPayerCdtCodeFees]);
+	}, [treatmentPlanId, patientTreatmentPlans]);
 
 	const handleLogoClick = () => {
 		navigate("/");

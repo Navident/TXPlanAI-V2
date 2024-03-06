@@ -44,7 +44,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.UcrDollarAmount)
                       .HasColumnType("decimal(18, 2)");
 
-                entity.Property(e => e.DiscountFeeDollarAmount)
+                entity.Property(e => e.CoveragePercent)
                       .HasColumnType("decimal(18, 2)"); 
             });
 

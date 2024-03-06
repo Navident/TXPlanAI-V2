@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { fetchPayersForFacility, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
     'shared/fetchAllPatientTreatmentPlansForFacility',
@@ -94,9 +94,9 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
         const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         if (isUserLoggedIn) {
             await Promise.all([
-                dispatch(fetchPayersForFacility()),
+                dispatch(fetchPayersWithCdtCodesFeesForFacility()),
                 dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
-                dispatch(fetchAllPatientTreatmentPlansForFacility()) 
+                dispatch(fetchAllPatientTreatmentPlansForFacility()),
             ]);
         }
     }

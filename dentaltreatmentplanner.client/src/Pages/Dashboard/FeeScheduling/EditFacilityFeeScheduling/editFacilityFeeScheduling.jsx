@@ -14,7 +14,7 @@ import { updateFacilityPayerCdtCodeFees } from '../../../../ClientServices/apiSe
 import SaveButtonRow from "../../../../Components/Common/SaveButtonRow/index";
 import { CircularProgress } from "@mui/material";
 import { useSelector } from 'react-redux';
-import { selectActiveCdtCodes } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectActiveCdtCodes, selectPayersForFacility } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const EditFacilityFeeScheduling = () => {
     const { payerId } = useParams();
@@ -22,56 +22,58 @@ const EditFacilityFeeScheduling = () => {
     const initialPayerName = location.state?.payerName || 'Unknown Payer';
     const [payerNameInputText, setPayerNameInputText] = useState(initialPayerName);
     const [searchInputText, setSearchInputText] = useState('');
-    const headers = ["CDT Code", "Description", "UCR Fee", "Discount Fee", ""];
+    const headers = ["CDT Code", "Description", "UCR Fee", "Coverage Percent", ""];
     const columnWidths = ['20%', '45%', '15%', '15%', '5%'];
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
-    const { facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, fetchPayers , fetchFacilityPayerCdtCodeFees } = useBusiness(); 
+    const { facilityCdtCodes, defaultCdtCodes, fetchPayers  } = useBusiness(); 
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const activeCdtCodes = useSelector(selectActiveCdtCodes);
+    const payers = useSelector(selectPayersForFacility); 
 
     useEffect(() => {
         setIsLoading(true);
-        fetchFacilityPayerCdtCodeFees(payerId);
     }, [payerId]);
 
     useEffect(() => {
+        const payerFees = payers.find(payer => payer.payerId === parseInt(payerId))?.cdtCodeFees || [];
+
         const combinedCdtCodes = [...defaultCdtCodes, ...facilityCdtCodes];
-        if (combinedCdtCodes.length > 0) {
-            const _activeRowsData = [];
-            const _inactiveRowsData = [];
+        const _activeRowsData = [];
+        const _inactiveRowsData = [];
 
-            combinedCdtCodes.forEach(code => {
-                const fees = facilityPayerCdtCodeFees.find(fee => parseInt(fee.cdtCodeId) === parseInt(code.cdtCodeId));
-                const rowData = {
-                    id: code.cdtCodeId.toString(),
-                    code: code.code,
-                    description: code.longDescription,
-                    ucrFee: fees?.ucrDollarAmount ?? '',
-                    discountFee: fees?.discountFeeDollarAmount ?? '',
-                    isStatic: true
-                };
+        combinedCdtCodes.forEach(code => {
+            const fee = payerFees.find(f => f.cdtCodeId === code.cdtCodeId);
+            const rowData = {
+                id: code.cdtCodeId.toString(),
+                code: code.code,
+                description: code.longDescription,
+                ucrFee: fee?.ucrDollarAmount ?? '',
+                coveragePercent: fee?.coveragePercent ?? '',
+                coPay: fee?.coPay ?? '', 
+                isStatic: true
+            };
 
-                if (activeCdtCodes.includes(code.cdtCodeId)) {
-                    _activeRowsData.push(rowData);
-                } else {
-                    _inactiveRowsData.push(rowData);
-                }
-            });
-            setIsLoading(false);
-            setActiveRowsData(_activeRowsData);
-            setInactiveRowsData(_inactiveRowsData);
-        }
-    }, [facilityCdtCodes, defaultCdtCodes, facilityPayerCdtCodeFees, activeCdtCodes]);
+            if (activeCdtCodes.includes(code.cdtCodeId)) {
+                _activeRowsData.push(rowData);
+            } else {
+                _inactiveRowsData.push(rowData);
+            }
+        });
+
+        setIsLoading(false);
+        setActiveRowsData(_activeRowsData);
+        setInactiveRowsData(_inactiveRowsData);
+    }, [payers, facilityCdtCodes, defaultCdtCodes, payerId, activeCdtCodes]);
 
     const renderStaticRow = (row, index) => ([
         <span key={`code-${index}`}>{row.code}</span>,
         <span key={`description-${index}`}>{row.description}</span>,
         <span key={`ucrFee-${index}`}>{row.ucrFee ? `$${row.ucrFee}` : ''}</span>,
-        <span key={`discountFee-${index}`}>{row.discountFee ? `$${row.discountFee}` : ''}</span>,
+        <span key={`coveragePercent-${index}`}>{row.coveragePercent ? `$${row.coveragePercent}` : ''}</span>,
         createDeleteAndEditIconCell(row, index)
     ]);
 
@@ -90,9 +92,9 @@ const EditFacilityFeeScheduling = () => {
                 adornment={<InputAdornment position="start">$</InputAdornment>}
             />,
             <StandardTextfield 
-                key={`discountFee-${index}`}
-                value={row.discountFee}
-                onChange={(e) => handleInputChange(row.id, 'discountFee', e.target.value)}
+                key={`coveragePercent-${index}`}
+                value={row.coveragePercent}
+                onChange={(e) => handleInputChange(row.id, 'coveragePercent', e.target.value)}
                 borderColor={UI_COLORS.purple}
                 width="300px"
                 adornment={<InputAdornment position="start">$</InputAdornment>}
@@ -128,14 +130,14 @@ const EditFacilityFeeScheduling = () => {
         const newFees = combinedRowsData.filter(row => !row.UcrFeeId && row.isEdited).map(row => ({
             CdtCodeId: parseInt(row.id, 10),
             UcrDollarAmount: parseFloat(row.ucrFee),
-            DiscountFeeDollarAmount: parseFloat(row.discountFee)
+            CoveragePercent: parseFloat(row.coveragePercent)
         }));
 
         // Existing fees being updated
         const updatedFees = combinedRowsData.filter(row => row.UcrFeeId && row.isEdited).map(row => ({
             UcrFeeId: parseInt(row.UcrFeeId, 10),
             UcrDollarAmount: parseFloat(row.ucrFee),
-            DiscountFeeDollarAmount: parseFloat(row.discountFee)
+            CoveragePercent: parseFloat(row.coveragePercent)
         }));
 
         let editedPayer = null;

@@ -42,10 +42,13 @@ import {
 	toggleGroupActive,
 	clearCheckedRows,
 	selectSelectedCategories,
-	updateCheckedRows
+	updateCheckedRows,
+	selectUpdateRequested, clearUpdateRequest
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
+import { selectPayersForFacility, selectSelectedPayer } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
@@ -77,11 +80,10 @@ const TreatmentPlanOutput = ({
 	const [editedRows, setEditedRows] = useState([]);
 	const {
 		selectedPatient,
-		facilityPayerCdtCodeFees,
 	} = useBusiness();
-	const { selectedPayer } = useTreatmentPlan();
+	//const { selectedPayer } = useTreatmentPlan();
 	const [hasEdits, setHasEdits] = useState(false);
-	const columnWidths = ["5%", "10%", "10%", "45%", "15%", "15%", "5%"];
+	const columnWidths = ["5%", "10%", "10%", "40%", "10%", "10%", "10%", "5%"];
 
 	const checkedRows = useSelector(selectCheckedRows);
 	const isGroupActive = useSelector(selectIsGroupActive);
@@ -89,6 +91,10 @@ const TreatmentPlanOutput = ({
 	const visitOrder = useSelector(selectVisitOrder);
 	const [editTableNameMode, setEditTableNameMode] = useState(null); 
 	const [editTableNameValue, setEditTableNameValue] = useState(''); 
+	const updateRequested = useSelector(selectUpdateRequested);
+	const payers = useSelector(selectPayersForFacility);
+	const selectedPayer = useSelector(selectSelectedPayer);
+
 	useEffect(() => {
 		const newCheckedRows = [];
 		Object.values(allRows).forEach(visitRows => {
@@ -101,6 +107,12 @@ const TreatmentPlanOutput = ({
 		dispatch(updateCheckedRows(newCheckedRows)); 
 	}, [selectedCategories, allRows, dispatch]);
 
+	useEffect(() => {
+		if (updateRequested ) {
+			handleUpdateTreatmentPlan(); 
+			dispatch(clearUpdateRequest()); 
+		}
+	}, [updateRequested, treatmentPlan, dispatch]);
 
 	useEffect(() => {
 		if (isGroupActive) {
@@ -222,30 +234,35 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 
 	const createInitialStaticRows = (visitCdtCodeMap, visitId, index) => {
-		const fee = facilityPayerCdtCodeFees.find(
-			(f) => f.code === visitCdtCodeMap.code
-		);
-
-		let ucrFee, discountFee;
-		if (isInGenerateTreatmentPlanContext && selectedPayer) {
-			ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
-			discountFee = fee ? fee.discountFeeDollarAmount : "Not configured";
-		} else {
-			ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
-			discountFee = fee ? fee.discountFeeDollarAmount : "Not configured";
+		let selectedPayerDetails;
+		// Check if we're not in the create treatment plan context and a payerId exists on the treatment plan
+		if (!isInGenerateTreatmentPlanContext && treatmentPlan.payerId) {
+			const savedTxPayerId = treatmentPlan.payerId;
+			selectedPayerDetails = payers.find(payer => payer.payerId === savedTxPayerId);
 		}
+		// Check if we are in the create treatment plan context and a selectedPayer exists
+		else if (isInGenerateTreatmentPlanContext && selectedPayer && selectedPayer.payerId) {
+			selectedPayerDetails = payers.find(payer => payer.payerId === selectedPayer.payerId);
+		}
+
+		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === visitCdtCodeMap.code);
+
+		// Default values for UCR Fee, Coverage Percent, and CoPay when fee details are available
+		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
+		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
+		const coPay = fee ? fee.coPay : "Not configured";
 
 		const extraRowInput = [
 			visitCdtCodeMap.toothNumber,
 			visitCdtCodeMap.code,
 			visitCdtCodeMap.longDescription,
 			ucrFee,
-			discountFee,
+			coveragePercent,
+			coPay
 		];
-		console.log(
-			`Creating row for visitId ${visitId}, index ${index}, toothNumber:`,
-			visitCdtCodeMap.toothNumber
-		);
+
+		console.log(`Creating row for visitId ${visitId}, index ${index}, toothNumber:`, visitCdtCodeMap.toothNumber);
+
 		return {
 			id: `static-${visitId}-${index}`,
 			visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
@@ -255,6 +272,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			extraRowInput,
 		};
 	};
+
 
 	const createCDTCodeDropdown = (
 		rowId,
@@ -311,7 +329,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 				? selectedCdtCode.longDescription
 				: currentRow.description);
 		const ucrFee = currentRow.extraRowInput[2];
-		const discountFee = currentRow.extraRowInput[3];
+		const coveragePercent = currentRow.extraRowInput[3];
+		const coPay = currentRow.extraRowInput[4];
+
 		setHasEdits(true);
 		return {
 			...currentRow,
@@ -327,7 +347,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 					: currentRow.selectedCdtCode?.code,
 				description,
 				ucrFee,
-				discountFee,
+				coveragePercent,
+				coPay
 			],
 		};
 	};
@@ -345,13 +366,15 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 				? currentRow.selectedCdtCode.toothNumber
 				: "";
 		const ucrFee = currentRow.extraRowInput[3];
-		const discountFee = currentRow.extraRowInput[4];
+		const coveragePercent = currentRow.extraRowInput[4];
+		const coPay = currentRow.extraRowInput[5];
 
 		const extraRowInput = [
 			toothNumber,
 			dropdownSearchElement,
 			ucrFee,
-			discountFee,
+			coveragePercent,
+			coPay
 		];
 
 		return {
@@ -771,14 +794,15 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			"CDT Code",
 			"Description",
 			"UCR Fee",
-			"Discount Fee",
+			"Coverage %",
+			"Co-Pay",
 		];
 		return headers;
 	};
 
 	const constructStaticRowData = (row) => {
 		return row.extraRowInput.map((input, index, array) => {
-			// UCR Fee and Discount Fee are the last two elements in the array
+			// UCR Fee and Coverage Percent are the last two elements in the array
 			if (index === array.length - 2 || index === array.length - 1) {
 				// Replace null or undefined fees with "NA"
 				return input != null ? input.toString() : "NA";
@@ -789,7 +813,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	const constructDynamicRowData = (row, visitId) => {
 		const ucrFee = row.extraRowInput[2];
-		const discountFee = row.extraRowInput[3];
+		const coveragePercent = row.extraRowInput[3];
+		const coPay = row.extraRowInput[4];
 		const dropdownKey = `dropdown-${row.id}`;
 		const cdtDropdown = (
 			<DropdownSearch
@@ -809,7 +834,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			row.selectedCdtCode && row.selectedCdtCode.toothNumber
 				? row.selectedCdtCode.toothNumber.toString()
 				: "";
-		return [toothNumber, cdtDropdown, row.description, ucrFee, discountFee];
+		return [toothNumber, cdtDropdown, row.description, ucrFee, coveragePercent, coPay];
 	};
 
 	const handleCancelEdit = (rowId, visitId) => {
@@ -926,9 +951,23 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 		// Determine if the row is checked
 		const isRowChecked = checkedRows.includes(row.id);
+
 		// Determine the category and corresponding background color
-		const category = row.selectedCdtCode?.originalVisitCategory; // Adjust based on your data structure
-		const backgroundColor = isRowChecked && category ? categoryColorMapping[category] : null;
+		const category = row.selectedCdtCode?.originalVisitCategory;
+
+		let backgroundColor;
+		if (isRowChecked) {
+			if (category && selectedCategories.has(category)) {
+				// If the row's category is selected, use the corresponding color
+				backgroundColor = categoryColorMapping[category];
+			} else {
+				// If the row is checked but its category is not among the selected, or it doesn't have a category, make it transparent
+				backgroundColor = "transparent";
+			}
+		} else {
+			// Default background color when not checked
+			backgroundColor = null; 
+		}
 
 		return {
 			id: row.id,
@@ -936,6 +975,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			backgroundColor,
 		};
 	};
+
 
 	const handleEditRow = (rowId, visitId) => {
 		// Directly access the rows for the specific visitId
@@ -1083,7 +1123,6 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	return (
 		<>
-			<SaveButtonRow onSave={handleUpdateTreatmentPlan} />
 			{treatmentPlan && (
 				<DragDropContext
 					onDragEnd={(result) =>

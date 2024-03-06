@@ -14,10 +14,12 @@ const SaveButton = ({ onSave, children, gap }) => {
                 backgroundColor={UI_COLORS.green}
                 textColor="white"
                 border={false}
-                width="200px"
-                minWidth="200px"
+                width="150px"
+                minWidth="150px"
                 className="green-button-hover"
                 onClick={onSave}
+                borderRadius="4px"
+                height="39px"
             />
         </StyledSaveButtonRow>
     );

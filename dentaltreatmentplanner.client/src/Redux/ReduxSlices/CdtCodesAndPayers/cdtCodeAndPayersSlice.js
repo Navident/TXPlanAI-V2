@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer } from '../../../ClientServices/apiService';
+import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
 
 const initialState = {
     defaultCdtCodes: [],
@@ -41,10 +41,23 @@ export const fetchPayersForFacility = createAsyncThunk(
 export const fetchFacilityPayerCdtCodeFeesByPayer = createAsyncThunk(
     'cdtCodeAndPayers/fetchFacilityPayerCdtCodeFeesByPayer',
     async (payerId) => {
+        console.log('getting facility payer cdt code fees with redux...');
         const response = await getFacilityPayerCdtCodesFeesByPayer(payerId);
+        console.log('Facility payer cdt code fees redux received:', response);
         return response;
     }
 );
+
+export const fetchPayersWithCdtCodesFeesForFacility = createAsyncThunk(
+    'cdtCodeAndPayers/fetchPayersWithCdtCodesFeesForFacility',
+    async () => {
+        console.log('Fetching payers with CDT code fees for facility...');
+        const response = await getFacilityPayersWithCdtCodesFees();
+        console.log('Response received for payers with fees:', response);
+        return response;
+    }
+);
+
 
 export const cdtCodeAndPayersSlice = createSlice({
     name: 'cdtCodeAndPayers',
@@ -66,11 +79,12 @@ export const cdtCodeAndPayersSlice = createSlice({
             .addCase(fetchCustomCdtCodesForFacility.fulfilled, (state, action) => {
                 state.facilityCdtCodes = action.payload;
             })
-            .addCase(fetchPayersForFacility.fulfilled, (state, action) => {
-                state.payers = action.payload;
-            })
-            .addCase(fetchFacilityPayerCdtCodeFeesByPayer.fulfilled, (state, action) => {
-                state.facilityPayerCdtCodeFees = action.payload;
+            .addCase(fetchPayersWithCdtCodesFeesForFacility.fulfilled, (state, action) => {
+                state.payers = action.payload.map(payer => ({
+                    payerId: payer.payerId,
+                    payerName: payer.payerName,
+                    cdtCodeFees: payer.cdtCodeFees // Directly assign the fees array to each payer
+                }));
             })
             .addMatcher(
                 action => action.type.endsWith('/pending'),
@@ -92,6 +106,7 @@ export const cdtCodeAndPayersSlice = createSlice({
                 }
             );
     },
+
 });
 
 export const { resetState, setSelectedPayer, setActiveCdtCodes } = cdtCodeAndPayersSlice.actions;

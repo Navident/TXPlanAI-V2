@@ -32,7 +32,6 @@ const FeeScheduling = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const isEditingFacilityFeeScheduling = location.pathname.includes("/feescheduling/edit");
-
     useEffect(() => {
         let payerRows = [];
         if (payers && payers.length > 0) {
@@ -46,6 +45,9 @@ const FeeScheduling = () => {
         setRowsData([...payerRows, newPayerRow]);
     }, [payers, location.key]);
 
+    useEffect(() => {
+        console.log("payers: ", payers);
+    }, [payers]);
 
     const handleEditButtonClick = (payerId, payerName) => {
         navigate(`/dashboard/feescheduling/edit/${payerId}`, { state: { payerName } });

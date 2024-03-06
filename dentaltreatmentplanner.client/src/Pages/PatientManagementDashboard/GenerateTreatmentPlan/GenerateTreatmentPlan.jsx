@@ -18,7 +18,6 @@ import {
 
 } from "../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSelectedPayer } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 import {
 	selectAllSubcategoryTreatmentPlans,
@@ -32,14 +31,12 @@ import {
 const GenerateTreatmentPlan = () => {
 
 	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
-	const selectedPayer = useSelector(selectSelectedPayer);
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 
 	const [inputText, setInputText] = useState("");
 	const dispatch = useDispatch();
 
 	const {
-		fetchFacilityPayerCdtCodeFees,
 		selectedPatient,
 	} = useBusiness();
 
@@ -51,11 +48,7 @@ const GenerateTreatmentPlan = () => {
 		}
 	}, [treatmentPlans]);
 
-	useEffect(() => {
-		if (selectedPayer) {
-			fetchFacilityPayerCdtCodeFees(selectedPayer.payerId);
-		}
-	}, [selectedPayer]);
+
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);

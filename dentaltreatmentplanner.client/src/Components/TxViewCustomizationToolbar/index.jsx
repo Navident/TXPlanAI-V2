@@ -13,16 +13,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
     selectSortBy,
     selectInitialRenderComplete,
-    toggleGroupActive
+    toggleGroupActive,
+    requestUpdateTreatmentPlan
 } from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
+import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
     const [isSticky, setIsSticky] = useState(false);
     const toolbarRef = useRef(null);
     const sentinelRef = useRef(null); 
-    const sortBy = useSelector(selectSortBy);
-    const initialRenderComplete = useSelector(selectInitialRenderComplete);
+    const handleSaveButtonClick = () => {
+        dispatch(requestUpdateTreatmentPlan());
+    };
 
     const handleGroupClick = () => {
         dispatch(toggleGroupActive());
@@ -63,9 +66,10 @@ const TxViewCustomizationToolbar = () => {
                         border={false}
                         borderRadius="4px"
                         height="39px"
-                        width="200px"
+                        width="150px"
                     />
                 <CategoryFilters />
+                <SaveButtonRow onSave={handleSaveButtonClick} />
             </StyledTxToolbarContainer>
         </>
     );

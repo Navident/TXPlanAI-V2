@@ -17,14 +17,12 @@ const CategoryFilters = () => {
     const activeTxCategories = useSelector(selectActiveTxCategories);
     const selectedCategories = useSelector(selectSelectedCategories);
 
-    // Removed isAllSelected as it's no longer needed
-
     useEffect(() => {
         console.log("activeTxCategories:", activeTxCategories);
     }, [activeTxCategories]);
 
 
-    // Directly mapping activeTxCategories to filters without "Select All"
+    // Directly mapping activeTxCategories to filters 
     const filters = activeTxCategories.map(category => ({
         label: category,
         checked: selectedCategories.has(category)
