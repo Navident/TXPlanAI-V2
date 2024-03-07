@@ -47,11 +47,12 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { selectPayersForFacility, selectSelectedPayer } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
+import PaymentTotals from "../../Components/PaymentTotals/index";
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -261,8 +262,6 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			coPay
 		];
 
-		console.log(`Creating row for visitId ${visitId}, index ${index}, toothNumber:`, visitCdtCodeMap.toothNumber);
-
 		return {
 			id: `static-${visitId}-${index}`,
 			visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
@@ -322,17 +321,25 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		selectedCdtCode,
 		originalDescription
 	) => {
-		// Prioritize using the originalDescription if provided
-		const description =
-			originalDescription ||
-			(selectedCdtCode
-				? selectedCdtCode.longDescription
-				: currentRow.description);
-		const ucrFee = currentRow.extraRowInput[2];
-		const coveragePercent = currentRow.extraRowInput[3];
-		const coPay = currentRow.extraRowInput[4];
+		// Find the payer details based on the context
+		let selectedPayerDetails;
+		if (!isInGenerateTreatmentPlanContext && treatmentPlan.payerId) {
+			const savedTxPayerId = treatmentPlan.payerId;
+			selectedPayerDetails = payers.find(payer => payer.payerId === savedTxPayerId);
+		} else if (isInGenerateTreatmentPlanContext && selectedPayer && selectedPayer.payerId) {
+			selectedPayerDetails = payers.find(payer => payer.payerId === selectedPayer.payerId);
+		}
 
-		setHasEdits(true);
+		// Extract fee details for the selected CDT code
+		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === (selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code));
+
+		// Use extracted or default values
+		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
+		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
+		const coPay = fee ? fee.coPay : "Not configured";
+
+		const description = originalDescription || (selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description);
+
 		return {
 			...currentRow,
 			id: `static-${visitId}-${Date.now()}`,
@@ -341,10 +348,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
 			description,
 			extraRowInput: [
-				treatmentPlan.toothNumber,
-				selectedCdtCode
-					? selectedCdtCode.code
-					: currentRow.selectedCdtCode?.code,
+				currentRow.extraRowInput[0], 
+				selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code, 
 				description,
 				ucrFee,
 				coveragePercent,
@@ -352,6 +357,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			],
 		};
 	};
+
 
 	const convertToDynamicRow = (currentRow, visitId) => {
 		const dropdownSearchElement = createCDTCodeDropdown(
@@ -802,14 +808,13 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	const constructStaticRowData = (row) => {
 		return row.extraRowInput.map((input, index, array) => {
-			// UCR Fee and Coverage Percent are the last two elements in the array
-			if (index === array.length - 2 || index === array.length - 1) {
-				// Replace null or undefined fees with "NA"
-				return input != null ? input.toString() : "NA";
+			if (index >= array.length - 3) {
+				return input != null ? input.toString() : "Not configured";
 			}
 			return input;
 		});
 	};
+
 
 	const constructDynamicRowData = (row, visitId) => {
 		const ucrFee = row.extraRowInput[2];
@@ -1036,18 +1041,51 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		};
 	};
 
+	const calculateTotalsForVisit = (visitRows) => {
+		let ucrTotal = 0;
+		let coPayTotal = 0;
+
+		visitRows.forEach(row => {
+			if (row.isStatic) {
+				const ucrFee = parseFloat(row.extraRowInput[3]);
+				const coPay = parseFloat(row.extraRowInput[5]);
+
+				if (!isNaN(ucrFee)) {
+					ucrTotal += ucrFee;
+				}
+
+				if (!isNaN(coPay)) {
+					coPayTotal += coPay;
+				}
+			}
+		});
+
+		return { ucrTotal, coPayTotal };
+	};
+
+	const calculateGrandTotals = (allRows) => {
+		let grandUcrTotal = 0;
+		let grandCoPayTotal = 0;
+
+		if (allRows) {
+			console.log("we went inside the if condition")
+			Object.values(allRows).forEach(visitRows => {
+				const { ucrTotal, coPayTotal } = calculateTotalsForVisit(visitRows);
+				grandUcrTotal += ucrTotal;
+				grandCoPayTotal += coPayTotal;
+			});
+		}
+
+		return { grandUcrTotal, grandCoPayTotal };
+	};
+
+
 
 	const renderVisit = (visitId, index) => {
 		console.log("Visit order when we get in renderVisit", visitOrder);
 		const visitIdStr = String(visitId);
 
-		// Ensure localUpdatedVisits and treatmentPlan.visits are treated as arrays even if they're null/undefined
-		//const safeLocalUpdatedVisits = Array.isArray(localUpdatedVisits) ? localUpdatedVisits : [];
 		const safeTreatmentPlanVisits = Array.isArray(treatmentPlan.visits) ? treatmentPlan.visits : [];
-
-		// Attempt to find the visit in either localUpdatedVisits or directly in treatmentPlan.visits
-		//const visit = safeLocalUpdatedVisits.find(v => String(v.visitId) === visitIdStr) ||
-			//safeTreatmentPlanVisits.find(v => String(v.visitId) === visitIdStr);
 
 		const visit = safeTreatmentPlanVisits.find(v => String(v.visitId) === visitIdStr);
 
@@ -1075,6 +1113,12 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 				allRows[visitIdStr]
 			);
 		});
+		const { ucrTotal, coPayTotal } = calculateTotalsForVisit(allRows[visitIdStr]);
+		const { grandUcrTotal, grandCoPayTotal } = calculateGrandTotals(allRows);
+		// Dispatch actions to update the totals in the store
+		dispatch(setGrandUcrTotal(grandUcrTotal));
+		dispatch(setGrandCoPayTotal(grandCoPayTotal));
+		dispatch(setGrandTotalsReady(true));
 		console.log("Visit before return", visit);
 		return (
 			<Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
@@ -1115,7 +1159,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 							onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
 							columnWidths={columnWidths}
 						/>
+						<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />
 					</div>
+
 				)}
 			</Draggable>
 		);
@@ -1144,8 +1190,11 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 								{visitOrder.map((visitId, index) =>
 									renderVisit(visitId, index)
 								)}
+
 								{provided.placeholder}
+
 							</div>
+
 						)}
 					</Droppable>
 				</DragDropContext>

@@ -10,6 +10,7 @@ import {
 	StyledContainerWithTableInner,
 	StyledLargeText,
 	StyledSeparator,
+	StyledTitleAndPaymentTotalsContainer
 } from "../../../GlobalStyledComponents";
 import { runGeminiPro } from "../../../GeminiPro/geminiProRunner";
 import { CircularProgress } from "@mui/material";
@@ -27,14 +28,17 @@ import {
 	onDeleteVisit,
 	selectAllTreatmentPlans
 } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import PaymentTotals from "../../../Components/PaymentTotals/index";
 
 const GenerateTreatmentPlan = () => {
-
+	const dispatch = useDispatch();
 	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
-
+	const grandUcrTotal = useSelector(selectGrandUcrTotal);
+	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
 	const [inputText, setInputText] = useState("");
-	const dispatch = useDispatch();
+	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
 
 	const {
 		selectedPatient,
@@ -243,7 +247,21 @@ const GenerateTreatmentPlan = () => {
 				<TxViewCustomizationToolbar />
 				<StyledSeparator customMarginTop="0px" />
 				<StyledContainerWithTableInner>
-					<StyledLargeText textAlign="center">Treatment Plan</StyledLargeText>
+					<StyledTitleAndPaymentTotalsContainer>
+						<div style={{ flex: 1 }}></div> 
+						<StyledLargeText>Treatment Plan</StyledLargeText>
+						<div style={{ flex: 1 }}>
+							{areGrandTotalsReady && (
+								<PaymentTotals
+									ucrTotal={grandUcrTotal}
+									coPayTotal={grandCoPayTotal}
+									isGrandTotal={true}
+									justifyContent="end"
+								/>
+							)}
+						</div> 
+					</StyledTitleAndPaymentTotalsContainer>
+
 					{isLoading ? (
 						<div
 							style={{

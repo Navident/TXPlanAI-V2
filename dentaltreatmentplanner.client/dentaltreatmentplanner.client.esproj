@@ -20,6 +20,7 @@
     <Folder Include="src\Components\AlertWrapper\" />
     <Folder Include="src\Components\DropdownHeaderPopup\" />
     <Folder Include="src\Components\InitialDataLoader\" />
+    <Folder Include="src\Components\PaymentTotals\" />
     <Folder Include="src\Components\TxPlansBoxLinesChart\" />
     <Folder Include="src\Components\RecentTxPlans\" />
     <Folder Include="src\Components\TxViewCustomizationToolbar\CategoryFilters\" />

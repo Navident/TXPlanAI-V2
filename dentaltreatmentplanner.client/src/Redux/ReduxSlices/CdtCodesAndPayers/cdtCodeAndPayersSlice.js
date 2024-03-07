@@ -10,6 +10,9 @@ const initialState = {
     selectedPayer: null, 
     isLoading: false,
     error: null,
+    grandUcrTotal: 0,
+    grandCoPayTotal: 0,
+    areGrandTotalsReady: false,
 };
 
 export const fetchCustomCdtCodesForFacility = createAsyncThunk(
@@ -70,6 +73,15 @@ export const cdtCodeAndPayersSlice = createSlice({
         setActiveCdtCodes: (state, action) => {
             state.activeCdtCodes = action.payload;
         },
+        setGrandUcrTotal: (state, action) => {
+            state.grandUcrTotal = action.payload;
+        },
+        setGrandCoPayTotal: (state, action) => {
+            state.grandCoPayTotal = action.payload;
+        },
+        setGrandTotalsReady: (state, action) => {
+            state.areGrandTotalsReady = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -109,7 +121,7 @@ export const cdtCodeAndPayersSlice = createSlice({
 
 });
 
-export const { resetState, setSelectedPayer, setActiveCdtCodes } = cdtCodeAndPayersSlice.actions;
+export const { resetState, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal } = cdtCodeAndPayersSlice.actions;
 
 // Selector to get the default CDT codes
 export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;
@@ -134,5 +146,15 @@ export const selectIsLoading = (state) => state.cdtCodeAndPayers.isLoading;
 
 // Selector to get any errors
 export const selectError = (state) => state.cdtCodeAndPayers.error;
+
+// Selector to get the grand UCR total
+export const selectGrandUcrTotal = (state) => state.cdtCodeAndPayers.grandUcrTotal;
+
+// Selector to get the grand Co-Pay total
+export const selectGrandCoPayTotal = (state) => state.cdtCodeAndPayers.grandCoPayTotal;
+
+// Selector to check if the grand totals are ready to be displayed
+export const selectAreGrandTotalsReady = (state) => state.cdtCodeAndPayers.areGrandTotalsReady;
+
 
 export default cdtCodeAndPayersSlice.reducer;
