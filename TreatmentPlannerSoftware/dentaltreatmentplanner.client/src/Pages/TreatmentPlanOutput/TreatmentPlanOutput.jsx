@@ -19,17 +19,23 @@ import deleteIcon from "../../assets/delete-x.svg";
 import dragIcon from "../../assets/drag-icon.svg";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import {
+	StyledContainerWithTableInner,
 	StyledAddButtonCellContainer,
 	StyledClickableText,
 	StyledEditIcon,
 	StyledDeleteIcon,
 	StyledEditDeleteIconsContainer,
-
+	StyledSaveTextBtn,
+	StyledLightGreyText,
+	StyledRoundedBoxContainerInner,
+	StyledSemiboldBlackTitle,
 	TableHeader
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
+import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
+import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import {
 	selectCheckedRows,
 	selectIsGroupActive,
@@ -76,6 +82,7 @@ const TreatmentPlanOutput = ({
 	const {
 		selectedPatient,
 	} = useBusiness();
+	//const { selectedPayer } = useTreatmentPlan();
 	const [hasEdits, setHasEdits] = useState(false);
 	const columnWidths = ["5%", "10%", "10%", "40%", "10%", "10%", "10%", "5%"];
 
