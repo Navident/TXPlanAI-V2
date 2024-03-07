@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DentalTreatmentPlanner.Server", "DentalTreatmentPlanner.Server\DentalTreatmentPlanner.Server.csproj", "{9106CC3A-B9D5-4AFB-972D-4898B56E04BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DentalTreatmentPlanner.Server", "DentalTreatmentPlanner.Server\DentalTreatmentPlanner.Server.csproj", "{9106CC3A-B9D5-4AFB-972D-4898B56E04BC}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "dentaltreatmentplanner.client", "dentaltreatmentplanner.client\dentaltreatmentplanner.client.esproj", "{E66C4521-0528-4456-87E2-206371C1F120}"
 EndProject

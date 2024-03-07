@@ -1,0 +1,373 @@
+﻿
+
+
+
+* {
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+}
+
+.large-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.large-text-bold {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.login-signup-header.large-text {
+    line-height: 1;
+}
+
+.tx-container .header-bar{
+    background-color: white;
+
+}
+.rounded-box{
+    border-radius: 15px;
+    background-color:white;
+}
+.table-container {
+    display: flex;
+    flex-direction: column;   
+}
+
+.visit-section{
+    margin-bottom: 20px;
+}
+
+.sidebar-container {
+    background-color: white;
+    height: calc(100vh - 100px);
+    border-bottom-right-radius: 15px;
+    width: 260px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.MuiOutlinedInput-root {
+    border-radius: 15px !important; 
+}
+
+[class*="MuiFormControl-root-MuiTextField-root"] {
+    border-radius: 15px;
+}
+    .purple-button-hover:hover {
+        background-color: #65658a !important;
+    }
+
+.textbox-label {
+    margin-bottom: 10px;
+}
+
+.login-signup-header.large-text {
+    font-size: 40px;
+}
+
+.tx-table th, .tx-table td {
+    border: none;
+    padding: 12px;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+    .tx-table th{
+        font-weight: 600;
+    }
+
+    .tx-table thead tr th {
+        background-color: #eeeef3;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+.delete-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.edit-button {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+}
+.login-signup-container {
+    height: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+.loading-spinner{
+    margin: auto;
+}
+.login-signup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    max-width: 650px;
+}
+.tx-table {
+    width: 100%;
+    border-spacing: 0;
+}
+.table-inner-header th {
+    border-top: 1px solid #7777a1;
+}
+    .tx-table th, .tx-table td {
+        border-bottom: 1px solid #7777a1;
+    }
+
+    .tx-table thead tr:first-child th:first-child {
+        border-top: 1px solid #7777a1;
+        border-left: 1px solid #7777a1;
+    }
+        .tx-table thead tr th:nth-child(1) {
+            width: 10%;
+            border-left: 1px solid #7777a1;
+        }
+    .tx-table tr td:nth-child(1) {
+        width: 10%;
+        border-left: 1px solid #7777a1;
+    }
+
+        .tx-table thead tr th:nth-child(2) {
+            width: 10%;
+        }
+    .tx-table tbody tr td:nth-child(2) {
+        width: 10%;
+    }
+    .tx-table tbody tr th:nth-child(3) {
+        width: 15%;
+
+    }
+    .tx-table tbody tr td:nth-child(3) {
+        width: 15%;
+    }
+
+        .tx-table thead tr th:nth-child(4) {
+            width: 35%;
+        }
+    .tx-table tbody tr td:nth-child(4) {
+        width: 35%;
+    }
+
+    .tx-table thead tr th:nth-child(5) {
+        width: 20%;
+    }
+
+    .tx-table tr td:nth-child(5) {
+        width: 20%;
+
+    }
+
+.tx-table thead tr th:nth-child(6) {
+    width: 10%;
+    
+}
+
+.tx-table tr td:nth-child(6) {
+    width: 10%;
+    
+}
+
+.tx-table {
+    border-right: 1px solid #7777a1;
+}
+
+
+
+
+.login-signup-container {
+    margin-top: 80px;
+    padding: 60px;
+}
+
+.light-grey-text {
+    color: #666666;
+}
+
+.table-inner-header th {
+    text-align: left;
+    background-color: #eeeef3;
+}
+
+.outline-button-hover:hover {
+    background-color: #eeeef3 !important;
+}
+
+.green-button-hover:hover {
+    background-color: rgb(146, 203, 181) !important;
+}
+
+
+a, .link {
+    color: #A2E1C9; 
+}
+.App {
+    min-height: 100vh;
+    
+    max-width: 1900px;
+    margin: 0rem auto;
+}
+
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+
+}
+
+
+
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+    margin: 0;
+}
+
+.button-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
+    .button-container .MuiButton-root {
+        border-radius: 4px;
+        width: 150px;
+        height: 40px;
+    }
+
+
+.custom-contained-button {
+    background-color: #A2E1C9 !important;
+    box-shadow: none !important;
+}
+
+.custom-contained-button:hover {
+    background-color: #91d6b8 !important;
+}
+
+.custom-outlined-button {
+    color: #A2E1C9 !important;
+    border-color: #A2E1C9 !important;
+}
+
+.custom-outlined-button:hover {
+    background-color: rgba(162, 225, 201, 0.04) !important;
+    border-color: #91d6b8 !important;
+}
+
+
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 90px;
+}
+
+.landing-right-side-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-right-side-heading {
+    margin-bottom: 10px;
+}
+
+.home-right-text-section {
+    text-align: center;
+    color: #6a6a6a;
+}
+
+.home-bannerImage-container {
+    position: absolute;
+    top: -100px;
+    right: -170px;
+    z-index: -2;
+    max-width: 700px;
+}
+
+.back-btn-arrow {
+    height: 37px;
+    width: auto;
+}
+
+
+.box-shadow {
+    -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.green-button {
+    width: 260px;
+    padding: 15px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 25px;
+    background-color: #A2E1C9;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 80px;
+}
+
+.underlined-text {
+    text-decoration: underline;
+    color: black;
+    
+}
+    .underlined-text:hover {
+        color: #7777a1;
+        cursor:pointer;
+    }
+
+@media (max-width: 800px) {
+    .header-left-corner-container {
+        max-width: 140px;
+    }
+
+    .navbar-menu-container {
+        display: flex;
+    }
+
+    .primary-heading {
+        text-align: center;
+        max-width: 90%;
+    }
+
+    .primary-text {
+        text-align: center;
+        max-width: 80%;
+    }
+
+}

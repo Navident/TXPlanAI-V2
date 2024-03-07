@@ -1,0 +1,25 @@
+.login-wrapper{
+    height: 100vh;
+
+}
+
+    .login-wrapper .login-signup-container {
+        height: calc( 100vh - 80px);
+    }
+
+.login-bottom-section {
+    text-align: center;
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
+
+    .login-bottom-section .divider-container {
+        margin: 20px 0 0;
+    }
+
+.login-bottom-section-icons-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}

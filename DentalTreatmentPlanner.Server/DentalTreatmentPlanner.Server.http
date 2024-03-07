@@ -1,6 +1,0 @@
-@DentalTreatmentPlanner.Server_HostAddress = http://localhost:5183
-
-GET {{DentalTreatmentPlanner.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

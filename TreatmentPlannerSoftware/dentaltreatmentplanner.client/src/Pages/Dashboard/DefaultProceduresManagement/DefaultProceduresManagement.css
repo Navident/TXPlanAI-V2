@@ -1,0 +1,59 @@
+
+.dropdown-container{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.edit-procedures-inner {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    gap: 20px;
+}
+
+
+
+.centered-title {
+    text-align: center;
+    font-size: 21px;
+}
+
+.edit-procedures-table-outer-header {
+}
+
+.edit-procedures-inner .tx-table td{
+    text-align: left;
+}
+
+.edit-procedures-inner .table-inner-header th{
+    text-align: left
+}
+
+.edit-procedures-inner .tx-table {
+    border-right: 1px solid #7777a1;
+}
+
+.edit-procedures-row{
+    display:flex;
+}
+
+.edit-procedures-inner td{
+    position:relative;
+}
+
+.default-procedure-management-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.tx-icon {
+    width: fit-content;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
