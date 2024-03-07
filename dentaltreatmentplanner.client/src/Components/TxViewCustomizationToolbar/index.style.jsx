@@ -31,17 +31,23 @@ export const StyledCategoryFiltersWrapper = styled.div`
     justify-content: end;
 `;
 
-export const StyledPrintButton = styled.img`
+export const StyledPrintImportButton = styled.img`
     cursor: pointer;
-    height: 20px;
-
+    height: ${props => props.height || '25px'};
 `;
 
 
 export const StyledPrintSaveBtnContainer = styled.div`
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: 25px;
+    align-items: center;
+`;
+
+export const StyledPrintImportBtnContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
     align-items: center;
 `;
 

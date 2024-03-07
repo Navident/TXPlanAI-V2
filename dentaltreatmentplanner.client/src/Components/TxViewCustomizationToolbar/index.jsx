@@ -1,8 +1,9 @@
 import {
     StyledTxToolbarContainer,
-    StyledPrintButton,
+    StyledPrintImportButton,
     StyledPrintSaveBtnContainer,
-    StyledFlexAlignContainer
+    StyledFlexAlignContainer,
+    StyledPrintImportBtnContainer
 } from "./index.style";
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import CategoryFilters from "./CategoryFilters/index";
@@ -19,6 +20,7 @@ import {
 } from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import printIcon from "../../assets/printer-icon.svg";
+import importIcon from "../../assets/import-icon.svg";
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
@@ -77,7 +79,10 @@ const TxViewCustomizationToolbar = () => {
                 </StyledFlexAlignContainer>
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
-                        <StyledPrintButton src={printIcon} alt="Print Icon" />
+                        <StyledPrintImportBtnContainer>
+                            <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
+                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" />
+                        </StyledPrintImportBtnContainer>
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>
                 </StyledFlexAlignContainer>
