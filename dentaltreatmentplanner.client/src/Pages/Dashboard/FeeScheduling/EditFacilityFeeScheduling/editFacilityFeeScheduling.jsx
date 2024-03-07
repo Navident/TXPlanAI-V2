@@ -13,16 +13,18 @@ import pencilEditIcon from '../../../../assets/pencil-edit-icon.svg';
 import { updateFacilityPayerCdtCodeFees } from '../../../../ClientServices/apiService';
 import SaveButtonRow from "../../../../Components/Common/SaveButtonRow/index";
 import { CircularProgress } from "@mui/material";
-import { useSelector } from 'react-redux';
-import { selectActiveCdtCodes, selectPayersForFacility } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectActiveCdtCodes, selectPayersForFacility, fetchPayersWithCdtCodesFeesForFacility } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { showAlert } from '../../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const EditFacilityFeeScheduling = () => {
+    const dispatch = useDispatch();
     const { payerId } = useParams();
     const location = useLocation();
     const initialPayerName = location.state?.payerName || 'Unknown Payer';
     const [payerNameInputText, setPayerNameInputText] = useState(initialPayerName);
     const [searchInputText, setSearchInputText] = useState('');
-    const headers = ["CDT Code", "Description", "UCR Fee", "Coverage Percent", ""];
+    const headers = ["CDT Code", "Description", "UCR Fee", "Coverage %", ""];
     const columnWidths = ['20%', '45%', '15%', '15%', '5%'];
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
@@ -73,7 +75,7 @@ const EditFacilityFeeScheduling = () => {
         <span key={`code-${index}`}>{row.code}</span>,
         <span key={`description-${index}`}>{row.description}</span>,
         <span key={`ucrFee-${index}`}>{row.ucrFee ? `$${row.ucrFee}` : ''}</span>,
-        <span key={`coveragePercent-${index}`}>{row.coveragePercent ? `$${row.coveragePercent}` : ''}</span>,
+        <span key={`coveragePercent-${index}`}>{row.coveragePercent ? `${row.coveragePercent}%` : ''}</span>,
         createDeleteAndEditIconCell(row, index)
     ]);
 
@@ -97,7 +99,7 @@ const EditFacilityFeeScheduling = () => {
                 onChange={(e) => handleInputChange(row.id, 'coveragePercent', e.target.value)}
                 borderColor={UI_COLORS.purple}
                 width="300px"
-                adornment={<InputAdornment position="start">$</InputAdornment>}
+                adornment={<InputAdornment position="start">%</InputAdornment>}
             />,
             lastCell
         ];
@@ -157,10 +159,10 @@ const EditFacilityFeeScheduling = () => {
 
         const response = await updateFacilityPayerCdtCodeFees(payload);
         if (response) {
-            setAlertInfo({ open: true, type: 'success', message: 'Your changes have been saved' });
-            fetchPayers();
+            dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
+            dispatch(fetchPayersWithCdtCodesFeesForFacility());
         } else {
-            setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
+            dispatch(showAlert({ type: 'error', message: 'Your changes failed to save' }));
         }
     };
 

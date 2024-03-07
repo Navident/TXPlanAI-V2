@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const StyledTxToolbarContainer = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     position: sticky;
     top:-20px;
     z-index: 100;
@@ -29,4 +29,25 @@ export const StyledCategoryFiltersWrapper = styled.div`
     flex: 1;
     display: flex;
     justify-content: end;
+`;
+
+export const StyledPrintButton = styled.img`
+    cursor: pointer;
+    height: 20px;
+
+`;
+
+
+export const StyledPrintSaveBtnContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+`;
+
+export const StyledFlexAlignContainer = styled.div`
+    display: flex;
+    flex: 1;
+    justify-content: ${props => props.justify || 'center'};
+    align-items: center;
 `;

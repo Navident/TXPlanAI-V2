@@ -1,7 +1,8 @@
 import {
     StyledTxToolbarContainer,
-    StyledCategoryFiltersWrapper,
-    StyledToggleButtonGroupWrapper
+    StyledPrintButton,
+    StyledPrintSaveBtnContainer,
+    StyledFlexAlignContainer
 } from "./index.style";
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import CategoryFilters from "./CategoryFilters/index";
@@ -17,6 +18,7 @@ import {
     requestUpdateTreatmentPlan
 } from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
+import printIcon from "../../assets/printer-icon.svg";
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
@@ -58,6 +60,7 @@ const TxViewCustomizationToolbar = () => {
         <>
             <div ref={sentinelRef} style={{ height: '1px' }}></div>
             <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
+                <StyledFlexAlignContainer justify="flex-start">
                     <RoundedButton
                         text="Group"
                         onClick={handleGroupClick}
@@ -68,8 +71,16 @@ const TxViewCustomizationToolbar = () => {
                         height="39px"
                         width="150px"
                     />
-                <CategoryFilters />
-                <SaveButtonRow onSave={handleSaveButtonClick} />
+                </StyledFlexAlignContainer>
+                <StyledFlexAlignContainer justify="center">
+                    <CategoryFilters />
+                </StyledFlexAlignContainer>
+                <StyledFlexAlignContainer justify="flex-end">
+                    <StyledPrintSaveBtnContainer>
+                        <StyledPrintButton src={printIcon} alt="Print Icon" />
+                        <SaveButtonRow onSave={handleSaveButtonClick} />
+                    </StyledPrintSaveBtnContainer>
+                </StyledFlexAlignContainer>
             </StyledTxToolbarContainer>
         </>
     );

@@ -95,7 +95,7 @@ export const cdtCodeAndPayersSlice = createSlice({
                 state.payers = action.payload.map(payer => ({
                     payerId: payer.payerId,
                     payerName: payer.payerName,
-                    cdtCodeFees: payer.cdtCodeFees // Directly assign the fees array to each payer
+                    cdtCodeFees: payer.cdtCodeFees 
                 }));
             })
             .addMatcher(

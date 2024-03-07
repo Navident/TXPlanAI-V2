@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import TextField from '@mui/material/TextField';
-import { CircularProgress } from '@mui/material';
 import StandardTextfield from '../../../Components/Common/StandardTextfield/StandardTextfield';
 import UniversalTable from '../../../Components/Common/UniversalTable/UniversalTable';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
@@ -16,7 +15,7 @@ import Alert from "../../../Components/Common/Alert/Alert";
 import { Outlet } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
-import { selectPayersForFacility, fetchPayersForFacility } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
+import { selectPayersForFacility, fetchPayersWithCdtCodesFeesForFacility } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const FeeScheduling = () => {
@@ -237,7 +236,7 @@ const FeeScheduling = () => {
         if (response) {
             dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
             // Re-fetch payers to refresh the global state after successful update
-            dispatch(fetchPayersForFacility());
+            dispatch(fetchPayersWithCdtCodesFeesForFacility());
         } else {
             setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
         }
