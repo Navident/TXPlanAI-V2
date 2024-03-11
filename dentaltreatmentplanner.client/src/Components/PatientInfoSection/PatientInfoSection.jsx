@@ -21,15 +21,16 @@ import {
 	selectSelectedPayer,
 	setSelectedPayer as setReduxSelectedPayer
 } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 
 const PatientInfoSection = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { selectedPatient } = useBusiness();
 	const payers = useSelector(selectPayersForFacility);
 	console.log("Payers in PatientInfoSection: ", payers);
 	const selectedPayer = useSelector(selectSelectedPayer);
+	const selectedPatient = useSelector(selectSelectedPatient);
 
 	// Determine which button to show based on the current route
 	const showCreateNewTxPlanButton = location.pathname.includes(
@@ -83,7 +84,7 @@ const PatientInfoSection = () => {
 	};
 
 	return (
-		<StyledRoundedBoxContainer>
+		<StyledRoundedBoxContainer flexGrow={0}>
 			<StyledPatientInfoInnerContainer>
 				<StyledGridItem>
 					<StyledGridItemLabel>Name:</StyledGridItemLabel>

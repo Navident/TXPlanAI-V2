@@ -30,6 +30,9 @@ import {
 } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
+import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
+import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
+
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
@@ -39,10 +42,7 @@ const GenerateTreatmentPlan = () => {
 	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
 	const [inputText, setInputText] = useState("");
 	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
-
-	const {
-		selectedPatient,
-	} = useBusiness();
+	const selectedPatient = useSelector(selectSelectedPatient);
 
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -200,6 +200,7 @@ const GenerateTreatmentPlan = () => {
 
 	return (
 		<div className="dashboard-bottom-inner-row">
+			<PatientInfoSection />
 			<div className="large-text">Create New TX Plan</div>
 			<div className="create-treatment-plan-section rounded-box box-shadow">
 				<div className="create-treatment-plan-section-inner">

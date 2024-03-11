@@ -73,7 +73,6 @@
 
 .search-patient {
     background-color: white;
-    width: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -82,6 +81,9 @@
 .all-patients-container {
     width: 320px;
     background-color: white;
+    height: calc(100vh - 165px);
+    position: sticky;
+    top: 45px;
 }
 
 .patients-inner-section {
@@ -91,6 +93,7 @@
     justify-content: center;
     gap: 12px;
     padding: 20px;
+    padding-bottom: 0;
 }
 
 .all-patients-container .purple-button {

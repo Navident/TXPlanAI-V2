@@ -60,7 +60,20 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return Unauthorized();
             }
 
-            var patients = await _dentalService.GetPatientsByFacility(facilityId.Value);
+            var patients = await _dentalService.GetAllPatientsByFacility(facilityId.Value);
+            return Ok(patients);
+        }
+
+        [HttpGet("facilityPatientsOpenDental")]
+        public async Task<ActionResult<IEnumerable<Patient>>> GetPatientsForUserFacilityFromOpenDental()
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            var patients = await _dentalService.GetAllPatientsByFacilityFromOpenDental(facilityId.Value);
             return Ok(patients);
         }
 

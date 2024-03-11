@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getPatientsForUserFacility } from '../../../ClientServices/apiService';
+import { getPatientsForUserFacilityFromOpenDental } from '../../../ClientServices/apiService';
 
 // Define initial state
 const initialState = {
@@ -16,7 +16,7 @@ export const fetchPatientsForFacility = createAsyncThunk(
     'patients/fetchPatientsForFacility',
     async (_, { rejectWithValue }) => {
         try {
-            const fetchedPatients = await getPatientsForUserFacility();
+            const fetchedPatients = await getPatientsForUserFacilityFromOpenDental();
             return fetchedPatients;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -66,6 +66,15 @@ const patientsSlice = createSlice({
 
 // Export actions
 export const { setSearchQuery, setSelectedPatient, resetPatientsState } = patientsSlice.actions;
+
+// Selector for filteredPatients
+export const selectFilteredPatients = (state) => state.patients.filteredPatients;
+
+// Selector for selectedPatient
+export const selectSelectedPatient = (state) => state.patients.selectedPatient;
+
+// Selector for searchQuery
+export const selectSearchQuery = (state) => state.patients.searchQuery;
 
 // Export reducer
 export default patientsSlice.reducer;

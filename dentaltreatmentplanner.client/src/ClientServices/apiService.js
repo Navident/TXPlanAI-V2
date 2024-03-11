@@ -416,7 +416,37 @@ export const getPatientsForUserFacility = async () => {
     }
 };
 
+// Function to get patients for the user's facility from opendental
+export const getPatientsForUserFacilityFromOpenDental = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${PATIENTS_API_URL}/facilityPatientsOpenDental`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
 
+        if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                console.log(`Patients for user's facility:`, data);
+                return data;
+            } else {
+                console.log(`Received non-JSON response for patients`);
+                return null;
+            }
+        } else {
+            console.error(`Failed to retrieve patients. Status:`, response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching patients:`, error.message);
+        return null;
+    }
+};
 
 export const getCdtCodes = async () => {
     try {

@@ -1,21 +1,20 @@
-import { useContext } from 'react';
-
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../assets/search-icon.svg';
-import { BusinessContext } from '../../Contexts/BusinessContext/BusinessContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchQuery, selectSearchQuery } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 
 const SearchPatient = () => {
-    const { searchQuery, setSearchQuery } = useContext(BusinessContext);
+    const dispatch = useDispatch();
+    const searchQuery = useSelector(selectSearchQuery);
 
     const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value);
+        dispatch(setSearchQuery(event.target.value));
     };
 
     return (
-        <div className="search-patient rounded-box box-shadow">
-            <div className="patients-inner-section">
-                <div className="large-text">Search Patient</div>
+            <>
+                <div className="large-text">Patients</div>
                 <TextField
                     className="rounded-box"                   
                     value={searchQuery}
@@ -50,8 +49,7 @@ const SearchPatient = () => {
                     }}
                 />
 
-            </div>
-        </div>
+            </>
     );
 };
 

@@ -1,19 +1,20 @@
 import RoundedButton from "../Common/RoundedButton/RoundedButton";
-import { useContext } from 'react';
-import { BusinessContext } from '../../Contexts/BusinessContext/BusinessContext';
 import './PatientList.css';
-import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { StyledLargeText } from '../../GlobalStyledComponents';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSelectedPatient, selectFilteredPatients, selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
+import SearchPatient from "../../Components/SearchPatient/SearchPatient";
 
 const PatientList = () => {
-    const { filteredPatients } = useContext(BusinessContext);
-    const { selectedPatient, setSelectedPatient } = useBusiness();
+    const dispatch = useDispatch();
+    const filteredPatients = useSelector(selectFilteredPatients);
+    const selectedPatient = useSelector(selectSelectedPatient);
     const navigate = useNavigate();
     const location = useLocation(); 
 
     const handlePatientSelection = (patient) => {
-        setSelectedPatient(patient);
+        dispatch(setSelectedPatient(patient));
         // Check if the current path includes 'saved-patient-tx-plans' before navigating
         if (location.pathname.includes('/saved-patient-tx-plans')) {
             navigate(`/PatientManagementDashboard/saved-patient-tx-plans/${patient.patientId}`);
@@ -26,17 +27,9 @@ const PatientList = () => {
     return (
         <div className="all-patients-container rounded-box box-shadow">
             <div className="patients-inner-section">
-                <StyledLargeText>All Patients</StyledLargeText>
-                <RoundedButton
-                    text="New Patient"
-                    backgroundColor="#7777a1"
-                    textColor="white"
-                    border={false}
-                    width="100%"
-                    className="purple-button-hover"
-                    onClick={handleNewPatientClick}
-                />
-                <div style={{ borderTop: '1px solid #ccc', margin: '5px 0' }}></div>
+                <SearchPatient />
+
+                <div style={{ borderTop: '1px solid #ccc', margin: '5px 0', marginTop: '15px' }}></div>
 
             </div>
             {filteredPatients.map((patient) => (

@@ -7,7 +7,6 @@ import CreateNewPatient from "./CreateNewPatient/CreateNewPatient";
 import PatientTreatmentPlanCustomizer from "../PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer";
 
 import PatientList from "../../Components/PatientList/PatientList";
-import PatientInfoSection from "../../Components/PatientInfoSection/PatientInfoSection";
 import logo from "../../assets/navident-logo.svg";
 import { Outlet } from "react-router-dom";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
@@ -81,15 +80,10 @@ const PatientManagementDashboard = () => {
 							customOnClick={() => navigate("/dashboard")}
 						/>
 					)}
-					{!isCreatingNewPatient && !isCustomizingTreatmentPlan && (
-						<div className="dashboard-top-row">
-							<SearchPatient />
-							<PatientInfoSection />
-						</div>
-					)}
 
 					{!isCreatingNewPatient && !isCustomizingTreatmentPlan ? (
 						<div className="dashboard-bottom-row">
+
 							<PatientList />
 							<Outlet />
 						</div>

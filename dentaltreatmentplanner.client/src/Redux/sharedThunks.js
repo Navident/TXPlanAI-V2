@@ -4,6 +4,7 @@ import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSu
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import { setCustomerKey } from './ReduxSlices/User/userSlice';
+import { fetchPatientsForFacility } from './ReduxSlices/Patients/patientsSlice';
 
 export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
     'shared/fetchAllPatientTreatmentPlansForFacility',
@@ -115,6 +116,7 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
                 dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
                 dispatch(fetchAllPatientTreatmentPlansForFacility()),
                 dispatch(fetchAndSetCustomerKey()),
+                dispatch(fetchPatientsForFacility()),
             ]);
         }
     }

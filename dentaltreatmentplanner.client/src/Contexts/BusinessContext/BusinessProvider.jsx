@@ -9,7 +9,7 @@ export const BusinessProvider = ({ children }) => {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
     // State hooks for patients and filtering
-    const [patients, setPatients] = useState([]);
+   // const [patients, setPatients] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredPatients, setFilteredPatients] = useState([]);
     const [selectedPatient, setSelectedPatient] = useState(null);
@@ -49,9 +49,9 @@ export const BusinessProvider = ({ children }) => {
     }, [isUserLoggedIn]);
 
     // Effect hook for filtering patients based on search query
-    useEffect(() => {
+/*    useEffect(() => {
         setFilteredPatients(searchQuery ? patients.filter(patient => patient.name.toLowerCase().includes(searchQuery.toLowerCase())) : patients);
-    }, [searchQuery, patients]);
+    }, [searchQuery, patients]);*/
 
 
 
@@ -69,7 +69,7 @@ export const BusinessProvider = ({ children }) => {
     const resetAppStates = () => {
         setBusinessName('');
         setIsUserLoggedIn(false);
-        setPatients([]);
+        //setPatients([]);
         setSearchQuery('');
         setFilteredPatients([]);
         setSelectedPatient(null);
@@ -159,8 +159,8 @@ export const BusinessProvider = ({ children }) => {
 
     const fetchPatientsForFacility = async () => {
         try {
-            const fetchedPatients = await getPatientsForUserFacility();
-            setPatients(fetchedPatients || []);
+            //const fetchedPatients = await getPatientsForUserFacility();
+            //setPatients(fetchedPatients || []);
         } catch (error) {
             console.error('Error fetching patients:', error);
         }
@@ -239,8 +239,8 @@ export const BusinessProvider = ({ children }) => {
     // Refresh functions
     const refreshPatients = async () => {
         try {
-            const fetchedPatients = await getPatientsForUserFacility();
-            setPatients(fetchedPatients || []);
+            //const fetchedPatients = await getPatientsForUserFacility();
+            //setPatients(fetchedPatients || []);
         } catch (error) {
             console.error('Error refreshing patients:', error);
         }
@@ -256,7 +256,7 @@ export const BusinessProvider = ({ children }) => {
     return (
         <BusinessContext.Provider value={{
             businessName, setBusinessName,
-            patients, setPatients,
+            //patients, setPatients,
             searchQuery, setSearchQuery,
             filteredPatients, setFilteredPatients,
             selectedPatient, setSelectedPatient,
