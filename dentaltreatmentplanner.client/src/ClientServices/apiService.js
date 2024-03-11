@@ -9,7 +9,7 @@ const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
 const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
 const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
-const PAYER_API_URL = 'https://localhost:7089/api/payer';
+const PAYER_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/payer';
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
@@ -33,6 +33,65 @@ export const registerUser = async (userData) => {
         console.error('Error during user registration:', error);
     }
 };
+
+// Function to get the customer key for the user's facility
+export const getCustomerKeyForUserFacility = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`https://localhost:7089/api/account/customerkey`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const customerKey = await response.json();
+                console.log(`Received customer key object:`, customerKey); 
+                return customerKey;
+            } else {
+                console.log(`Received non-JSON response for customer key`);
+                return null;
+            }
+        } else {
+            console.error(`Failed to retrieve customer key. Status:`, response.status);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching customer key:`, error.message);
+        return null;
+    }
+};
+
+// Function to update the customer key for a facility
+export const updateFacilityCustomerKey = async (newCustomerKey) => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`https://localhost:7089/api/account/updatecustomerkey`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ newCustomerKey }),
+        });
+
+        if (response.ok) {
+            console.log(`Customer key updated successfully`);
+            return true;
+        } else {
+            console.error(`Failed to update customer key. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error updating customer key:`, error.message);
+        return false;
+    }
+};
+
 
 export const loginUser = async (credentials) => {
     try {
@@ -356,6 +415,8 @@ export const getPatientsForUserFacility = async () => {
         return null;
     }
 };
+
+
 
 export const getCdtCodes = async () => {
     try {

@@ -5,6 +5,7 @@ import alertReducer from '../ReduxSlices/Alerts/alertSlice';
 import cdtCodeAndPayersReducer from '../ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import tableViewControlReducer from '../ReduxSlices/TableViewControls/tableViewControlSlice';
 import categoriesSubcategoriesReducer from '../ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
+import userReducer from '../ReduxSlices/User/userSlice';
 
 export const store = configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
         cdtCodeAndPayers: cdtCodeAndPayersReducer,
         alert: alertReducer,
         tableViewControl: tableViewControlReducer,
+        user: userReducer,
     },
 });

@@ -11,6 +11,7 @@ const userSlice = createSlice({
     initialState: {
         businessName: '',
         isUserLoggedIn: false,
+        customerKey: '',
     },
     reducers: {
         setBusinessName: (state, action) => {
@@ -27,6 +28,9 @@ const userSlice = createSlice({
             localStorage.removeItem('businessName');
             localStorage.setItem('isLoggedIn', 'false');
         },
+        setCustomerKey: (state, action) => {
+            state.customerKey = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(initializeUser.fulfilled, (state, action) => {
@@ -36,6 +40,8 @@ const userSlice = createSlice({
     },
 });
 
-export const { setBusinessName, setIsUserLoggedIn, resetUserState } = userSlice.actions;
+export const { setBusinessName, setIsUserLoggedIn, resetUserState, setCustomerKey } = userSlice.actions;
+
+export const selectCustomerKey = (state) => state.user.customerKey;
 
 export default userSlice.reducer;

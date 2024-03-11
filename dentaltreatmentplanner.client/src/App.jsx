@@ -8,6 +8,7 @@ import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import DefaultProcedures from "./Pages/Dashboard/DefaultProceduresManagement/DefaultProceduresManagement";
 import CustomCdtCodes from "./Pages/Dashboard/CustomCdtCodes/CustomCdtCodes";
+import AccountInfo from "./Pages/Dashboard/AccountInfo/index";
 import FeeScheduling from "./Pages/Dashboard/FeeScheduling/feeScheduling";
 import EditFacilityFeeScheduling from "./Pages/Dashboard/FeeScheduling/EditFacilityFeeScheduling/editFacilityFeeScheduling";
 import ProceduresCustomizer from "./Pages/Dashboard/DefaultProceduresManagement/ProceduresCustomizer/ProceduresCustomizer";
@@ -49,6 +50,7 @@ function App() {
                             <Route path="feescheduling" element={<FeeScheduling />}>
                                 <Route path="edit/:payerId" element={<EditFacilityFeeScheduling />} />
                             </Route>
+                            <Route path="accountinfo" element={<AccountInfo />} />
                             <Route path="all-saved-patient-tx-plans" element={<AllSavedPatientTxPlans />} />
                         </Route>
 

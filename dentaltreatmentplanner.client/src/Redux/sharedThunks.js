@@ -1,8 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility } from '../ClientServices/apiService';
+import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility, getCustomerKeyForUserFacility } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { setCustomerKey } from './ReduxSlices/User/userSlice';
 
 export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
     'shared/fetchAllPatientTreatmentPlansForFacility',
@@ -88,6 +89,22 @@ const extractUniqueCdtCodeIds = (categoriesData) => {
         return Array.from(uniqueCdtCodeIds);
 };
 
+export const fetchAndSetCustomerKey = createAsyncThunk(
+    'shared/fetchAndSetCustomerKey',
+    async (_, { dispatch }) => {
+        try {
+            const response = await getCustomerKeyForUserFacility(); 
+            if (response && response.customerKey) {
+                console.log("found customer key: ", response.customerKey);
+                dispatch(setCustomerKey(response.customerKey));
+            }
+        } catch (error) {
+            console.error('Error fetching and setting customer key:', error);
+        }
+    }
+);
+
+
 export const fetchInitialDataIfLoggedIn = createAsyncThunk(
     'shared/fetchInitialDataIfLoggedIn',
     async (_, { dispatch }) => {
@@ -97,6 +114,7 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
                 dispatch(fetchPayersWithCdtCodesFeesForFacility()),
                 dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
                 dispatch(fetchAllPatientTreatmentPlansForFacility()),
+                dispatch(fetchAndSetCustomerKey()),
             ]);
         }
     }

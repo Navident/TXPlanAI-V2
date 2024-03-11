@@ -56,6 +56,7 @@ const Login = () => {
     };
 
     const handleBackClick = () => {
+        console.log("back button clicked");
         navigate("/"); 
     };
     const handleCloseAlert = () => {

@@ -60,6 +60,40 @@ namespace DentalTreatmentPlanner.Server.Services
             return newCdtCode;
         }
 
+
+        public async Task<bool> UpdateCustomerKeyAsync(string? newCustomerKey, int facilityId)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    var facility = await _context.Facilities.FindAsync(facilityId);
+                    if (facility != null)
+                    {
+                        // Update the customer key. If newCustomerKey is null, it "deletes" the customer key.
+                        facility.CustomerKey = newCustomerKey;
+                        _context.Facilities.Update(facility);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Facility with ID: {facilityId} not found.");
+                        await transaction.RollbackAsync();
+                        return false; // Facility not found
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error occurred during updating the customer key: {ex.Message}");
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+
         public async Task<bool> UpdateCustomCdtCodesAsync(List<CreateCdtCodeDto> newCdtCodes, List<EditCdtCodeDto> editedCdtCodes, List<int> deletedCdtCodeIds, int facilityId)
         {
             using (var transaction = _context.Database.BeginTransaction())
@@ -338,6 +372,15 @@ namespace DentalTreatmentPlanner.Server.Services
             return await _context.CdtCodes.Where(c => c.FacilityId == facilityId).ToListAsync();
         }
 
+        public async Task<string> GetCustomerKeyByFacility(int facilityId)
+        {
+            var facility = await _context.Facilities
+                                          .Where(f => f.FacilityId == facilityId)
+                                          .Select(f => f.CustomerKey)
+                                          .FirstOrDefaultAsync();
+
+            return facility; 
+        }
 
 
 

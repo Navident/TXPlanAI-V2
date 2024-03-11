@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Cryptography;
+using DentalTreatmentPlanner.Server.Models;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace DentalTreatmentPlanner.Server.Controllers
@@ -18,11 +20,96 @@ namespace DentalTreatmentPlanner.Server.Controllers
     public class AccountController : ControllerBase
     {
         private readonly DentalTreatmentPlannerService _dentalTreatmentPlannerService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountController(DentalTreatmentPlannerService dentalTreatmentPlannerService)
+        public AccountController(DentalTreatmentPlannerService dentalTreatmentPlannerService, UserManager<ApplicationUser> userManager)
         {
             _dentalTreatmentPlannerService = dentalTreatmentPlannerService;
+            _userManager = userManager;
         }
+
+        private string GetUsernameFromToken()
+        {
+            var authorizationHeader = HttpContext.Request.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            var usernameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+            return usernameClaim?.Value;
+        }
+
+        private async Task<int?> GetUserFacilityIdAsync()
+        {
+            var username = GetUsernameFromToken();
+            if (string.IsNullOrEmpty(username))
+            {
+                return null;
+            }
+
+            var user = await _userManager.FindByNameAsync(username);
+            return user?.FacilityId;
+        }
+
+        [HttpGet("customerkey")]
+        public async Task<IActionResult> GetCustomerKey()
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var customerKey = await _dentalTreatmentPlannerService.GetCustomerKeyByFacility(facilityId.Value);
+                Console.WriteLine($"Customer key in controller method before returning to frontend: {customerKey}");
+                return Ok(new { CustomerKey = customerKey });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred during fetching customer key: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        [HttpPost("updatecustomerkey")]
+        public async Task<IActionResult> UpdateCustomerKey([FromBody] UpdateCustomerKeyDto updateCustomerKeyDto)
+        {
+            // Obtain the facility ID for the current user
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                // Attempt to update the customer key using the service layer method
+                var success = await _dentalTreatmentPlannerService.UpdateCustomerKeyAsync(updateCustomerKeyDto.NewCustomerKey, facilityId.Value);
+
+                if (success)
+                {
+                    return Ok(new { message = "Customer key updated successfully." });
+                }
+                else
+                {
+                    return NotFound(new { message = "Facility not found." });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred during updating customer key: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUserDto)

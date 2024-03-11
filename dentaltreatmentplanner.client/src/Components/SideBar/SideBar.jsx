@@ -25,7 +25,7 @@ const SideBar = () => {
         { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers" },
         { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIcon, text: "Custom CDT Codes", path: "customcdtCodes" },
         { imgSrc: settingsIcon, imgSrcSelected: settingsIconActive, text: "TX Plan Settings", path: "defaultprocedures" },
-        { imgSrc: settingsIcon2, imgSrcSelected: settingsIconActive, text: "Account Info", path: "accountInfo" }
+        { imgSrc: settingsIcon2, imgSrcSelected: settingsIconActive, text: "Account Info", path: "accountinfo" }
 
     ];
 

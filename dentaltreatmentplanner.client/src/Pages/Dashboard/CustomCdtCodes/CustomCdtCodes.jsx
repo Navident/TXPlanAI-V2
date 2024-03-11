@@ -21,7 +21,6 @@ const CustomCdtCodes = () => {
     const [rowsData, setRowsData] = useState([]);
     const headers = ["CDT Code", "Description", ""];
     const [deletedCdtCodes, setDeletedCdtCodes] = useState([]);
-    const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
     const dispatch = useDispatch()

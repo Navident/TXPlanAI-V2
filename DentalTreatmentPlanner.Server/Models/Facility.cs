@@ -9,10 +9,8 @@ namespace DentalTreatmentPlanner.Server.Models
         public string ZipCode { get; set; } 
         public string City { get; set; } 
         public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifiedAt { get; set; } 
-
-        //public ICollection<FacilityProviderMap> FacilityProviderMaps { get; set; }
-        //public ICollection<CdtCode> CdtCodes { get; set; }
+        public DateTime? ModifiedAt { get; set; }
+        public string? CustomerKey { get; set; }
     }
 
 }
