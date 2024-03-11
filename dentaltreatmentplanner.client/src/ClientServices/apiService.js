@@ -38,7 +38,7 @@ export const registerUser = async (userData) => {
 export const getCustomerKeyForUserFacility = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`https://localhost:7089/api/account/customerkey`, {
+        const response = await fetch(`https://dentaltreatmentplanner.azurewebsites.net/api/account/customerkey`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const getCustomerKeyForUserFacility = async () => {
 export const updateFacilityCustomerKey = async (newCustomerKey) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`https://localhost:7089/api/account/updatecustomerkey`, { 
+        const response = await fetch(`https://dentaltreatmentplanner.azurewebsites.net/api/account/updatecustomerkey`, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
