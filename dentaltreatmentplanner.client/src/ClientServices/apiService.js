@@ -114,8 +114,6 @@ export const loginUser = async (credentials) => {
 
         // If response is OK, process the successful login
         const data = await response.json();
-        console.log('User logged in successfully', data);
-        console.log('Response data:', data);
 
 
         // Store the token
