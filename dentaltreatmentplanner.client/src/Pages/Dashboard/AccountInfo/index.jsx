@@ -182,7 +182,6 @@ const AccountInfo = () => {
     }
 
     function createDeleteIconCell(row, index) {
-        console.log("Creating delete icon cell for row:", row.id);
         if (row.isStatic ) {
             return (
                 <StyledEditDeleteIconsContainer>

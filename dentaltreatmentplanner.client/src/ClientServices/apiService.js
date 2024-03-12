@@ -1,4 +1,4 @@
-// Determine the base URL based on the window location or another condition
+// Determine the base URL based on the window location
 const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'https://localhost:7089/api'
     : 'https://dentaltreatmentplanner.azurewebsites.net/api';
