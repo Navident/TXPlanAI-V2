@@ -14,7 +14,6 @@ import {
 	StyledUnderlinedText,
 } from "../../GlobalStyledComponents";
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
-import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import { useSelector, useDispatch } from 'react-redux';
 import {
 	selectPayersForFacility,

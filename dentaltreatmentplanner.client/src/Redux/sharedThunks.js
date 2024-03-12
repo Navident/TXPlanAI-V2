@@ -111,6 +111,7 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
     async (_, { dispatch }) => {
         const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         if (isUserLoggedIn) {
+            console.log("we running fetchInitialDataIfLoggedIn now");
             await Promise.all([
                 dispatch(fetchPayersWithCdtCodesFeesForFacility()),
                 dispatch(fetchCategoriesSubcategoriesAndTxPlans()),

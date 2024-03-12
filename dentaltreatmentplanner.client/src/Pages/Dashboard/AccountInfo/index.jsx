@@ -10,16 +10,16 @@ import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButto
 import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
 import { UI_COLORS } from '../../../Theme';
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCustomerKey, setCustomerKey } from '../../../Redux/ReduxSlices/User/userSlice';
+import { fetchInitialDataIfLoggedIn } from '../../../Redux/sharedThunks';
+import { fetchPatientsForFacility } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
 
 const AccountInfo = () => {
     const [rowsData, setRowsData] = useState([]);
     const headers = ["Customer Key", ""];
-    const [deletedCdtCodes, setDeletedCdtCodes] = useState([]);
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
     const dispatch = useDispatch()
@@ -231,6 +231,7 @@ const AccountInfo = () => {
             // call updateFacilityCustomerKeyFrontend with null to delete the customer key
             await updateFacilityCustomerKeyFrontend(null);
         }
+        dispatch(fetchPatientsForFacility()); //we need to update the patients after saving the customer key
     };
 
 
