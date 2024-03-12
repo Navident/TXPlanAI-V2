@@ -1,20 +1,22 @@
-//const API_BASE_URL = 'https://localhost:7089/api/TreatmentPlans';
-//const CDT_CODES_API_URL = 'https://localhost:7089/api/cdtcodes';
-//const VISITS_API_URL = 'https://localhost:7089/api/visits';
-//const PROCEDURES_API_URL = 'https://localhost:7089/api';
-const API_BASE_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/TreatmentPlans';
+// Determine the base URL based on the window location or another condition
+const API_BASE_URL = window.location.hostname === 'localhost'
+    ? 'https://localhost:7089/api'
+    : 'https://dentaltreatmentplanner.azurewebsites.net/api';
 
-const VISITS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/visits';
-const PROCEDURES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api';
+const VISITS_API_URL = `${API_BASE_URL}/visits`;
+const PROCEDURES_API_URL = `${API_BASE_URL}`;
 const CREATE_NEW_PROCEDURES_API_URL = `${VISITS_API_URL}/CreateNewProcedures`;
-const PATIENTS_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/Patient';
-const CDT_CODES_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/cdtcodes';
-const PAYER_API_URL = 'https://dentaltreatmentplanner.azurewebsites.net/api/payer';
+const PATIENTS_API_URL = `${API_BASE_URL}/Patient`;
+const CDT_CODES_API_URL = `${API_BASE_URL}/cdtcodes`;
+const PAYER_API_URL = `${API_BASE_URL}/payer`;
+const ACCOUNT_API_URL = `${API_BASE_URL}/account`;
+const TREATMENT_PLANS_API_URL = `${API_BASE_URL}/TreatmentPlans`;
+
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
 export const registerUser = async (userData) => {
     try {
-        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/register', {
+        const response = await fetch(`${ACCOUNT_API_URL}/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +40,7 @@ export const registerUser = async (userData) => {
 export const getCustomerKeyForUserFacility = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`https://dentaltreatmentplanner.azurewebsites.net/api/account/customerkey`, {
+        const response = await fetch(`${ACCOUNT_API_URL}/customerkey`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -70,7 +72,7 @@ export const getCustomerKeyForUserFacility = async () => {
 export const updateFacilityCustomerKey = async (newCustomerKey) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`https://dentaltreatmentplanner.azurewebsites.net/api/account/updatecustomerkey`, { 
+        const response = await fetch(`${ACCOUNT_API_URL}/updatecustomerkey`, { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -95,7 +97,7 @@ export const updateFacilityCustomerKey = async (newCustomerKey) => {
 
 export const loginUser = async (credentials) => {
     try {
-        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/login', {
+        const response = await fetch(`${ACCOUNT_API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +132,7 @@ export const loginUser = async (credentials) => {
 
 export const logoutUser = async () => {
     try {
-        const response = await fetch('https://dentaltreatmentplanner.azurewebsites.net/api/account/logout', {
+        const response = await fetch(`${ACCOUNT_API_URL}/logout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -298,7 +300,7 @@ export const updateTreatmentPlan = async (id, updatedData) => {
 export const getAllPatientTreatmentPlansForFacility = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/allpatientplansforfacility`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/allpatientplansforfacility`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -678,7 +680,7 @@ export const getTreatmentPlansBySubcategory = async (subcategoryName) => {
     try {
         const token = localStorage.getItem('jwtToken');
         console.log(`token in gettreatmentplan ${token}`);
-        const response = await fetch(`${API_BASE_URL}/Subcategory/${subcategoryName}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/Subcategory/${subcategoryName}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
