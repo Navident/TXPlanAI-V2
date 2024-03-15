@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Newtonsoft.Json;
+using DentalTreatmentPlanner.Server.Dtos.OpenDentalDtos;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -341,6 +342,7 @@ public class TreatmentPlansController : ControllerBase
             return StatusCode(500, new { error = "Internal server error", details = ex.Message });
         }
     }
+
 
 }
 

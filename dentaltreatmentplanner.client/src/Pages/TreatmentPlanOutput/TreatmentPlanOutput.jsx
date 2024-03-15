@@ -34,8 +34,6 @@ import {
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
-import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
-import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import {
 	selectCheckedRows,
 	selectIsGroupActive,
@@ -49,7 +47,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
-import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
 import PaymentTotals from "../../Components/PaymentTotals/index";
@@ -82,7 +80,6 @@ const TreatmentPlanOutput = ({
 	const {
 		selectedPatient,
 	} = useBusiness();
-	//const { selectedPayer } = useTreatmentPlan();
 	const [hasEdits, setHasEdits] = useState(false);
 	const columnWidths = ["5%", "10%", "10%", "40%", "10%", "10%", "10%", "5%"];
 
@@ -206,7 +203,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
     const newVisit = {
         visitId: visitId,
         treatment_plan_id: treatmentPlan.treatmentPlanId,
-        visit_number: treatmentPlan.visits.length + 1, // Fixed to correctly increment visit_number
+        visitNumber: treatmentPlan.visits.length + 1, // Fixed to correctly increment visit_number
         description: "Table " + (treatmentPlan.visits.length + 1),
     };
     console.log('Adding new visit:', newVisit);
@@ -315,6 +312,18 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		};
 	};
 
+
+	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
+		return {
+			cdtCodeId: selectedCdtCode.cdtCodeId, 
+			code: selectedCdtCode.code, // The actual CDT code string
+			longDescription: selectedCdtCode.longDescription, // Description of the CDT code
+			toothNumber: selectedCdtCode.toothNumber,
+			visitId: visitId, 
+			orderWithinVisit: 0, 
+		};
+	};
+
 	const convertToStaticRow = (
 		currentRow,
 		visitId,
@@ -339,6 +348,14 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const coPay = fee ? fee.coPay : "Not configured";
 
 		const description = originalDescription || (selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description);
+
+		//attempting to add cdt code - START
+		const newCdtCode = createNewCdtCodeObject(selectedCdtCode, visitId);
+		console.log('Created new CDT code object', newCdtCode);
+
+		console.log('Dispatching action to add CDT code', { treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode });
+		dispatch(handleAddCdtCode({ treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, newCdtCode }));
+		//attempting to add cdt code - END
 
 		return {
 			...currentRow,
@@ -540,7 +557,10 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		
 	};
 
-	const handleDeleteRow = (visitId, rowId) => {
+	const handleDeleteRow = (visitId, rowId, row) => {
+		console.log("row in delete", row);
+		const rowVisitCdtCodeMapId = row.visitCdtCodeMapId;
+		dispatch(onDeleteCdtCode({ treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, visitCdtCodeMapIdToDelete: rowVisitCdtCodeMapId }));
 		setAllRows((prevRows) => {
 			const updatedRows = prevRows[visitId].filter((row) => row.id !== rowId);
 			return { ...prevRows, [visitId]: updatedRows };
@@ -918,7 +938,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 					<StyledDeleteIcon
 						src={deleteIcon}
 						alt="Delete Icon"
-						onClick={() => handleDeleteRow(visitId, row.id)}
+						onClick={() => handleDeleteRow(visitId, row.id, row)}
 					/>
 				</StyledEditDeleteIconsContainer>
 			);
@@ -1078,6 +1098,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 		return { grandUcrTotal, grandCoPayTotal };
 	};
+
 
 
 

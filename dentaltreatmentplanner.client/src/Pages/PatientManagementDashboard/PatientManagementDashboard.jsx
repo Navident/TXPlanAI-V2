@@ -18,6 +18,7 @@ import {
 	StyledMainContentWrapper,
 	StyledContentArea,
 } from "../../GlobalStyledComponents";
+import PatientInfoSection from "../../Components/PatientInfoSection/PatientInfoSection";
 
 const PatientManagementDashboard = () => {
 	const { businessName } = useBusiness();

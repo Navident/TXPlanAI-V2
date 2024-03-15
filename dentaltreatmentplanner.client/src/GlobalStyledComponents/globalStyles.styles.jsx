@@ -105,6 +105,7 @@ export const StyledLightGrey2Text = styled.div`
 export const StyledRoundedBoxContainer = styled.div`
     background-color: ${UI_COLORS.white};
     width: 100%;
+    height: ${({ height }) => height || '100%'};
      flex-grow: ${({ flexGrow }) => flexGrow ?? 1};
 
     border-radius: 15px;

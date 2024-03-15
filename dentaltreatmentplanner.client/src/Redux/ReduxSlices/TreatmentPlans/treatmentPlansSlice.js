@@ -55,6 +55,29 @@ const addCdtCodeToVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visit
     });
 };
 
+const deleteCdtCodeFromVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visitId, visitCdtCodeMapIdToDelete) => {
+    return treatmentPlans.map(plan => {
+        if (plan.treatmentPlanId === treatmentPlanId) {
+            return {
+                ...plan,
+                visits: plan.visits.map(visit => {
+                    if (visit.visitId === visitId) {
+                        // Filter out the cdtCode by visitCdtCodeMapId
+                        const updatedCdtCodes = visit.cdtCodes.filter(cdtCode => cdtCode.visitCdtCodeMapId !== visitCdtCodeMapIdToDelete);
+                        return {
+                            ...visit,
+                            cdtCodes: updatedCdtCodes,
+                        };
+                    }
+                    return visit;
+                }),
+            };
+        }
+        return plan;
+    });
+};
+
+
 const updateVisitsInTreatmentPlan = (treatmentPlans, treatmentPlanId, updatedVisits) => {
     const updatedTreatmentPlans = treatmentPlans.map(plan => {
         if (plan.treatmentPlanId === treatmentPlanId) {
@@ -165,6 +188,12 @@ export const treatmentPlansSlice = createSlice({
             const { treatmentPlanId, visitId, newCdtCode } = action.payload;
             state.treatmentPlans = addCdtCodeToVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, newCdtCode);
         },
+
+        onDeleteCdtCode: (state, action) => {
+            const { treatmentPlanId, visitId, visitCdtCodeMapIdToDelete } = action.payload;
+            state.treatmentPlans = deleteCdtCodeFromVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, visitCdtCodeMapIdToDelete);
+        },
+
         onDeleteTemporaryVisit: (state, action) => {
             const { deletedVisitId } = action.payload;
             state.treatmentPlans = deleteTemporaryVisit(current(state.treatmentPlans), deletedVisitId);
@@ -182,7 +211,7 @@ export const {
     handleAddVisit,
     onDeleteVisit,
     onUpdateVisitsInTreatmentPlan,
-    handleAddCdtCode,
+    handleAddCdtCode, onDeleteCdtCode,
     onDeleteTemporaryVisit,
     addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById,
     setVisitOrder,

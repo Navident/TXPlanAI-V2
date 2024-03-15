@@ -25,6 +25,7 @@
     <Folder Include="src\Components\RecentTxPlans\" />
     <Folder Include="src\Components\TxViewCustomizationToolbar\CategoryFilters\" />
     <Folder Include="src\GlobalStyledComponents\" />
+    <Folder Include="src\OpenAiLlm\Config\" />
     <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
     <Folder Include="src\Pages\Dashboard\AllSavedPatientTxPlans\" />
     <Folder Include="src\Pages\Dashboard\AccountInfo\" />
@@ -34,6 +35,7 @@
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Redux\ReduxSlices\User\" />
     <Folder Include="src\Theme\" />
+    <Folder Include="src\Utils\Mapping\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptConfiguration Remove="src\ReduxSlices\**" />

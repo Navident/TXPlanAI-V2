@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging
+builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Debug);
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -50,8 +53,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddHttpClient();
+
 // Register DentalTreatmentPlanner service
 builder.Services.AddScoped<DentalTreatmentPlannerService>();
+builder.Services.AddScoped<OpenDentalService>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>

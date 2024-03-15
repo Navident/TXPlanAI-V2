@@ -1,8 +1,10 @@
 ﻿using DentalTreatmentPlanner.Server.Dtos;
+using DentalTreatmentPlanner.Server.Dtos.OpenDentalDtos;
 using DentalTreatmentPlanner.Server.Models;
 using DentalTreatmentPlanner.Server.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -10,14 +12,14 @@ namespace DentalTreatmentPlanner.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientController : ControllerBase
+    public class OpenDentalController : ControllerBase
     {
-        private readonly DentalTreatmentPlannerService _dentalService;
+        private readonly OpenDentalService _openDentalService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public PatientController(DentalTreatmentPlannerService dentalService, UserManager<ApplicationUser> userManager)
+        public OpenDentalController(OpenDentalService openDentalService, UserManager<ApplicationUser> userManager)
         {
-            _dentalService = dentalService;
+            _openDentalService = openDentalService;
             _userManager = userManager;
         }
 
@@ -48,11 +50,12 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
 
             var user = await _userManager.FindByNameAsync(username);
-            return user?.FacilityId; 
+            return user?.FacilityId;
         }
 
-        [HttpGet("facilityPatients")]
-        public async Task<ActionResult<IEnumerable<Patient>>> GetPatientsForUserFacility()
+
+        [HttpGet("facilityPatientsOpenDental")]
+        public async Task<ActionResult<IEnumerable<Patient>>> GetPatientsForUserFacilityFromOpenDental()
         {
             var facilityId = await GetUserFacilityIdAsync();
             if (!facilityId.HasValue)
@@ -60,14 +63,13 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return Unauthorized();
             }
 
-            var patients = await _dentalService.GetAllPatientsByFacility(facilityId.Value);
+            var patients = await _openDentalService.GetAllPatientsByFacilityFromOpenDental(facilityId.Value);
             return Ok(patients);
         }
 
 
-
-        [HttpPost("create")]
-        public async Task<ActionResult<int>> CreatePatient([FromBody] CreatePatientDto createPatientDto)
+        [HttpPost("importtoopendental")]
+        public async Task<IActionResult> ImportToOpenDental([FromBody] OpenDentalTreatmentPlanDto treatmentPlan)
         {
             var facilityId = await GetUserFacilityIdAsync();
             if (!facilityId.HasValue)
@@ -75,15 +77,17 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return Unauthorized();
             }
 
-            var newPatient = await _dentalService.CreatePatientAsync(createPatientDto, facilityId.Value);
-
-            if (newPatient == null)
+            try
             {
-                return BadRequest("Unable to create patient");
+                await _openDentalService.ImportToOpenDental(treatmentPlan, facilityId.Value);
+                return Ok();
             }
-
-            return Ok(newPatient.PatientId); 
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while importing the treatment plan.");
+            }
         }
+
 
     }
 

@@ -1,7 +1,7 @@
 ﻿using DentalTreatmentPlanner.Server.Data;
 using DentalTreatmentPlanner.Server.Models;
 using DentalTreatmentPlanner.Server.Dtos;
-using DentalTreatmentPlanner.Server.Dtos.OpenDentalDtos;
+
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
@@ -371,54 +371,7 @@ namespace DentalTreatmentPlanner.Server.Services
             return await _context.Patients.Where(p => p.FacilityId == facilityId).ToListAsync();
         }
 
-        public async Task<List<Patient>> GetAllPatientsByFacilityFromOpenDental(int facilityId)
-        {
-            // Retrieve the Facility to get the CustomerKey
-            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
-            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
-            {
-                // Handle the case where the facility doesn't exist or doesn't have a CustomerKey
-                return new List<Patient>();
-            }
 
-            var developerKey = "7MIiO8sGZaLc4hkE"; // developer key here
-            var customerKey = facility.CustomerKey; // Using the CustomerKey from the Facility
-
-            var httpClient = new HttpClient();
-            var api_url = "https://api.opendental.com/api/v1/patients";
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ODFHIR", $"{developerKey}/{customerKey}");
-
-            try
-            {
-                var response = await httpClient.GetAsync(api_url);
-                if (response.IsSuccessStatusCode)
-                {
-                    var patientsData = await response.Content.ReadFromJsonAsync<List<OpenDentalPatientDto>>();
-
-                    var patients = patientsData.Select(p => new Patient
-                    {
-                        // We need to ensure that 'PatNum' from the API can map to our 'PatientId' 
-                        PatientId = p.PatNum, 
-                        FirstName = p.FName,
-                        LastName = p.LName,
-                        FacilityId = facilityId,
-                                               
-                    }).ToList();
-
-                    return patients;
-                }
-                else
-                {
-                    // Log or handle the error response from the API
-                    return new List<Patient>();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle exceptions
-                return new List<Patient>();
-            }
-        }
 
         public async Task<List<CdtCode>> GetCustomCdtCodesByFacility(int facilityId)
         {

@@ -21,18 +21,45 @@ import {
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import printIcon from "../../assets/printer-icon.svg";
 import importIcon from "../../assets/import-icon.svg";
+import { mapToOpenDentalTreatmentPlanDto } from "../../Utils/Mapping/openDentalMapping";
+import { importTreatmentPlanToOpenDental } from '../../ClientServices/apiService';
+import {
+    selectAllTreatmentPlans
+} from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
+import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
     const [isSticky, setIsSticky] = useState(false);
     const toolbarRef = useRef(null);
     const sentinelRef = useRef(null); 
+    const treatmentPlans = useSelector(selectAllTreatmentPlans);
+    const selectedPatient = useSelector(selectSelectedPatient);
+
     const handleSaveButtonClick = () => {
         dispatch(requestUpdateTreatmentPlan());
     };
 
     const handleGroupClick = () => {
         dispatch(toggleGroupActive());
+    };
+
+    const handleImportClick = async () => {
+        // here we map the treatment plan to the dto 
+        const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDto(treatmentPlans, selectedPatient.patientId); 
+
+        // sending the entire treatment plan to the backend in one go
+        const success = await importTreatmentPlanToOpenDental(openDentalTreatmentPlanDto);
+
+        if (success) {
+            console.log("Treatment plan imported successfully.");
+            dispatch(showAlert({ type: 'success', message: 'Treatment plan was successfully imported into your EHR!' }));
+        } else {
+            console.error("Failed to import treatment plan.");
+            dispatch(showAlert({ type: 'error', message: 'Failed to import into your EHR' }));
+
+        }
     };
 
     useEffect(() => {
@@ -81,7 +108,7 @@ const TxViewCustomizationToolbar = () => {
                     <StyledPrintSaveBtnContainer>
                         <StyledPrintImportBtnContainer>
                             <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
-                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" />
+                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" onClick={handleImportClick} />
                         </StyledPrintImportBtnContainer>
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>

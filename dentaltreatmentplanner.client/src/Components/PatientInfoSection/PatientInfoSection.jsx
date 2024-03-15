@@ -83,7 +83,7 @@ const PatientInfoSection = () => {
 	};
 
 	return (
-		<StyledRoundedBoxContainer flexGrow={0}>
+		<StyledRoundedBoxContainer flexGrow={0} height="auto">
 			<StyledPatientInfoInnerContainer>
 				<StyledGridItem>
 					<StyledGridItemLabel>Name:</StyledGridItemLabel>

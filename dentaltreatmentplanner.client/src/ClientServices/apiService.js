@@ -11,6 +11,7 @@ const CDT_CODES_API_URL = `${API_BASE_URL}/cdtcodes`;
 const PAYER_API_URL = `${API_BASE_URL}/payer`;
 const ACCOUNT_API_URL = `${API_BASE_URL}/account`;
 const TREATMENT_PLANS_API_URL = `${API_BASE_URL}/TreatmentPlans`;
+const OPEN_DENTAL_API_URL = `${API_BASE_URL}/OpenDental`;
 
 import { mapToCreateNewTreatmentPlanFromDefaultDto, mapToCreateNewCombinedTreatmentPlanForPatient } from '../Utils/mappingUtils';
 
@@ -420,7 +421,7 @@ export const getPatientsForUserFacility = async () => {
 export const getPatientsForUserFacilityFromOpenDental = async () => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${PATIENTS_API_URL}/facilityPatientsOpenDental`, {
+        const response = await fetch(`${OPEN_DENTAL_API_URL}/facilityPatientsOpenDental`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -445,6 +446,33 @@ export const getPatientsForUserFacilityFromOpenDental = async () => {
     } catch (error) {
         console.error(`Error fetching patients:`, error.message);
         return null;
+    }
+};
+
+//function to import treatment plan into opendental
+export const importTreatmentPlanToOpenDental = async (openDentalTreatmentPlanDto) => {
+    console.log("openDentalTreatmentPlanDto in importTreatmentPlanToOpenDental: ", openDentalTreatmentPlanDto);
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${OPEN_DENTAL_API_URL}/importtoopendental`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(openDentalTreatmentPlanDto),
+        });
+
+        if (response.ok) {
+            console.log(`Treatment plan imported successfully`);
+            return true;
+        } else {
+            console.error(`Failed to import treatment plan. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error importing treatment plan:`, error.message);
+        return false;
     }
 };
 

@@ -17,6 +17,7 @@ import {
 	StyledContainerWithTableInner,
 	StyledRoundedBoxContainer,
 } from "../../../GlobalStyledComponents";
+import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
 
 const SavedPatientTxPlans = () => {
 	const [inputText, setInputText] = useState("");
@@ -116,6 +117,7 @@ const SavedPatientTxPlans = () => {
 
 	return (
 		<div className="dashboard-bottom-inner-row">
+			<PatientInfoSection />
 			<div className="dashboard-right-side-row">
 				<div className="large-text">Saved Tx Plans</div>
 				<TextField

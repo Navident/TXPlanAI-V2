@@ -1,18 +1,16 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
-
 import { TextField } from "@mui/material";
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
-import { useBusiness } from "../../../Contexts/BusinessContext/useBusiness";
 import {
 	StyledContainerWithTableInner,
 	StyledLargeText,
 	StyledSeparator,
 	StyledTitleAndPaymentTotalsContainer
 } from "../../../GlobalStyledComponents";
-import { runGeminiPro } from "../../../GeminiPro/geminiProRunner";
+import { fetchOpenAIResponse } from "../../../OpenAiLlm/gptRunner";
 import { CircularProgress } from "@mui/material";
 import {
 	setActiveTxCategories,
@@ -52,7 +50,11 @@ const GenerateTreatmentPlan = () => {
 		}
 	}, [treatmentPlans]);
 
-
+	useEffect(() => {
+		if (selectedPatient) {
+			console.log("selectedPatient state in parent", selectedPatient);
+		}
+	}, [selectedPatient]);
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);
@@ -70,12 +72,15 @@ const GenerateTreatmentPlan = () => {
 	// Utility function to preprocess input text and maintain order
 	async function preprocessInputText(inputText) {
 		console.log("inputText sent to ai", inputText);
-		const aiResponse = await runGeminiPro(inputText);
+		const aiResponse = await fetchOpenAIResponse(inputText);
 		console.log("aiResponsePreprocessedInputText", aiResponse);
 		const parsedResponse = JSON.parse(aiResponse);
 		console.log("parsedResponse", parsedResponse);
 
-		return parsedResponse.map((item, index) => ({
+		// Wrap parsedResponse in an array if it's not already one
+		const responseArray = Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse];
+
+		return responseArray.map((item, index) => ({
 			...item,
 			originalOrder: index,
 		}));
@@ -155,6 +160,7 @@ const GenerateTreatmentPlan = () => {
 			description: "Table 1",
 			cdtCodes: combinedCdtCodes,
 			originLineIndex: 0,
+			visitNumber: 1
 		};
 	}
 
