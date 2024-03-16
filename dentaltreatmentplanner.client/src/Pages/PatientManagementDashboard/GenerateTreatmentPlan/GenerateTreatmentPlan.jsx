@@ -29,7 +29,6 @@ import {
 import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
-import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
 
 
 const GenerateTreatmentPlan = () => {
@@ -104,7 +103,7 @@ const GenerateTreatmentPlan = () => {
 		);
 
 		for (const item of treatmentEntries) {
-			const { toothNumber, treatments, originalOrder } = item;
+			const { arch, toothNumber, surface, treatments, originalOrder } = item;
 
 			for (const [treatmentIndex, treatment] of treatments.entries()) {
 				const plan = plansMap.get(treatment.toLowerCase());
@@ -115,6 +114,8 @@ const GenerateTreatmentPlan = () => {
 						cdtCodes: visit.cdtCodes.map((cdtCode) => ({
 							...cdtCode,
 							toothNumber,
+							surface,
+							arch,
 							originalVisitCategory: plan.procedureCategoryName,
 						})),
 						originLineIndex: originalOrder,
@@ -173,14 +174,15 @@ const GenerateTreatmentPlan = () => {
 			);
 			return;
 		}
-		if (!selectedPatient) {
-			dispatch(showAlert({ type: 'error', message: 'Please select a patient before creating a treatment plan' }));
-			return;
-		}
+		//if (!selectedPatient) {
+		//	dispatch(showAlert({ type: 'error', message: 'Please select a patient before creating a treatment plan' }));
+		//	return;
+		//}
 		setIsLoading(true);
 
 		try {
 			const treatmentEntries = await preprocessInputText(inputText);
+			console.log("treatmentEntries", treatmentEntries);
 			let allVisits = await fetchAndProcessTreatments(
 				treatmentEntries,
 				subcategoryTreatmentPlans
@@ -206,8 +208,8 @@ const GenerateTreatmentPlan = () => {
 
 	return (
 		<div className="dashboard-bottom-inner-row">
-			<PatientInfoSection />
-			<div className="large-text">Create New TX Plan</div>
+			{/* <PatientInfoSection /> */}
+			{/* <div className="large-text">Create New TX Plan</div> */}
 			<div className="create-treatment-plan-section rounded-box box-shadow">
 				<div className="create-treatment-plan-section-inner">
 					<img src={PenIcon} alt="Edit" />

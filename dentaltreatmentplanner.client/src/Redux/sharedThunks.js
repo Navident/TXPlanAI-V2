@@ -3,7 +3,7 @@ import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubca
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
-import { setCustomerKey } from './ReduxSlices/User/userSlice';
+import { setCustomerKey, selectIsUserLoggedIn } from './ReduxSlices/User/userSlice';
 import { fetchPatientsForFacility } from './ReduxSlices/Patients/patientsSlice';
 
 export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
@@ -108,10 +108,13 @@ export const fetchAndSetCustomerKey = createAsyncThunk(
 
 export const fetchInitialDataIfLoggedIn = createAsyncThunk(
     'shared/fetchInitialDataIfLoggedIn',
-    async (_, { dispatch }) => {
-        const isUserLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        if (isUserLoggedIn) {
-            console.log("we running fetchInitialDataIfLoggedIn now");
+    async (_, { dispatch, getState }) => {
+        const isUserLoggedIn = getState().user.isUserLoggedIn;
+        const isUserLoggedInLocalStorage = localStorage.getItem('isLoggedIn') === 'true';
+        const isLoggedIn = isUserLoggedIn || isUserLoggedInLocalStorage;
+
+        if (isLoggedIn) { 
+            console.log("Running fetchInitialDataIfLoggedIn now");
             await Promise.all([
                 dispatch(fetchPayersWithCdtCodesFeesForFacility()),
                 dispatch(fetchCategoriesSubcategoriesAndTxPlans()),

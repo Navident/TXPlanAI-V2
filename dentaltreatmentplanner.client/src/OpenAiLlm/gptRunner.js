@@ -8,6 +8,7 @@ export async function fetchOpenAIResponse(userQuery) {
         model: API_CONFIG.model,
         messages: [{ "role": "system", "content": instructions.content }, ...examples, { "role": "user", "content": userQuery }]
     });
+    console.log("Headers being sent:", API_CONFIG.headers);
 
     const response = await fetch(API_CONFIG.endpoint, { method: "POST", headers: API_CONFIG.headers, body });
 
@@ -17,11 +18,5 @@ export async function fetchOpenAIResponse(userQuery) {
     return data.choices[0].message.content; 
 }
 
-async function test() {
-    const userQuery = "#1 acc";
-    fetchOpenAIResponse(userQuery)
-        .then(response => console.log(response))
-        .catch(error => console.error('Error fetching OpenAI response:', error));
-}
 
 

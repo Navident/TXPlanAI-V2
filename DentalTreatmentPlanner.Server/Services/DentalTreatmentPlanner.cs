@@ -446,7 +446,7 @@ namespace DentalTreatmentPlanner.Server.Services
             return result;
         }
 
-        public async Task<(Microsoft.AspNetCore.Identity.SignInResult, ApplicationUser, string)> LoginUserAsync(LoginUserDto loginUserDto)
+        public async Task<(Microsoft.AspNetCore.Identity.SignInResult, ApplicationUser, string, bool)> LoginUserAsync(LoginUserDto loginUserDto)
         {
             var result = await _signInManager.PasswordSignInAsync(loginUserDto.Email, loginUserDto.Password, loginUserDto.RememberMe, lockoutOnFailure: false);
 
@@ -454,6 +454,8 @@ namespace DentalTreatmentPlanner.Server.Services
             {
                 var user = await _userManager.FindByEmailAsync(loginUserDto.Email);
 
+                //check if this user is a superadmin
+                var isSuperAdmin = await _userManager.IsInRoleAsync(user, "SuperAdmin");
                 // Log the user's email and FacilityId
                 Console.WriteLine($"User logged in with email: {user?.Email}, FacilityId: {user?.FacilityId}");
 
@@ -478,12 +480,12 @@ namespace DentalTreatmentPlanner.Server.Services
                     Console.WriteLine($"FacilityId is null for user with email: {user?.Email}");
                 }
 
-                return (result, user, facilityName); // Return the sign-in result, user details, and facility name
+                return (result, user, facilityName, isSuperAdmin); // Return the sign-in result, user details, facility name, superadmin status
             }
             else
             {
                 Console.WriteLine($"Login failed for user with email: {loginUserDto.Email}");
-                return (result, null, null);
+                return (result, null, null, false);
             }
         }
 

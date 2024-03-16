@@ -38,6 +38,7 @@ import {
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
 import { handleAddCdtCode, updateSubcategoryTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { selectIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
 import { useSelector, useDispatch } from "react-redux";
 
 const TreatmentPlanConfiguration = ({
@@ -71,6 +72,7 @@ const TreatmentPlanConfiguration = ({
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
 	const columnWidths = ["5%", "5%", "20%", "55%", "15%"];
+	const isSuperAdmin = useSelector(selectIsSuperAdmin);
 
 	const handleCloseAlert = () => {
 		setAlertInfo({ ...alertInfo, open: false });
@@ -82,6 +84,10 @@ const TreatmentPlanConfiguration = ({
 
 	useEffect(() => {
 		console.log("cdtcodes state:", combinedCdtCodes);
+	}, [combinedCdtCodes]);
+
+	useEffect(() => {
+		console.log("isSuperAdmin state:", isSuperAdmin);
 	}, [combinedCdtCodes]);
 
 
@@ -457,8 +463,10 @@ const TreatmentPlanConfiguration = ({
 	const handleUpdateTreatmentPlan = async () => {
 		console.log("Treatment Plan before updating:", treatmentPlan);
 		try {
-			// Check if the treatment plan is a default plan, we only create one if its a default, otherwise we already have one
-			if (treatmentPlan.facilityId === null) {
+			// Check if the treatment plan is a default/global plan (no facility id indicates it is), we instead
+			//create a tx plan if its a default, otherwise we already have one an existing facility tx plan.
+			//if its a superadmin we just proceed to update the treatment plan globally.
+			if (treatmentPlan.facilityId === null && !isSuperAdmin) {
 				// Logic to create a new treatment plan from the default
 				await createNewTreatmentPlanFromDefault(
 					treatmentPlan,
@@ -499,9 +507,12 @@ const TreatmentPlanConfiguration = ({
 				}
 			});
 
+			console.log("Current allRows state before update: ", allRows);
+			console.log("deepCopyAllRows after processing: ", deepCopyAllRows);
+			console.log("Is setAllRows a function? ", typeof setAllRows === 'function');
 			// Update the state
 			setAllRows(deepCopyAllRows);
-
+			
 			// Identify new procedures and associate them with actualVisitIds
 			const newProcedures = [];
 			Object.keys(deepCopyAllRows).forEach((visitId) => {

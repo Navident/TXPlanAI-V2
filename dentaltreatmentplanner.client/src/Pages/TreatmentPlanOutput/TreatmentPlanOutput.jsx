@@ -81,7 +81,7 @@ const TreatmentPlanOutput = ({
 		selectedPatient,
 	} = useBusiness();
 	const [hasEdits, setHasEdits] = useState(false);
-	const columnWidths = ["5%", "10%", "10%", "40%", "10%", "10%", "10%", "5%"];
+	const columnWidths = ["5%", "10%", "10%", "30%", "10%", "10%", "10%", "5%", "5%", "5%"];
 
 	const checkedRows = useSelector(selectCheckedRows);
 	const isGroupActive = useSelector(selectIsGroupActive);
@@ -203,18 +203,15 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
     const newVisit = {
         visitId: visitId,
         treatment_plan_id: treatmentPlan.treatmentPlanId,
-        visitNumber: treatmentPlan.visits.length + 1, // Fixed to correctly increment visit_number
+        visitNumber: treatmentPlan.visits.length + 1, 
         description: "Table " + (treatmentPlan.visits.length + 1),
     };
-    console.log('Adding new visit:', newVisit);
 
-    // Update the parent component's state
     onAddVisit(newVisit);
 
     const dynamicRow = createDynamicRowv1(visitId, initialRowId);
     const newRows = [...groupedRows, dynamicRow];
 
-    // Directly use the visitOrder from useSelector to update the visitOrder in Redux
     const newVisitOrder = [...visitOrder, visitId];
     dispatch(setVisitOrder(newVisitOrder));
 
@@ -249,6 +246,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
 		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
 		const coPay = fee ? fee.coPay : "Not configured";
+		const surface = visitCdtCodeMap.surface || "";
+		const arch = visitCdtCodeMap.arch || "";
 
 		const extraRowInput = [
 			visitCdtCodeMap.toothNumber,
@@ -256,7 +255,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			visitCdtCodeMap.longDescription,
 			ucrFee,
 			coveragePercent,
-			coPay
+			coPay,
+			surface,
+			arch
 		];
 
 		return {
@@ -375,7 +376,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		};
 	};
 
-
+	//this function is executed when the user clicks edit to make the row dynamic
 	const convertToDynamicRow = (currentRow, visitId) => {
 		const dropdownSearchElement = createCDTCodeDropdown(
 			currentRow.id,
@@ -391,13 +392,17 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const ucrFee = currentRow.extraRowInput[3];
 		const coveragePercent = currentRow.extraRowInput[4];
 		const coPay = currentRow.extraRowInput[5];
+		const surf = currentRow.extraRowInput[6];
+		const arch = currentRow.extraRowInput[7];
 
 		const extraRowInput = [
 			toothNumber,
 			dropdownSearchElement,
 			ucrFee,
 			coveragePercent,
-			coPay
+			coPay,
+			surf,
+			arch
 		];
 
 		return {
@@ -822,6 +827,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			"UCR Fee",
 			"Coverage %",
 			"Co-Pay",
+			"Surf",
+			"arch"
 		];
 		return headers;
 	};
@@ -840,6 +847,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const ucrFee = row.extraRowInput[2];
 		const coveragePercent = row.extraRowInput[3];
 		const coPay = row.extraRowInput[4];
+		const surf = row.extraRowInput[5];
+		const arch = row.extraRowInput[6];
 		const dropdownKey = `dropdown-${row.id}`;
 		const cdtDropdown = (
 			<DropdownSearch
@@ -859,7 +868,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			row.selectedCdtCode && row.selectedCdtCode.toothNumber
 				? row.selectedCdtCode.toothNumber.toString()
 				: "";
-		return [toothNumber, cdtDropdown, row.description, ucrFee, coveragePercent, coPay];
+		return [toothNumber, cdtDropdown, row.description, ucrFee, coveragePercent, coPay, surf, arch];
 	};
 
 	const handleCancelEdit = (rowId, visitId) => {

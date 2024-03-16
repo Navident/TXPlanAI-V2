@@ -18,7 +18,6 @@ import {
 	StyledMainContentWrapper,
 	StyledContentArea,
 } from "../../GlobalStyledComponents";
-import PatientInfoSection from "../../Components/PatientInfoSection/PatientInfoSection";
 
 const PatientManagementDashboard = () => {
 	const { businessName } = useBusiness();
@@ -85,7 +84,7 @@ const PatientManagementDashboard = () => {
 					{!isCreatingNewPatient && !isCustomizingTreatmentPlan ? (
 						<div className="dashboard-bottom-row">
 
-							<PatientList />
+							{/* <PatientList /> */}
 							<Outlet />
 						</div>
 					) : isCustomizingTreatmentPlan ? (

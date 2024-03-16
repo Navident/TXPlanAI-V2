@@ -3,7 +3,7 @@ export const API_CONFIG = {
     model: "ft:gpt-3.5-turbo-0125:personal:playground-data:91MAKlHq",
     headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
+        "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
     },
     defaultParams: {
         temperature: 0,

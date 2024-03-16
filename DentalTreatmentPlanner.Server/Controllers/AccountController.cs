@@ -133,8 +133,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
         {
             try
             {
-                var (signInResult, user, facilityName) = await _dentalTreatmentPlannerService.LoginUserAsync(loginUserDto);
-
+                var (signInResult, user, facilityName, isSuperAdmin) = await _dentalTreatmentPlannerService.LoginUserAsync(loginUserDto);
                 if (signInResult.Succeeded)
                 {
                     var claims = new List<Claim>
@@ -163,7 +162,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
                     var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
                     Console.WriteLine($"Generated JWT token: {tokenString}");
 
-                    return Ok(new { Token = tokenString, User = user, FacilityName = facilityName });
+                    return Ok(new { Token = tokenString, User = user, FacilityName = facilityName, IsSuperAdmin = isSuperAdmin });
                 }
 
 

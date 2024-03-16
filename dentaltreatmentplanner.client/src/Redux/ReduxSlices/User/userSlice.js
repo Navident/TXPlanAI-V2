@@ -11,6 +11,8 @@ const userSlice = createSlice({
     initialState: {
         businessName: '',
         isUserLoggedIn: false,
+        isSuperAdmin: false,
+
         customerKey: '',
     },
     reducers: {
@@ -31,17 +33,25 @@ const userSlice = createSlice({
         setCustomerKey: (state, action) => {
             state.customerKey = action.payload;
         },
+        setIsSuperAdmin: (state, action) => {
+            state.isSuperAdmin = action.payload;
+            localStorage.setItem('isSuperAdmin', action.payload.toString()); 
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(initializeUser.fulfilled, (state, action) => {
             state.businessName = action.payload.businessName;
             state.isUserLoggedIn = action.payload.isUserLoggedIn;
+            const isSuperAdmin = localStorage.getItem('isSuperAdmin') === 'true';
+            state.isSuperAdmin = isSuperAdmin;
         });
     },
 });
 
-export const { setBusinessName, setIsUserLoggedIn, resetUserState, setCustomerKey } = userSlice.actions;
+export const { setBusinessName, setIsUserLoggedIn, resetUserState, setCustomerKey, setIsSuperAdmin } = userSlice.actions;
 
 export const selectCustomerKey = (state) => state.user.customerKey;
+export const selectIsUserLoggedIn = (state) => state.user.isUserLoggedIn;
+export const selectIsSuperAdmin = (state) => state.user.isSuperAdmin;
 
 export default userSlice.reducer;

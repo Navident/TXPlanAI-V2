@@ -115,7 +115,7 @@ export const loginUser = async (credentials) => {
 
         // If response is OK, process the successful login
         const data = await response.json();
-
+        console.log("data in loginUser: ", data);
 
         // Store the token
         localStorage.setItem('jwtToken', data.token);
@@ -152,7 +152,7 @@ export const logoutUser = async () => {
 export const generateTreatmentPlan = async (parsedData, setTreatmentPlanId) => {
     try {
         console.log('Parsed Data being sent:', parsedData);
-        const response = await fetch(`${API_BASE_URL}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -182,7 +182,7 @@ export const generateTreatmentPlan = async (parsedData, setTreatmentPlanId) => {
 // Function to get a treatment plan by ID
 export const getTreatmentPlanById = async (id) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/${id}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -207,10 +207,10 @@ export const getTreatmentPlanById = async (id) => {
 // Function to create a new treatment plan from default
 export const handleCreateNewTreatmentPlanFromDefault = async (treatmentPlan, allRows, visitOrder) => {
     try {
-        const token = localStorage.getItem('jwtToken'); // Retrieve the token from local storage
+        const token = localStorage.getItem('jwtToken'); 
         const newPlanData = mapToCreateNewTreatmentPlanFromDefaultDto(treatmentPlan, allRows, visitOrder);
 
-        const response = await fetch(`${API_BASE_URL}/newfromdefault`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/newfromdefault`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ export const handleCreateNewTreatmentPlanForPatient = async (treatmentPlan, allR
             patientId: selectedPatientId
         };
 
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}${endpoint}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -271,7 +271,7 @@ export const handleCreateNewTreatmentPlanForPatient = async (treatmentPlan, allR
 export const updateTreatmentPlan = async (id, updatedData) => {
     try {
         console.log('Updating Treatment Plan ID:', id, 'with data:', updatedData);
-        const response = await fetch(`${API_BASE_URL}/${id}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -739,7 +739,7 @@ export const getTreatmentPlansByPatient = async (patientId) => {
     try {
         const token = localStorage.getItem('jwtToken');
         console.log(`token in getTreatmentPlansByPatient: ${token}`);
-        const response = await fetch(`${API_BASE_URL}/Patient/${patientId}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/Patient/${patientId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -770,7 +770,7 @@ export const getTreatmentPlansByPatient = async (patientId) => {
 export const deleteTreatmentPlanById = async (treatmentPlanId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await fetch(`${API_BASE_URL}/delete/${treatmentPlanId}`, {
+        const response = await fetch(`${TREATMENT_PLANS_API_URL}/delete/${treatmentPlanId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}` 
