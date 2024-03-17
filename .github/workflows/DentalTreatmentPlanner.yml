@@ -32,6 +32,14 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.SWASHBUCKLE_DOTNET_CORE_VERSION }}
+
+    # Dynamically create .env.production for React app - start
+    - name: Create .env.production file for React app
+      run: |
+        echo "VITE_OPENAI_API_KEY=${{ secrets.VITE_OPENAI_API_KEY }}" > ./dentaltreatmentplanner.client/.env.production
+      shell: bash
+    # Dynamically create .env.production for React app - END
+
     - name: Restore
       run: dotnet restore ${{ env.WORKING_DIRECTORY }}
     - name: Build
