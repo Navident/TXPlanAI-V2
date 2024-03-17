@@ -88,6 +88,41 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
+        [HttpPost("savePatientsFromOpenDentalToDatabase")]
+        public async Task<IActionResult> SavePatientsFromOpenDentalToDatabase()
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _openDentalService.SavePatientsFromOpenDentalToDatabase(facilityId.Value);
+                return Ok("Patients successfully saved to the database.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while saving patients from OpenDental.");
+            }
+        }
+
+        [HttpPost("api/opendental/events")]
+        public async Task<IActionResult> HandleOpenDentalEvent([FromBody] OpenDentalEventDto eventDto)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            await _openDentalService.HandlePatientEvent(eventDto.PatientData, facilityId.Value);
+
+            return Ok();
+        }
+
+
 
     }
 

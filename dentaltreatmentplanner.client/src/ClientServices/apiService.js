@@ -476,6 +476,32 @@ export const importTreatmentPlanToOpenDental = async (openDentalTreatmentPlanDto
     }
 };
 
+// Function to save patients from OpenDental to the database
+export const savePatientsFromOpenDentalToDatabase = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${OPEN_DENTAL_API_URL}/savePatientsFromOpenDentalToDatabase`, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            console.log(`Patients successfully saved to the database.`);
+            return true;
+        } else {
+            console.error(`Failed to save patients. Status:`, response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error(`Error saving patients:`, error.message);
+        return false;
+    }
+};
+
+
 export const getCdtCodes = async () => {
     try {
         const response = await fetch(`${CDT_CODES_API_URL}/defaultcdtcodes`, {

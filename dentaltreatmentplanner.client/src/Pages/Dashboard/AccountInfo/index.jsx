@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import StandardTextfield from '../../../Components/Common/StandardTextfield/StandardTextfield';
 import UniversalTable from '../../../Components/Common/UniversalTable/UniversalTable';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
-import { updateFacilityCustomerKey } from '../../../ClientServices/apiService';
+import { updateFacilityCustomerKey, savePatientsFromOpenDentalToDatabase } from '../../../ClientServices/apiService';
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
@@ -231,7 +231,15 @@ const AccountInfo = () => {
             // call updateFacilityCustomerKeyFrontend with null to delete the customer key
             await updateFacilityCustomerKeyFrontend(null);
         }
-        dispatch(fetchPatientsForFacility()); //we need to update the patients after saving the customer key
+
+        const saveResult = await savePatientsFromOpenDentalToDatabase(); //before getting the patients for the facility we need to add/update the patients in the database
+        if (saveResult) {
+            dispatch(showAlert({ type: 'success', message: 'OpenDental patients integrated successfully!' }));
+        } else {
+            dispatch(showAlert({ type: 'error', message: 'Patient integration with OpenDental failed' }));
+        }
+
+        dispatch(fetchPatientsForFacility()); //we need to update the patients state after saving the customer key
     };
 
 

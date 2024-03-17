@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using DentalTreatmentPlanner.Server.Data;
 using Newtonsoft.Json;
 using System.Text;
+using DentalTreatmentPlanner.Server.Dtos;
+using Azure;
 
 namespace DentalTreatmentPlanner.Server.Services
 {
@@ -120,7 +122,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     var patientsData = await response.Content.ReadFromJsonAsync<List<OpenDentalPatientDto>>();
                     var patients = patientsData.Select(p => new Patient
                     {
-                        PatientId = p.PatNum,
+                        OpenDentalPatientId = p.PatNum,
                         FirstName = p.FName,
                         LastName = p.LName,
                         FacilityId = facilityId,
@@ -140,6 +142,96 @@ namespace DentalTreatmentPlanner.Server.Services
                 return new List<Patient>();
             }
         }
+
+        public async Task<Patient> CreatePatientAsync(CreatePatientDto createPatientDto, int facilityId)
+        {
+            var newPatient = new Patient
+            {
+                FirstName = createPatientDto.FirstName,
+                LastName = createPatientDto.LastName,
+                DateOfBirth = createPatientDto.DateOfBirth,
+                FacilityId = facilityId,
+            };
+
+            _context.Patients.Add(newPatient);
+            await _context.SaveChangesAsync();
+
+            return newPatient;
+        }
+
+        public async Task SavePatientsFromOpenDentalToDatabase(int facilityId)
+        {
+            var patientsFromOpenDental = await GetAllPatientsByFacilityFromOpenDental(facilityId);
+
+            foreach (var patientDto in patientsFromOpenDental)
+            {
+                // Check if the patient already exists in the database to avoid duplication
+                var existingPatient = await _context.Patients
+                    .FirstOrDefaultAsync(p => p.OpenDentalPatientId == patientDto.OpenDentalPatientId && p.FacilityId == facilityId);
+
+                if (existingPatient == null)
+                {
+                    var newPatient = new Patient
+                    {
+                        FirstName = patientDto.FirstName,
+                        LastName = patientDto.LastName,
+                        OpenDentalPatientId = patientDto.OpenDentalPatientId, 
+                        FacilityId = facilityId,
+                    };
+
+                    _context.Patients.Add(newPatient);
+                }
+                else
+                {
+                    // Optionally, update the existing patient's details if necessary
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task HandlePatientEvent(OpenDentalPatientDto patientData, int facilityId)
+        {
+            try
+            {
+                var existingPatient = await _context.Patients
+                                        .FirstOrDefaultAsync(p => p.OpenDentalPatientId == patientData.PatNum);
+
+                if (existingPatient != null)
+                {
+                    // Update existing patient data
+                    existingPatient.FirstName = patientData.FName;
+                    existingPatient.LastName = patientData.LName;
+                }
+                else
+                {
+                    // Create a new patient record
+                    var newPatient = new Patient
+                    {
+                        OpenDentalPatientId = patientData.PatNum,
+                        FirstName = patientData.FName,
+                        LastName = patientData.LName,
+                        FacilityId = facilityId,
+                    };
+                    _context.Patients.Add(newPatient);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to handle patient event: {ex.Message}", ex);
+                throw; 
+            }
+        }
+
+
+
+
+
+
+
+
 
     }
 }

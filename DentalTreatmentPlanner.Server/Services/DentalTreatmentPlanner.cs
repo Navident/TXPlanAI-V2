@@ -939,7 +939,9 @@ namespace DentalTreatmentPlanner.Server.Services
                             {
                                 CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
                                 Order = visitCdtCodeMapDto.Order,
-                                ToothNumber = visitCdtCodeMapDto.ToothNumber, 
+                                ToothNumber = visitCdtCodeMapDto.ToothNumber,
+                                Surface = visitCdtCodeMapDto.Surface,
+                                Arch = visitCdtCodeMapDto.Arch,
                             };
                             newVisit.VisitCdtCodeMaps.Add(newProcedure);
                         }

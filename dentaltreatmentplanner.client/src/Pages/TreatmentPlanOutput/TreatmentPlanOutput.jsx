@@ -51,6 +51,7 @@ import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, a
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
 import PaymentTotals from "../../Components/PaymentTotals/index";
+import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -77,9 +78,7 @@ const TreatmentPlanOutput = ({
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
-	const {
-		selectedPatient,
-	} = useBusiness();
+
 	const [hasEdits, setHasEdits] = useState(false);
 	const columnWidths = ["5%", "10%", "10%", "30%", "10%", "10%", "10%", "5%", "5%", "5%"];
 
@@ -92,6 +91,7 @@ const TreatmentPlanOutput = ({
 	const updateRequested = useSelector(selectUpdateRequested);
 	const payers = useSelector(selectPayersForFacility);
 	const selectedPayer = useSelector(selectSelectedPayer);
+	const selectedPatient = useSelector(selectSelectedPatient);
 
 	useEffect(() => {
 		const newCheckedRows = [];
@@ -632,7 +632,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		} catch (error) {
 			console.error("Error in creating new treatment plan:", error);
 		}
-	};
+	}
 
 
 	const handleUpdateTreatmentPlan = async () => {

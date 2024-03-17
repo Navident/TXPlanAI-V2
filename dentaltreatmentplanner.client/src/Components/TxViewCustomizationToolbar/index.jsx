@@ -26,8 +26,9 @@ import { importTreatmentPlanToOpenDental } from '../../ClientServices/apiService
 import {
     selectAllTreatmentPlans
 } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
+import { selectSelectedPatient, selectFilteredPatients,  setSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
+import AlertDialog from "../../Components/Common/PopupAlert/index";
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
@@ -36,9 +37,35 @@ const TxViewCustomizationToolbar = () => {
     const sentinelRef = useRef(null); 
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
     const selectedPatient = useSelector(selectSelectedPatient);
+    const filteredPatients = useSelector(selectFilteredPatients);
+
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [userInput, setUserInput] = useState('');
 
     const handleSaveButtonClick = () => {
-        dispatch(requestUpdateTreatmentPlan());
+        setIsDialogOpen(true);
+        //dispatch(requestUpdateTreatmentPlan());
+    };
+
+    const handleClose = () => {
+        setIsDialogOpen(false); // Close the AlertDialog
+    };
+
+    const handleAgree = (inputValue) => {
+        console.log('User input:', inputValue);
+        const patientIdIntInputValue = parseInt(inputValue, 10);
+        const patientObject = filteredPatients.find(p => p.patientId === patientIdIntInputValue);
+
+        if (patientObject) {
+            // If a matching patient is found, dispatch setSelectedPatient with the patient object
+            dispatch(setSelectedPatient(patientObject));
+            console.log('User input:', patientIdIntInputValue);
+            setIsDialogOpen(false);
+            dispatch(requestUpdateTreatmentPlan());
+        } else {
+            // Handle the case where no patient is found by the given ID
+            console.error('No patient found with ID:', patientIdIntInputValue);
+        }
     };
 
     const handleGroupClick = () => {
@@ -87,6 +114,14 @@ const TxViewCustomizationToolbar = () => {
 
     return (
         <>
+            <AlertDialog
+                title="Patient"
+                content="Please enter the patient ID."
+                open={isDialogOpen}
+                onClose={handleClose}
+                onAgree={handleAgree}
+                textInput={true} 
+            />
             <div ref={sentinelRef} style={{ height: '1px' }}></div>
             <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
                 <StyledFlexAlignContainer justify="flex-start">

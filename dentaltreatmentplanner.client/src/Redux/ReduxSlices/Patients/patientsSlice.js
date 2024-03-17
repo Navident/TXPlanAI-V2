@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getPatientsForUserFacilityFromOpenDental } from '../../../ClientServices/apiService';
+import { getPatientsForUserFacility } from '../../../ClientServices/apiService';
 
 // Define initial state
 const initialState = {
@@ -16,7 +16,7 @@ export const fetchPatientsForFacility = createAsyncThunk(
     'patients/fetchPatientsForFacility',
     async (_, { rejectWithValue }) => {
         try {
-            const fetchedPatients = await getPatientsForUserFacilityFromOpenDental();
+            const fetchedPatients = await getPatientsForUserFacility();
             return fetchedPatients;
         } catch (error) {
             return rejectWithValue(error.response.data);

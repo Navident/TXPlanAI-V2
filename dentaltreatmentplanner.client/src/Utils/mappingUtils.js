@@ -98,11 +98,17 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
             const toothNumberMatch = row.selectedCdtCode.toothNumber.match(/\d+/);
             const toothNumberNumeric = toothNumberMatch ? parseInt(toothNumberMatch[0]) : null;
 
+
+            const surface = row.selectedCdtCode.surface ? row.selectedCdtCode.surface : null;
+            const arch = row.selectedCdtCode.arch ? row.selectedCdtCode.arch : null;
+
             return {
                 CdtCodeId: row.selectedCdtCode.cdtCodeId,
                 Code: row.selectedCdtCode.code,
                 LongDescription: row.selectedCdtCode.longDescription,
                 ToothNumber: toothNumberNumeric,
+                Surface: surface,
+                Arch: arch,
             };
         });
 

@@ -15,6 +15,7 @@
         public Visit Visit { get; set; }
         public CdtCode CdtCode { get; set; }
         public ProcedureType ProcedureType { get; set; }
-
+        public string? Surface { get; set; }
+        public string? Arch { get; set; }
     }
 }
