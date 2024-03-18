@@ -139,7 +139,8 @@ const TreatmentPlanOutput = ({
 			const visits = treatmentPlan.visits || [];
 			const newAllRows = visits.reduce((acc, visit, index) => {
 				const visitId = visit.visitId;
-				const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+				// Create a shallow copy of cdtCodes and sort it
+				const cdtCodes = Array.isArray(visit.cdtCodes) ? [...visit.cdtCodes].sort((a, b) => a.order - b.order) : [];
 				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
 					createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex)
 				);
@@ -156,6 +157,8 @@ const TreatmentPlanOutput = ({
 			isInitialLoad.current = false;
 		}
 	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
+
+
 
 	useEffect(() => {
 		setLocalUpdatedVisits(treatmentPlan.visits);

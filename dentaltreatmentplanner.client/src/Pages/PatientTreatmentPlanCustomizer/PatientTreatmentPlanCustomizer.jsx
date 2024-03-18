@@ -1,4 +1,3 @@
-import useTreatmentPlan from "../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import TreatmentPlanOutput from "../TreatmentPlanOutput/TreatmentPlanOutput";
 import GoBack from "../../Components/Common/GoBack/GoBack";
 import {
@@ -24,7 +23,7 @@ import logo from "../../assets/navident-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { CircularProgress } from "@mui/material";
-import { selectPatientTreatmentPlans, handleAddVisit, onDeleteVisit, setTreatmentPlans, selectAllTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { selectPatientTreatmentPlans, handleAddVisit, onDeleteVisit, setTreatmentPlans, selectAllTreatmentPlans, onUpdateVisitsInTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPayersForFacility } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import TxViewCustomizationToolbar from "../../Components/TxViewCustomizationToolbar/index";
@@ -37,7 +36,6 @@ import PaymentTotals from "../../Components/PaymentTotals/index";
 const PatientTreatmentPlanCustomizer = () => {
 	const dispatch = useDispatch();
 	const { treatmentPlanId } = useParams();
-	const [plan, setPlan] = useState(null);
 	const { businessName, fetchFacilityPayerCdtCodeFees } = useBusiness();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
@@ -46,11 +44,6 @@ const PatientTreatmentPlanCustomizer = () => {
 	const grandUcrTotal = useSelector(selectGrandUcrTotal);
 	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
 	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
-
-	const {
-		cdtCodes,
-		onUpdateVisitsInTreatmentPlan,
-	} = useTreatmentPlan();
 
 	useEffect(() => {
 		const fetchPlanAndFees = async () => {
