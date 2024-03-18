@@ -102,9 +102,11 @@ const GenerateTreatmentPlan = () => {
 			])
 		);
 
+
 		for (const item of treatmentEntries) {
 			const { arch, toothNumber, surface, treatments, originalOrder } = item;
-
+			//removing "#" from tooth number
+			const sanitizedToothNumber = toothNumber.replace('#', '');
 			for (const [treatmentIndex, treatment] of treatments.entries()) {
 				const plan = plansMap.get(treatment.toLowerCase());
 				if (plan) {
@@ -113,7 +115,7 @@ const GenerateTreatmentPlan = () => {
 						visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
 						cdtCodes: visit.cdtCodes.map((cdtCode) => ({
 							...cdtCode,
-							toothNumber,
+							toothNumber: sanitizedToothNumber,
 							surface,
 							arch,
 							originalVisitCategory: plan.procedureCategoryName,
@@ -192,7 +194,7 @@ const GenerateTreatmentPlan = () => {
 
 			const combinedVisit = combineVisitsIntoOne(allVisits);
 			console.log("combinedVisit", combinedVisit);
-			const combinedTreatmentPlan = { treatmentPlanId: null, visits: [combinedVisit] };
+			const combinedTreatmentPlan = { treatmentPlanId: null, description: null, visits: [combinedVisit] };
 			console.log("Final Consolidated Treatment Plan:", combinedTreatmentPlan);
 			dispatch(setTreatmentPlans([combinedTreatmentPlan]));
 		} catch (error) {

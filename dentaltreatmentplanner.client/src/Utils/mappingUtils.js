@@ -94,9 +94,8 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
         const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
 
         const visitCdtCodeMaps = validRows.map(row => {
-            // Extract numeric part from toothNumber using regex
-            const toothNumberMatch = row.selectedCdtCode.toothNumber.match(/\d+/);
-            const toothNumberNumeric = toothNumberMatch ? parseInt(toothNumberMatch[0]) : null;
+            const toothNumber = row.selectedCdtCode.toothNumber
+            const toothNumberNumeric = toothNumber ? parseInt(toothNumber[0]) : null;
 
 
             const surface = row.selectedCdtCode.surface ? row.selectedCdtCode.surface : null;

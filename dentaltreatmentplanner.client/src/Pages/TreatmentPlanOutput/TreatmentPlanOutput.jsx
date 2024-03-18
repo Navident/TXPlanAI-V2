@@ -52,6 +52,7 @@ import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
 import PaymentTotals from "../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -317,8 +318,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
 		return {
 			cdtCodeId: selectedCdtCode.cdtCodeId, 
-			code: selectedCdtCode.code, // The actual CDT code string
-			longDescription: selectedCdtCode.longDescription, // Description of the CDT code
+			code: selectedCdtCode.code, 
+			longDescription: selectedCdtCode.longDescription, 
 			toothNumber: selectedCdtCode.toothNumber,
 			visitId: visitId, 
 			orderWithinVisit: 0, 
@@ -339,6 +340,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		} else if (isInGenerateTreatmentPlanContext && selectedPayer && selectedPayer.payerId) {
 			selectedPayerDetails = payers.find(payer => payer.payerId === selectedPayer.payerId);
 		}
+		const toothNumber = currentRow.selectedCdtCode?.toothNumber || "";
 
 		// Extract fee details for the selected CDT code
 		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === (selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code));
@@ -349,6 +351,14 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const coPay = fee ? fee.coPay : "Not configured";
 
 		const description = originalDescription || (selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description);
+
+		const surface = selectedCdtCode.surface || "";
+		const arch = selectedCdtCode.arch || "";
+
+		let updatedSelectedCdtCode = {
+			...(selectedCdtCode || currentRow.selectedCdtCode),
+			toothNumber: toothNumber, // Make sure to preserve the tooth number
+		};
 
 		//attempting to add cdt code - START
 		const newCdtCode = createNewCdtCodeObject(selectedCdtCode, visitId);
@@ -363,15 +373,17 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			id: `static-${visitId}-${Date.now()}`,
 			isStatic: true,
 			visitCdtCodeMapId: null,
-			selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
+			selectedCdtCode: updatedSelectedCdtCode,
 			description,
 			extraRowInput: [
-				currentRow.extraRowInput[0], 
-				selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code, 
+				toothNumber, // Ensure the tooth number is set here
+				updatedSelectedCdtCode.code,
 				description,
 				ucrFee,
 				coveragePercent,
-				coPay
+				coPay,
+				surface,
+				arch
 			],
 		};
 	};
@@ -425,11 +437,16 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 			if (rowIndex !== -1) {
 				const currentRow = rows[rowIndex];
+				// Preserve existing selectedCdtCode properties (like toothNumber) and merge with new cdtCodeObj
+				const updatedSelectedCdtCode = {
+					...currentRow.selectedCdtCode,
+					...cdtCodeObj,
+				};
 
-				// Update the current dynamic row with the selected CDT code
+				// Update the current dynamic row with the merged CDT code object
 				rows[rowIndex] = {
 					...currentRow,
-					selectedCdtCode: cdtCodeObj,
+					selectedCdtCode: updatedSelectedCdtCode,
 					description: cdtCodeObj.longDescription,
 				};
 			}
@@ -440,6 +457,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			};
 		});
 	};
+
 
 	const createDynamicRowUponAddClick = (visitId) => {
 		return {
@@ -619,12 +637,14 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		try {
 			const payerId = selectedPayer ? selectedPayer.payerId : null;
 
+			const patientId = selectedPatient && selectedPatient.patientId ? selectedPatient.patientId : null;
+
 			const newTreatmentPlan = await handleCreateNewTreatmentPlanForPatient(
 				treatmentPlan,
 				allRows,
 				visitOrder,
-				selectedPatient.patientId,
-				payerId, 
+				patientId, 
+				payerId,
 				hasEdits
 			);
 			console.log("New treatment plan created successfully:", newTreatmentPlan);
@@ -828,7 +848,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			"Coverage %",
 			"Co-Pay",
 			"Surf",
-			"arch"
+			"Arch"
 		];
 		return headers;
 	};
@@ -841,6 +861,44 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			return input;
 		});
 	};
+
+	const handleInputChange = (visitId, rowId, field, value) => {
+		setAllRows(prevAllRows => {
+			// Make a shallow copy of the allRows object
+			const updatedAllRows = { ...prevAllRows };
+
+			// Find the specific visit's array of rows
+			const rowsForVisit = updatedAllRows[visitId];
+
+			// Map over the rows to find the correct one and update it
+			const updatedRows = rowsForVisit.map(row => {
+				if (row.id === rowId) {
+					// For dynamic rows, update the selectedCdtCode object with the new value
+					const updatedRow = { ...row };
+					if (!updatedRow.selectedCdtCode) {
+						updatedRow.selectedCdtCode = {}; // Initialize if necessary
+					}
+					updatedRow.selectedCdtCode = {
+						...updatedRow.selectedCdtCode,
+						[field]: value, 
+					};
+					return updatedRow;
+				}
+				return row; // Return the row unchanged if it's not the one we're updating
+			});
+
+			// Update the visit's rows in the allRows object
+			updatedAllRows[visitId] = updatedRows;
+			return updatedAllRows;
+		});
+	};
+
+
+	const handleToothNumberChange = (e, visitId, rowId) => {
+		const newToothNumber = e.target.value;
+		handleInputChange(visitId, rowId, 'toothNumber', newToothNumber);
+	};
+
 
 
 	const constructDynamicRowData = (row, visitId) => {
@@ -864,11 +922,19 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			/>
 		);
 
-		const toothNumber =
-			row.selectedCdtCode && row.selectedCdtCode.toothNumber
-				? row.selectedCdtCode.toothNumber.toString()
-				: "";
-		return [toothNumber, cdtDropdown, row.description, ucrFee, coveragePercent, coPay, surf, arch];
+		const toothNumberInput = (
+			<StandardTextfield
+				key={`toothNumber-${row.id}`}
+				label=""
+				value={row.selectedCdtCode?.toothNumber?.toString() || ""}
+				onChange={(e) => handleToothNumberChange(e, visitId, row.id)}
+				borderColor={UI_COLORS.purple}
+				width="75px"
+				adornment={<InputAdornment position="start">#</InputAdornment>}
+			/>
+		);
+
+		return [toothNumberInput, cdtDropdown, row.description, ucrFee, coveragePercent, coPay, surf, arch];
 	};
 
 	const handleCancelEdit = (rowId, visitId) => {
@@ -1041,14 +1107,6 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		}
 	};
 
-
-	const lockDimensions = () => {
-		const tables = document.querySelectorAll(".tx-table");
-		tables.forEach(table => {
-			const computedStyle = window.getComputedStyle(table);
-			table.style.width = computedStyle.getPropertyValue('width');
-		});
-	};
 
 	const handleEditClick = (visitId, currentDescription) => {
 		setEditTableNameMode(visitId);

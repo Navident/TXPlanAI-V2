@@ -40,7 +40,7 @@ const RecentTxPlans = () => {
 				<StyledHomeBoxBottomContainer itemsList>
 					{sortedPlans.map((plan, index) => (
 						<StyledItemContainer key={index}>
-							<div>{plan.patientName}</div>
+							<div>{plan.description}</div>
 							<StyledLightGrey2Text hoverEffect className="editText">
 								Edit
 							</StyledLightGrey2Text>

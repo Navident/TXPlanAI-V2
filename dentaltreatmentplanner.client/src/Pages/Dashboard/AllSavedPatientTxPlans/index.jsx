@@ -6,21 +6,27 @@ import {
 	getTreatmentPlansByPatient,
 	deleteTreatmentPlanById,
 } from "../../../ClientServices/apiService";
-import { useParams } from "react-router-dom";
 import UniversalTable from "../../../Components/Common/UniversalTable/UniversalTable";
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { StyledContainerWithTableInner, StyledRoundedBoxContainer } from "../../../GlobalStyledComponents";
 import { selectPatientTreatmentPlans, removeTreatmentPlanById } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import PopupAlert from "../../../Components/Common/PopupAlert/index";
+import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const AllSavedPatientTxPlans = () => {
 	const dispatch = useDispatch();
 	const [inputText, setInputText] = useState("");
 	const navigate = useNavigate();
 	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [dialogContent, setDialogContent] = useState('');
+	const [dialogTitle, setDialogTitle] = useState('');
+	const [planToDelete, setPlanToDelete] = useState(null);
+
+
 	const handleOpenClick = (planId) => {
 		navigate(`/customize-treatment-plan/${planId}`);
 	};
@@ -41,26 +47,39 @@ const AllSavedPatientTxPlans = () => {
 		});
 	};
 
-	const handleDeleteClick = async (planId) => {
-		const confirmed = window.confirm("Are you sure you want to delete this treatment plan?");
-		if (confirmed) {
-			const success = await deleteTreatmentPlanById(planId);
-			if (success) {
-				dispatch(removeTreatmentPlanById(planId));
-				alert("Treatment plan deleted successfully.");
-			} else {
-				alert("Failed to delete treatment plan.");
-			}
-		}
+	const handleDeleteClick = (planId) => {
+		setPlanToDelete(planId);
+		setDialogTitle("Confirm Deletion");
+		setDialogContent("Are you sure you want to delete this treatment plan?");
+		setIsDialogOpen(true);
 	};
 
-	const headers = ["Date", "Patient Name", "Treatment Plan ID", ""];
+	const handleClose = () => {
+		setIsDialogOpen(false);
+	};
+
+	const handleAgree = async () => {
+		if (planToDelete) {
+			const success = await deleteTreatmentPlanById(planToDelete);
+			if (success) {
+				dispatch(removeTreatmentPlanById(planToDelete));
+				dispatch(showAlert({ type: 'success', message: 'Successfully deleted treatment plan!' }));
+			} else {
+				dispatch(showAlert({ type: 'error', message: 'Failed to delete treatment plan' }));
+			}
+		}
+		setIsDialogOpen(false);
+		setPlanToDelete(null); // Reset the planToDelete after handling
+	};
+
+
+	const headers = ["Date", "TX Description", "Treatment Plan ID", ""];
 
 
 	// Update rows
 	const rows = patientTreatmentPlans.map((plan) => {
 		const date = plan.createdAt ? formatDate(plan.createdAt) : "N/A";
-		const patientName = plan.patientName || "Unknown";
+		const patientName = plan.description || "Unknown";
 
 		const buttons = (
 			<div className="savedPatientsTxTableButtons">
@@ -91,7 +110,17 @@ const AllSavedPatientTxPlans = () => {
 	});
 
 	return (
+
 		<div className="dashboard-bottom-inner-row">
+			{isDialogOpen && (
+				<PopupAlert
+					title={dialogTitle}
+					content={dialogContent}
+					open={isDialogOpen}
+					onClose={handleClose}
+					onAgree={handleAgree}
+				/>
+			)}
 			<div className="dashboard-right-side-row">
 				<div className="large-text">All Saved Patient Tx Plans</div>
 				<TextField

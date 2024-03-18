@@ -964,10 +964,9 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-        //without edits
-/*        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
+
+        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsyncPriorHippa(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
         {
-            Console.WriteLine($"Received PayerId: {createUnmodifiedPatientTxDto.PayerId}");
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -976,7 +975,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     // Create a new treatment plan based on the default
                     TreatmentPlan newTreatmentPlan = new TreatmentPlan
                     {
-                        //Description = createUnmodifiedPatientTxDto.Description,
+                        Description = createUnmodifiedPatientTxDto.Description,
                         ProcedureSubcategoryId = null,
                         FacilityId = facilityId,
                         PatientId = createUnmodifiedPatientTxDto.PatientId,
@@ -999,6 +998,8 @@ namespace DentalTreatmentPlanner.Server.Services
                                 CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
                                 Order = visitCdtCodeMapDto.Order,
                                 ToothNumber = visitCdtCodeMapDto.ToothNumber,
+                                Surface = visitCdtCodeMapDto.Surface,
+                                Arch = visitCdtCodeMapDto.Arch,
                             };
                             newVisit.VisitCdtCodeMaps.Add(newProcedure);
                         }
@@ -1019,7 +1020,64 @@ namespace DentalTreatmentPlanner.Server.Services
                     throw;
                 }
             }
-        }*/
+        }
+
+        //without edits
+        /*        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
+                {
+                    Console.WriteLine($"Received PayerId: {createUnmodifiedPatientTxDto.PayerId}");
+
+                    using (var transaction = await _context.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            // Create a new treatment plan based on the default
+                            TreatmentPlan newTreatmentPlan = new TreatmentPlan
+                            {
+                                //Description = createUnmodifiedPatientTxDto.Description,
+                                ProcedureSubcategoryId = null,
+                                FacilityId = facilityId,
+                                PatientId = createUnmodifiedPatientTxDto.PatientId,
+                                PayerId = createUnmodifiedPatientTxDto.PayerId
+                            };
+
+                            foreach (var visitDto in createUnmodifiedPatientTxDto.Visits)
+                            {
+                                Visit newVisit = new Visit
+                                {
+                                    Description = visitDto.Description,
+                                    VisitNumber = visitDto.VisitNumber,
+                                    VisitCdtCodeMaps = new List<VisitCdtCodeMap>(),
+                                };
+
+                                foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps)
+                                {
+                                    VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
+                                    {
+                                        CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
+                                        Order = visitCdtCodeMapDto.Order,
+                                        ToothNumber = visitCdtCodeMapDto.ToothNumber,
+                                    };
+                                    newVisit.VisitCdtCodeMaps.Add(newProcedure);
+                                }
+
+                                newTreatmentPlan.Visits.Add(newVisit);
+                            }
+
+                            // Save the new treatment plan to the database
+                            await _context.TreatmentPlans.AddAsync(newTreatmentPlan);
+                            await _context.SaveChangesAsync();
+                            await transaction.CommitAsync();
+                            return newTreatmentPlan;
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            Console.WriteLine($"Error occurred: {ex.Message}");
+                            throw;
+                        }
+                    }
+                }*/
 
         private void UpdateVisitCdtCodes(Visit visit, ICollection<VisitCdtCodeMapDto> updatedCdtCodeMaps)
         {
@@ -1234,6 +1292,49 @@ namespace DentalTreatmentPlanner.Server.Services
             return treatmentPlans;
         }
 
+
+        public async Task<IEnumerable<RetrievePatientTreatmentPlanDto>> GetAllPatientTreatmentPlansForFacilityAsyncPriorHippa(int facilityId)
+        {
+            IQueryable<TreatmentPlan> query = _context.TreatmentPlans
+                .Where(tp => tp.FacilityId == facilityId && (tp.PatientId != null || !string.IsNullOrEmpty(tp.Description))) //treatment plans that either have a non-null PatientId or a non-empty description
+                .Include(tp => tp.Patient);
+
+            var treatmentPlans = await query
+                .OrderBy(tp => tp.CreatedAt) // Ensure the treatment plans are ordered by date
+                .Select(tp => new RetrievePatientTreatmentPlanDto
+                {
+                    TreatmentPlanId = tp.TreatmentPlanId,
+                    Description = tp.Description,
+                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
+                    CreatedUserId = tp.CreatedUserId,
+                    CreatedAt = tp.CreatedAt,
+                    PayerId = tp.PayerId,
+                    PatientName = (tp.Patient.FirstName ?? "") + " " + (tp.Patient.LastName ?? ""),
+
+                    // Mapping each visit of the treatment plan to a RetrieveVisitDto
+                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                    {
+                        VisitId = v.VisitId,
+                        Description = v.Description,
+                        VisitNumber = v.VisitNumber,
+
+                        // Mapping CDT codes associated with each visit
+                        CdtCodes = v.VisitCdtCodeMaps.Select(vc => new VisitCdtCodeMapDto
+                        {
+                            VisitCdtCodeMapId = vc.VisitCdtCodeMapId,
+                            CdtCodeId = vc.CdtCode.CdtCodeId,
+                            Order = vc.Order,
+                            ProcedureTypeId = vc.ProcedureTypeId,
+                            ToothNumber = vc.ToothNumber,
+                            Code = vc.CdtCode.Code,
+                            LongDescription = vc.CdtCode.LongDescription
+                        }).ToList()
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return treatmentPlans;
+        }
 
 
         // Method to retrieve treatment plans by patient ID

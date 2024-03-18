@@ -24,7 +24,9 @@ import importIcon from "../../assets/import-icon.svg";
 import { mapToOpenDentalTreatmentPlanDto } from "../../Utils/Mapping/openDentalMapping";
 import { importTreatmentPlanToOpenDental } from '../../ClientServices/apiService';
 import {
-    selectAllTreatmentPlans
+    selectAllTreatmentPlans,
+    updateTreatmentPlanDescription
+
 } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { selectSelectedPatient, selectFilteredPatients,  setSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
@@ -41,22 +43,46 @@ const TxViewCustomizationToolbar = () => {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [userInput, setUserInput] = useState('');
+    const [currentAction, setCurrentAction] = useState(null);
+    const [dialogTitle, setDialogTitle] = useState('');
+    const [dialogContent, setDialogContent] = useState('');
+    const [textFieldWidth, setTextFieldWidth] = useState('');
 
     const handleSaveButtonClick = () => {
         setIsDialogOpen(true);
-        //dispatch(requestUpdateTreatmentPlan());
+        setCurrentAction('save');
+        setDialogTitle("Save Treatment Plan");
+        setDialogContent("Please enter a short description for this treatment plan. This description will allow you to identify it later.");
+        setTextFieldWidth('100%'); 
     };
+
+    const handleExportClick = () => {
+        setIsDialogOpen(true);
+        setCurrentAction('export');
+        setDialogTitle("Export Treatment Plan");
+        setDialogContent("Please enter the patient ID to export this treatment plan into OpenDental.");
+        setTextFieldWidth('75px'); 
+    };
+
 
     const handleClose = () => {
         setIsDialogOpen(false); // Close the AlertDialog
+        setCurrentAction(null); // Reset the current action
+        setDialogTitle(''); // Reset dialog title
+        setDialogContent(''); // Reset dialog content
+        
     };
 
-    const handleAgree = (inputValue) => {
-        console.log('User input:', inputValue);
-        const patientIdIntInputValue = parseInt(inputValue, 10);
-        const patientObject = filteredPatients.find(p => p.patientId === patientIdIntInputValue);
 
-        if (patientObject) {
+    const handleConfirmSaveClick = (inputValue) => {
+        console.log('User input:', inputValue);
+        dispatch(updateTreatmentPlanDescription({ treatmentPlanId: treatmentPlans[0].treatmentPlanId, description: inputValue }));
+        dispatch(requestUpdateTreatmentPlan());
+        setIsDialogOpen(false);
+        //const patientIdIntInputValue = parseInt(inputValue, 10);
+        //const patientObject = filteredPatients.find(p => p.patientId === patientIdIntInputValue);
+
+/*        if (patientObject) {
             // If a matching patient is found, dispatch setSelectedPatient with the patient object
             dispatch(setSelectedPatient(patientObject));
             console.log('User input:', patientIdIntInputValue);
@@ -65,16 +91,18 @@ const TxViewCustomizationToolbar = () => {
         } else {
             // Handle the case where no patient is found by the given ID
             console.error('No patient found with ID:', patientIdIntInputValue);
-        }
+        }*/
     };
 
     const handleGroupClick = () => {
         dispatch(toggleGroupActive());
     };
 
-    const handleImportClick = async () => {
+
+    const handleAgreeExportClick = async (inputValue) => {
         // here we map the treatment plan to the dto 
-        const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDto(treatmentPlans, selectedPatient.patientId); 
+        const patientIdIntInputValue = parseInt(inputValue, 10);
+        const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDto(treatmentPlans, patientIdIntInputValue);
 
         // sending the entire treatment plan to the backend in one go
         const success = await importTreatmentPlanToOpenDental(openDentalTreatmentPlanDto);
@@ -115,13 +143,21 @@ const TxViewCustomizationToolbar = () => {
     return (
         <>
             <AlertDialog
-                title="Patient"
-                content="Please enter the patient ID."
+                title={dialogTitle}
+                content={dialogContent}
                 open={isDialogOpen}
                 onClose={handleClose}
-                onAgree={handleAgree}
-                textInput={true} 
+                onAgree={inputValue => {
+                    if (currentAction === 'save') {
+                        handleConfirmSaveClick(inputValue);
+                    } else if (currentAction === 'export') {
+                        handleAgreeExportClick(inputValue);
+                    }
+                }}
+                textInput={true}
+                textInputWidth={textFieldWidth}
             />
+
             <div ref={sentinelRef} style={{ height: '1px' }}></div>
             <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
                 <StyledFlexAlignContainer justify="flex-start">
@@ -143,7 +179,7 @@ const TxViewCustomizationToolbar = () => {
                     <StyledPrintSaveBtnContainer>
                         <StyledPrintImportBtnContainer>
                             <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
-                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" onClick={handleImportClick} />
+                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" onClick={handleExportClick} />
                         </StyledPrintImportBtnContainer>
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>

@@ -110,6 +110,14 @@ const updateVisitDescriptionInTreatmentPlan = (treatmentPlans, visitId, newDescr
 };
 
 
+const updateTreatmentPlanDescriptionInState = (treatmentPlans, treatmentPlanId, description) => {
+    return treatmentPlans.map(plan => {
+        if (plan.treatmentPlanId === treatmentPlanId) {
+            return { ...plan, description };
+        }
+        return plan;
+    });
+};
 
 
 
@@ -201,6 +209,10 @@ export const treatmentPlansSlice = createSlice({
         setVisitOrder: (state, action) => {
             state.visitOrder = action.payload;
         },
+        updateTreatmentPlanDescription: (state, action) => {
+            const { treatmentPlanId, description } = action.payload;
+            state.treatmentPlans = updateTreatmentPlanDescriptionInState(state.treatmentPlans, treatmentPlanId, description);
+        },
     },
 });
 
@@ -216,6 +228,7 @@ export const {
     addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById,
     setVisitOrder,
     onUpdateVisitDescription,
+    updateTreatmentPlanDescription
     
 } = treatmentPlansSlice.actions;
 

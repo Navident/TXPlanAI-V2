@@ -154,7 +154,8 @@ public class TreatmentPlansController : ControllerBase
 
 
 
-    // POST: api/TreatmentPlans/newTxForPatient
+    // POST: api/TreatmentPlans/newTxForPatient 
+    //this function is using the prior hippa version temporarily
     [HttpPost("newTxForPatient")]
     public async Task<IActionResult> CreateNewTreatmentPlanWithoutEditsForPatient([FromBody] CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto)
     {
@@ -186,7 +187,7 @@ public class TreatmentPlansController : ControllerBase
 
         try
         {
-            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanForPatientFromCombinedAsync(createUnmodifiedPatientTxDto, facilityId.Value);
+            var newTreatmentPlan = await _dentalTreatmentPlannerService.CreateNewTreatmentPlanForPatientFromCombinedAsyncPriorHippa(createUnmodifiedPatientTxDto, facilityId.Value);
             if (newTreatmentPlan == null)
             {
                 return NotFound();
@@ -312,6 +313,7 @@ public class TreatmentPlansController : ControllerBase
     }
 
     // GET: api/TreatmentPlans/allpatientplansforfacility
+    //this function is using the prior hippa version temporarily
     [HttpGet("allpatientplansforfacility")]
     public async Task<IActionResult> GetAllTreatmentPlansForFacility()
     {
@@ -334,7 +336,7 @@ public class TreatmentPlansController : ControllerBase
 
         try
         {
-            var treatmentPlans = await _dentalTreatmentPlannerService.GetAllPatientTreatmentPlansForFacilityAsync(user.FacilityId.Value);
+            var treatmentPlans = await _dentalTreatmentPlannerService.GetAllPatientTreatmentPlansForFacilityAsyncPriorHippa(user.FacilityId.Value);
             return Ok(treatmentPlans);
         }
         catch (Exception ex)
