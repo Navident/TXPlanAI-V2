@@ -471,29 +471,31 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 	function addNewRow(visitId) {
 		setAllRows((prevAllRows) => {
 			const rowsForVisit = prevAllRows[visitId] || [];
-			const lastRow =
-				rowsForVisit.length > 0 ? rowsForVisit[rowsForVisit.length - 1] : null;
+			const lastRow = rowsForVisit.length > 0 ? rowsForVisit[rowsForVisit.length - 1] : null;
 
 			if (lastRow) {
-				// Use convertToStaticRow to convert the last row to static
-				const staticRow = convertToStaticRow(
-					lastRow,
-					visitId,
-					lastRow.selectedCdtCode
-				);
+				// Ensure a CDT code is selected and a tooth number is present
+				if (lastRow.selectedCdtCode.code && lastRow.selectedCdtCode.toothNumber) {
+					// Use convertToStaticRow to convert the last row to static
+					const staticRow = convertToStaticRow(lastRow, visitId, lastRow.selectedCdtCode);
 
-				// Use createDynamicRow to add a new dynamic row
-				const newDynamicRow = createDynamicRowUponAddClick(visitId);
+					// Use createDynamicRow to add a new dynamic row
+					const newDynamicRow = createDynamicRowUponAddClick(visitId);
 
-				return {
-					...prevAllRows,
-					[visitId]: [...rowsForVisit.slice(0, -1), staticRow, newDynamicRow],
-				};
+					return {
+						...prevAllRows,
+						[visitId]: [...rowsForVisit.slice(0, -1), staticRow, newDynamicRow],
+					};
+				} else {
+					// alert the user that a tooth number and CDT code must be selected
+					dispatch(showAlert({ type: 'error', message: 'Ensure both a tooth number is inputted and a CDT code is selected before adding a new row.' }));
+				}
 			}
 
 			return prevAllRows;
 		});
 	}
+
 
 	function createAddButtonCell(visitId) {
 		return (
