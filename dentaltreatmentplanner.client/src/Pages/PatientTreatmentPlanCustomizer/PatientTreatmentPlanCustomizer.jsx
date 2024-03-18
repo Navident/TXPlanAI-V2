@@ -46,6 +46,13 @@ const PatientTreatmentPlanCustomizer = () => {
 	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
 
 	useEffect(() => {
+		return () => {
+			// Reset treatmentPlans when component unmounts
+			dispatch(setTreatmentPlans([]));
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
 		const fetchPlanAndFees = async () => {
 			if (treatmentPlanId && patientTreatmentPlans.length > 0) {
 				const id = parseInt(treatmentPlanId, 10);

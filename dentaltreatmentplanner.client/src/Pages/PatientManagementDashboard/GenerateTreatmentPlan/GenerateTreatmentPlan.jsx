@@ -44,6 +44,13 @@ const GenerateTreatmentPlan = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		return () => {
+			// Reset treatmentPlans when component unmounts
+			dispatch(setTreatmentPlans([]));
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
 		if (treatmentPlans) {
 			console.log("treatmentPlans state in parent", treatmentPlans);
 		}
