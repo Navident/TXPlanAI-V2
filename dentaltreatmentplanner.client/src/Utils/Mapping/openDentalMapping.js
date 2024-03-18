@@ -11,7 +11,7 @@ export const mapToOpenDentalTreatmentPlanDto = (treatmentPlans, patientId) => {
         for (let item of visit.cdtCodes) {
             const procedureDto = {
                 ToothNum: item.toothNumber.replace('#', ''),
-                Surf: "",
+                Surf: item.surface,
                 ProcStatus: "TP",
                 procCode: item.code,
                 priority: visit.visitNumber.toString()  // This should be dynamic, the priority should be the visit number that the procedure is in

@@ -14,11 +14,19 @@ import {
 	StyledTableLabelText
 } from "../../../../GlobalStyledComponents";
 import GoBack from "../../../../Components/Common/GoBack/GoBack";
-import { useSelector } from 'react-redux';
-import { selectAllSubcategoryTreatmentPlans } from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+	selectAllSubcategoryTreatmentPlans,
+	setTreatmentPlans,
+	handleAddVisit,
+	onUpdateVisitsInTreatmentPlan,
+	onDeleteVisit,
+	selectAllTreatmentPlans
+} from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 
 const ProceduresCustomizer = () => {
-	const [treatmentPlans, setTreatmentPlans] = useState([]);
+	const dispatch = useDispatch();
+	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 	const params = useParams();
 	const paramsSubcategoryId = Number(params.subcategory);
 	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
@@ -27,17 +35,12 @@ const ProceduresCustomizer = () => {
 	useEffect(() => {
 		// Filter out any null values 
 		const filteredPlans = subcategoryTreatmentPlans.filter(plan => plan && plan.procedureSubcategoryId === paramsSubcategoryId);
-		setTreatmentPlans(filteredPlans);
+		dispatch(setTreatmentPlans(filteredPlans));
 	}, [paramsSubcategoryId, subcategoryTreatmentPlans]); 
 
 	useEffect(() => {
 		console.log("treatmentPlans updated:", treatmentPlans);
 	}, [treatmentPlans]);
-	const handleAddVisitToTreatmentPlan = (treatmentPlanId, newVisit) => {
-		setTreatmentPlans((prevPlans) =>
-			addVisitToTreatmentPlan(prevPlans, treatmentPlanId, newVisit)
-		);
-	};
 
 	const handleDeleteVisitInTreatmentPlan = (
 		treatmentPlanId,
@@ -82,10 +85,7 @@ const ProceduresCustomizer = () => {
 										includeExtraRow={true}
 										addProcedureElement={<span>+ Add Procedure</span>}
 										onAddVisit={(newVisit) =>
-											handleAddVisitToTreatmentPlan(
-												plan.treatmentPlanId,
-												newVisit
-											)
+											dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
 										}
 										onUpdateVisitsInTreatmentPlan={(
 											treatmentPlanId,

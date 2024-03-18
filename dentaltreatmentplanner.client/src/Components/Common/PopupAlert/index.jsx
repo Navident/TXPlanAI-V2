@@ -9,9 +9,8 @@ import StandardTextField from '../../../Components/Common/StandardTextfield/Stan
 import { useState } from 'react';
 
 
-function AlertDialog({ title, content, open, onClose, onAgree, textInput = false, textInputWidth = "75px" }) {
+function AlertDialog({ title, content, open, onClose, onAgree, textInput = false, textInputWidth = "75px", inputValue, onInputChange }) {
     const purple = UI_COLORS.purple;
-    const [inputValue, setInputValue] = useState('');
 
     const handleTextSubmit = () => {
         onAgree(inputValue);
@@ -31,9 +30,9 @@ function AlertDialog({ title, content, open, onClose, onAgree, textInput = false
                 {textInput && (
                     <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                         <StandardTextField
-                            style={{ width: textInputWidth }} 
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
+                            style={{ width: textInputWidth }}
+                            value={inputValue} 
+                            onChange={onInputChange} 
                             borderColor={purple}
                         />
                     </div>

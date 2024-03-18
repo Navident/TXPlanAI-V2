@@ -81,6 +81,7 @@ const GenerateTreatmentPlan = () => {
 
 		return responseArray.map((item, index) => ({
 			...item,
+			toothNumber: item.toothNumber ? item.toothNumber.replace('#', '') : '', //if tooth number not provided we need to assign it empty string
 			originalOrder: index,
 		}));
 	}
@@ -105,8 +106,8 @@ const GenerateTreatmentPlan = () => {
 
 		for (const item of treatmentEntries) {
 			const { arch, toothNumber, surface, treatments, originalOrder } = item;
-			//removing "#" from tooth number
-			const sanitizedToothNumber = toothNumber.replace('#', '');
+			// Removing "#" from tooth number if present, else default to an empty string
+			const sanitizedToothNumber = toothNumber ? toothNumber.replace('#', '') : '';
 			for (const [treatmentIndex, treatment] of treatments.entries()) {
 				const plan = plansMap.get(treatment.toLowerCase());
 				if (plan) {
@@ -115,7 +116,7 @@ const GenerateTreatmentPlan = () => {
 						visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
 						cdtCodes: visit.cdtCodes.map((cdtCode) => ({
 							...cdtCode,
-							toothNumber: sanitizedToothNumber,
+							toothNumber: sanitizedToothNumber, 
 							surface,
 							arch,
 							originalVisitCategory: plan.procedureCategoryName,
@@ -128,7 +129,6 @@ const GenerateTreatmentPlan = () => {
 				}
 			}
 		}
-
 		allVisits.sort(
 			(a, b) =>
 				a.originLineIndex - b.originLineIndex || a.visitNumber - b.visitNumber

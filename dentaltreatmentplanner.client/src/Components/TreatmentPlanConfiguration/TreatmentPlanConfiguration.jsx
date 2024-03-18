@@ -37,7 +37,7 @@ import {
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
-import { handleAddCdtCode, updateSubcategoryTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { handleAddCdtCode, updateSubcategoryTreatmentPlan, setVisitOrder, selectVisitOrder, } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { selectIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
 import { useSelector, useDispatch } from "react-redux";
 
@@ -51,9 +51,8 @@ const TreatmentPlanConfiguration = ({
 	isInGenerateTreatmentPlanContext,
 }) => {
 	const dispatch = useDispatch();
-
+	const visitOrder = useSelector(selectVisitOrder);
 	const [allRows, setAllRows] = useState({});
-	const [visitOrder, setVisitOrder] = useState([]);
 	const [deletedRowIds, setDeletedRowIds] = useState([]);
 	const [deletedVisitIds, setDeletedVisitIds] = useState([]);
 	const isInitialLoad = useRef(true);
@@ -79,12 +78,12 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	useEffect(() => {
-		console.log("treatmentPlans updated:", treatmentPlans);
-	}, [treatmentPlans]);
+		console.log("current treatmentPlan:", treatmentPlan);
+	}, [treatmentPlan]);
 
 	useEffect(() => {
-		console.log("cdtcodes state:", combinedCdtCodes);
-	}, [combinedCdtCodes]);
+		console.log("allRows:", allRows);
+	}, [allRows]);
 
 	useEffect(() => {
 		console.log("isSuperAdmin state:", isSuperAdmin);
@@ -93,23 +92,25 @@ const TreatmentPlanConfiguration = ({
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
-			const { sortedVisits, sortedCdtCodes } = sortTreatmentPlan(treatmentPlan);
-			console.log("sortedCdtCodes", sortedCdtCodes);
-			const newAllRows = sortedVisits.reduce((acc, visit) => {
-				const staticRows = sortedCdtCodes[visit.visitId].map((cdtCode, index) =>
-					createStaticRows(cdtCode, visit.visitId, index)
+			console.log("we went in the initial load conditional");
+			const visits = treatmentPlan.visits || [];
+			const newAllRows = visits.reduce((acc, visit, index) => {
+				const visitId = visit.visitId;
+				const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
+					createStaticRows(visitCdtCodeMap, visitId, cdtIndex)
 				);
-				const initialRowId = `initial-${visit.visitId}`;
-				acc[visit.visitId] = [
+				const initialRowId = `initial-${visitId}`;
+				acc[visitId] = [
 					...staticRows,
-					createDynamicRowv1(visit.visitId, initialRowId),
+					createDynamicRowv1(visitId, initialRowId),
 				];
 				return acc;
 			}, {});
 
 			setAllRows(newAllRows);
-			setVisitOrder(sortedVisits.map((visit) => visit.visitId));
-			isInitialLoad.current = false; // Set the flag to false after initial setup
+			dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
+			isInitialLoad.current = false;
 		}
 	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
 
@@ -854,21 +855,51 @@ const TreatmentPlanConfiguration = ({
 			console.error("Row not found with rowId:", rowId, "in visitId:", visitId);
 		}
 	};
+	const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
+		const visitId = `temp-${Date.now()}`;
+		const initialRowId = `initial-${visitId}`;
+
+		const newVisit = {
+			visitId: visitId,
+			treatment_plan_id: treatmentPlan.treatmentPlanId,
+			visitNumber: treatmentPlan.visits.length + 1,
+			description: "Table " + (treatmentPlan.visits.length + 1),
+		};
+
+		onAddVisit(newVisit);
+
+		const dynamicRow = createDynamicRowv1(visitId, initialRowId);
+		const newRows = [...groupedRows, dynamicRow];
+
+		const newVisitOrder = [...visitOrder, visitId];
+		dispatch(setVisitOrder(newVisitOrder));
+
+		// Handling updatedAllRows
+		const finalAllRows = updatedAllRows ? { ...updatedAllRows, [visitId]: newRows } : null;
+		if (finalAllRows) {
+			setAllRows(finalAllRows);
+		} else {
+			setAllRows(prevRows => ({
+				...prevRows,
+				[visitId]: newRows,
+			}));
+		}
+	};
 
 	const renderVisit = (visitId, index) => {
+		console.log("Visit order when we get in renderVisit", visitOrder);
 		const visitIdStr = String(visitId);
-		const isTempVisit = visitIdStr.startsWith("temp-");
 
-		const visit = isTempVisit
-			? { visitId: visitIdStr, visit_number: index + 1 }
-			: localUpdatedVisits.find((v) => String(v.visitId) === visitIdStr);
+		const safeTreatmentPlanVisits = Array.isArray(treatmentPlan.visits) ? treatmentPlan.visits : [];
+
+		const visit = safeTreatmentPlanVisits.find(v => String(v.visitId) === visitIdStr);
 
 		if (!visit) {
+			console.log("Visit not found:", visitId);
 			return null;
 		}
-		const draggableKey = isTempVisit
-			? `temp-visit-${index}`
-			: `visit-${visit.visitId}`;
+
+		const draggableKey = `visit-${visit.visitId}`;
 		const headers = createHeaders();
 
 		if (!allRows[visitIdStr]) {
@@ -955,6 +986,9 @@ const TreatmentPlanConfiguration = ({
 				</DragDropContext>
 			)}
 			<div className="bottom-tx-plan-buttons">
+				<div className="add-visit-btn-container" onClick={handleAddVisit}>
+					+ Add Treatment Table
+				</div>
 				<span
 					onClick={handleUpdateTreatmentPlan}
 					className="save-treatment-plan-text-btn"

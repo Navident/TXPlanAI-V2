@@ -10,7 +10,7 @@ import CategoryFilters from "./CategoryFilters/index";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { UI_COLORS } from '../../Theme';
 import { useState, useEffect, useRef } from 'react';
-import ToggleButtonGroup from "../../Components/Common/ToggleButtonGroup/index";
+import ToolbarContainer from "../../Components/Containers/ToolbarContainer/index";
 import { useSelector, useDispatch } from 'react-redux';
 import {
     selectSortBy,
@@ -34,19 +34,14 @@ import AlertDialog from "../../Components/Common/PopupAlert/index";
 
 const TxViewCustomizationToolbar = () => {
     const dispatch = useDispatch();
-    const [isSticky, setIsSticky] = useState(false);
-    const toolbarRef = useRef(null);
-    const sentinelRef = useRef(null); 
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
-    const selectedPatient = useSelector(selectSelectedPatient);
-    const filteredPatients = useSelector(selectFilteredPatients);
-
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [userInput, setUserInput] = useState('');
     const [currentAction, setCurrentAction] = useState(null);
     const [dialogTitle, setDialogTitle] = useState('');
     const [dialogContent, setDialogContent] = useState('');
     const [textFieldWidth, setTextFieldWidth] = useState('');
+    const [alertDialogInputValue, setAlertDialogInputValue] = useState('');
+
 
     const handleSaveButtonClick = () => {
         setIsDialogOpen(true);
@@ -70,7 +65,7 @@ const TxViewCustomizationToolbar = () => {
         setCurrentAction(null); // Reset the current action
         setDialogTitle(''); // Reset dialog title
         setDialogContent(''); // Reset dialog content
-        
+        setAlertDialogInputValue(''); // Reset the input field
     };
 
 
@@ -117,29 +112,6 @@ const TxViewCustomizationToolbar = () => {
         }
     };
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsSticky(!entry.isIntersecting);
-            },
-            {
-                rootMargin: '-1px 0px 0px 0px',
-                threshold: [1]
-            }
-        );
-
-        if (sentinelRef.current) {
-            observer.observe(sentinelRef.current);
-        }
-
-        return () => {
-            if (sentinelRef.current) {
-                observer.unobserve(sentinelRef.current);
-            }
-        };
-    }, []);
-
-
     return (
         <>
             <AlertDialog
@@ -147,19 +119,20 @@ const TxViewCustomizationToolbar = () => {
                 content={dialogContent}
                 open={isDialogOpen}
                 onClose={handleClose}
-                onAgree={inputValue => {
+                onAgree={() => {
                     if (currentAction === 'save') {
-                        handleConfirmSaveClick(inputValue);
+                        handleConfirmSaveClick(alertDialogInputValue);
                     } else if (currentAction === 'export') {
-                        handleAgreeExportClick(inputValue);
+                        handleAgreeExportClick(alertDialogInputValue);
                     }
                 }}
+                onInputChange={(e) => setAlertDialogInputValue(e.target.value)} 
+                inputValue={alertDialogInputValue}
                 textInput={true}
                 textInputWidth={textFieldWidth}
             />
 
-            <div ref={sentinelRef} style={{ height: '1px' }}></div>
-            <StyledTxToolbarContainer ref={toolbarRef} className={isSticky ? 'sticky' : ''}>
+            <ToolbarContainer>
                 <StyledFlexAlignContainer justify="flex-start">
                     <RoundedButton
                         text="Group"
@@ -184,7 +157,7 @@ const TxViewCustomizationToolbar = () => {
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>
                 </StyledFlexAlignContainer>
-            </StyledTxToolbarContainer>
+            </ToolbarContainer>
         </>
     );
 };
