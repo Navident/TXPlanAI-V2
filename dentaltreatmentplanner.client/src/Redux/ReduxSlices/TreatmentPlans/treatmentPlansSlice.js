@@ -42,9 +42,11 @@ const addCdtCodeToVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visit
                 ...plan,
                 visits: plan.visits.map(visit => {
                     if (visit.visitId === visitId) {
+                        // Ensure cdtCodes is an array before spreading
+                        const cdtCodesArray = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
                         return {
                             ...visit,
-                            cdtCodes: [...visit.cdtCodes, newCdtCode],
+                            cdtCodes: [...cdtCodesArray, newCdtCode],
                         };
                     }
                     return visit;

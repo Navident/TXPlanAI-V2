@@ -32,7 +32,7 @@ import { selectSelectedPatient, selectFilteredPatients,  setSelectedPatient } fr
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 
-const TxViewCustomizationToolbar = () => {
+const TxViewCustomizationToolbar = ({ immediateSave = false }) => {
     const dispatch = useDispatch();
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -44,12 +44,21 @@ const TxViewCustomizationToolbar = () => {
 
 
     const handleSaveButtonClick = () => {
-        setIsDialogOpen(true);
-        setCurrentAction('save');
-        setDialogTitle("Save Treatment Plan");
-        setDialogContent("Please enter a short description for this treatment plan. This description will allow you to identify it later.");
-        setTextFieldWidth('100%'); 
+        if (immediateSave) {
+            // Perform the immediate save 
+            console.log('Performing immediate save...');
+            dispatch(updateTreatmentPlanDescription({ treatmentPlanId: treatmentPlans[0].treatmentPlanId, description: 'Default Description' })); // Example
+            dispatch(requestUpdateTreatmentPlan());
+        } else {
+            // Popup before save 
+            setIsDialogOpen(true);
+            setCurrentAction('save');
+            setDialogTitle("Save Treatment Plan");
+            setDialogContent("Please enter a short description for this treatment plan. This description will allow you to identify it later.");
+            setTextFieldWidth('100%');
+        }
     };
+
 
     const handleExportClick = () => {
         setIsDialogOpen(true);

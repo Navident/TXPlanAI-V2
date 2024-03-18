@@ -528,30 +528,41 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 	};
 
 	const onDragEnd = (result) => {
-		if (!result.destination) {
+		const { source, destination } = result;
+
+		// Do nothing if dropped outside the list
+		if (!destination) {
 			return;
 		}
 
 		if (result.type === "row") {
-			const tableId = result.source.droppableId.replace("droppable-table-", "");
-			const rows = allRows[tableId];
+			// Deconstructing for easier access
+			const sourceId = source.droppableId.replace("droppable-table-", "");
+			const destinationId = destination.droppableId.replace("droppable-table-", "");
 
-			if (!rows) {
-				return;
+			// Dropping in the same table
+			if (source.droppableId === destination.droppableId) {
+				const newRows = reorder(allRows[sourceId], source.index, destination.index);
+				setAllRows((prevRows) => ({
+					...prevRows,
+					[sourceId]: newRows,
+				}));
+			} else {
+				// Moving from one table to another
+				const sourceRows = Array.from(allRows[sourceId]);
+				const destRows = Array.from(allRows[destinationId]);
+				const [removed] = sourceRows.splice(source.index, 1);
+				destRows.splice(destination.index, 0, removed);
+
+				setAllRows((prevRows) => ({
+					...prevRows,
+					[sourceId]: sourceRows,
+					[destinationId]: destRows,
+				}));
 			}
-
-			const reorderedRows = reorder(
-				rows,
-				result.source.index,
-				result.destination.index
-			);
-
-			setAllRows((prevRows) => ({
-				...prevRows,
-				[tableId]: reorderedRows,
-			}));
 		}
 	};
+
 
 	const reorderAllRows = (newVisitOrder) => {
 		const reorderedRows = {};
@@ -601,16 +612,17 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	const handleDeleteVisit = (visitId) => {
 		// Check if the visitId starts with "temp-" to identify temporary visits
-		const isTemporaryVisit = visitId.startsWith("temp-");
+		const visitIdStr = `${visitId}`;
+		const isTemporaryVisit = visitIdStr.startsWith("temp-");
 
 		// Update the visitOrder to remove the visit
-		const newVisitOrder = visitOrder.filter(id => id !== visitId);
+		const newVisitOrder = visitOrder.filter(id => id !== visitIdStr);
 		dispatch(setVisitOrder(newVisitOrder));
 
 		// Update allRows to remove the rows associated with the visit
 		setAllRows(prevRows => {
 			const updatedRows = { ...prevRows };
-			delete updatedRows[visitId];
+			delete updatedRows[visitIdStr];
 			return updatedRows;
 		});
 
@@ -622,18 +634,14 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 				return newDeletedVisitIds;
 			});
 
-			if (treatmentPlan.treatmentPlanId) {
 				onDeleteVisit(treatmentPlan.treatmentPlanId, visitId);
-			}
 
-		}
-
-		else {
-			// here the visit is temporary
-			dispatch(onDeleteTemporaryVisit({ deletedVisitId: visitId }));
-
+		} else {
+			// If the visit is temporary
+			dispatch(onDeleteTemporaryVisit({ deletedVisitId: visitIdStr }));
 		}
 	};
+
 
 
 	const createNewCombinedTreatmentPlanForPatient = async (
@@ -1294,6 +1302,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 						)}
 					</Droppable>
 				</DragDropContext>
+
 			)}
 			<div className="bottom-tx-plan-buttons">
 				<div className="add-visit-btn-container" onClick={handleAddVisit}>

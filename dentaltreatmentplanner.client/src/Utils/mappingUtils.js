@@ -17,6 +17,7 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, 
                     VisitCdtCodeMapId: row.visitCdtCodeMapId,
                     VisitId: visitId,
                     CdtCodeId: cdtCode.cdtCodeId,
+                    ToothNumber: cdtCode.toothNumber,
                     Order: idx,
                     Code: cdtCode.code,
                     LongDescription: cdtCode.longDescription,
@@ -96,8 +97,6 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
         const visitCdtCodeMaps = validRows.map(row => {
             // Check if toothNumber is an empty string, if so, set to null
             const toothNumber = row.selectedCdtCode.toothNumber === '' ? null : row.selectedCdtCode.toothNumber;
-            // If toothNumber is null, keep it as null. Otherwise, attempt to parse the first character as a number
-            const toothNumberNumeric = toothNumber === null ? null : parseInt(toothNumber[0]);
 
             const surface = row.selectedCdtCode.surface ? row.selectedCdtCode.surface : null;
             const arch = row.selectedCdtCode.arch ? row.selectedCdtCode.arch : null;
@@ -106,7 +105,7 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
                 CdtCodeId: row.selectedCdtCode.cdtCodeId,
                 Code: row.selectedCdtCode.code,
                 LongDescription: row.selectedCdtCode.longDescription,
-                ToothNumber: !isNaN(toothNumberNumeric) ? toothNumberNumeric : null, // Ensure parsed number is valid; otherwise, set as null
+                ToothNumber: toothNumber, 
                 Surface: surface,
                 Arch: arch,
             };

@@ -15,30 +15,40 @@ import {
 	StyledAppContainer,
 	StyledMainContentWrapper,
 	StyledContentArea,
+	StyledSeparator,
+	StyledTitleAndPaymentTotalsContainer,
+	StyledLargeText
 } from "../../GlobalStyledComponents";
 import HeaderBar from "../../Components/Common/HeaderBar/HeaderBar";
 import logo from "../../assets/navident-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { CircularProgress } from "@mui/material";
-import { selectPatientTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { selectPatientTreatmentPlans, handleAddVisit, onDeleteVisit, setTreatmentPlans, selectAllTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPayersForFacility } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import TxViewCustomizationToolbar from "../../Components/TxViewCustomizationToolbar/index";
+
+
+import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import PaymentTotals from "../../Components/PaymentTotals/index";
+
 
 const PatientTreatmentPlanCustomizer = () => {
+	const dispatch = useDispatch();
 	const { treatmentPlanId } = useParams();
 	const [plan, setPlan] = useState(null);
 	const { businessName, fetchFacilityPayerCdtCodeFees } = useBusiness();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
 	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
-	const payers = useSelector(selectPayersForFacility);
+	const treatmentPlans = useSelector(selectAllTreatmentPlans);
+	const grandUcrTotal = useSelector(selectGrandUcrTotal);
+	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
+	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
 
 	const {
-		treatmentPlans,
 		cdtCodes,
-		handleAddVisit,
-		onDeleteVisit,
 		onUpdateVisitsInTreatmentPlan,
 	} = useTreatmentPlan();
 
@@ -47,7 +57,7 @@ const PatientTreatmentPlanCustomizer = () => {
 			if (treatmentPlanId && patientTreatmentPlans.length > 0) {
 				const id = parseInt(treatmentPlanId, 10);
 				const foundPlan = patientTreatmentPlans.find(plan => parseInt(plan.treatmentPlanId, 10) === id);
-				setPlan(foundPlan);
+				dispatch(setTreatmentPlans([foundPlan]));
 
 				setIsLoading(false); 
 			} else {
@@ -57,6 +67,12 @@ const PatientTreatmentPlanCustomizer = () => {
 
 		fetchPlanAndFees();
 	}, [treatmentPlanId, patientTreatmentPlans]);
+
+	useEffect(() => {
+		if (treatmentPlans) {
+			console.log("treatmentPlans state in parent", treatmentPlans);
+		}
+	}, [treatmentPlans]);
 
 	const handleLogoClick = () => {
 		navigate("/");
@@ -83,8 +99,25 @@ const PatientTreatmentPlanCustomizer = () => {
 				<StyledMainContentWrapper>
 					<StyledContentArea>
 						<GoBack text="Go Back" />
-						<StyledRoundedBoxContainer>
+						<StyledRoundedBoxContainer height="auto">
+							<TxViewCustomizationToolbar immediateSave={true} />
+							<StyledSeparator customMarginTop="0px" />
 							<StyledContainerWithTableInner>
+								<StyledTitleAndPaymentTotalsContainer>
+									<div style={{ flex: 1 }}></div>
+									<StyledLargeText>Treatment Plan</StyledLargeText>
+									<div style={{ flex: 1 }}>
+										{areGrandTotalsReady && (
+											<PaymentTotals
+												ucrTotal={grandUcrTotal}
+												coPayTotal={grandCoPayTotal}
+												isGrandTotal={true}
+												justifyContent="end"
+											/>
+										)}
+									</div>
+								</StyledTitleAndPaymentTotalsContainer>
+
 								{isLoading ? (
 									<div
 										style={{
@@ -97,28 +130,25 @@ const PatientTreatmentPlanCustomizer = () => {
 										<CircularProgress style={{ color: "#7777a1" }} />
 									</div>
 								) : (
-									plan && (
+									treatmentPlans.map((plan, index) => (
 										<TreatmentPlanOutput
-											key={`treatment-plan-${plan.treatmentPlanId}`}
+											key={`treatment-plan-${index}`}
 											treatmentPlan={plan}
 											treatmentPlans={treatmentPlans}
-											cdtCodes={cdtCodes}
 											onAddVisit={(newVisit) =>
-												handleAddVisit(plan.treatmentPlanId, newVisit)
+												dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
 											}
-											onUpdateVisitsInTreatmentPlan={(updatedVisits) =>
-												onUpdateVisitsInTreatmentPlan(
-													plan.treatmentPlanId,
-													updatedVisits
-												)
-											}
+											onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
+												console.log("Dispatching updated visits:", updatedVisits);
+												dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
+											}}
 											onDeleteVisit={(deletedVisitId) =>
-												onDeleteVisit(plan.treatmentPlanId, deletedVisitId)
+												dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
 											}
 											showToothNumber={true}
 											isInGenerateTreatmentPlanContext={false}
 										/>
-									)
+									))
 								)}
 							</StyledContainerWithTableInner>
 						</StyledRoundedBoxContainer>
