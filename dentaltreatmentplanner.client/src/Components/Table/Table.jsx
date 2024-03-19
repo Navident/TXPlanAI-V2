@@ -12,6 +12,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { UI_COLORS } from '../../Theme';
+import redDropdownIcon from "../../assets/red-dropdown-icon.svg";
 
 const Table = ({
 	headers,
@@ -25,6 +26,7 @@ const Table = ({
 	onDeleteVisit,
 	columnWidths = [],
 	displayCheckmark = true,
+	onRedDropdownIconClick,
 }) => {
 	const dispatch = useDispatch();
 	const checkedRows = useSelector(selectCheckedRows);
@@ -40,6 +42,8 @@ const Table = ({
 	}, [checkedRows]);
 
 	const renderDraggableRow = (rowData, rowIndex) => {
+		console.log("Row data for row", rowIndex, ":", rowData);
+
 		const isLastRow = rowIndex === rows.length - 1;
 		const rowBackgroundColor = rowData.backgroundColor || "transparent";
 		console.log("rowBackgroundColor", rowBackgroundColor);
@@ -70,6 +74,12 @@ const Table = ({
 											alt="Drag Icon"
 											{...provided.dragHandleProps}
 										/>
+										<img
+											src={redDropdownIcon}
+											className="drag-icon"
+											alt="red dropdown Icon"
+											onClick={(e) => onRedDropdownIconClick(rowData.id, e.currentTarget)}
+										/>
 										{displayCheckmark && (
 											<CustomCheckbox
 												label=""
@@ -82,7 +92,7 @@ const Table = ({
 								)}
 							</StyledDragCheckmarkIconsContainer>
 						</td>
-						{rowData.data.map((cell, cellIndex) => (
+						{rowData.data && rowData.data.map((cell, cellIndex) => (
 							<td
 								key={`cell-${tableId}-${rowIndex}-${cellIndex}`}
 								style={
@@ -101,6 +111,8 @@ const Table = ({
 	};
 
 	const renderRow = (rowData, rowIndex) => {
+		console.log("Row data for row", rowIndex, ":", rowData);
+
 		const isLastRow = rowIndex === rows.length - 1;
 		return (
 			<tr key={`row-${tableId}-${rowIndex}`}>
@@ -112,6 +124,12 @@ const Table = ({
 								className="drag-icon"
 								alt="Drag Icon"
 							/>
+							<img
+								src={redDropdownIcon}
+								className="drag-icon"
+								alt="Drag Icon"
+								onClick={(e) => onRedDropdownIconClick(rowData.id, e.currentTarget)}
+							/>
 							{displayCheckmark && (
 								<CustomCheckbox
 									label=""
@@ -122,7 +140,7 @@ const Table = ({
 						</StyledDragCheckmarkIconsContainer>
 					)}
 				</td>
-				{rowData.data.map((cell, cellIndex) => (
+				{rowData.data && rowData.data.map((cell, cellIndex) => (
 					<td
 						key={`cell-${tableId}-${rowIndex}-${cellIndex}`}
 						style={

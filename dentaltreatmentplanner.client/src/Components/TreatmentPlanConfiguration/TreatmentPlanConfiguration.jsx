@@ -886,6 +886,42 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
+	const handleRedDropdownIconClick = (rowId) => {
+		setAllRows((prevAllRows) => {
+			return Object.entries(prevAllRows).reduce((acc, [visitId, rows]) => {
+				const rowIndex = rows.findIndex(row => row.id === rowId);
+				const nextRow = rows[rowIndex + 1];
+				const isDynamicRowForAltCode = nextRow && nextRow.id.startsWith("dynamic-alt-code");
+
+				let newRows;
+				if (isDynamicRowForAltCode) {
+					// Remove the dynamic row if it's already there
+					newRows = [...rows.slice(0, rowIndex + 1), ...rows.slice(rowIndex + 2)];
+				} else {
+					// Insert a new dynamic row for alternative CDT code selection
+					const dynamicRowForAltCode = createDynamicRowForAltCode(visitId, rowId);
+					newRows = [...rows.slice(0, rowIndex + 1), dynamicRowForAltCode, ...rows.slice(rowIndex + 1)];
+				}
+
+				acc[visitId] = newRows;
+				return acc;
+			}, {});
+		});
+	};
+
+	const createDynamicRowForAltCode = (visitId, baseRowId) => {
+		// Your logic for creating the dynamic row structure
+		// This can include a specific ID pattern to recognize it as an alt code row
+		return {
+			id: `dynamic-alt-code-${visitId}-${baseRowId}-${Date.now()}`,
+			description: "Select an alternative CDT code",
+			selectedCdtCode: null,
+			isVisible: true,
+		};
+	};
+
+
+
 	const renderVisit = (visitId, index) => {
 		console.log("Visit order when we get in renderVisit", visitOrder);
 		const visitIdStr = String(visitId);
@@ -941,6 +977,7 @@ const TreatmentPlanConfiguration = ({
 							onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
 							columnWidths={columnWidths}
 							displayCheckmark={false}
+							onRedDropdownIconClick={handleRedDropdownIconClick}
 						/>
 					</div>
 				)}

@@ -235,6 +235,10 @@ a, .link {
 
 }
 
+.dynamic-row {
+    transition: height 0.3s ease-out;
+    overflow: hidden;
+}
 
 
 body {
