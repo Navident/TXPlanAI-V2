@@ -4,6 +4,6 @@
     {
         public string? Description { get; set; }
         public int VisitNumber { get; set; } 
-        public List<CreateVisitCdtCodeMapDto> VisitCdtCodeMaps { get; set; } = new List<CreateVisitCdtCodeMapDto>();
+        public List<CreateNewVisitCdtCodeMapFromDefaultDto> VisitCdtCodeMaps { get; set; } = new List<CreateNewVisitCdtCodeMapFromDefaultDto>();
     }
 }

@@ -39,8 +39,8 @@ import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
 import { handleAddCdtCode, updateSubcategoryTreatmentPlan, setVisitOrder, setTreatmentPlans, selectVisitOrder, } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { selectIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
-import { useSelector, useDispatch } from "react-redux";
-import { selectCombinedCdtCodes, selectAlternativeProcedures, addAlternativeProcedure, deleteAlternativeProcedure, updateAlternativeProcedure } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { useSelector, useDispatch, useStore } from "react-redux";
+import { selectCombinedCdtCodes, selectAlternativeProcedures, addAlternativeProcedure, deleteAlternativeProcedure, updateAlternativeProcedure, updateAlternativeProcedureVisitCdtCodeMapIds } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const TreatmentPlanConfiguration = ({
 	treatmentPlan,
@@ -77,7 +77,7 @@ const TreatmentPlanConfiguration = ({
 	const alternativeProcedures = useSelector(selectAlternativeProcedures);
 	const [dynamicRowValues, setDynamicRowValues] = useState({});
 	const [activeParentRow, setActiveParentRow] = useState(null);
-
+	const store = useStore();
 	const handleCloseAlert = () => {
 		setAlertInfo({ ...alertInfo, open: false });
 	};
@@ -87,8 +87,8 @@ const TreatmentPlanConfiguration = ({
 	}, [treatmentPlan]);
 
 	useEffect(() => {
-		console.log("combinedFacilityDefaultCdtCodes: ", combinedFacilityDefaultCdtCodes);
-	}, [combinedFacilityDefaultCdtCodes]);
+		console.log("activeParentRow:", activeParentRow);
+	}, [activeParentRow]);
 
 	useEffect(() => {
 		console.log("alternativeProcedures: ", alternativeProcedures);
@@ -107,28 +107,44 @@ const TreatmentPlanConfiguration = ({
 	}, [dynamicRowValues]);
 
 	useEffect(() => {
-		if (isInitialLoad.current) {
-			console.log("we went in the initial load conditional");
-			const visits = treatmentPlan.visits || [];
-			const newAllRows = visits.reduce((acc, visit, index) => {
-				const visitId = visit.visitId;
-				const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
-				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
-					createStaticRows(visitCdtCodeMap, visitId, cdtIndex)
-				);
-				const initialRowId = `initial-${visitId}`;
-				acc[visitId] = [
-					...staticRows,
-					createDynamicRowv1(visitId, initialRowId),
-				];
-				return acc;
-			}, {});
+		console.log("we went in the initial load conditional");
+		const visits = treatmentPlan.visits || [];
+		const newAllRows = visits.reduce((acc, visit, index) => {
+			const visitId = visit.visitId;
+			const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
+			const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
+				createStaticRows(visitCdtCodeMap, visitId, cdtIndex)
+			);
+			const initialRowId = `initial-${visitId}`;
+			acc[visitId] = [
+				...staticRows,
+				createDynamicRowv1(visitId, initialRowId),
+			];
+			return acc;
+		}, {});
 
-			setAllRows(newAllRows);
-			dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
-			isInitialLoad.current = false;
+		setAllRows(newAllRows);
+		dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
+
+		// Check and expand rows based on activeParentRow after initial setup
+		if (activeParentRow) {
+			setAllRows((prevAllRows) => {
+				const updatedAllRows = { ...prevAllRows };
+				Object.entries(updatedAllRows).forEach(([visitId, rows]) => {
+					const rowIndex = rows.findIndex(row => row.id === activeParentRow);
+					if (rowIndex !== -1) {
+						expandRows(rows, rowIndex, visitId, rows[rowIndex], alternativeProcedures);
+					}
+				});
+				return updatedAllRows;
+			});
 		}
-	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
+
+
+		isInitialLoad.current = false;
+	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes, activeParentRow, alternativeProcedures]);
+
+
 
 	useEffect(() => {
 		return () => {
@@ -515,24 +531,75 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
-	const getCodeByCdtCodeId = (cdtCodeId) => {
-		const cdtCode = combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
-		return cdtCode ? cdtCode.code : null;
-	};
+	function buildNewVisitCdtCodeMapIdMapping(oldTreatmentPlan, newTreatmentPlan) {
+		const newVisitCdtCodeMapIdMapping = new Map();
+		console.log("old treatment plan: ", oldTreatmentPlan);
+		console.log("new treatment plan: ", newTreatmentPlan);
+
+		// Ensure the new treatment plan has visits defined
+		if (!newTreatmentPlan.visits) {
+			console.error("New treatment plan does not contain any visits.");
+			return newVisitCdtCodeMapIdMapping;
+		}
+
+		// Create a composite key of cdtCodeId and visit index for the new treatment plan for easy lookup
+		const newCodesMap = new Map();
+		newTreatmentPlan.visits.forEach((visit, visitIndex) => {
+			if (visit.visitCdtCodeMaps) { // Adjusted to visitCdtCodeMaps
+				visit.visitCdtCodeMaps.forEach(cdtCodeMap => {
+					const key = `${cdtCodeMap.cdtCodeId}-${visitIndex}`;
+					newCodesMap.set(key, cdtCodeMap.visitCdtCodeMapId);
+				});
+			}
+		});
+
+		// Ensure the old treatment plan has visits defined
+		if (!oldTreatmentPlan.visits) {
+			console.error("Old treatment plan does not contain any visits.");
+			return newVisitCdtCodeMapIdMapping;
+		}
+
+		// Iterate over the old treatment plan to find matches in the new treatment plan using the composite key
+		oldTreatmentPlan.visits.forEach((visit, visitIndex) => {
+			if (visit.cdtCodes) {
+				visit.cdtCodes.forEach(oldCdtCode => {
+					const key = `${oldCdtCode.cdtCodeId}-${visitIndex}`;
+					if (newCodesMap.has(key)) {
+						newVisitCdtCodeMapIdMapping.set(oldCdtCode.visitCdtCodeMapId, newCodesMap.get(key));
+					}
+				});
+			}
+		});
+
+		return newVisitCdtCodeMapIdMapping;
+	}
+
 
 	const handleUpdateTreatmentPlan = async () => {
 		console.log("Treatment Plan before updating:", treatmentPlan);
+		let updatedAlternativeProcedures = alternativeProcedures;
 		try {
+			let newTreatmentPlanCreated = false;
+
 			// Check if the treatment plan is a default/global plan (no facility id indicates it is), we instead
 			//create a tx plan if its a default, otherwise we already have one an existing facility tx plan.
 			//if its a superadmin we just proceed to update the treatment plan globally.
 			if (treatmentPlan.facilityId === null && !isSuperAdmin) {
-				// Logic to create a new treatment plan from the default
-				await createNewTreatmentPlanFromDefault(
-					treatmentPlan,
-					allRows,
-					visitOrder
-				);
+				const newTreatmentPlan = await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
+				newTreatmentPlanCreated = true;
+				const newVisitCdtCodeMapIdMapping = buildNewVisitCdtCodeMapIdMapping(treatmentPlan, newTreatmentPlan);
+				dispatch(updateAlternativeProcedureVisitCdtCodeMapIds({ newVisitCdtCodeMapIdMapping }));
+				updatedAlternativeProcedures = selectAlternativeProcedures(store.getState());
+				console.log("alternativeProcedures after dispatch: ", updatedAlternativeProcedures);
+				console.log("Current State after dispatch:", updatedAlternativeProcedures);
+
+			}
+
+			// Determine if there are new alternative procedures that need to be processed
+			const hasNewAlternativeProcedures = alternativeProcedures.some(ap => ap.alternativeProcedureId === null);
+
+			// If the treatment plan was newly created but there are no new alternative procedures, return early
+			if (newTreatmentPlanCreated && !hasNewAlternativeProcedures) {
 				return;
 			}
 
@@ -643,7 +710,7 @@ const TreatmentPlanConfiguration = ({
 				deletedRowIds,
 				deletedVisitIds,
 				editedRows,
-				alternativeProcedures
+				updatedAlternativeProcedures
 			);
 			const updatedTreatmentPlan = await updateTreatmentPlan(
 				treatmentPlan.treatmentPlanId,

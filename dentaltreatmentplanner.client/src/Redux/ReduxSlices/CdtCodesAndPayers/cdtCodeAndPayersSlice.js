@@ -119,6 +119,22 @@ export const cdtCodeAndPayersSlice = createSlice({
 
             state.alternativeProcedures = state.alternativeProcedures.filter(ap => ap[identifier] !== idValue);
         },
+        updateAlternativeProcedureVisitCdtCodeMapIds: (state, action) => {
+            const { newVisitCdtCodeMapIdMapping } = action.payload;
+            // Assuming you're using JSON.stringify and JSON.parse for deep copy
+            console.log("Before updating alternativeProcedures", JSON.parse(JSON.stringify(state.alternativeProcedures)));
+            console.log("newVisitCdtCodeMapIdMapping received", newVisitCdtCodeMapIdMapping);
+            state.alternativeProcedures.forEach(ap => {
+                if (newVisitCdtCodeMapIdMapping.has(ap.visitCdtCodeMapId)) {
+                    console.log(`Updating visitCdtCodeMapId from ${ap.visitCdtCodeMapId} to ${newVisitCdtCodeMapIdMapping.get(ap.visitCdtCodeMapId)} for alternativeProcedureId/tempId ${ap.alternativeProcedureId || ap.tempId}`);
+                    ap.visitCdtCodeMapId = newVisitCdtCodeMapIdMapping.get(ap.visitCdtCodeMapId);
+                }
+            });
+            console.log("After updating alternativeProcedures", JSON.parse(JSON.stringify(state.alternativeProcedures)));
+
+        },
+
+
 
 
     },
@@ -166,7 +182,7 @@ export const cdtCodeAndPayersSlice = createSlice({
 
 });
 
-export const { resetState, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal, addAlternativeProcedure, updateAlternativeProcedure, deleteAlternativeProcedure } = cdtCodeAndPayersSlice.actions;
+export const { resetState, updateAlternativeProcedureVisitCdtCodeMapIds, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal, addAlternativeProcedure, updateAlternativeProcedure, deleteAlternativeProcedure } = cdtCodeAndPayersSlice.actions;
 
 // Selector to get the default CDT codes
 export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;

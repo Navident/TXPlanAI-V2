@@ -119,8 +119,6 @@ const Table = ({
 	const toggleDropdown = (id, target) => {
 		// Your existing logic when red dropdown is clicked
 		onRedDropdownIconClick(id, target);
-		// Toggle the state of the dropdown
-		setIsDropdownExpanded(!isDropdownExpanded);
 	};
 
 

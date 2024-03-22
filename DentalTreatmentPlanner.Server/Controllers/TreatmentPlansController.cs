@@ -82,10 +82,6 @@ public class TreatmentPlansController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        if (id != updateTreatmentPlanDto.TreatmentPlanId)
-        {
-            return BadRequest("ID mismatch");
-        }
 
         try
         {

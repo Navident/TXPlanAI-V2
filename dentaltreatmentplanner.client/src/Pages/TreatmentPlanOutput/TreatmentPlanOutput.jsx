@@ -45,7 +45,7 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady, selectAlternativeProcedures } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
@@ -132,6 +132,11 @@ const TreatmentPlanOutput = ({
 	useEffect(() => {
 		setCombinedVisits(treatmentPlan.visits);
 	}, [treatmentPlan, isInGenerateTreatmentPlanContext]);
+	const alternativeProcedures = useSelector(selectAlternativeProcedures);
+
+	useEffect(() => {
+		console.log("alternativeProcedures: ", alternativeProcedures);
+	}, [alternativeProcedures]);
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
@@ -139,11 +144,20 @@ const TreatmentPlanOutput = ({
 			const visits = treatmentPlan.visits || [];
 			const newAllRows = visits.reduce((acc, visit, index) => {
 				const visitId = visit.visitId;
-				// Create a shallow copy of cdtCodes and sort it
 				const cdtCodes = Array.isArray(visit.cdtCodes) ? [...visit.cdtCodes].sort((a, b) => a.order - b.order) : [];
-				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
-					createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex)
-				);
+				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) => {
+					// Create your static row data here
+					let rowData = createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex);
+
+					// Find and add the matching alternative procedures to the row data
+					const matchingAlternativeProcedures = alternativeProcedures.filter(ap =>
+						ap.visitCdtCodeMapId === visitCdtCodeMap.visitCdtCodeMapId
+					);
+					rowData.matchingAlternativeProcedures = matchingAlternativeProcedures;
+
+					return rowData;
+				});
+
 				const initialRowId = `initial-${visitId}`;
 				acc[visitId] = [
 					...staticRows,
@@ -156,7 +170,8 @@ const TreatmentPlanOutput = ({
 			dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
 			isInitialLoad.current = false;
 		}
-	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
+	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes, alternativeProcedures]);
+
 
 
 

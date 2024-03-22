@@ -903,15 +903,17 @@ namespace DentalTreatmentPlanner.Server.Services
 
                         foreach (var visitCdtCodeMapDto in visitDto.VisitCdtCodeMaps)
                         {
-                            VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
+                            if (visitCdtCodeMapDto.CdtCodeId.HasValue) // Assuming CdtCodeId is nullable
                             {
-                                CdtCodeId = visitCdtCodeMapDto.CdtCodeId,
-                                Order = visitCdtCodeMapDto.Order,
-                                //ProcedureTypeId = visitCdtCodeMapDto.ProcedureTypeId,
-                                ToothNumber = visitCdtCodeMapDto.ToothNumber,
-                                                                             
-                            };
-                            newVisit.VisitCdtCodeMaps.Add(newProcedure);
+                                VisitCdtCodeMap newProcedure = new VisitCdtCodeMap
+                                {
+                                    CdtCodeId = visitCdtCodeMapDto.CdtCodeId.Value, 
+                                    Order = visitCdtCodeMapDto.Order, 
+                                                                     
+                                    ToothNumber = visitCdtCodeMapDto.ToothNumber, 
+                                };
+                                newVisit.VisitCdtCodeMaps.Add(newProcedure);
+                            }
                         }
 
                         newTreatmentPlan.Visits.Add(newVisit);
