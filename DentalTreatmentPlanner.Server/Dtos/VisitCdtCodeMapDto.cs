@@ -11,6 +11,6 @@
         public int? ToothNumber { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public string LongDescription { get; set; }
+        public string? LongDescription { get; set; }
     }
 }

@@ -527,6 +527,38 @@ export const getCdtCodes = async () => {
     }
 };
 
+
+export const getAlternativeProceduresByFacility = async () => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await fetch(`${CDT_CODES_API_URL}/alternativeprocedures`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (response.ok) {
+            try {
+                const data = await response.json();
+                console.log('Alternative procedures fetched successfully:', data);
+                return data;
+            } catch (jsonParseError) {
+                console.error('Failed to parse response as JSON:', jsonParseError);
+                return [];
+            }
+        } else {
+            console.error('Failed to fetch alternative procedures. Status:', response.status);
+            return [];
+        }
+    } catch (networkError) {
+        console.error('Error fetching alternative procedures:', networkError.message);
+        return [];
+    }
+};
+
+
 export const getPayersForFacility = async () => {
     try {
         const token = localStorage.getItem('jwtToken');

@@ -37,9 +37,10 @@ import {
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
-import { handleAddCdtCode, updateSubcategoryTreatmentPlan, setVisitOrder, selectVisitOrder, } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { handleAddCdtCode, updateSubcategoryTreatmentPlan, setVisitOrder, setTreatmentPlans, selectVisitOrder, } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { selectIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
 import { useSelector, useDispatch } from "react-redux";
+import { selectCombinedCdtCodes, selectAlternativeProcedures, addAlternativeProcedure, deleteAlternativeProcedure, updateAlternativeProcedure } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const TreatmentPlanConfiguration = ({
 	treatmentPlan,
@@ -72,6 +73,10 @@ const TreatmentPlanConfiguration = ({
 	const [editedRows, setEditedRows] = useState([]);
 	const columnWidths = ["5%", "5%", "20%", "55%", "15%"];
 	const isSuperAdmin = useSelector(selectIsSuperAdmin);
+	const combinedFacilityDefaultCdtCodes = useSelector(selectCombinedCdtCodes);
+	const alternativeProcedures = useSelector(selectAlternativeProcedures);
+	const [dynamicRowValues, setDynamicRowValues] = useState({});
+	const [activeParentRow, setActiveParentRow] = useState(null);
 
 	const handleCloseAlert = () => {
 		setAlertInfo({ ...alertInfo, open: false });
@@ -82,6 +87,14 @@ const TreatmentPlanConfiguration = ({
 	}, [treatmentPlan]);
 
 	useEffect(() => {
+		console.log("combinedFacilityDefaultCdtCodes: ", combinedFacilityDefaultCdtCodes);
+	}, [combinedFacilityDefaultCdtCodes]);
+
+	useEffect(() => {
+		console.log("alternativeProcedures: ", alternativeProcedures);
+	}, [alternativeProcedures]);
+
+	useEffect(() => {
 		console.log("allRows:", allRows);
 	}, [allRows]);
 
@@ -89,6 +102,9 @@ const TreatmentPlanConfiguration = ({
 		console.log("isSuperAdmin state:", isSuperAdmin);
 	}, [combinedCdtCodes]);
 
+	useEffect(() => {
+		console.log("dynamicRowValues state:", dynamicRowValues);
+	}, [dynamicRowValues]);
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
@@ -113,6 +129,14 @@ const TreatmentPlanConfiguration = ({
 			isInitialLoad.current = false;
 		}
 	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes]);
+
+	useEffect(() => {
+		return () => {
+			dispatch(setTreatmentPlans([]));
+			// Reset treatmentPlans when component unmounts
+		
+		};
+	}, [dispatch]);
 
 	useEffect(() => {
 		setLocalUpdatedVisits(treatmentPlan.visits);
@@ -211,7 +235,7 @@ const TreatmentPlanConfiguration = ({
 			isStatic: true,
 			visitCdtCodeMapId: null,
 			selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
-			description, // Use the adjusted description logic here
+			description, 
 			extraRowInput: showToothNumber
 				? [
 						treatmentPlan.toothNumber,
@@ -294,49 +318,71 @@ const TreatmentPlanConfiguration = ({
 		};
 	};
 
-	function addNewRow(visitId) {
+	function addNewRow(visitId, rowId) {
 		setAllRows((prevAllRows) => {
 			const rowsForVisit = prevAllRows[visitId] || [];
-			const lastRow =
-				rowsForVisit.length > 0 ? rowsForVisit[rowsForVisit.length - 1] : null;
+			const rowIndexToConvert = rowsForVisit.findIndex(row => row.id === rowId);
+			if (rowIndexToConvert === -1) return prevAllRows; // Row not found, return early
 
-			if (lastRow) {
-				// Use convertToStaticRow to convert the last row to static
-				const staticRow = convertToStaticRow(
-					lastRow,
+			const rowToConvert = rowsForVisit[rowIndexToConvert];
+
+			const tempId = rowToConvert.tempId;
+			// Determine if it's an alt row based on the rowId pattern
+			const isAltRow = rowId.startsWith("dynamic-alt-code");
+
+			// Convert the targeted dynamic row to a static row
+			const staticRow = isAltRow
+				? convertToStaticRowForAltCode(
+					rowToConvert.selectedCdtCode, 
 					visitId,
-					lastRow.selectedCdtCode
+					rowToConvert.id,
+					rowsForVisit,
+					dynamicRowValues,
+					tempId,
+					"create"
+				)
+				: convertToStaticRow(
+					rowToConvert,
+					visitId,
+					rowToConvert.selectedCdtCode
 				);
 
-				// Use createDynamicRow to add a new dynamic row
-				const newDynamicRow = createDynamicRowUponAddClick(visitId);
+			// Conditionally create a new dynamic row based on the type
+			const newDynamicRow = isAltRow
+				? createDynamicRowForAltCode(visitId, rowToConvert)
+				: createDynamicRowUponAddClick(visitId);
 
-				return {
-					...prevAllRows,
-					[visitId]: [...rowsForVisit.slice(0, -1), staticRow, newDynamicRow],
-				};
-			}
+			// Construct the new array of rows
+			let newRows = [...rowsForVisit];
+			newRows.splice(rowIndexToConvert, 1, staticRow, newDynamicRow); // Replace and add new
 
-			return prevAllRows;
+			return {
+				...prevAllRows,
+				[visitId]: newRows,
+			};
 		});
 	}
 
-	function createAddButtonCell(visitId) {
+
+
+	function createAddButtonCell(visitId, rowId, isAltRow = false) {
+		const backgroundColor = isAltRow ? UI_COLORS.altPurple : UI_COLORS.purple;
 		return (
 			<StyledAddButtonCellContainer>
 				<RoundedButton
 					text="Add"
-					backgroundColor={UI_COLORS.purple}
+					backgroundColor={backgroundColor}
 					textColor="white"
 					border={false}
 					borderRadius="4px"
 					height="39px"
 					width="150px"
-					onClick={() => addNewRow(visitId)}
+					onClick={() => addNewRow(visitId, rowId)} 
 				/>
 			</StyledAddButtonCellContainer>
 		);
 	}
+
 
 	const reorder = (list, startIndex, endIndex) => {
 		const result = Array.from(list);
@@ -425,7 +471,20 @@ const TreatmentPlanConfiguration = ({
 		reorderAllRows(newOrder);
 	};
 
-	const handleDeleteRow = (visitId, rowId) => {
+	const handleDeleteRow = (visitId, rowId, row) => {
+		const isAltCodeRow = row.id.startsWith('dynamic-alt-code') || row.id.startsWith('static-alt-code');
+
+		if (isAltCodeRow) {
+			// Check if the row represents a newly created or an existing alternative procedure
+			const tempId = row.tempId;
+			const alternativeProcedureId = row.alternativeProcedureId;
+
+			// Dispatch the delete action using either tempId or alternativeProcedureId
+			if (tempId || alternativeProcedureId) {
+				dispatch(deleteAlternativeProcedure({ tempId, alternativeProcedureId }));
+			}
+		}
+
 		setAllRows((prevRows) => {
 			const updatedRows = prevRows[visitId].filter((row) => row.id !== rowId);
 			return { ...prevRows, [visitId]: updatedRows };
@@ -508,9 +567,6 @@ const TreatmentPlanConfiguration = ({
 				}
 			});
 
-			console.log("Current allRows state before update: ", allRows);
-			console.log("deepCopyAllRows after processing: ", deepCopyAllRows);
-			console.log("Is setAllRows a function? ", typeof setAllRows === 'function');
 			// Update the state
 			setAllRows(deepCopyAllRows);
 			
@@ -586,7 +642,8 @@ const TreatmentPlanConfiguration = ({
 				updatedVisitOrder,
 				deletedRowIds,
 				deletedVisitIds,
-				editedRows
+				editedRows,
+				alternativeProcedures
 			);
 			const updatedTreatmentPlan = await updateTreatmentPlan(
 				treatmentPlan.treatmentPlanId,
@@ -688,6 +745,7 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	const constructDynamicRowData = (row, visitId) => {
+		// Keep your dropdown logic as it is
 		const dropdownKey = `dropdown-${row.id}`;
 		const cdtDropdown = (
 			<DropdownSearch
@@ -703,10 +761,31 @@ const TreatmentPlanConfiguration = ({
 			/>
 		);
 
-		return showToothNumber
-			? ["", cdtDropdown, row.description]
-			: ["", cdtDropdown, row.description];
+		// Check if the row has textFieldProps indicating it's a dynamic row requiring a TextField
+		if (row.textFieldProps) {
+			// Retrieve the current text field value from dynamicRowValues
+			// This ensures the text field displays the most up-to-date value
+			const textFieldValue = dynamicRowValues[row.id] || "";
+
+			const textField = (
+				<StandardTextfield
+					key={`textfield-${row.id}`}
+					label={row.textFieldProps.label}
+					value={textFieldValue}  // Use the dynamically updated value
+					onChange={(e) => handleDescriptionChange(e, visitId, row.id)}
+					borderColor={row.textFieldProps.borderColor}
+					width={row.textFieldProps.width}
+				/>
+			);
+
+			// Return the array including the TextField for rendering in your table
+			return showToothNumber ? ["", cdtDropdown, textField] : ["", cdtDropdown, textField];
+		}
+
+		// For non-dynamic rows, return your usual structure
+		return showToothNumber ? ["", cdtDropdown, row.description] : ["", cdtDropdown, row.description];
 	};
+
 
 	const handleCancelEdit = (rowId, visitId) => {
 		setEditingRowId(null);
@@ -728,19 +807,20 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	const handleDoneEdit = (rowId, visitId) => {
+		const isAltRow = rowId.startsWith('dynamic-alt-code') || rowId.startsWith('static-alt-code');
 		setEditingRowId(null);
+
 		setAllRows((prevAllRows) => {
 			const rows = prevAllRows[visitId];
 			const updatedRows = rows.map((row) => {
 				if (row.id === rowId) {
-					const editedRow = convertToStaticRow(
-						row,
-						visitId,
-						row.selectedCdtCode,
-						row.description
-					);
-					// This step might require adjustments depending on how you track edits
-					setEditedRows((prev) => [...prev, { ...editedRow, visitId }]); // Storing full row data and visitId
+					// Determine which conversion function to use based on row type
+					const editedRow = isAltRow
+						? convertToStaticRowForAltCode(row.selectedCdtCode, visitId, rowId, rows, dynamicRowValues, row.tempId, "update")
+						: convertToStaticRow(row, visitId, row.selectedCdtCode, row.description);
+
+					// Optionally handle storing the edited row's data
+					setEditedRows((prev) => [...prev, { ...editedRow, visitId }]);
 
 					return editedRow;
 				}
@@ -753,9 +833,11 @@ const TreatmentPlanConfiguration = ({
 				[visitId]: updatedRows,
 			};
 		});
+
 		// After successfully saving the edits, clear the originalRowData
 		setOriginalRowData(null);
 	};
+
 
 	function renderDoneCancelText(rowId, visitId) {
 		return (
@@ -784,7 +866,7 @@ const TreatmentPlanConfiguration = ({
 					<StyledDeleteIcon
 						src={deleteIcon}
 						alt="Delete Icon"
-						onClick={() => handleDeleteRow(visitId, row.id)}
+						onClick={() => handleDeleteRow(visitId, row.id, row)}
 					/>
 				</StyledEditDeleteIconsContainer>
 			);
@@ -815,7 +897,7 @@ const TreatmentPlanConfiguration = ({
 			if (row.isEditing) {
 				lastCellContent = renderDoneCancelText(row.id, visitId); // For rows being edited
 			} else {
-				lastCellContent = createAddButtonCell(visitId); // For other dynamic rows
+				lastCellContent = createAddButtonCell(visitId, row.id); // For other dynamic rows
 			}
 		}
 		rowData.push(lastCellContent);
@@ -834,11 +916,22 @@ const TreatmentPlanConfiguration = ({
 		if (rowIndex !== -1) {
 			const currentRow = rows[rowIndex];
 
+			const isAltRow = currentRow.id.startsWith('dynamic-alt-code') || currentRow.id.startsWith('static-alt-code');
+
+			// Before converting the row, update dynamicRowValues with the current description
+			const initialDescription = currentRow.description || "";
+			setDynamicRowValues(prevValues => ({
+				...prevValues,
+				[currentRow.id]: initialDescription,
+			}));
+
 			// Set originalRowData with the current state of the row before making it dynamic for editing
 			setOriginalRowData({ ...currentRow });
 
-			// Convert the current row to a dynamic row for editing
-			const dynamicRow = convertToDynamicRow(currentRow, visitId);
+			// Convert the current row to a dynamic row for editing based on its type
+			const dynamicRow = isAltRow
+				? convertToDynamicRowForAltCode(currentRow, visitId, dynamicRowValues) // Use the alt row conversion for alt rows
+				: convertToDynamicRow(currentRow, visitId); // Use the regular row conversion for normal rows
 
 			// Update the rows array with the newly converted dynamic row
 			const updatedRows = [
@@ -855,6 +948,7 @@ const TreatmentPlanConfiguration = ({
 			console.error("Row not found with rowId:", rowId, "in visitId:", visitId);
 		}
 	};
+
 	const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
 		const visitId = `temp-${Date.now()}`;
 		const initialRowId = `initial-${visitId}`;
@@ -886,39 +980,229 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
+	const collapseRows = (rows, rowIndex) => {
+		// Remove all related alternative procedure rows
+		const rowsToRemove = rows.slice(rowIndex + 1).findIndex(row =>
+			!row.id.startsWith("dynamic-alt-code") && !row.id.startsWith("static-alt-code")
+		);
+		const removeCount = rowsToRemove === -1 ? rows.length - rowIndex - 1 : rowsToRemove;
+		rows.splice(rowIndex + 1, removeCount);
+	};
+
+
+	const expandRows = (rows, rowIndex, visitId, currentRow, alternativeProcedures) => {
+		// Find matching alternative procedures
+		const visitCdtCodeMapId = currentRow.visitCdtCodeMapId;
+		const matchingAlternativeProcedures = alternativeProcedures.filter(ap =>
+			ap.visitCdtCodeMapId === visitCdtCodeMapId
+		);
+
+		// Optionally include logic to fetch and insert any newly created static alt rows
+		const newlyCreatedAltRows = rows.filter(row =>
+			row.id.startsWith("static-alt-code") &&
+			row.visitCdtCodeMapId === visitCdtCodeMapId
+		);
+
+		// Combine and sort both sets of rows before inserting
+		const combinedAltRows = [...matchingAlternativeProcedures, ...newlyCreatedAltRows];
+
+		// Insert new static rows for each matching alternative procedure
+		combinedAltRows.forEach((ap, index) => {
+			const staticRowForAltCode = createStaticRowForAltCode(ap, visitId, `alt-${index}`);
+			rows.splice(rowIndex + 1 + index, 0, staticRowForAltCode); // Insert right after the current row
+		});
+
+		// Insert a new dynamic row for alternative CDT code selection
+		const dynamicRowForAltCode = createDynamicRowForAltCode(visitId, currentRow);
+		rows.splice(rowIndex + 1 + combinedAltRows.length, 0, dynamicRowForAltCode);
+	};
+
+
 	const handleRedDropdownIconClick = (rowId) => {
 		setAllRows((prevAllRows) => {
-			return Object.entries(prevAllRows).reduce((acc, [visitId, rows]) => {
+			const updatedAllRows = { ...prevAllRows };
+			Object.entries(updatedAllRows).forEach(([visitId, rows]) => {
 				const rowIndex = rows.findIndex(row => row.id === rowId);
-				const nextRow = rows[rowIndex + 1];
-				const isDynamicRowForAltCode = nextRow && nextRow.id.startsWith("dynamic-alt-code");
+				if (rowIndex === -1) return; // Skip if the row doesn't exist in this visit.
 
-				let newRows;
-				if (isDynamicRowForAltCode) {
-					// Remove the dynamic row if it's already there
-					newRows = [...rows.slice(0, rowIndex + 1), ...rows.slice(rowIndex + 2)];
+				const currentRow = rows[rowIndex];
+
+				// Check if the row is currently expanded
+				const isExpanded = activeParentRow === rowId;
+
+				if (isExpanded) {
+					collapseRows(rows, rowIndex);
+					setActiveParentRow(null); // Reset active parent row since we are collapsing
 				} else {
-					// Insert a new dynamic row for alternative CDT code selection
-					const dynamicRowForAltCode = createDynamicRowForAltCode(visitId, rowId);
-					newRows = [...rows.slice(0, rowIndex + 1), dynamicRowForAltCode, ...rows.slice(rowIndex + 1)];
+					// If another row was previously expanded, first collapse it
+					if (activeParentRow) {
+						const prevRowIndex = rows.findIndex(row => row.id === activeParentRow);
+						if (prevRowIndex !== -1) {
+							collapseRows(rows, prevRowIndex);
+						}
+					}
+					expandRows(rows, rowIndex, visitId, currentRow, alternativeProcedures);
+					setActiveParentRow(rowId); // Set new active parent row
 				}
-
-				acc[visitId] = newRows;
-				return acc;
-			}, {});
+			});
+			return updatedAllRows;
 		});
 	};
 
-	const createDynamicRowForAltCode = (visitId, baseRowId) => {
-		// Your logic for creating the dynamic row structure
-		// This can include a specific ID pattern to recognize it as an alt code row
+
+	const createStaticRowForAltCode = (alternativeProcedure, visitId, baseRowId) => {
+		const description = alternativeProcedure.userDescription || 'Description not provided';
+		const cdtCode = alternativeProcedure.code;
+		const alternativeProcedureId = alternativeProcedure.alternativeProcedureId || null;
+
+		const extraRowInput = [
+			cdtCode,
+			description
+		];
+
 		return {
-			id: `dynamic-alt-code-${visitId}-${baseRowId}-${Date.now()}`,
-			description: "Select an alternative CDT code",
-			selectedCdtCode: null,
-			isVisible: true,
+			id: `static-alt-code-${visitId}-${baseRowId}`,
+			alternativeProcedureId: alternativeProcedureId,
+			visitCdtCodeMapId: alternativeProcedure.visitCdtCodeMapId,
+			description: description,
+			selectedCdtCode: {
+				code: cdtCode,
+			},
+			isStatic: true,
+			extraRowInput 
 		};
 	};
+
+	const handleInputChange = (visitId, rowId, field, value) => {
+		setDynamicRowValues(prevValues => ({
+			...prevValues,
+			[rowId]: value, // Directly update the value for the dynamic row
+		}));
+	};
+
+	const handleDescriptionChange = (e, visitId, rowId) => {
+		const newDescription = e.target.value;
+		handleInputChange(visitId, rowId, 'description', newDescription);
+	};
+
+	const createDynamicRowForAltCode = (visitId, currentRow, activeParentRowId) => {
+		const dynamicRowId = `dynamic-alt-code-${visitId}-${currentRow.id}-${Date.now()}`;
+		const tempId = `temp-${Date.now()}`;
+		return {
+			id: dynamicRowId,
+			tempId,
+			parentRowId: activeParentRowId,
+			textFieldProps: {
+				label: "",
+				borderColor: UI_COLORS.purple,
+				width: "auto"
+			},
+			visitCdtCodeMapId: currentRow.visitCdtCodeMapId,
+			selectedCdtCode: null,
+		};
+	};
+
+	const convertToDynamicRowForAltCode = (currentRow, visitId, dynamicRowValues) => {
+
+		const textFieldValue = dynamicRowValues[currentRow.id] || currentRow.description || "not found";
+
+		const dropdownSearchElement = createCDTCodeDropdown(
+			currentRow.id,
+			visitId,
+			combinedCdtCodes,
+			handleSelect,
+			currentRow.selectedCdtCode
+		);
+
+		const textFieldProps = {
+			label: "",
+			borderColor: UI_COLORS.purple,
+			width: "auto",
+		};
+
+		const extraRowInput = showToothNumber
+			? [
+				currentRow.selectedCdtCode
+					? currentRow.selectedCdtCode.toothNumber
+					: "",
+				dropdownSearchElement,
+			]
+			: [dropdownSearchElement];
+
+		return {
+			...currentRow,
+			id: currentRow.id,
+			tempId: currentRow.tempId,
+			extraRowInput,
+			isStatic: false,
+			isEditing: true, // Indicate this row is being edited
+			textFieldProps: { 
+				...textFieldProps,
+				value: textFieldValue, 
+			},
+		};
+	};
+
+	const convertToStaticRowForAltCode = (selectedCdtCode, visitId, rowId, rowsForVisit, dynamicRowValues, tempId, operationType) => {
+
+		const userDescription = dynamicRowValues[rowId] || 'Description not provided';
+
+		const parentRow = rowsForVisit.find(row => row.id === rowId);
+
+		const newStaticAltRow = {
+			id: rowId,
+			tempId,
+			isStatic: true,
+			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
+			description: userDescription,
+			selectedCdtCode: {
+				code: selectedCdtCode.code,
+				longDescription: userDescription,
+			},
+			extraRowInput: showToothNumber
+				? [treatmentPlan.toothNumber, selectedCdtCode.code, userDescription || 'Description not provided']
+				: [selectedCdtCode.code, userDescription || 'Description not provided'],
+		};
+
+		// Define the base structure for creates
+		const newAltProcedureObjectForState = {
+			alternativeProcedureId: null,
+			tempId,
+			cdtCodeId: selectedCdtCode.cdtCodeId,
+			code: selectedCdtCode.code, 
+			userDescription: userDescription,
+			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
+		};
+
+		// Define the base structure for updates
+		const updates = {
+			code: selectedCdtCode.code,
+			userDescription: userDescription,
+			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
+		};
+
+		// Only include cdtCodeId in updates if it's defined in selectedCdtCode
+		if ('cdtCodeId' in selectedCdtCode && typeof selectedCdtCode.cdtCodeId !== 'undefined') {
+			updates.cdtCodeId = selectedCdtCode.cdtCodeId;
+		} else {
+			// If cdtCodeId is not being updated, retain the existing value from the state
+			const existingAltProcedure = alternativeProcedures.find(ap => ap.tempId === tempId || ap.alternativeProcedureId === parentRow.alternativeProcedureId);
+			if (existingAltProcedure) {
+				updates.cdtCodeId = existingAltProcedure.cdtCodeId;
+			}
+		}
+
+		if (operationType === "update") {
+			const identifier = tempId ? { tempId } : { alternativeProcedureId: parentRow.alternativeProcedureId };
+			dispatch(updateAlternativeProcedure({ ...identifier, updates }));
+		} else if (operationType === "create") {
+			dispatch(addAlternativeProcedure(newAltProcedureObjectForState));
+		}
+
+		return newStaticAltRow;
+	};
+
+
 
 
 
@@ -978,6 +1262,7 @@ const TreatmentPlanConfiguration = ({
 							columnWidths={columnWidths}
 							displayCheckmark={false}
 							onRedDropdownIconClick={handleRedDropdownIconClick}
+							activeParentRow={activeParentRow}
 						/>
 					</div>
 				)}

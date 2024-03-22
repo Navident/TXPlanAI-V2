@@ -1,6 +1,8 @@
-export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, deletedVisitIds, editedRows) => {
+export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, deletedVisitIds, editedRows, alternativeProcedures) => {
     const updateVisits = [];
     const updatedProcedures = [];
+
+    const alternativeProcedureDtos = mapToAlternativeProcedureDto(alternativeProcedures);
 
     // Iterate over the visit order to maintain the correct order
     visitOrder.forEach((visitId, index) => {
@@ -45,7 +47,7 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, 
             updatedProcedures.push({
                 VisitCdtCodeMapId: visitCdtCodeMapId,
                 VisitId: visitId,
-                CdtCodeId: selectedCdtCode.cdtCodeId,
+                CdtCodeId: selectedCdtCode.cdtCodeId || null,
             });
         }
     });
@@ -58,10 +60,21 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, 
         Visits: updateVisits,
         DeletedVisitIds: deletedVisitIds,
         UpdatedProcedures: updatedProcedures,
+        AlternativeProcedures: alternativeProcedureDtos,
     };
     console.log('Mapped DTO:', updateTreatmentPlanDto);
     return updateTreatmentPlanDto;
 };
+
+const mapToAlternativeProcedureDto = (alternativeProcedures) => {
+    return alternativeProcedures.map(ap => ({
+        AlternativeProcedureId: ap.alternativeProcedureId || null,
+        VisitCdtCodeMapId: ap.visitCdtCodeMapId,
+        CdtCodeId: ap.cdtCodeId,
+        UserDescription: ap.userDescription,
+    }));
+};
+
 
 export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows, visitOrder) => {
     const newPlanVisits = visitOrder.map(visitId => {

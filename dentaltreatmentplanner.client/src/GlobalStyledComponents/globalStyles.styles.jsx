@@ -172,3 +172,35 @@ export const StyledAddButtonCellContainer = styled.div`
     display: flex;
     justify-content: flex-end;
 `;
+
+export const StyledRedCircleWithArrowDropdownContainer = styled.div`
+  position: relative;
+  width: 20px; 
+  height: 20px; 
+  background-image: url(${props => props.src});
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent; 
+    border-right: 4px solid transparent; 
+    border-top: 5px solid red; 
+    transition: transform 0.3s ease;
+    transform: translate(-50%, -50%) ${({ isExpanded }) => isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+  }
+`;
+
+export const StyledDragCircleContainer = styled.div`
+    display:flex;
+    align-items:center;
+    flex-direction: row;
+    gap: 12px;
+  }
+`;

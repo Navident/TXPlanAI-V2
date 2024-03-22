@@ -650,10 +650,11 @@ namespace DentalTreatmentPlanner.Server.Services
                     {
                         var cdtCodeMap = await _context.VisitCdtCodeMaps.FirstOrDefaultAsync(c => c.VisitCdtCodeMapId == updateProc.VisitCdtCodeMapId);
 
-                        if (cdtCodeMap != null)
+                        if (cdtCodeMap != null && updateProc.CdtCodeId.HasValue)
                         {
-                            Console.WriteLine($"Updating VisitCdtCodeMap with ID: {updateProc.VisitCdtCodeMapId}, CdtCodeId: {updateProc.CdtCodeId}");
-                            cdtCodeMap.CdtCodeId = updateProc.CdtCodeId;
+                            _logger.LogInformation($"Updating VisitCdtCodeMap with ID: {updateProc.VisitCdtCodeMapId}, CdtCodeId: {updateProc.CdtCodeId.Value}");
+
+                            cdtCodeMap.CdtCodeId = updateProc.CdtCodeId.Value; // Use .Value for non-nullable int
                         }
                     }
 
@@ -769,12 +770,17 @@ namespace DentalTreatmentPlanner.Server.Services
                         {
                             var cdtCodeMap = await _context.VisitCdtCodeMaps.FirstOrDefaultAsync(c => c.VisitCdtCodeMapId == updatedProc.VisitCdtCodeMapId);
 
-                            if (cdtCodeMap != null)
+                            // Check if cdtCodeMap is not null and updatedProc.CdtCodeId has a value before assignment
+                            if (cdtCodeMap != null && updatedProc.CdtCodeId.HasValue)
                             {
-                                cdtCodeMap.CdtCodeId = updatedProc.CdtCodeId;
+                                // Since updatedProc.CdtCodeId is nullable, use .Value to get the non-nullable int
+                                cdtCodeMap.CdtCodeId = updatedProc.CdtCodeId.Value;
                             }
                         }
                     }
+
+
+                    await createUpdateDeleteAlternativeProcedures(updateTreatmentPlanDto.AlternativeProcedures, updateTreatmentPlanDto.TreatmentPlanId);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -788,6 +794,89 @@ namespace DentalTreatmentPlanner.Server.Services
                 }
             }
         }
+
+        public async Task<List<AlternativeProcedureDto>> GetAlternativeProceduresByFacilityDTO(int facilityId)
+        {
+            var alternativeProcedures = await _context.AlternativeProcedures
+                .Where(ap => _context.Visits
+                    .Any(v => v.VisitId == ap.VisitCdtCodeMap.VisitId &&
+                              _context.TreatmentPlans
+                                  .Any(tp => tp.TreatmentPlanId == v.TreatmentPlanId &&
+                                             tp.FacilityId == facilityId)))
+                .Include(ap => ap.CdtCode)
+                .Select(ap => new AlternativeProcedureDto
+                {
+                    AlternativeProcedureId = ap.AlternativeProcedureId,
+                    VisitCdtCodeMapId = ap.VisitCdtCodeMapId,
+                    CdtCodeId = ap.CdtCodeId,
+                    UserDescription = ap.UserDescription,
+                    Code = ap.CdtCode.Code
+                })
+                .ToListAsync();
+
+            return alternativeProcedures;
+        }
+
+        public async Task createUpdateDeleteAlternativeProcedures(ICollection<AlternativeProcedureDto> alternativeProcedureDtos, int treatmentPlanId)
+        {
+            // Preload existing alternative procedures for the treatment plan 
+            var existingAlternativeProcedures = await _context.AlternativeProcedures
+                .Where(ap => _context.VisitCdtCodeMaps
+                    .Any(vcm => vcm.VisitCdtCodeMapId == ap.VisitCdtCodeMapId &&
+                                _context.Visits
+                                    .Any(v => v.VisitId == vcm.VisitId &&
+                                              _context.TreatmentPlans
+                                                  .Any(tp => tp.TreatmentPlanId == v.TreatmentPlanId &&
+                                                             tp.TreatmentPlanId == treatmentPlanId))))
+                .ToListAsync();
+
+            var providedIds = alternativeProcedureDtos
+                .Select(ap => ap.AlternativeProcedureId)
+                .Where(id => id.HasValue)
+                .Select(id => id.Value)
+                .ToList();
+
+            // Handle updates or creations.
+            foreach (var dto in alternativeProcedureDtos)
+            {
+                if (dto.AlternativeProcedureId.HasValue)
+                {
+                    // Update existing alternative procedure - the user description and selected cdt code are properties that can be updated
+                    var existingProcedure = existingAlternativeProcedures.FirstOrDefault(ap => ap.AlternativeProcedureId == dto.AlternativeProcedureId.Value);
+                    if (existingProcedure != null)
+                    {
+                        // Check if the CdtCodeId has changed before updating
+                        if (existingProcedure.CdtCodeId != dto.CdtCodeId)
+                        {
+                            existingProcedure.CdtCodeId = dto.CdtCodeId;
+                        }
+
+                        // Always update the UserDescription as this might change independently of the CdtCodeId
+                        existingProcedure.UserDescription = dto.UserDescription;
+                    }
+                }
+                else
+                {
+                    // Create a new alternative procedure since no existing ID is provided in the DTO
+                    var newProcedure = new AlternativeProcedure
+                    {
+                        VisitCdtCodeMapId = dto.VisitCdtCodeMapId,
+                        CdtCodeId = dto.CdtCodeId,
+                        UserDescription = dto.UserDescription,
+                    };
+                    _context.AlternativeProcedures.Add(newProcedure);
+                }
+            }
+
+            // Handle deletions for procedures that were removed on the frontend but exist in the database.
+            var proceduresToDelete = existingAlternativeProcedures.Where(ap => !providedIds.Contains(ap.AlternativeProcedureId)).ToList();
+            _context.AlternativeProcedures.RemoveRange(proceduresToDelete);
+
+            await _context.SaveChangesAsync();
+        }
+
+
+
 
         public async Task<TreatmentPlan> CreateNewTreatmentPlanFromDefaultAsync(CreateNewTxPlanFromDefaultDto createNewTxPlanFromDefaultDto, int facilityId)
         {
@@ -1377,6 +1466,11 @@ namespace DentalTreatmentPlanner.Server.Services
                 .ToListAsync();
             return treatmentPlans;
         }
+
+
+
+
+
 
 
         public async Task<IEnumerable<CdtCodeDto>> GetAllDefaultCdtCodesAsync()

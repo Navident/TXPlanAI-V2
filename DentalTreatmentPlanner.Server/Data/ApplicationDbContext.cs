@@ -25,11 +25,11 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<ProcedureType> ProcedureTypes { get; set; }
         public DbSet<ProcedureCategory> ProcedureCategories { get; set; }
         public DbSet<ProcedureSubCategory> ProcedureSubCategories { get; set; }
-        public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
         public DbSet<VisitOrderRule> VisitOrderRules { get; set; }
         public DbSet<Payer> Payers { get; set; }
         public DbSet<PayerFacilityMap> PayerFacilityMaps { get; set; }
         public DbSet<UcrFee> UcrFees { get; set; }
+        public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -192,17 +192,7 @@ namespace DentalTreatmentPlanner.Server.Data
                     .WithMany(p => p.ProcedureSubCategories)
                     .HasForeignKey(d => d.ProcedureCategoryId);
             });
-            // Map AlternativeProcedure entity
-            modelBuilder.Entity<AlternativeProcedure>(entity =>
-            {
-                entity.ToTable("alternative_procedure");
-                entity.Property(e => e.AlternativeProcedureId).HasColumnName("alternative_procedure_id");
-                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
-                entity.Property(e => e.Type).HasColumnName("type");
-                entity.Property(e => e.Description).HasColumnName("description");
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
-            });
+
 
             // Configure VisitOrderRule entity
             modelBuilder.Entity<VisitOrderRule>(entity =>

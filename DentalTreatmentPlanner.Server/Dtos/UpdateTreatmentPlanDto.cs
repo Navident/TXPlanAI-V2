@@ -11,6 +11,6 @@
         public ICollection<UpdateVisitDto> Visits { get; set; }
         public ICollection<int> DeletedVisitIds { get; set; }
         public ICollection<UpdateProcedureDto> UpdatedProcedures { get; set; }
-
+        public ICollection<AlternativeProcedureDto> AlternativeProcedures { get; set; } = new List<AlternativeProcedureDto>();
     }
 }

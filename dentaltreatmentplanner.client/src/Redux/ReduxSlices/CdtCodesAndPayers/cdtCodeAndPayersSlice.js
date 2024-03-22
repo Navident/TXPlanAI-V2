@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
+import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getAlternativeProceduresByFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
 
 const initialState = {
     defaultCdtCodes: [],
@@ -8,12 +8,14 @@ const initialState = {
     facilityPayerCdtCodeFees: [],
     activeCdtCodes: [],
     selectedPayer: null, 
+    alternativeProcedures: [],
     isLoading: false,
     error: null,
     grandUcrTotal: 0,
     grandCoPayTotal: 0,
     areGrandTotalsReady: false,
 };
+
 
 export const fetchCustomCdtCodesForFacility = createAsyncThunk(
     'cdtCodeAndPayers/fetchCustomCdtCodesForFacility',
@@ -22,6 +24,8 @@ export const fetchCustomCdtCodesForFacility = createAsyncThunk(
         return response;
     }
 );
+
+
 
 export const fetchDefaultCdtCodes = createAsyncThunk(
     'cdtCodeAndPayers/fetchDefaultCdtCodesForFacility',
@@ -61,6 +65,18 @@ export const fetchPayersWithCdtCodesFeesForFacility = createAsyncThunk(
     }
 );
 
+export const fetchAlternativeProceduresForFacility = createAsyncThunk(
+    'cdtCodeAndPayers/fetchAlternativeProceduresForFacility',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getAlternativeProceduresByFacility();
+            return response;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 
 export const cdtCodeAndPayersSlice = createSlice({
     name: 'cdtCodeAndPayers',
@@ -82,6 +98,29 @@ export const cdtCodeAndPayersSlice = createSlice({
         setGrandTotalsReady: (state, action) => {
             state.areGrandTotalsReady = action.payload;
         },
+        addAlternativeProcedure: (state, action) => {
+            state.alternativeProcedures.push(action.payload);
+        },
+        updateAlternativeProcedure: (state, action) => {
+            const { tempId, alternativeProcedureId, updates } = action.payload;
+            const identifier = alternativeProcedureId ? 'alternativeProcedureId' : 'tempId';
+            const idValue = alternativeProcedureId || tempId;
+
+            const index = state.alternativeProcedures.findIndex(ap => ap[identifier] === idValue);
+            if (index !== -1) {
+                state.alternativeProcedures[index] = { ...state.alternativeProcedures[index], ...updates };
+            }
+        },
+        deleteAlternativeProcedure: (state, action) => {
+            const { tempId, alternativeProcedureId } = action.payload;
+            // This will prioritize deleting by alternativeProcedureId if it's provided
+            const idValue = alternativeProcedureId || tempId;
+            const identifier = alternativeProcedureId ? 'alternativeProcedureId' : 'tempId';
+
+            state.alternativeProcedures = state.alternativeProcedures.filter(ap => ap[identifier] !== idValue);
+        },
+
+
     },
     extraReducers: (builder) => {
         builder
@@ -97,6 +136,12 @@ export const cdtCodeAndPayersSlice = createSlice({
                     payerName: payer.payerName,
                     cdtCodeFees: payer.cdtCodeFees 
                 }));
+            })
+            .addCase(fetchAlternativeProceduresForFacility.fulfilled, (state, action) => {
+                state.alternativeProcedures = action.payload;
+            })
+            .addCase(fetchAlternativeProceduresForFacility.rejected, (state, action) => {
+                console.error('Failed to fetch alternative procedures:', action.payload);
             })
             .addMatcher(
                 action => action.type.endsWith('/pending'),
@@ -121,7 +166,7 @@ export const cdtCodeAndPayersSlice = createSlice({
 
 });
 
-export const { resetState, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal } = cdtCodeAndPayersSlice.actions;
+export const { resetState, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal, addAlternativeProcedure, updateAlternativeProcedure, deleteAlternativeProcedure } = cdtCodeAndPayersSlice.actions;
 
 // Selector to get the default CDT codes
 export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;
@@ -155,6 +200,14 @@ export const selectGrandCoPayTotal = (state) => state.cdtCodeAndPayers.grandCoPa
 
 // Selector to check if the grand totals are ready to be displayed
 export const selectAreGrandTotalsReady = (state) => state.cdtCodeAndPayers.areGrandTotalsReady;
+
+// Selector to get the alternative procedures for the facility
+export const selectAlternativeProcedures = (state) => state.cdtCodeAndPayers.alternativeProcedures;
+
+// Add this selector to your existing selectors
+export const selectCombinedCdtCodes = (state) => {
+    return [...state.cdtCodeAndPayers.defaultCdtCodes, ...state.cdtCodeAndPayers.facilityCdtCodes];
+};
 
 
 export default cdtCodeAndPayersSlice.reducer;

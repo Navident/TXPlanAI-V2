@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { StyledDeleteIcon } from "../../GlobalStyledComponents";
+import { StyledDeleteIcon, StyledRedCircleWithArrowDropdownContainer, StyledDragCircleContainer } from "../../GlobalStyledComponents";
 import CustomCheckbox from "../../Components/Common/Checkbox/index";
 import { StyledDragCheckmarkIconsContainer } from "./index.style";
 import {
@@ -12,7 +12,8 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { UI_COLORS } from '../../Theme';
-import redDropdownIcon from "../../assets/red-dropdown-icon.svg";
+import redDropdownCircle from "../../assets/red-dropdown-circle.svg";
+import { useState } from 'react';
 
 const Table = ({
 	headers,
@@ -27,10 +28,13 @@ const Table = ({
 	columnWidths = [],
 	displayCheckmark = true,
 	onRedDropdownIconClick,
+	activeParentRow
 }) => {
 	const dispatch = useDispatch();
 	const checkedRows = useSelector(selectCheckedRows);
 	const isRowChecked = (rowId) => checkedRows.includes(rowId);
+
+	
 
 	const handleCheckboxChange = (rowId) => {
 		dispatch(toggleRowChecked(rowId));
@@ -42,11 +46,14 @@ const Table = ({
 	}, [checkedRows]);
 
 	const renderDraggableRow = (rowData, rowIndex) => {
-		console.log("Row data for row", rowIndex, ":", rowData);
+		const isAltCodeRow = rowData.id.startsWith('dynamic-alt-code') || rowData.id.startsWith('static-alt-code');
+
+		const isRowActive = rowData.id === activeParentRow;
 
 		const isLastRow = rowIndex === rows.length - 1;
-		const rowBackgroundColor = rowData.backgroundColor || "transparent";
+		const rowBackgroundColor = isAltCodeRow ? "#E8E7E7" : (rowData.backgroundColor || "transparent");
 		console.log("rowBackgroundColor", rowBackgroundColor);
+
 		return (
 			<Draggable
 				key={`row-${tableId}-${rowIndex}`}
@@ -66,19 +73,18 @@ const Table = ({
 					>
 						<td style={columnWidths[0] ? { width: columnWidths[0] } : {}}>
 							<StyledDragCheckmarkIconsContainer>
-								{!isLastRow && (
-									<>
+								{!isLastRow && !isAltCodeRow && (
+									<StyledDragCircleContainer>
 										<img
 											src={dragImageIconSrc}
 											className="drag-icon"
 											alt="Drag Icon"
 											{...provided.dragHandleProps}
 										/>
-										<img
-											src={redDropdownIcon}
-											className="drag-icon"
-											alt="red dropdown Icon"
-											onClick={(e) => onRedDropdownIconClick(rowData.id, e.currentTarget)}
+										<StyledRedCircleWithArrowDropdownContainer
+											src={redDropdownCircle}
+											isExpanded={isRowActive}
+											onClick={(e) => toggleDropdown(rowData.id, e.currentTarget)}
 										/>
 										{displayCheckmark && (
 											<CustomCheckbox
@@ -88,7 +94,7 @@ const Table = ({
 												color= {UI_COLORS.purple}
 											/>
 										)}
-									</>
+									</StyledDragCircleContainer>
 								)}
 							</StyledDragCheckmarkIconsContainer>
 						</td>
@@ -110,6 +116,14 @@ const Table = ({
 		);
 	};
 
+	const toggleDropdown = (id, target) => {
+		// Your existing logic when red dropdown is clicked
+		onRedDropdownIconClick(id, target);
+		// Toggle the state of the dropdown
+		setIsDropdownExpanded(!isDropdownExpanded);
+	};
+
+
 	const renderRow = (rowData, rowIndex) => {
 		console.log("Row data for row", rowIndex, ":", rowData);
 
@@ -125,7 +139,7 @@ const Table = ({
 								alt="Drag Icon"
 							/>
 							<img
-								src={redDropdownIcon}
+								src={redDropdownCircle}
 								className="drag-icon"
 								alt="Drag Icon"
 								onClick={(e) => onRedDropdownIconClick(rowData.id, e.currentTarget)}

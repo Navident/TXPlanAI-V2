@@ -77,10 +77,9 @@ const ProceduresCustomizer = () => {
 					<div>
 						{treatmentPlans.length > 0 &&
 							treatmentPlans.map((plan, index) => {
-								const key = index;
 								return (
 									<TreatmentPlanConfiguration
-										key={key}
+										key={`treatment-plan-${index}`}
 										treatmentPlan={plan}
 										includeExtraRow={true}
 										addProcedureElement={<span>+ Add Procedure</span>}
