@@ -95,10 +95,7 @@ const GenerateTreatmentPlan = () => {
 	}
 
 	// Utility function to fetch and process treatments with order maintained
-	async function fetchAndProcessTreatments(
-		treatmentEntries,
-		subcategoryTreatmentPlans
-	) {
+	async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
 		console.log("Treatment entries (with original order):", treatmentEntries);
 		let allVisits = [];
 		let globalVisitIdCounter = 0;
@@ -111,7 +108,6 @@ const GenerateTreatmentPlan = () => {
 			])
 		);
 
-
 		for (const item of treatmentEntries) {
 			const { arch, toothNumber, surface, treatments, originalOrder } = item;
 			// Removing "#" from tooth number if present, else default to an empty string
@@ -122,16 +118,21 @@ const GenerateTreatmentPlan = () => {
 					const clonedVisits = plan.visits.map((visit) => ({
 						...visit,
 						visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
-						cdtCodes: visit.cdtCodes.map((cdtCode) => ({
-							...cdtCode,
-							toothNumber: sanitizedToothNumber, 
-							surface,
-							arch,
-							originalVisitCategory: plan.procedureCategoryName,
+						VisitToProcedureMapDtos: visit.procedures.map((procedureMap) => ({
+							...procedureMap,
+							procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => ({  // Corrected here
+								...cdtMap,
+								toothNumber: sanitizedToothNumber,
+								surface,
+								arch,
+								originalVisitCategory: plan.procedureCategoryName,
+							})),
+							originLineIndex: originalOrder,
 						})),
 						originLineIndex: originalOrder,
 						procedureCategoryName: plan.procedureCategoryName,
 					}));
+
 
 					allVisits.push(...clonedVisits);
 				}
@@ -144,22 +145,27 @@ const GenerateTreatmentPlan = () => {
 		return allVisits;
 	}
 
+
 	function combineVisitsIntoOne(allVisits) {
-		let combinedCdtCodes = [];
+		let combinedProcedures = []; // Correctly named and initialized here
 
 		allVisits.forEach((visit) => {
-			visit.cdtCodes.forEach((cdtCode) => {
-				combinedCdtCodes.push({
-					...cdtCode,
-					originLineIndex: visit.originLineIndex,
-					visitNumber: visit.visitNumber,
-					orderWithinVisit: cdtCode.order,
+			visit.VisitToProcedureMapDtos.forEach((procedureMap) => {
+				combinedProcedures.push({
+					...procedureMap, // Spread to inherit all properties
+					procedureToCdtMaps: procedureMap.procedureToCdtMaps.map(cdtMap => ({
+						...cdtMap,
+						visitToProcedureMapId: procedureMap.visitToProcedureMapId,
+						originLineIndex: visit.originLineIndex,
+						visitNumber: visit.visitNumber,
+						orderWithinVisit: procedureMap.order, // Assuming 'order' correctly reflects within-visit ordering
+					})) // Corrected: Added missing parenthesis here
 				});
 			});
 		});
 
-		// Sort combinedCdtCodes by originLineIndex, visitNumber, and then by orderWithinVisit
-		combinedCdtCodes.sort(
+		// Sort combinedProcedures by originLineIndex, visitNumber, and then by orderWithinVisit
+		combinedProcedures.sort(
 			(a, b) =>
 				a.originLineIndex - b.originLineIndex ||
 				a.visitNumber - b.visitNumber ||
@@ -169,11 +175,14 @@ const GenerateTreatmentPlan = () => {
 		return {
 			visitId: `temp-${Date.now()}`,
 			description: "Table 1",
-			cdtCodes: combinedCdtCodes,
+			procedures: combinedProcedures, // Correctly using combinedProcedures here
 			originLineIndex: 0,
 			visitNumber: 1
 		};
 	}
+
+
+
 
 	// Main function to generate treatment plan
 	const handleGenerateTreatmentPlan = async () => {

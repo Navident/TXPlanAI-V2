@@ -50,17 +50,17 @@ const Table = ({
 
 	const renderDraggableRow = (rowData, rowIndex) => {
 		const rowIdentifier = rowData.id || rowData.tempId || "";
-
+		const isDefaultProcedure = rowData.default;
 		const isAltCodeRow = rowIdentifier.startsWith('dynamic-alt-code') || rowIdentifier.startsWith('static-alt-code');
 		const isRowActive = rowIdentifier === activeParentRow;
 		const isLastRow = rowIndex === rows.length - 1;
-		const rowBackgroundColor = isAltCodeRow ? "#E8E7E7" : (rowData.backgroundColor || "transparent");
+		const rowBackgroundColor = isDefaultProcedure === false ? "#E8E7E7" : "transparent";
 
-		// Rules: Don't display the redDropdown if this is an alternative procedure row
-		const shouldDisplayRedDropdown = (insideTxConfig || (rowData.defToAltProcMapDtos && rowData.defToAltProcMapDtos.length > 0)) && !isAltCodeRow;
+		// when not in txconfig, wee want to display the red dropdown for default rows that have altchildren
+		const shouldDisplayRedDropdown = (insideTxConfig || (rowData.hasAltChildren));
 
 		// Condition to display the swap icon for alternative procedure children rows when not in Tx config
-		const shouldDisplaySwapIcon = !insideTxConfig && isAltCodeRow;
+		const shouldDisplaySwapIcon = !insideTxConfig && isDefaultProcedure === false;
 
 
 
@@ -73,7 +73,7 @@ const Table = ({
 									<StyledDragCircleContainer justifyContent={!isAltCodeRow ? "start" : "space-between"}>
 
 										{/* The drag icon and checkbox are only rendered for non-alternative procedure rows */}
-										{!isAltCodeRow && (
+									{isDefaultProcedure && (
 											<>
 												<img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />
 												{displayCheckmark && (
