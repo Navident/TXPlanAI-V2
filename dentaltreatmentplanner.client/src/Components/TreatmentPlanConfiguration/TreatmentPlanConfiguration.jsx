@@ -54,6 +54,7 @@ const TreatmentPlanConfiguration = ({
 	const dispatch = useDispatch();
 	const visitOrder = useSelector(selectVisitOrder);
 	const [allRows, setAllRows] = useState({});
+	const [alternativeRows, setAlternativeRows] = useState({});
 	const [deletedRowIds, setDeletedRowIds] = useState([]);
 	const [deletedVisitIds, setDeletedVisitIds] = useState([]);
 	const isInitialLoad = useRef(true);
@@ -73,8 +74,6 @@ const TreatmentPlanConfiguration = ({
 	const [editedRows, setEditedRows] = useState([]);
 	const columnWidths = ["5%", "5%", "20%", "55%", "15%"];
 	const isSuperAdmin = useSelector(selectIsSuperAdmin);
-	const combinedFacilityDefaultCdtCodes = useSelector(selectCombinedCdtCodes);
-	const alternativeProcedures = useSelector(selectAlternativeProcedures);
 	const [dynamicRowValues, setDynamicRowValues] = useState({});
 	const [activeParentRow, setActiveParentRow] = useState(null);
 	const store = useStore();
@@ -86,13 +85,11 @@ const TreatmentPlanConfiguration = ({
 		console.log("current treatmentPlan:", treatmentPlan);
 	}, [treatmentPlan]);
 
+
 	useEffect(() => {
 		console.log("activeParentRow:", activeParentRow);
 	}, [activeParentRow]);
 
-	useEffect(() => {
-		console.log("alternativeProcedures: ", alternativeProcedures);
-	}, [alternativeProcedures]);
 
 	useEffect(() => {
 		console.log("allRows:", allRows);
@@ -109,42 +106,43 @@ const TreatmentPlanConfiguration = ({
 	useEffect(() => {
 		console.log("we went in the initial load conditional");
 		const visits = treatmentPlan.visits || [];
-		const newAllRows = visits.reduce((acc, visit, index) => {
+		const newAllRows = {}; // Default procedures
+		const newAlternativeRows = {}; // Non-default procedures for later access
+
+		visits.forEach(visit => {
 			const visitId = visit.visitId;
-			const cdtCodes = Array.isArray(visit.cdtCodes) ? visit.cdtCodes : [];
-			const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) =>
-				createStaticRows(visitCdtCodeMap, visitId, cdtIndex)
-			);
-			const initialRowId = `initial-${visitId}`;
-			acc[visitId] = [
-				...staticRows,
-				createDynamicRowv1(visitId, initialRowId),
-			];
-			return acc;
-		}, {});
+			newAllRows[visitId] = [];
+			newAlternativeRows[visitId] = [];
 
-		setAllRows(newAllRows);
-		dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
+			(visit.procedures || []).forEach((procedureMap, procIndex) => {
+				(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
+					const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
-		// Check and expand rows based on activeParentRow after initial setup
-		if (activeParentRow) {
-			setAllRows((prevAllRows) => {
-				const updatedAllRows = { ...prevAllRows };
-				Object.entries(updatedAllRows).forEach(([visitId, rows]) => {
-					const rowIndex = rows.findIndex(row => row.id === activeParentRow);
-					if (rowIndex !== -1) {
-						expandRows(rows, rowIndex, visitId, rows[rowIndex], alternativeProcedures);
+					if (cdtMap.default) { 
+						newAllRows[visitId].push(row);
+					} else {
+						newAlternativeRows[visitId].push(row);
 					}
 				});
-				return updatedAllRows;
 			});
-		}
 
+			// Include a dynamic row at the end of each visit in allRows
+			const initialRowId = `initial-${visitId}`;
+			newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
+		});
+
+		setAllRows(newAllRows);
+		setAlternativeRows(newAlternativeRows);
+		dispatch(setVisitOrder(visits.map(visit => visit.visitId)));
 
 		isInitialLoad.current = false;
-	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes, activeParentRow, alternativeProcedures]);
+	}, [treatmentPlans]);
 
 
+
+	useEffect(() => {
+		console.log("alternativeRows:", alternativeRows);
+	}, [alternativeRows]);
 
 	useEffect(() => {
 		return () => {
@@ -158,18 +156,19 @@ const TreatmentPlanConfiguration = ({
 		setLocalUpdatedVisits(treatmentPlan.visits);
 	}, [treatmentPlan.visits]);
 
-	const createStaticRows = (cdtCode, visitId, index) => {
+	const createStaticRows = (cdtMap, visitId, index, procedureMap) => {
 		const extraRowInput = showToothNumber
-			? [cdtCode.toothNumber, cdtCode.code, cdtCode.longDescription]
-			: [cdtCode.code, cdtCode.longDescription];
+			? [procedureMap.toothNumber, cdtMap.code, cdtMap.longDescription]
+			: [cdtMap.code, cdtMap.longDescription];
 
 		return {
 			id: `static-${visitId}-${index}`,
-			visitCdtCodeMapId: cdtCode.visitCdtCodeMapId,
-			description: cdtCode.longDescription,
-			selectedCdtCode: cdtCode,
+			visitToProcedureMapId: procedureMap.visitToProcedureMapId,
+			description: cdtMap.longDescription,
+			default: cdtMap.default,
+			selectedCdtCode: cdtMap,
 			isStatic: true,
-			extraRowInput,
+			extraRowInput
 		};
 	};
 
@@ -218,25 +217,13 @@ const TreatmentPlanConfiguration = ({
 		};
 	};
 
-	const createNewCdtCodeObject = (selectedCdtCode, visitId) => {
-		return {
-			cdtCodeId: selectedCdtCode.cdtCodeId,
-			code: selectedCdtCode.code,
-			longDescription: selectedCdtCode.longDescription,
-			order: 0,
-			orderWithinVisit: 0,
-			originLineIndex: 0,
-			procedureTypeId: null,
-			toothNumber: null,
-			visitId: visitId,
-		};
-	};
-
+	//
 	const convertToStaticRow = (
 		currentRow,
 		visitId,
 		selectedCdtCode,
-		originalDescription
+		originalDescription,
+		isNewRow = false 
 	) => {
 		// Prioritize using the originalDescription if provided
 		const description =
@@ -249,9 +236,10 @@ const TreatmentPlanConfiguration = ({
 			...currentRow,
 			id: `static-${visitId}-${Date.now()}`,
 			isStatic: true,
-			visitCdtCodeMapId: null,
+			procedureToCdtMapId: isNewRow ? null : currentRow.selectedCdtCode.procedureToCdtMapId,
 			selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
 			description, 
+			default: true,
 			extraRowInput: showToothNumber
 				? [
 						treatmentPlan.toothNumber,
@@ -308,10 +296,19 @@ const TreatmentPlanConfiguration = ({
 			if (rowIndex !== -1) {
 				const currentRow = rows[rowIndex];
 
-				// Update the current dynamic row with the selected CDT code
+				// Check if the currentRow already has a selectedCdtCode with a ProcedureToCdtMapId
+				const procedureToCdtMapId = currentRow.selectedCdtCode?.procedureToCdtMapId;
+
+				// Update the selectedCdtCode object to include the ProcedureToCdtMapId
+				const updatedCdtCodeObj = {
+					...cdtCodeObj,
+					procedureToCdtMapId: procedureToCdtMapId, // Incorporate the ProcedureToCdtMapId here
+				};
+
+				// Update the current dynamic row with the modified selected CDT code
 				rows[rowIndex] = {
 					...currentRow,
-					selectedCdtCode: cdtCodeObj,
+					selectedCdtCode: updatedCdtCodeObj, // Use the updated CDT code object
 					description: cdtCodeObj.longDescription,
 				};
 			}
@@ -323,11 +320,13 @@ const TreatmentPlanConfiguration = ({
 		});
 	};
 
+
 	const createDynamicRowUponAddClick = (visitId) => {
 		return {
 			id: `dynamic-${visitId}-${Date.now()}`,
 			description: "",
 			selectedCdtCode: null,
+			default: true,
 			extraRowInput: showToothNumber
 				? [treatmentPlan.toothNumber, "", ""]
 				: ["", ""],
@@ -342,47 +341,58 @@ const TreatmentPlanConfiguration = ({
 
 			const rowToConvert = rowsForVisit[rowIndexToConvert];
 
-			const tempId = rowToConvert.tempId;
-			// Determine if it's an alt row based on the rowId pattern
-			const isAltRow = rowId.startsWith("dynamic-alt-code");
-
-			// Convert the targeted dynamic row to a static row
-			const staticRow = isAltRow
-				? convertToStaticRowForAltCode(
-					rowToConvert.selectedCdtCode, 
+			let staticRow;
+			if (rowToConvert.default === false) {
+				staticRow = convertToStaticRowForAltCode(
+					rowToConvert.selectedCdtCode,
 					visitId,
-					rowToConvert.id,
+					rowId,
 					rowsForVisit,
-					dynamicRowValues,
-					tempId,
-					"create"
-				)
-				: convertToStaticRow(
-					rowToConvert,
-					visitId,
-					rowToConvert.selectedCdtCode
+					dynamicRowValues
 				);
 
-			// Conditionally create a new dynamic row based on the type
-			const newDynamicRow = isAltRow
-				? createDynamicRowForAltCode(visitId, rowToConvert)
-				: createDynamicRowUponAddClick(visitId);
+			} else {
+				staticRow = convertToStaticRow(
+					rowToConvert,
+					visitId,
+					rowToConvert.selectedCdtCode,
+					undefined,
+					true
+				);
+			}
 
-			// Construct the new array of rows
+			const newDynamicRow = createDynamicRowUponAddClick(visitId);
+
+			// Update the rows array with the new static row and a new dynamic row
 			let newRows = [...rowsForVisit];
-			newRows.splice(rowIndexToConvert, 1, staticRow, newDynamicRow); // Replace and add new
+			if (newDynamicRow) {
+				newRows.splice(rowIndexToConvert, 2, staticRow, newDynamicRow); // Replace the dynamic row with static and add a new dynamic row
+			} else {
+				newRows.splice(rowIndexToConvert, 1, staticRow); // Only replace the dynamic row with static
+			}
 
-			return {
+			const updatedAllRows = {
 				...prevAllRows,
 				[visitId]: newRows,
 			};
+
+			synchronizeAlternativeRows(visitId, updatedAllRows);
+
+			return updatedAllRows;
 		});
 	}
 
 
 
-	function createAddButtonCell(visitId, rowId, isAltRow = false) {
-		const backgroundColor = isAltRow ? UI_COLORS.altPurple : UI_COLORS.purple;
+
+
+
+
+
+
+	function createAddButtonCell(visitId, rowId, hasAltInId = false) {
+		// If hasAltInId is true, use grey; otherwise, use purple.
+		const backgroundColor = hasAltInId ? UI_COLORS.light_grey2 : UI_COLORS.purple;
 		return (
 			<StyledAddButtonCellContainer>
 				<RoundedButton
@@ -393,11 +403,12 @@ const TreatmentPlanConfiguration = ({
 					borderRadius="4px"
 					height="39px"
 					width="150px"
-					onClick={() => addNewRow(visitId, rowId)} 
+					onClick={() => addNewRow(visitId, rowId)}
 				/>
 			</StyledAddButtonCellContainer>
 		);
 	}
+
 
 
 	const reorder = (list, startIndex, endIndex) => {
@@ -487,26 +498,22 @@ const TreatmentPlanConfiguration = ({
 		reorderAllRows(newOrder);
 	};
 
-	const handleDeleteRow = (visitId, rowId, row) => {
-		const isAltCodeRow = row.id.startsWith('dynamic-alt-code') || row.id.startsWith('static-alt-code');
-
-		if (isAltCodeRow) {
-			// Check if the row represents a newly created or an existing alternative procedure
-			const tempId = row.tempId;
-			const alternativeProcedureId = row.alternativeProcedureId;
-
-			// Dispatch the delete action using either tempId or alternativeProcedureId
-			if (tempId || alternativeProcedureId) {
-				dispatch(deleteAlternativeProcedure({ tempId, alternativeProcedureId }));
-			}
-		}
-
+	const handleDeleteRow = (visitId, rowId) => {
+		// Proceed to remove the row visually from the UI
 		setAllRows((prevRows) => {
-			const updatedRows = prevRows[visitId].filter((row) => row.id !== rowId);
+			const updatedRows = prevRows[visitId].filter((r) => r.id !== rowId);
+
+			// After filtering out the deleted row, synchronize alternativeRows
+			synchronizeAlternativeRows(visitId, { ...prevRows, [visitId]: updatedRows });
+
 			return { ...prevRows, [visitId]: updatedRows };
 		});
+
 		setDeletedRowIds((prevIds) => [...prevIds, rowId]);
 	};
+
+
+
 
 	const createNewTreatmentPlanFromDefault = async (
 		treatmentPlan,
@@ -531,90 +538,21 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
-	function buildNewVisitCdtCodeMapIdMapping(oldTreatmentPlan, newTreatmentPlan) {
-		const newVisitCdtCodeMapIdMapping = new Map();
-		console.log("old treatment plan: ", oldTreatmentPlan);
-		console.log("new treatment plan: ", newTreatmentPlan);
-
-		// Ensure the new treatment plan has visits defined
-		if (!newTreatmentPlan.visits) {
-			console.error("New treatment plan does not contain any visits.");
-			return newVisitCdtCodeMapIdMapping;
-		}
-
-		// Create a composite key of cdtCodeId and visit index for the new treatment plan for easy lookup
-		const newCodesMap = new Map();
-		newTreatmentPlan.visits.forEach((visit, visitIndex) => {
-			if (visit.visitCdtCodeMaps) { // Adjusted to visitCdtCodeMaps
-				visit.visitCdtCodeMaps.forEach(cdtCodeMap => {
-					const key = `${cdtCodeMap.cdtCodeId}-${visitIndex}`;
-					newCodesMap.set(key, cdtCodeMap.visitCdtCodeMapId);
-				});
-			}
-		});
-
-		// Ensure the old treatment plan has visits defined
-		if (!oldTreatmentPlan.visits) {
-			console.error("Old treatment plan does not contain any visits.");
-			return newVisitCdtCodeMapIdMapping;
-		}
-
-		// Iterate over the old treatment plan to find matches in the new treatment plan using the composite key
-		oldTreatmentPlan.visits.forEach((visit, visitIndex) => {
-			if (visit.cdtCodes) {
-				visit.cdtCodes.forEach(oldCdtCode => {
-					const key = `${oldCdtCode.cdtCodeId}-${visitIndex}`;
-					if (newCodesMap.has(key)) {
-						newVisitCdtCodeMapIdMapping.set(oldCdtCode.visitCdtCodeMapId, newCodesMap.get(key));
-					}
-				});
-			}
-		});
-
-		return newVisitCdtCodeMapIdMapping;
-	}
 
 
 	const handleUpdateTreatmentPlan = async () => {
 		console.log("Treatment Plan before updating:", treatmentPlan);
-		let updatedAlternativeProcedures = alternativeProcedures;
 		try {
 			let newTreatmentPlanCreated = false;
 
-			// Check if the treatment plan is a default/global plan (no facility id indicates it is), we instead
-			//create a tx plan if its a default, otherwise we already have one an existing facility tx plan.
-			//if its a superadmin we just proceed to update the treatment plan globally.
 			if (treatmentPlan.facilityId === null && !isSuperAdmin) {
-				const newTreatmentPlan = await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
+				await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
 				newTreatmentPlanCreated = true;
-				const newVisitCdtCodeMapIdMapping = buildNewVisitCdtCodeMapIdMapping(treatmentPlan, newTreatmentPlan);
-				dispatch(updateAlternativeProcedureVisitCdtCodeMapIds({ newVisitCdtCodeMapIdMapping }));
-				updatedAlternativeProcedures = selectAlternativeProcedures(store.getState());
-				console.log("alternativeProcedures after dispatch: ", updatedAlternativeProcedures);
-				console.log("Current State after dispatch:", updatedAlternativeProcedures);
-
 			}
 
-			// Determine if there are new alternative procedures that need to be processed
-			const hasNewAlternativeProcedures = alternativeProcedures.some(ap => ap.alternativeProcedureId === null);
-
-			// If the treatment plan was newly created but there are no new alternative procedures, return early
-			if (newTreatmentPlanCreated && !hasNewAlternativeProcedures) {
-				return;
-			}
-
-			// Identify new visits
-			const tempVisitIds = visitOrder.filter((visitId) =>
-				String(visitId).startsWith("temp-")
-			);
-
-			// Create new visits and store the responses
-			const createVisitPromises = tempVisitIds.map((tempVisitId) => {
-				const visitData = mapToCreateVisitDto(
-					treatmentPlan,
-					allRows,
-					tempVisitId
-				);
+			const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith("temp-"));
+			const createVisitPromises = tempVisitIds.map(tempVisitId => {
+				const visitData = mapToCreateVisitDto(treatmentPlan, allRows, tempVisitId);
 				return createVisit(visitData, tempVisitId);
 			});
 
@@ -624,68 +562,55 @@ const TreatmentPlanConfiguration = ({
 				return acc;
 			}, {});
 
-			// Deep copy
 			const deepCopyAllRows = JSON.parse(JSON.stringify(allRows));
-			// Update allRows with actualVisitIds
-			Object.keys(deepCopyAllRows).forEach((visitId) => {
+			Object.keys(deepCopyAllRows).forEach(visitId => {
 				if (visitIdMap[visitId]) {
 					deepCopyAllRows[visitIdMap[visitId]] = deepCopyAllRows[visitId];
 					delete deepCopyAllRows[visitId];
 				}
 			});
 
-			// Update the state
 			setAllRows(deepCopyAllRows);
-			
-			// Identify new procedures and associate them with actualVisitIds
+
 			const newProcedures = [];
-			Object.keys(deepCopyAllRows).forEach((visitId) => {
-				deepCopyAllRows[visitId].forEach((row) => {
-					if (!row.visitCdtCodeMapId && row.selectedCdtCode) {
+			Object.keys(deepCopyAllRows).forEach(visitId => {
+				deepCopyAllRows[visitId].forEach(row => {
+					if (!row.procedureToCdtMapId && row.selectedCdtCode && typeof row.selectedCdtCode.cdtCodeId !== 'undefined') {
 						newProcedures.push({
 							visitId: visitId,
-							CdtCodeId: row.selectedCdtCode.cdtCodeId,
-							Order: 0,
+							cdtCodeId: row.selectedCdtCode.cdtCodeId,
+							order: 0, 
 						});
 					}
 				});
 			});
 
-			// Send new procedures to backend and process the response
+			console.log("newProcedures: ", newProcedures);
 			const newProcedureResponse = await createNewProcedures(newProcedures);
-			newProcedureResponse.forEach((proc) => {
-				const { visitId, visitCdtCodeMapId, cdtCodeId } = proc;
+			newProcedureResponse.forEach(proc => {
+				const { visitId, procedureToCdtMapId, cdtCodeId } = proc;
 				const rows = deepCopyAllRows[visitId];
 				if (!rows) {
 					return;
 				}
-				const rowIndex = rows.findIndex(
-					(row) =>
-						row.selectedCdtCode && row.selectedCdtCode.cdtCodeId === cdtCodeId
-				);
+				const rowIndex = rows.findIndex(row => row.selectedCdtCode && row.selectedCdtCode.cdtCodeId === cdtCodeId);
 				if (rowIndex > -1) {
-					rows[rowIndex].visitCdtCodeMapId = visitCdtCodeMapId;
+					rows[rowIndex].procedureToCdtMapId = procedureToCdtMapId;
 				}
 			});
 
-			// Update the visit order with actualVisitIds
-			const updatedVisitOrder = visitOrder.map(
-				(visitId) => visitIdMap[visitId] || visitId
-			);
+			const updatedVisitOrder = visitOrder.map(visitId => visitIdMap[visitId] || visitId);
 
-			// Update the treatment plan visits
-			const updatedVisits = treatmentPlan.visits.map((visit) => {
+			const updatedVisits = treatmentPlan.visits.map(visit => {
 				const actualVisitId = visitIdMap[visit.visitId] || visit.visitId;
 				const updatedProcedures = deepCopyAllRows[actualVisitId]
 					? deepCopyAllRows[actualVisitId]
-							.filter((row) => row.selectedCdtCode !== null)
-							.map((row) => {
-								return {
-									visitCdtCodeMapId: row.visitCdtCodeMapId,
-									cdtCodeId: row.selectedCdtCode.cdtCodeId,
-									description: row.description,
-								};
-							})
+						.filter(row => row.selectedCdtCode !== null)
+						.map(row => ({
+							procedureToCdtMapId: row.procedureToCdtMapId, 
+							cdtCodeId: row.selectedCdtCode.cdtCodeId,
+							description: row.description,
+						}))
 					: visit.procedures;
 
 				return {
@@ -695,36 +620,17 @@ const TreatmentPlanConfiguration = ({
 				};
 			});
 
-			// Update local state for immediate reflection in the UI
 			setLocalUpdatedVisits(updatedVisits);
-
-			// Update allRows and visitOrder in state
 			setVisitOrder(updatedVisitOrder);
 			setAllRows(deepCopyAllRows);
 
-			// update the treatment plan
-			const updateDto = mapToUpdateTreatmentPlanDto(
-				treatmentPlan,
-				deepCopyAllRows,
-				updatedVisitOrder,
-				deletedRowIds,
-				deletedVisitIds,
-				editedRows,
-				updatedAlternativeProcedures
-			);
-			const updatedTreatmentPlan = await updateTreatmentPlan(
-				treatmentPlan.treatmentPlanId,
-				updateDto
-			);
+			const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, deepCopyAllRows, alternativeRows, updatedVisitOrder, deletedRowIds, deletedVisitIds, editedRows);
+			const updatedTreatmentPlan = await updateTreatmentPlan(treatmentPlan.treatmentPlanId, updateDto);
 
-			adjustUpdatedTreatmentPlanStructure(updatedTreatmentPlan, treatmentPlan);
-
+			//adjustUpdatedTreatmentPlanStructure(updatedTreatmentPlan, treatmentPlan);
 			dispatch(updateSubcategoryTreatmentPlan(updatedTreatmentPlan));
+			onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
 
-			onUpdateVisitsInTreatmentPlan(
-				treatmentPlan.treatmentPlanId,
-				updatedVisits
-			);
 			console.log("Updated Treatment Plan:", updatedTreatmentPlan);
 
 			setAlertInfo({
@@ -737,38 +643,39 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
+
 	const getCdtCodeDetailsByCdtCodeId = (cdtCodeId) => {
 		return combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
 	};
 
-	const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
-		return visit.visitCdtCodeMaps.map(cdtCodeMap => {
-			const cdtCodeDetails = getCdtCodeDetailsByCdtCodeId(cdtCodeMap.cdtCodeId);
-			return {
-				cdtCodeId: cdtCodeMap.cdtCodeId,
-				code: cdtCodeDetails?.code,
-				longDescription: cdtCodeDetails?.longDescription,
-				createdAt: cdtCodeMap.createdAt,
-				modifiedAt: cdtCodeMap.modifiedAt,
-				order: cdtCodeMap.order,
-				procedureTypeId: cdtCodeMap.procedureTypeId,
-				toothNumber: cdtCodeMap.toothNumber,
-				visitCdtCodeMapId: cdtCodeMap.visitCdtCodeMapId,
-				visitId: cdtCodeMap.visitId,
-			};
-		});
-	};
+	//const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
+	//	return visit.visitCdtCodeMaps.map(cdtCodeMap => {
+	//		const cdtCodeDetails = getCdtCodeDetailsByCdtCodeId(cdtCodeMap.cdtCodeId);
+	//		return {
+	//			cdtCodeId: cdtCodeMap.cdtCodeId,
+	//			code: cdtCodeDetails?.code,
+	//			longDescription: cdtCodeDetails?.longDescription,a
+	//			createdAt: cdtCodeMap.createdAt,
+	//			modifiedAt: cdtCodeMap.modifiedAt,
+	//			order: cdtCodeMap.order,
+	//			procedureTypeId: cdtCodeMap.procedureTypeId,
+	//			toothNumber: cdtCodeMap.toothNumber,
+	//			visitCdtCodeMapId: cdtCodeMap.visitCdtCodeMapId,
+	//			visitId: cdtCodeMap.visitId,
+	//		};
+	//	});
+	//};
 
-	const adjustUpdatedTreatmentPlanStructure = (updatedTreatmentPlan, originalTreatmentPlan) => {
-		// Reinsert the category names from the original treatment plan
-		updatedTreatmentPlan.procedureCategoryName = originalTreatmentPlan.procedureCategoryName;
-		updatedTreatmentPlan.procedureSubCategoryName = originalTreatmentPlan.procedureSubCategoryName;
+	//const adjustUpdatedTreatmentPlanStructure = (updatedTreatmentPlan, originalTreatmentPlan) => {
+	//	// Reinsert the category names from the original treatment plan
+	//	updatedTreatmentPlan.procedureCategoryName = originalTreatmentPlan.procedureCategoryName;
+	//	updatedTreatmentPlan.procedureSubCategoryName = originalTreatmentPlan.procedureSubCategoryName;
 
-		updatedTreatmentPlan.visits.forEach(visit => {
-			visit.cdtCodes = transformVisitCdtCodeMapsToCdtCodes(visit);
-			delete visit.visitCdtCodeMaps;
-		});
-	};
+	//	updatedTreatmentPlan.visits.forEach(visit => {
+	//		visit.cdtCodes = transformVisitCdtCodeMapsToCdtCodes(visit);
+	//		delete visit.visitCdtCodeMaps;
+	//	});
+	//};
 
 
 	const lockDimensions = () => {
@@ -812,7 +719,6 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	const constructDynamicRowData = (row, visitId) => {
-		// Keep your dropdown logic as it is
 		const dropdownKey = `dropdown-${row.id}`;
 		const cdtDropdown = (
 			<DropdownSearch
@@ -845,11 +751,11 @@ const TreatmentPlanConfiguration = ({
 				/>
 			);
 
-			// Return the array including the TextField for rendering in your table
+			// Return the array including the TextField for rendering 
 			return showToothNumber ? ["", cdtDropdown, textField] : ["", cdtDropdown, textField];
 		}
 
-		// For non-dynamic rows, return your usual structure
+		// For non-dynamic rows
 		return showToothNumber ? ["", cdtDropdown, row.description] : ["", cdtDropdown, row.description];
 	};
 
@@ -873,35 +779,54 @@ const TreatmentPlanConfiguration = ({
 		setOriginalRowData(null);
 	};
 
+	const synchronizeAlternativeRows = (visitId, updatedAllRows) => {
+		// Filter for non-default rows that are static, do not have a temporary ID, and have a non-null selectedCdtCode
+		const updatedAlternativeRows = updatedAllRows[visitId].filter(row =>
+			!row.default && // Not default
+			row.selectedCdtCode != null // Exclude rows with null selectedCdtCode
+		);
+
+		setAlternativeRows(prevAlternativeRows => ({
+			...prevAlternativeRows,
+			[visitId]: updatedAlternativeRows,
+		}));
+	};
+
 	const handleDoneEdit = (rowId, visitId) => {
-		const isAltRow = rowId.startsWith('dynamic-alt-code') || rowId.startsWith('static-alt-code');
 		setEditingRowId(null);
 
+		let updatedRowForAlt = null; // This will hold the updated row if it's an alternative row
+
+		// First, update allRows
 		setAllRows((prevAllRows) => {
-			const rows = prevAllRows[visitId];
+			const rows = [...prevAllRows[visitId]];
+
 			const updatedRows = rows.map((row) => {
 				if (row.id === rowId) {
-					// Determine which conversion function to use based on row type
-					const editedRow = isAltRow
-						? convertToStaticRowForAltCode(row.selectedCdtCode, visitId, rowId, rows, dynamicRowValues, row.tempId, "update")
-						: convertToStaticRow(row, visitId, row.selectedCdtCode, row.description);
+					const updatedRow = row.default ?
+						convertToStaticRow(row, visitId, row.selectedCdtCode, row.description, false) :
+						convertToStaticRowForAltCode(row.selectedCdtCode, visitId, rowId, rows, dynamicRowValues);
 
-					// Optionally handle storing the edited row's data
-					setEditedRows((prev) => [...prev, { ...editedRow, visitId }]);
-
-					return editedRow;
+					if (!row.default) {
+						updatedRowForAlt = updatedRow; // Store the updated alternative row
+					}
+					return updatedRow;
 				}
 				return row;
 			});
 
-			// Update only the rows for the specific visitId
-			return {
+			// Here's the updated return statement with a callback to ensure we have the updated state
+			const updatedAllRows = {
 				...prevAllRows,
 				[visitId]: updatedRows,
 			};
+
+			// Synchronize alternativeRows right after updating allRows
+			synchronizeAlternativeRows(visitId, updatedAllRows); // Call to synchronize alternativeRows
+
+			return updatedAllRows;
 		});
 
-		// After successfully saving the edits, clear the originalRowData
 		setOriginalRowData(null);
 	};
 
@@ -928,7 +853,7 @@ const TreatmentPlanConfiguration = ({
 					<StyledEditIcon
 						src={pencilEditIcon}
 						alt="Edit Icon"
-						onClick={() => handleEditRow(row.id, visitId)}
+						onClick={() => row.default ? handleEditRow(row.id, visitId) : handleEditAlternativeRow(row.id, visitId)}
 					/>
 					<StyledDeleteIcon
 						src={deleteIcon}
@@ -950,6 +875,7 @@ const TreatmentPlanConfiguration = ({
 
 	const createTableRow = (row, visitId, headers, index) => {
 		const isStaticRow = row.isStatic;
+		const hasAltInId = row.id.includes('alt');
 		let rowData = isStaticRow
 			? constructStaticRowData(row)
 			: constructDynamicRowData(row, visitId);
@@ -964,7 +890,7 @@ const TreatmentPlanConfiguration = ({
 			if (row.isEditing) {
 				lastCellContent = renderDoneCancelText(row.id, visitId); // For rows being edited
 			} else {
-				lastCellContent = createAddButtonCell(visitId, row.id); // For other dynamic rows
+				lastCellContent = createAddButtonCell(visitId, row.id, hasAltInId); // For other dynamic rows
 			}
 		}
 		rowData.push(lastCellContent);
@@ -972,6 +898,8 @@ const TreatmentPlanConfiguration = ({
 		return {
 			id: row.id,
 			data: rowData,
+			backgroundColor: null,
+			parentId: row.parentId,
 		};
 	};
 
@@ -983,7 +911,42 @@ const TreatmentPlanConfiguration = ({
 		if (rowIndex !== -1) {
 			const currentRow = rows[rowIndex];
 
-			const isAltRow = currentRow.id.startsWith('dynamic-alt-code') || currentRow.id.startsWith('static-alt-code');
+			// Before converting the row, update dynamicRowValues with the current description
+			const initialDescription = currentRow.description || "";
+			setDynamicRowValues(prevValues => ({
+				...prevValues,
+				[currentRow.id]: initialDescription,
+			}));
+
+			// Set originalRowData with the current state of the row before making it dynamic for editing
+			setOriginalRowData({ ...currentRow });
+
+			// Convert the current row to a dynamic row for editing
+			const dynamicRow = convertToDynamicRow(currentRow, visitId);
+
+			// Update the rows array with the newly converted dynamic row
+			const updatedRows = [
+				...rows.slice(0, rowIndex),
+				dynamicRow,
+				...rows.slice(rowIndex + 1),
+			];
+			// Update the state to reflect the changes
+			setAllRows((prevAllRows) => ({
+				...prevAllRows,
+				[visitId]: updatedRows, // Only update the rows for the specific visit
+			}));
+		} else {
+			console.error("Row not found with rowId:", rowId, "in visitId:", visitId);
+		}
+	};
+
+	const handleEditAlternativeRow = (rowId, visitId) => {
+		// Directly access the rows for the specific visitId
+		const rows = allRows[visitId];
+		const rowIndex = rows.findIndex((row) => row.id === rowId);
+
+		if (rowIndex !== -1) {
+			const currentRow = rows[rowIndex];
 
 			// Before converting the row, update dynamicRowValues with the current description
 			const initialDescription = currentRow.description || "";
@@ -995,10 +958,8 @@ const TreatmentPlanConfiguration = ({
 			// Set originalRowData with the current state of the row before making it dynamic for editing
 			setOriginalRowData({ ...currentRow });
 
-			// Convert the current row to a dynamic row for editing based on its type
-			const dynamicRow = isAltRow
-				? convertToDynamicRowForAltCode(currentRow, visitId, dynamicRowValues) // Use the alt row conversion for alt rows
-				: convertToDynamicRow(currentRow, visitId); // Use the regular row conversion for normal rows
+			// Convert the current row to a dynamic row for editing
+			const dynamicRow = convertToDynamicRowForAltCode(currentRow, visitId);
 
 			// Update the rows array with the newly converted dynamic row
 			const updatedRows = [
@@ -1047,6 +1008,9 @@ const TreatmentPlanConfiguration = ({
 		}
 	};
 
+
+
+
 	const collapseRows = (rows, rowIndex) => {
 		// Remove all related alternative procedure rows
 		const rowsToRemove = rows.slice(rowIndex + 1).findIndex(row =>
@@ -1057,31 +1021,27 @@ const TreatmentPlanConfiguration = ({
 	};
 
 
-	const expandRows = (rows, rowIndex, visitId, currentRow, alternativeProcedures) => {
-		// Find matching alternative procedures
-		const visitCdtCodeMapId = currentRow.visitCdtCodeMapId;
-		const matchingAlternativeProcedures = alternativeProcedures.filter(ap =>
-			ap.visitCdtCodeMapId === visitCdtCodeMapId
-		);
+	const expandRows = (rows, rowIndex, visitId, currentRow, alternativeRows) => {
+		let newRows = []; // Temporarily hold new rows to be added
 
-		// Optionally include logic to fetch and insert any newly created static alt rows
-		const newlyCreatedAltRows = rows.filter(row =>
-			row.id.startsWith("static-alt-code") &&
-			row.visitCdtCodeMapId === visitCdtCodeMapId
-		);
+		// Check if there are alternative rows for the current visitId
+		const alternatives = alternativeRows[visitId];
+		if (alternatives && alternatives.length > 0) {
+			// Filter alternative rows that match the current default row's visitToProcedureMapId
+			const matchingAlternatives = alternatives.filter(alt => alt.visitToProcedureMapId === currentRow.visitToProcedureMapId);
+			// Create a static row for each matching alternative
+			matchingAlternatives.forEach((altRow, index) => {
+				const altRowId = `alt-${rowIndex}-${index}`;
+				newRows.push(createStaticRowForAltCode(altRow, visitId, altRowId, currentRow.id));
+			});
+		}
 
-		// Combine and sort both sets of rows before inserting
-		const combinedAltRows = [...matchingAlternativeProcedures, ...newlyCreatedAltRows];
+		// Create a new dynamic row for alternative CDT code selection
+		const dynamicAltRow = createDynamicRowForAltCode(visitId, currentRow);
+		newRows.push(dynamicAltRow);
 
-		// Insert new static rows for each matching alternative procedure
-		combinedAltRows.forEach((ap, index) => {
-			const staticRowForAltCode = createStaticRowForAltCode(ap, visitId, `alt-${index}`);
-			rows.splice(rowIndex + 1 + index, 0, staticRowForAltCode); // Insert right after the current row
-		});
-
-		// Insert a new dynamic row for alternative CDT code selection
-		const dynamicRowForAltCode = createDynamicRowForAltCode(visitId, currentRow);
-		rows.splice(rowIndex + 1 + combinedAltRows.length, 0, dynamicRowForAltCode);
+		// Insert new rows into the correct position
+		rows.splice(rowIndex + 1, 0, ...newRows); // Use spread operator to add all new rows at once
 	};
 
 
@@ -1108,7 +1068,8 @@ const TreatmentPlanConfiguration = ({
 							collapseRows(rows, prevRowIndex);
 						}
 					}
-					expandRows(rows, rowIndex, visitId, currentRow, alternativeProcedures);
+					// Pass alternativeRows to expandRows function
+					expandRows(rows, rowIndex, visitId, currentRow, alternativeRows);
 					setActiveParentRow(rowId); // Set new active parent row
 				}
 			});
@@ -1117,10 +1078,10 @@ const TreatmentPlanConfiguration = ({
 	};
 
 
-	const createStaticRowForAltCode = (alternativeProcedure, visitId, baseRowId) => {
-		const description = alternativeProcedure.userDescription || 'Description not provided';
-		const cdtCode = alternativeProcedure.code;
-		const alternativeProcedureId = alternativeProcedure.alternativeProcedureId || null;
+
+	const createStaticRowForAltCode = (procedureToCdtMapDto, visitId, baseRowId, parentId) => {
+		const description = procedureToCdtMapDto.selectedCdtCode.userDescription || 'Description not provided';
+		const cdtCode = procedureToCdtMapDto.selectedCdtCode.code; 
 
 		const extraRowInput = [
 			cdtCode,
@@ -1129,16 +1090,17 @@ const TreatmentPlanConfiguration = ({
 
 		return {
 			id: `static-alt-code-${visitId}-${baseRowId}`,
-			alternativeProcedureId: alternativeProcedureId,
-			visitCdtCodeMapId: alternativeProcedure.visitCdtCodeMapId,
+			procedureToCdtMapId: procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId,
+			visitToProcedureMapId: procedureToCdtMapDto.visitToProcedureMapId,
 			description: description,
-			selectedCdtCode: {
-				code: cdtCode,
-			},
+			default: procedureToCdtMapDto.default,
+			selectedCdtCode: procedureToCdtMapDto.selectedCdtCode,
 			isStatic: true,
-			extraRowInput 
+			extraRowInput,
+			parentId
 		};
 	};
+
 
 	const handleInputChange = (visitId, rowId, field, value) => {
 		setDynamicRowValues(prevValues => ({
@@ -1152,25 +1114,8 @@ const TreatmentPlanConfiguration = ({
 		handleInputChange(visitId, rowId, 'description', newDescription);
 	};
 
-	const createDynamicRowForAltCode = (visitId, currentRow, activeParentRowId) => {
-		const dynamicRowId = `dynamic-alt-code-${visitId}-${currentRow.id}-${Date.now()}`;
-		const tempId = `temp-${Date.now()}`;
-		return {
-			id: dynamicRowId,
-			tempId,
-			parentRowId: activeParentRowId,
-			textFieldProps: {
-				label: "",
-				borderColor: UI_COLORS.purple,
-				width: "auto"
-			},
-			visitCdtCodeMapId: currentRow.visitCdtCodeMapId,
-			selectedCdtCode: null,
-		};
-	};
-
 	const convertToDynamicRowForAltCode = (currentRow, visitId, dynamicRowValues) => {
-
+		dynamicRowValues = dynamicRowValues || {}; 
 		const textFieldValue = dynamicRowValues[currentRow.id] || currentRow.description || "not found";
 
 		const dropdownSearchElement = createCDTCodeDropdown(
@@ -1203,71 +1148,65 @@ const TreatmentPlanConfiguration = ({
 			extraRowInput,
 			isStatic: false,
 			isEditing: true, // Indicate this row is being edited
-			textFieldProps: { 
+			textFieldProps: {
 				...textFieldProps,
-				value: textFieldValue, 
+				value: textFieldValue,
 			},
 		};
 	};
 
-	const convertToStaticRowForAltCode = (selectedCdtCode, visitId, rowId, rowsForVisit, dynamicRowValues, tempId, operationType) => {
-
-		const userDescription = dynamicRowValues[rowId] || 'Description not provided';
-
-		const parentRow = rowsForVisit.find(row => row.id === rowId);
-
-		const newStaticAltRow = {
-			id: rowId,
+	const createDynamicRowForAltCode = (visitId, currentRow, activeParentRowId) => {
+		const dynamicRowId = `dynamic-alt-code-${visitId}-${currentRow.id}-${Date.now()}`;
+		const tempId = `temp-${Date.now()}`;
+		return {
+			id: dynamicRowId,
 			tempId,
-			isStatic: true,
-			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
-			description: userDescription,
-			selectedCdtCode: {
-				code: selectedCdtCode.code,
-				longDescription: userDescription,
+			default: false,
+			parentRowId: activeParentRowId,
+			visitToProcedureMapId: currentRow.visitToProcedureMapId,
+			textFieldProps: {
+				label: "",
+				borderColor: UI_COLORS.purple,
+				width: "auto"
 			},
-			extraRowInput: showToothNumber
-				? [treatmentPlan.toothNumber, selectedCdtCode.code, userDescription || 'Description not provided']
-				: [selectedCdtCode.code, userDescription || 'Description not provided'],
+			selectedCdtCode: null,
 		};
-
-		// Define the base structure for creates
-		const newAltProcedureObjectForState = {
-			alternativeProcedureId: null,
-			tempId,
-			cdtCodeId: selectedCdtCode.cdtCodeId,
-			code: selectedCdtCode.code, 
-			userDescription: userDescription,
-			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
-		};
-
-		// Define the base structure for updates
-		const updates = {
-			code: selectedCdtCode.code,
-			userDescription: userDescription,
-			visitCdtCodeMapId: parentRow.visitCdtCodeMapId,
-		};
-
-		// Only include cdtCodeId in updates if it's defined in selectedCdtCode
-		if ('cdtCodeId' in selectedCdtCode && typeof selectedCdtCode.cdtCodeId !== 'undefined') {
-			updates.cdtCodeId = selectedCdtCode.cdtCodeId;
-		} else {
-			// If cdtCodeId is not being updated, retain the existing value from the state
-			const existingAltProcedure = alternativeProcedures.find(ap => ap.tempId === tempId || ap.alternativeProcedureId === parentRow.alternativeProcedureId);
-			if (existingAltProcedure) {
-				updates.cdtCodeId = existingAltProcedure.cdtCodeId;
-			}
-		}
-
-		if (operationType === "update") {
-			const identifier = tempId ? { tempId } : { alternativeProcedureId: parentRow.alternativeProcedureId };
-			dispatch(updateAlternativeProcedure({ ...identifier, updates }));
-		} else if (operationType === "create") {
-			dispatch(addAlternativeProcedure(newAltProcedureObjectForState));
-		}
-
-		return newStaticAltRow;
 	};
+
+
+const convertToStaticRowForAltCode = (selectedCdtCode, visitId, rowId, rowsForVisit, dynamicRowValues) => {
+    const rowGettingUpdated = rowsForVisit.find(row => row.id === rowId);
+    const userDescription = dynamicRowValues[rowId] || 'Description not provided';
+
+    // Determine if we're creating a new row or updating an existing one
+    const isNewRow = !rowGettingUpdated || rowGettingUpdated.tempId;
+
+    const newStaticProcedureCdtRow = {
+        id: isNewRow ? `static-alt-code-${Date.now()}` : rowId,
+        tempId: isNewRow ? `temp-${Date.now()}` : undefined,
+        isStatic: true,
+        visitToProcedureMapId: rowGettingUpdated?.visitToProcedureMapId,
+		description: userDescription,
+		default: false,
+		selectedCdtCode: {
+			procedureToCdtMapId: isNewRow ? null : rowGettingUpdated?.selectedCdtCode.procedureToCdtMapId, // Conditional assignment based on isNewRow
+            cdtCodeId: selectedCdtCode.cdtCodeId,
+            code: selectedCdtCode.code,
+            //longDescription: selectedCdtCode.longDescription,
+            default: false,
+            userDescription: userDescription 
+        },
+        extraRowInput: [
+            ...(rowGettingUpdated?.toothNumber ? [rowGettingUpdated.toothNumber] : []),
+            selectedCdtCode.code,
+            userDescription
+        ],
+    };
+
+    return newStaticProcedureCdtRow;
+};
+
+
 
 
 
@@ -1330,6 +1269,7 @@ const TreatmentPlanConfiguration = ({
 							displayCheckmark={false}
 							onRedDropdownIconClick={handleRedDropdownIconClick}
 							activeParentRow={activeParentRow}
+							insideTxConfig={true}
 						/>
 					</div>
 				)}

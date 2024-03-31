@@ -19,6 +19,6 @@
         public Facility Facility { get; set; }
         public CdtCodeCategory CdtCodeCategory { get; set; }
         public CdtCodeSubcategory CdtCodeSubcategory { get; set; }
-        public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
+        //public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
     }
 }

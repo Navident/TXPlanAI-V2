@@ -8,6 +8,6 @@
         public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
-        public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
+        //public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
     }
 }

@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { UI_COLORS } from '../../Theme';
 import redDropdownCircle from "../../assets/red-dropdown-circle.svg";
+import swapAltRowIcon from "../../assets/swap-alt-row-icon.svg";
 import { useState } from 'react';
 
 const Table = ({
@@ -28,7 +29,9 @@ const Table = ({
 	columnWidths = [],
 	displayCheckmark = true,
 	onRedDropdownIconClick,
-	activeParentRow
+	activeParentRow,
+	insideTxConfig = false,
+	onSwapAltRow,
 }) => {
 	const dispatch = useDispatch();
 	const checkedRows = useSelector(selectCheckedRows);
@@ -46,75 +49,74 @@ const Table = ({
 	}, [checkedRows]);
 
 	const renderDraggableRow = (rowData, rowIndex) => {
-		const isAltCodeRow = rowData.id.startsWith('dynamic-alt-code') || rowData.id.startsWith('static-alt-code');
+		const rowIdentifier = rowData.id || rowData.tempId || "";
 
-		const isRowActive = rowData.id === activeParentRow;
-
+		const isAltCodeRow = rowIdentifier.startsWith('dynamic-alt-code') || rowIdentifier.startsWith('static-alt-code');
+		const isRowActive = rowIdentifier === activeParentRow;
 		const isLastRow = rowIndex === rows.length - 1;
 		const rowBackgroundColor = isAltCodeRow ? "#E8E7E7" : (rowData.backgroundColor || "transparent");
-		console.log("rowBackgroundColor", rowBackgroundColor);
+
+		// Rules: Don't display the redDropdown if this is an alternative procedure row
+		const shouldDisplayRedDropdown = (insideTxConfig || (rowData.defToAltProcMapDtos && rowData.defToAltProcMapDtos.length > 0)) && !isAltCodeRow;
+
+		// Condition to display the swap icon for alternative procedure children rows when not in Tx config
+		const shouldDisplaySwapIcon = !insideTxConfig && isAltCodeRow;
+
+
 
 		return (
-			<Draggable
-				key={`row-${tableId}-${rowIndex}`}
-				draggableId={`row-${tableId}-${rowIndex}`}
-				index={rowIndex}
-				type="row"
-			>
+			<Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">
 				{(provided, snapshot) => (
-					<tr
-						ref={provided.innerRef}
-						{...provided.draggableProps}
-						style={{
-							...provided.draggableProps.style,
-							borderBottom: snapshot.isDragging ? "1px solid #7777a1" : "",
-							backgroundColor: rowBackgroundColor,
-						}}
-					>
+					<tr ref={provided.innerRef} {...provided.draggableProps} style={{ ...provided.draggableProps.style, borderBottom: snapshot.isDragging ? "1px solid #7777a1" : "", backgroundColor: rowBackgroundColor }}>
 						<td style={columnWidths[0] ? { width: columnWidths[0] } : {}}>
-							<StyledDragCheckmarkIconsContainer>
-								{!isLastRow && !isAltCodeRow && (
-									<StyledDragCircleContainer>
-										<img
-											src={dragImageIconSrc}
-											className="drag-icon"
-											alt="Drag Icon"
-											{...provided.dragHandleProps}
-										/>
-										<StyledRedCircleWithArrowDropdownContainer
-											src={redDropdownCircle}
-											isExpanded={isRowActive}
-											onClick={(e) => toggleDropdown(rowData.id, e.currentTarget)}
-										/>
-										{displayCheckmark && (
-											<CustomCheckbox
-												label=""
-												checked={isRowChecked(rowData.id)}
-												onChange={() => handleCheckboxChange(rowData.id)}
-												color= {UI_COLORS.purple}
+								{!isLastRow && (
+									<StyledDragCircleContainer justifyContent={!isAltCodeRow ? "start" : "space-between"}>
+
+										{/* The drag icon and checkbox are only rendered for non-alternative procedure rows */}
+										{!isAltCodeRow && (
+											<>
+												<img src={dragImageIconSrc} className="drag-icon" alt="Drag Icon" {...provided.dragHandleProps} />
+												{displayCheckmark && (
+													<CustomCheckbox
+														label=""
+														checked={isRowChecked(rowData.id)}
+														onChange={() => handleCheckboxChange(rowData.id)}
+														color={UI_COLORS.purple}
+													/>
+												)}
+											</>
+										)}
+
+										{/* Conditionally render the StyledRedCircleWithArrowDropdownContainer */}
+										{shouldDisplayRedDropdown && !shouldDisplaySwapIcon && (
+											<StyledRedCircleWithArrowDropdownContainer
+												src={redDropdownCircle}
+												isExpanded={isRowActive}
+												onClick={(e) => toggleDropdown(rowData.id, e.currentTarget)}
+											/>
+										)}
+
+										{/* Conditionally render the swap icon for alternative procedure children rows */}
+										{shouldDisplaySwapIcon && (
+											<img
+												src={swapAltRowIcon}
+												alt="Swap Icon"
+												onClick={() => onSwapAltRow(rowData.parentId, rowData.id)}
 											/>
 										)}
 									</StyledDragCircleContainer>
 								)}
-							</StyledDragCheckmarkIconsContainer>
 						</td>
 						{rowData.data && rowData.data.map((cell, cellIndex) => (
-							<td
-								key={`cell-${tableId}-${rowIndex}-${cellIndex}`}
-								style={
-									columnWidths[cellIndex + 1]
-										? { width: columnWidths[cellIndex + 1] }
-										: {}
-								}
-							>
-								{cell}
-							</td>
+							<td key={`cell-${tableId}-${rowIndex}-${cellIndex}`} style={columnWidths[cellIndex + 1] ? { width: columnWidths[cellIndex + 1] } : {}}>{cell}</td>
 						))}
 					</tr>
 				)}
 			</Draggable>
 		);
 	};
+
+
 
 	const toggleDropdown = (id, target) => {
 		// Your existing logic when red dropdown is clicked

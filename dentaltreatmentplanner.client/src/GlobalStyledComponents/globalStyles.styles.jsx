@@ -201,6 +201,8 @@ export const StyledDragCircleContainer = styled.div`
     display:flex;
     align-items:center;
     flex-direction: row;
-    gap: 12px;
+    justify-content: ${props => props.justifyContent || 'space-between'};
+    gap: 10px;
+    width: fit-content
   }
 `;

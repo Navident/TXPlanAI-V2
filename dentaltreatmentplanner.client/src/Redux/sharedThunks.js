@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility, getCustomerKeyForUserFacility } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, fetchAlternativeProceduresForFacility, setActiveCdtCodes, fetchCustomCdtCodesForFacility, fetchDefaultCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes, fetchCustomCdtCodesForFacility, fetchDefaultCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import { setCustomerKey, selectIsUserLoggedIn } from './ReduxSlices/User/userSlice';
 import { fetchPatientsForFacility } from './ReduxSlices/Patients/patientsSlice';
 
@@ -123,7 +123,6 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
                 dispatch(fetchAllPatientTreatmentPlansForFacility()),
                 dispatch(fetchAndSetCustomerKey()),
                 dispatch(fetchPatientsForFacility()),
-                dispatch(fetchAlternativeProceduresForFacility())
             ]);
         }
     }

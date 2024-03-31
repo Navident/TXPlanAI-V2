@@ -6,8 +6,7 @@
         public string? Description { get; set; }
         public int VisitNumber { get; set; }  
 
-        public ICollection<int?> CdtCodeIds { get; set; }
-        public ICollection<VisitCdtCodeMapDto> VisitCdtCodeMaps { get; set; }
+        public ICollection<VisitToProcedureMapDto> VisitToProcedureMapDtos { get; set; }
 
     }
 }

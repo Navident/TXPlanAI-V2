@@ -4,6 +4,7 @@ using DentalTreatmentPlanner.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DentalTreatmentPlanner.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240324060756_updateRelationshipsWithAlternativeProc")]
+    partial class updateRelationshipsWithAlternativeProc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,38 @@ namespace DentalTreatmentPlanner.Server.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.AlternativeProcedure", b =>
+                {
+                    b.Property<int?>("AlternativeProcedureId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("AlternativeProcedureId"));
+
+                    b.Property<int?>("AlternativeProcedureCdtCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DefaultCdtCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AlternativeProcedureId");
+
+                    b.HasIndex("AlternativeProcedureCdtCodeId");
+
+                    b.HasIndex("DefaultCdtCodeId");
+
+                    b.ToTable("AlternativeProcedures");
+                });
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ApplicationUser", b =>
                 {
@@ -442,41 +477,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.ToTable("procedure_subcategory", (string)null);
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureToCdtMap", b =>
-                {
-                    b.Property<int>("ProcedureToCdtMapId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcedureToCdtMapId"));
-
-                    b.Property<int>("CdtCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Default")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VisitToProcedureMapId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProcedureToCdtMapId");
-
-                    b.HasIndex("CdtCodeId");
-
-                    b.HasIndex("VisitToProcedureMapId");
-
-                    b.ToTable("ProcedureToCdtMap");
-                });
-
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureType", b =>
                 {
                     b.Property<int?>("ProcedureTypeId")
@@ -637,6 +637,65 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.ToTable("visit", (string)null);
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitCdtCodeMap", b =>
+                {
+                    b.Property<int>("VisitCdtCodeMapId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("visit_cdt_code_map_id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VisitCdtCodeMapId"));
+
+                    b.Property<int?>("AlternativeProcedureId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Arch")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CdtCodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("cdt_code_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("modified_at");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int")
+                        .HasColumnName("order");
+
+                    b.Property<int?>("ProcedureTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("procedure_type_id");
+
+                    b.Property<string>("Surface")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ToothNumber")
+                        .HasColumnType("int")
+                        .HasColumnName("tooth_number");
+
+                    b.Property<int>("VisitId")
+                        .HasColumnType("int")
+                        .HasColumnName("visit_id");
+
+                    b.HasKey("VisitCdtCodeMapId");
+
+                    b.HasIndex("AlternativeProcedureId");
+
+                    b.HasIndex("CdtCodeId");
+
+                    b.HasIndex("ProcedureTypeId");
+
+                    b.HasIndex("VisitId");
+
+                    b.ToTable("visit_cdt_code_map", (string)null);
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitOrderRule", b =>
                 {
                     b.Property<int>("VisitOrderRuleId")
@@ -665,47 +724,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.HasKey("VisitOrderRuleId");
 
                     b.ToTable("visit_order_rule", (string)null);
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
-                {
-                    b.Property<int>("VisitToProcedureMapId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VisitToProcedureMapId"));
-
-                    b.Property<string>("Arch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProcedureTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Surface")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ToothNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VisitId")
-                        .HasColumnType("int");
-
-                    b.HasKey("VisitToProcedureMapId");
-
-                    b.HasIndex("ProcedureTypeId");
-
-                    b.HasIndex("VisitId");
-
-                    b.ToTable("VisitToProcedureMaps");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -879,6 +897,21 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.ToTable("UcrFee", (string)null);
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.AlternativeProcedure", b =>
+                {
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "AlternativeProcedureCdtCode")
+                        .WithMany()
+                        .HasForeignKey("AlternativeProcedureCdtCodeId");
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "DefaultCdtCode")
+                        .WithMany()
+                        .HasForeignKey("DefaultCdtCodeId");
+
+                    b.Navigation("AlternativeProcedureCdtCode");
+
+                    b.Navigation("DefaultCdtCode");
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ApplicationUser", b =>
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
@@ -975,25 +1008,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("ProcedureCategory");
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureToCdtMap", b =>
-                {
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "CdtCode")
-                        .WithMany()
-                        .HasForeignKey("CdtCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", "VisitToProcedureMap")
-                        .WithMany("ProcedureToCdtMaps")
-                        .HasForeignKey("VisitToProcedureMapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CdtCode");
-
-                    b.Navigation("VisitToProcedureMap");
-                });
-
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPlan", b =>
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
@@ -1032,17 +1046,31 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("TreatmentPlan");
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitCdtCodeMap", b =>
                 {
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureType", "ProcedureType")
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.AlternativeProcedure", "AlternativeProcedure")
                         .WithMany()
+                        .HasForeignKey("AlternativeProcedureId");
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "CdtCode")
+                        .WithMany("VisitCdtCodeMaps")
+                        .HasForeignKey("CdtCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureType", "ProcedureType")
+                        .WithMany("VisitCdtCodeMaps")
                         .HasForeignKey("ProcedureTypeId");
 
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Visit", "Visit")
-                        .WithMany("VisitToProcedureMaps")
+                        .WithMany("VisitCdtCodeMaps")
                         .HasForeignKey("VisitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AlternativeProcedure");
+
+                    b.Navigation("CdtCode");
 
                     b.Navigation("ProcedureType");
 
@@ -1119,6 +1147,11 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("PayerFacilityMap");
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.CdtCode", b =>
+                {
+                    b.Navigation("VisitCdtCodeMaps");
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.CdtCodeSubcategory", b =>
                 {
                     b.Navigation("CdtCodes");
@@ -1144,6 +1177,11 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("TreatmentPlans");
                 });
 
+            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureType", b =>
+                {
+                    b.Navigation("VisitCdtCodeMaps");
+                });
+
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Provider", b =>
                 {
                     b.Navigation("FacilityProviderMaps");
@@ -1156,12 +1194,7 @@ namespace DentalTreatmentPlanner.Server.Migrations
 
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Visit", b =>
                 {
-                    b.Navigation("VisitToProcedureMaps");
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
-                {
-                    b.Navigation("ProcedureToCdtMaps");
+                    b.Navigation("VisitCdtCodeMaps");
                 });
 #pragma warning restore 612, 618
         }

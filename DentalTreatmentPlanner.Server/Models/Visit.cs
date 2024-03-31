@@ -4,7 +4,7 @@
     {
         public Visit()
         {
-            VisitCdtCodeMaps = new List<VisitCdtCodeMap>();
+            VisitToProcedureMaps = new List<VisitToProcedureMap>();
         }
 
         public int VisitId { get; set; }
@@ -16,6 +16,6 @@
         public DateTime? ModifiedAt { get; set; }
 
         public TreatmentPlan TreatmentPlan { get; set; }
-        public ICollection<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
+        public ICollection<VisitToProcedureMap> VisitToProcedureMaps { get; set; }
     }
 }

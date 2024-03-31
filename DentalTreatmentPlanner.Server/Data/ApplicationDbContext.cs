@@ -15,7 +15,6 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<Facility> Facilities { get; set; }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<FacilityProviderMap> FacilityProviderMaps { get; set; }
-        public DbSet<VisitCdtCodeMap> VisitCdtCodeMaps { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<TreatmentPlan> TreatmentPlans { get; set; }
         public DbSet<Visit> Visits { get; set; }
@@ -29,7 +28,8 @@ namespace DentalTreatmentPlanner.Server.Data
         public DbSet<Payer> Payers { get; set; }
         public DbSet<PayerFacilityMap> PayerFacilityMaps { get; set; }
         public DbSet<UcrFee> UcrFees { get; set; }
-        public DbSet<AlternativeProcedure> AlternativeProcedures { get; set; }
+        public DbSet<VisitToProcedureMap> VisitToProcedureMaps { get; set; }
+        public DbSet<ProcedureToCdtMap> ProcedureToCdtMaps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +47,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.CoveragePercent)
                       .HasColumnType("decimal(18, 2)"); 
             });
+
 
             // Map Facility entity
             modelBuilder.Entity<Facility>(entity =>
@@ -71,19 +72,7 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
             });
-            // Map VisitCdtCodeMap entity
-            modelBuilder.Entity<VisitCdtCodeMap>(entity =>
-            {
-                entity.ToTable("visit_cdt_code_map");
-                entity.Property(e => e.VisitCdtCodeMapId).HasColumnName("visit_cdt_code_map_id");
-                entity.Property(e => e.VisitId).HasColumnName("visit_id");
-                entity.Property(e => e.CdtCodeId).HasColumnName("cdt_code_id");
-                entity.Property(e => e.Order).HasColumnName("order");
-                entity.Property(e => e.ProcedureTypeId).HasColumnName("procedure_type_id");
-                entity.Property(e => e.ToothNumber).HasColumnName("tooth_number"); 
-                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
-            });
+
             // Map Provider entity
             modelBuilder.Entity<Provider>(entity =>
             {
@@ -131,7 +120,8 @@ namespace DentalTreatmentPlanner.Server.Data
                 entity.Property(e => e.LongDescription).HasColumnName("long_description");
                 entity.Property(e => e.ShortDescription).HasColumnName("short_description").IsRequired(false); ;
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at").IsRequired(false); ;
+                entity.Property(e => e.ModifiedAt).HasColumnName("modified_at").IsRequired(false);
+
             });
             // Map CdtCodeCategory entity
             modelBuilder.Entity<CdtCodeCategory>(entity =>

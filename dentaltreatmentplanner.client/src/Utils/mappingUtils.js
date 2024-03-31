@@ -1,55 +1,57 @@
-export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, deletedRowIds, deletedVisitIds, editedRows, alternativeProcedures) => {
+export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeRows, visitOrder, deletedRowIds, deletedVisitIds, editedRows) => {
     const updateVisits = [];
-    const updatedProcedures = [];
 
-    const alternativeProcedureDtos = mapToAlternativeProcedureDto(alternativeProcedures);
-
-    // Iterate over the visit order to maintain the correct order
     visitOrder.forEach((visitId, index) => {
         const visitIdStr = visitId.toString();
-        const rows = allRows[visitIdStr] || [];
+        // Retrieve default and alternative rows for the current visit
+        const defaultRows = allRows[visitIdStr] || [];
+        const nonDefaultRows = alternativeRows[visitIdStr] || [];
+
+        // Create a set of identifiers (e.g., id) from nonDefaultRows to quickly check for existence
+        const nonDefaultRowIds = new Set(nonDefaultRows.map(row => row.id));
+
+        // Filter out any default rows that have a corresponding entry in nonDefaultRows
+        const filteredDefaultRows = defaultRows.filter(row => !nonDefaultRowIds.has(row.id));
+
+        // Combine the remaining default rows with the alternative rows
+        const combinedRows = [...filteredDefaultRows, ...nonDefaultRows];
+
         const visit = treatmentPlan.visits.find(v => v.visitId === visitId);
 
-        const cdtCodeDtos = rows
-            .filter(row => row.selectedCdtCode && !deletedRowIds.includes(row.id)) // Exclude deleted rows
+        const visitToProcedureMapDtos = combinedRows
+            .filter(row => row.isStatic && !deletedRowIds.includes(row.id)) // Exclude deleted rows, focus on static rows for mapping
             .map((row, idx) => {
-                const cdtCode = row.selectedCdtCode;
-
+                const { selectedCdtCode, visitToProcedureMapId, procedureTypeId, toothNumber, surface, arch } = row;
                 return {
-                    VisitCdtCodeMapId: row.visitCdtCodeMapId,
-                    VisitId: visitId,
-                    CdtCodeId: cdtCode.cdtCodeId,
-                    ToothNumber: cdtCode.toothNumber,
+                    VisitToProcedureMapId: visitToProcedureMapId,
+                    ProcedureTypeId: procedureTypeId,
                     Order: idx,
-                    Code: cdtCode.code,
-                    LongDescription: cdtCode.longDescription,
+                    ToothNumber: toothNumber,
+                    Surface: surface,
+                    Arch: arch,
+                    ProcedureToCdtMaps: [
+                        {
+                            ProcedureToCdtMapId: selectedCdtCode.procedureToCdtMapId,
+                            CdtCodeId: selectedCdtCode.cdtCodeId,
+                            Default: row.default !== undefined ? row.default : null,
+                            UserDescription: selectedCdtCode.userDescription,
+                            Code: selectedCdtCode.code,
+                            LongDescription: selectedCdtCode.longDescription,
+                        }
+                    ]
                 };
             });
-        console.log(`Processing visitId: ${visitId}, cdtCodeDtos:`, cdtCodeDtos);
 
-        const cdtCodeIds = cdtCodeDtos.map(dto => dto.CdtCodeId);
+        console.log(`Processing visitId: ${visitId}, Procedures:`, visitToProcedureMapDtos);
 
         const updateVisitDto = {
             VisitId: visitId,
             Description: visit ? visit.description : '',
-            VisitCdtCodeMaps: cdtCodeDtos,
-            VisitNumber: index, // Set based on the position in visitOrder
-            CdtCodeIds: cdtCodeIds
+            VisitNumber: index,
+            VisitToProcedureMapDtos: visitToProcedureMapDtos
         };
 
         updateVisits.push(updateVisitDto);
-    });
-
-    // Process edited rows to updated procedures
-    editedRows.forEach(row => {
-        const { visitId, visitCdtCodeMapId, selectedCdtCode } = row;
-        if (visitCdtCodeMapId) {
-            updatedProcedures.push({
-                VisitCdtCodeMapId: visitCdtCodeMapId,
-                VisitId: visitId,
-                CdtCodeId: selectedCdtCode.cdtCodeId || null,
-            });
-        }
     });
 
     const updateTreatmentPlanDto = {
@@ -57,23 +59,18 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, visitOrder, 
         Description: treatmentPlan.description,
         ProcedureSubcategoryId: treatmentPlan.procedureSubcategoryId,
         ToothNumber: treatmentPlan.toothNumber,
+        PatientId: treatmentPlan.patientId,
+        PayerId: treatmentPlan.payerId,
         Visits: updateVisits,
         DeletedVisitIds: deletedVisitIds,
-        UpdatedProcedures: updatedProcedures,
-        AlternativeProcedures: alternativeProcedureDtos,
     };
+
     console.log('Mapped DTO:', updateTreatmentPlanDto);
     return updateTreatmentPlanDto;
 };
 
-const mapToAlternativeProcedureDto = (alternativeProcedures) => {
-    return alternativeProcedures.map(ap => ({
-        AlternativeProcedureId: ap.alternativeProcedureId || null,
-        VisitCdtCodeMapId: ap.visitCdtCodeMapId,
-        CdtCodeId: ap.cdtCodeId,
-        UserDescription: ap.userDescription,
-    }));
-};
+
+
 
 
 export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows, visitOrder) => {
@@ -82,10 +79,17 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
         const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
 
         return {
-            visitId: String(visitId).startsWith('temp-') ? null : visitId,
-            VisitCdtCodeMaps: validRows.map(row => ({
-                CdtCodeId: row.selectedCdtCode.cdtCodeId,
-                Description: row.description || null,
+            Description: treatmentPlan.description || null, 
+            VisitToProcedureMaps: validRows.map(row => ({
+                Order: row.order, 
+                ToothNumber: row.toothNumber,
+                Surface: row.surface || null,
+                Arch: row.arch || null,
+                ProcedureToCdtMaps: [{
+                    CdtCodeId: row.selectedCdtCode.cdtCodeId,
+                    Default: false, 
+                    UserDescription: row.description || null,
+                }],
             })),
         };
     });
@@ -93,7 +97,6 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
     const newTreatmentPlanDto = {
         Description: treatmentPlan.description || null,
         ProcedureSubcategoryId: treatmentPlan.procedureSubcategoryId,
-        ToothNumber: treatmentPlan.toothNumber,
         Visits: newPlanVisits,
     };
 
@@ -101,24 +104,30 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
     return newTreatmentPlanDto;
 };
 
+
+
 export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, allRows, visitOrder, payerId) => {
     const newPlanVisits = visitOrder.map(visitId => {
         const visit = treatmentPlan.visits.find(v => v.visitId === visitId);
         const visitRows = allRows[visitId];
-        const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
+        // Simplify the filtering condition
+        const validRows = visitRows.filter(row => {
+            // Only include rows where selectedCdtCode is not null
+            return row.selectedCdtCode !== null;
+        });
 
         const visitCdtCodeMaps = validRows.map(row => {
             // Check if toothNumber is an empty string, if so, set to null
             const toothNumber = row.selectedCdtCode.toothNumber === '' ? null : row.selectedCdtCode.toothNumber;
-
             const surface = row.selectedCdtCode.surface ? row.selectedCdtCode.surface : null;
             const arch = row.selectedCdtCode.arch ? row.selectedCdtCode.arch : null;
 
             return {
+                VisitCdtCodeMapId: row.visitCdtCodeMapId,
                 CdtCodeId: row.selectedCdtCode.cdtCodeId,
                 Code: row.selectedCdtCode.code,
                 LongDescription: row.selectedCdtCode.longDescription,
-                ToothNumber: toothNumber, 
+                ToothNumber: toothNumber,
                 Surface: surface,
                 Arch: arch,
             };
@@ -147,6 +156,7 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
     console.log('Mapped DTO for new treatment plan:', newTreatmentPlanDto);
     return newTreatmentPlanDto;
 };
+
 
 
 

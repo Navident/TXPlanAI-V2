@@ -16,10 +16,19 @@ const CustomCheckbox = ({ label, checked, onChange, color }) => {
                             '&.Mui-checked': {
                                 color: color, 
                             },
+                            padding: 0,
+                            '& .MuiIconButton-root': {
+                                padding: '0', 
+                            }
                         }}
                     />
                 }
                 label={label}
+                sx={{
+                    marginLeft: 0, 
+                    marginRight: 0, 
+
+                }}
             />
         </FormGroup>
     );

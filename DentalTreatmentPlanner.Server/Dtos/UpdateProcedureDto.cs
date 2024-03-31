@@ -2,8 +2,8 @@
 {
     public class UpdateProcedureDto
     {
-        public int VisitCdtCodeMapId { get; set; }
+        public int VisitToProcedureMapId { get; set; } 
         public int? VisitId { get; set; }
-        public int? CdtCodeId { get; set; }
+        public List<ProcedureToCdtMapDto>? Procedures { get; set; }
     }
 }

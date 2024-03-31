@@ -93,6 +93,7 @@ const TreatmentPlanOutput = ({
 	const payers = useSelector(selectPayersForFacility);
 	const selectedPayer = useSelector(selectSelectedPayer);
 	const selectedPatient = useSelector(selectSelectedPatient);
+	const [activeParentRow, setActiveParentRow] = useState(null);
 
 	useEffect(() => {
 		const newCheckedRows = [];
@@ -128,49 +129,43 @@ const TreatmentPlanOutput = ({
 		console.log("allRows:", allRows);
 	}, [allRows]);
 
+	useEffect(() => {
+		console.log("activeParentRow:", activeParentRow);
+	}, [allRows]);
 
 	useEffect(() => {
 		setCombinedVisits(treatmentPlan.visits);
 	}, [treatmentPlan, isInGenerateTreatmentPlanContext]);
-	const alternativeProcedures = useSelector(selectAlternativeProcedures);
 
-	useEffect(() => {
-		console.log("alternativeProcedures: ", alternativeProcedures);
-	}, [alternativeProcedures]);
+
 
 	useEffect(() => {
 		if (isInitialLoad.current) {
 			console.log("we went in the initial load conditional");
 			const visits = treatmentPlan.visits || [];
-			const newAllRows = visits.reduce((acc, visit, index) => {
-				const visitId = visit.visitId;
-				const cdtCodes = Array.isArray(visit.cdtCodes) ? [...visit.cdtCodes].sort((a, b) => a.order - b.order) : [];
+			const newAllRows = visits.reduce((acc, visit) => {
+				const visitId = visit.visitId.toString();
+				const cdtCodes = [...visit.cdtCodes].sort((a, b) => a.order - b.order);
+
 				const staticRows = cdtCodes.map((visitCdtCodeMap, cdtIndex) => {
-					// Create your static row data here
-					let rowData = createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex);
-
-					// Find and add the matching alternative procedures to the row data
-					const matchingAlternativeProcedures = alternativeProcedures.filter(ap =>
-						ap.visitCdtCodeMapId === visitCdtCodeMap.visitCdtCodeMapId
-					);
-					rowData.matchingAlternativeProcedures = matchingAlternativeProcedures;
-
-					return rowData;
+					return createInitialStaticRows(visitCdtCodeMap, visitId, cdtIndex);
 				});
 
-				const initialRowId = `initial-${visitId}`;
 				acc[visitId] = [
 					...staticRows,
-					createDynamicRowv1(visitId, initialRowId),
+					createDynamicRowv1(visitId, `initial-${visitId}`),
 				];
 				return acc;
 			}, {});
 
 			setAllRows(newAllRows);
-			dispatch(setVisitOrder(visits.map((visit) => visit.visitId)));
+			dispatch(setVisitOrder(visits.map((visit) => visit.visitId.toString())));
 			isInitialLoad.current = false;
 		}
-	}, [treatmentPlan, facilityCdtCodes, defaultCdtCodes, alternativeProcedures]);
+	}, [treatmentPlan]);
+
+
+
 
 
 
@@ -246,18 +241,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
     }
 };
 
-
 	const createInitialStaticRows = (visitCdtCodeMap, visitId, index) => {
 		let selectedPayerDetails;
-		// Check if we're not in the create treatment plan context and a payerId exists on the treatment plan
-		if (!isInGenerateTreatmentPlanContext && treatmentPlan.payerId) {
-			const savedTxPayerId = treatmentPlan.payerId;
-			selectedPayerDetails = payers.find(payer => payer.payerId === savedTxPayerId);
-		}
-		// Check if we are in the create treatment plan context and a selectedPayer exists
-		else if (isInGenerateTreatmentPlanContext && selectedPayer && selectedPayer.payerId) {
-			selectedPayerDetails = payers.find(payer => payer.payerId === selectedPayer.payerId);
-		}
+		// Existing logic for selecting payer details remains unchanged...
 
 		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === visitCdtCodeMap.code);
 
@@ -268,7 +254,37 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		const surface = visitCdtCodeMap.surface || "";
 		const arch = visitCdtCodeMap.arch || "";
 
-		const extraRowInput = [
+		// Determining if there's a chosen alternative and setting the extraRowInput accordingly
+		const hasChosenAlternative = visitCdtCodeMap.chosenDefToAltProcMapDto !== null;
+
+		// Modify the list of alternative procedures if a chosen alternative exists
+		let modifiedDefToAltProcMapDtos = [...(visitCdtCodeMap.defToAltProcMapDtos || [])];
+		if (hasChosenAlternative) {
+			// Check if the original default procedure is already in the alternatives list
+			const originalExists = modifiedDefToAltProcMapDtos.some(dto => dto.defToAltProcMapId === visitCdtCodeMap.visitCdtCodeMapId);
+
+			if (!originalExists) {
+				// Add the original default procedure as an alternative
+				modifiedDefToAltProcMapDtos.push({
+					defToAltProcMapId: visitCdtCodeMap.visitCdtCodeMapId, // Or some unique identifier
+					alternativeProcedureCode: visitCdtCodeMap.code,
+					userDescription: visitCdtCodeMap.longDescription,
+					// Add other necessary properties of the original procedure here
+				});
+			}
+		}
+
+		// Use chosen alternative details if available, otherwise use default values
+		const extraRowInput = hasChosenAlternative ? [
+			visitCdtCodeMap.toothNumber, // Assuming the tooth number remains the same even for alternatives
+			visitCdtCodeMap.chosenDefToAltProcMapDto.alternativeProcedureCode, // Alternative procedure code
+			visitCdtCodeMap.chosenDefToAltProcMapDto.userDescription, // User description from the chosen alternative
+			ucrFee, 
+			coveragePercent, 
+			coPay, 
+			surface, 
+			arch 
+		] : [
 			visitCdtCodeMap.toothNumber,
 			visitCdtCodeMap.code,
 			visitCdtCodeMap.longDescription,
@@ -282,10 +298,13 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		return {
 			id: `static-${visitId}-${index}`,
 			visitCdtCodeMapId: visitCdtCodeMap.visitCdtCodeMapId,
-			description: visitCdtCodeMap.longDescription,
-			selectedCdtCode: visitCdtCodeMap,
+			description: hasChosenAlternative ? visitCdtCodeMap.chosenDefToAltProcMapDto.userDescription : visitCdtCodeMap.longDescription,
+			selectedCdtCode: hasChosenAlternative ? visitCdtCodeMap.chosenDefToAltProcMapDto : visitCdtCodeMap,
 			isStatic: true,
 			extraRowInput,
+			defToAltProcMapDtos: modifiedDefToAltProcMapDtos,
+			chosenDefToAltProcMapDto: visitCdtCodeMap.chosenDefToAltProcMapDto,
+			chosenDefToAltProcMapId: visitCdtCodeMap.chosenDefToAltProcMapId
 		};
 	};
 
@@ -554,7 +573,6 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		}
 
 		if (result.type === "row") {
-			// Deconstructing for easier access
 			const sourceId = source.droppableId.replace("droppable-table-", "");
 			const destinationId = destination.droppableId.replace("droppable-table-", "");
 
@@ -1035,8 +1053,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	function createDeleteIconCell(row, index, visitId) {
 		console.log("Creating delete icon cell for row:", row.id);
+		const isAltRow = row.id.startsWith('dynamic-alt-code') || row.id.startsWith('static-alt-code');
 		const isNotLastRow = index !== allRows.length - 1;
-		if (row.isStatic && isNotLastRow) {
+		if (row.isStatic && isNotLastRow && !isAltRow) {
 			return (
 				<StyledEditDeleteIconsContainer>
 					<StyledEditIcon
@@ -1103,10 +1122,14 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			backgroundColor = null; 
 		}
 
+		const rowDefToAltProcMapDtos = row.defToAltProcMapDtos ?? [];
+		console.log("rowDefToAltProcMapDtos", rowDefToAltProcMapDtos);
 		return {
 			id: row.id,
 			data: rowData,
 			backgroundColor,
+			defToAltProcMapDtos: rowDefToAltProcMapDtos,
+			parentId: row.parentId,
 		};
 	};
 
@@ -1139,6 +1162,105 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 		} else {
 			console.error("Row not found with rowId:", rowId, "in visitId:", visitId);
 		}
+	};
+
+	const createChosenDefToAltProcMapDto = (chosenDefToAltProcMapId, visitCdtCodeMapId, userDescription, defaultProcedureCdtCodeId, alternativeProcedureCdtCodeId, alternativeProcedureCode) => {
+		return {
+			ChosenDefToAltProcMapId: chosenDefToAltProcMapId,
+			VisitCdtCodeMapId: visitCdtCodeMapId,
+			//UserDescription: userDescription,
+			//DefaultProcedureCdtCodeId: defaultProcedureCdtCodeId,
+			//AlternativeProcedureCdtCodeId: alternativeProcedureCdtCodeId,
+			//AlternativeProcedureCode: alternativeProcedureCode,
+			
+		};
+	};
+
+
+	const handleSwapAltRow = (originalProcedureId, alternativeProcedureId) => {
+		setAllRows((previousRows) => {
+			const updatedRows = { ...previousRows };
+
+			Object.entries(updatedRows).forEach(([visitId, procedures]) => {
+				const originalIndex = procedures.findIndex(procedure => procedure.id === originalProcedureId);
+				const alternativeIndex = procedures.findIndex(procedure => procedure.id === alternativeProcedureId);
+				
+				if (originalIndex === -1 || alternativeIndex === -1) return;
+
+				// Creating copies to swap roles of original and alternative procedures
+				let becomingParentProcedure = { ...procedures[alternativeIndex] };
+				let becomingChildProcedure = { ...procedures[originalIndex] };
+
+				// Swapping identifiers to reflect their new roles
+				[becomingParentProcedure.id, becomingChildProcedure.id] = [becomingChildProcedure.id, becomingParentProcedure.id];
+				// Updating parent-child relationship
+				becomingParentProcedure.parentId = null; // The new parent is now top-level
+				becomingChildProcedure.parentId = becomingParentProcedure.id; // The old parent becomes a child
+
+				// Swap properties related to the procedure details
+				if (becomingParentProcedure.extraRowInput && becomingChildProcedure.extraRowInput) {
+					[0, 3, 4, 5, 6, 7].forEach(index => {
+						[becomingParentProcedure.extraRowInput[index], becomingChildProcedure.extraRowInput[index]] =
+							[becomingChildProcedure.extraRowInput[index], becomingParentProcedure.extraRowInput[index]];
+					});
+				}
+
+				[becomingParentProcedure.toothNumber, becomingChildProcedure.toothNumber] =
+					[becomingChildProcedure.toothNumber, becomingParentProcedure.toothNumber];
+
+				// Check if the swap is a reversion to the original procedure by comparing the DefToAltProcMapId.
+				// This is true if the parent procedure's alternative matches the child's chosen alternative.
+				const isRevertingToOriginal = becomingParentProcedure.defToAltProcMapDtos?.some(dto =>
+					dto.defToAltProcMapId === becomingChildProcedure.chosenDefToAltProcMapDto?.ChosenDefToAltProcMapId);
+
+				if (isRevertingToOriginal) {
+					// When reverting to the original, transfer the chosen alternative info from child to parent.
+					// This indicates the parent is reverting back to its status before the alternative was chosen.
+					becomingParentProcedure.chosenDefToAltProcMapDto = becomingChildProcedure.chosenDefToAltProcMapDto;
+					// Clear the child's chosen alternative as the parent reverts to its original procedure.
+					becomingChildProcedure.chosenDefToAltProcMapDto = null;
+				} else {
+					// If not reverting, find the first valid alternative to set as the new chosen alternative.
+					// This scenario applies when swapping a different alternative into the parent position.
+					//const newSelectedAlternativeDto = becomingChildProcedure.defToAltProcMapDtos?.find(dto => dto.defToAltProcMapId);
+					const newSelectedAlternativeDto = becomingChildProcedure.defToAltProcMapDtos?.find(dto => dto.defToAltProcMapId === becomingParentProcedure.alternativeProcedureId);
+					console.log("newSelectedAlternativeDto", newSelectedAlternativeDto);
+					if (newSelectedAlternativeDto) {
+						becomingChildProcedure.chosenDefToAltProcMapId = newSelectedAlternativeDto.defToAltProcMapId;
+						// Create and assign a new ChosenDefToAltProcMapDto with the selected alternative's details.
+						// This marks the alternative as the new chosen procedure, replacing the original.
+						becomingParentProcedure.chosenDefToAltProcMapDto = createChosenDefToAltProcMapDto(
+							newSelectedAlternativeDto.defToAltProcMapId,
+							newSelectedAlternativeDto.visitCdtCodeMapId
+							//newSelectedAlternativeDto.userDescription,
+							//null, // Null indicates no default procedure CdtCodeId in this context.
+							//newSelectedAlternativeDto.alternativeProcedureCdtCodeId,
+							//newSelectedAlternativeDto.alternativeProcedureCode,
+							
+						);
+					}
+				}
+
+				// Update the array with the new positions
+				procedures[originalIndex] = becomingParentProcedure;
+				procedures[alternativeIndex] = becomingChildProcedure;
+
+				// Update the activeParentRow if needed
+				if (activeParentRow === originalProcedureId) {
+					setActiveParentRow(becomingParentProcedure.id);
+				}
+				
+
+				// Maintain correct parent-child hierarchy among all procedures
+				procedures.forEach(procedure => {
+					if (procedure.parentId === originalProcedureId) {
+						procedure.parentId = becomingParentProcedure.id;
+					}
+				});
+			});
+
+			return updatedRows;
+		});
 	};
 
 
@@ -1201,7 +1323,88 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 	};
 
 
+	const collapseRows = (rows, rowIndex) => {
+		// Remove all related alternative procedure rows
+		const rowsToRemove = rows.slice(rowIndex + 1).findIndex(row =>
+			!row.id.startsWith("dynamic-alt-code") && !row.id.startsWith("static-alt-code")
+		);
+		const removeCount = rowsToRemove === -1 ? rows.length - rowIndex - 1 : rowsToRemove;
+		rows.splice(rowIndex + 1, removeCount);
+	};
 
+
+	const expandRows = (rows, rowIndex, visitId, currentRow) => {
+		let combinedAltRows = [];
+
+		// Assuming currentRow.selectedCdtCode represents the chosen alternative or the original procedure
+		const currentCode = currentRow.selectedCdtCode.code || currentRow.selectedCdtCode.alternativeProcedureCode;
+
+		// Filter alternatives, excluding the one that matches the current default procedure's code
+		const relevantAltProcs = currentRow.defToAltProcMapDtos.filter(altProcDto =>
+			altProcDto.alternativeProcedureCode !== currentCode);
+
+		relevantAltProcs.forEach((altProcDto, index) => {
+			const altRowId = `alt-${rowIndex}-${index}`; // Unique ID for each alt row
+			combinedAltRows.push(createStaticRowForAltCode(altProcDto, visitId, altRowId, currentRow.id));
+		});
+
+		// Insert new static rows for each filtered alternative procedure
+		combinedAltRows.forEach((altRow, index) => {
+			rows.splice(rowIndex + 1 + index, 0, altRow); // Insert right after the current row
+		});
+	};
+
+
+
+
+
+	const createStaticRowForAltCode = (defToAltProcMapDto, visitId, baseRowId, parentId) => {
+		const description = defToAltProcMapDto.userDescription || 'Description not provided';
+		const cdtCode = defToAltProcMapDto.alternativeProcedureCode;
+
+		return {
+			id: `static-alt-code-${visitId}-${baseRowId}`,
+			alternativeProcedureId: defToAltProcMapDto.defToAltProcMapId,
+			visitCdtCodeMapId: defToAltProcMapDto.visitCdtCodeMapId,
+			description: description,
+			selectedCdtCode: { code: cdtCode },
+			isStatic: true,
+			extraRowInput: ["", cdtCode, description, "", "", "", "", ""],
+			parentId
+		};
+	};
+
+
+	const handleRedDropdownIconClick = (rowId) => {
+		setAllRows((prevAllRows) => {
+			const updatedAllRows = { ...prevAllRows };
+			Object.entries(updatedAllRows).forEach(([visitId, rows]) => {
+				const rowIndex = rows.findIndex(row => row.id === rowId);
+				if (rowIndex === -1) return; // Skip if the row doesn't exist in this visit.
+
+				const currentRow = rows[rowIndex];
+
+				// Check if the row is currently expanded
+				const isExpanded = activeParentRow === rowId;
+
+				if (isExpanded) {
+					collapseRows(rows, rowIndex);
+					setActiveParentRow(null); // Reset active parent row since we are collapsing
+				} else {
+					// If another row was previously expanded, first collapse it
+					if (activeParentRow) {
+						const prevRowIndex = rows.findIndex(row => row.id === activeParentRow);
+						if (prevRowIndex !== -1) {
+							collapseRows(rows, prevRowIndex);
+						}
+					}
+					expandRows(rows, rowIndex, visitId, currentRow);
+					setActiveParentRow(rowId); // Set new active parent row
+				}
+			});
+			return updatedAllRows;
+		});
+	};
 
 	const renderVisit = (visitId, index) => {
 		console.log("Visit order when we get in renderVisit", visitOrder);
@@ -1279,7 +1482,9 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 							deleteImageIconSrcHeader={deleteIcon}
 							dragImageIconSrc={dragIcon}
 							onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
-							columnWidths={columnWidths}
+							onRedDropdownIconClick={handleRedDropdownIconClick}
+							activeParentRow={activeParentRow}
+							onSwapAltRow={handleSwapAltRow}
 						/>
 						<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />
 					</div>

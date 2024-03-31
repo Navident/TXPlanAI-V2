@@ -6,11 +6,11 @@
         public string? Description { get; set; }
         public int VisitNumber { get; set; }
         public string TempVisitId { get; set; }
-        public ICollection<VisitCdtCodeMapDto> VisitCdtCodeMaps { get; set; } 
+        public ICollection<VisitToProcedureMapDto> Procedures { get; set; }
 
         public CreateVisitDto()
         {
-            VisitCdtCodeMaps = new List<VisitCdtCodeMapDto>(); 
+            Procedures = new List<VisitToProcedureMapDto>();
         }
     }
 

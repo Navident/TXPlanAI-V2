@@ -26,7 +26,7 @@ import {
 	onDeleteVisit,
 	selectAllTreatmentPlans
 } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
 
@@ -74,6 +74,7 @@ const GenerateTreatmentPlan = () => {
 
 		return Array.from(uniqueCategories);
 	}
+
 
 	// Utility function to preprocess input text and maintain order
 	async function preprocessInputText(inputText) {

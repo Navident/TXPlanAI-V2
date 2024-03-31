@@ -24,6 +24,7 @@ import {
 	selectAllTreatmentPlans
 } from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 
+
 const ProceduresCustomizer = () => {
 	const dispatch = useDispatch();
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
@@ -32,11 +33,22 @@ const ProceduresCustomizer = () => {
 	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
 	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
 
+	const currentSubcategoryPlan = subcategoryTreatmentPlans.find(plan => plan && plan.procedureSubcategoryId === paramsSubcategoryId);
+	// Check if the names are defined, otherwise use fallbacks from the first treatment plan, if available.
+	const activeCategoryName = currentSubcategoryPlan?.procedureCategoryName ??
+		treatmentPlans[0]?.procedureCategoryName ??
+		'N/A';
+
+	const activeSubcategoryName = currentSubcategoryPlan?.procedureSubCategoryName ??
+		treatmentPlans[0]?.procedureSubCategoryName ??
+		'N/A';
+
 	useEffect(() => {
-		// Filter out any null values 
-		const filteredPlans = subcategoryTreatmentPlans.filter(plan => plan && plan.procedureSubcategoryId === paramsSubcategoryId);
-		dispatch(setTreatmentPlans(filteredPlans));
-	}, [paramsSubcategoryId, subcategoryTreatmentPlans]); 
+		if (currentSubcategoryPlan) {
+			// Assuming you only want to dispatch the plans that match the current subcategory.
+			dispatch(setTreatmentPlans([currentSubcategoryPlan]));
+		}
+	}, [paramsSubcategoryId]);
 
 	useEffect(() => {
 		console.log("treatmentPlans updated:", treatmentPlans);
@@ -70,9 +82,8 @@ const ProceduresCustomizer = () => {
 			<GoBack text="Go Back" />
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
-					<StyledTableLabelText>Procedure Category: {treatmentPlans.length > 0 ? treatmentPlans[0].procedureCategoryName : 'N/A'}</StyledTableLabelText>
-					
-					<StyledTableLabelText>Procedure Sub-Category: {treatmentPlans.length > 0 ? treatmentPlans[0].procedureSubCategoryName : 'N/A'}</StyledTableLabelText>
+					<StyledTableLabelText>Procedure Category: {activeCategoryName}</StyledTableLabelText>
+					<StyledTableLabelText>Procedure Sub-Category: {activeSubcategoryName}</StyledTableLabelText>
 
 					<div>
 						{treatmentPlans.length > 0 &&

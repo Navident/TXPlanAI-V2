@@ -4,6 +4,7 @@ using DentalTreatmentPlanner.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DentalTreatmentPlanner.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240328212351_deletevisitcdtcodemaptableanddeftoaltprocmap")]
+    partial class deletevisitcdtcodemaptableanddeftoaltprocmap
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -442,41 +445,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.ToTable("procedure_subcategory", (string)null);
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureToCdtMap", b =>
-                {
-                    b.Property<int>("ProcedureToCdtMapId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProcedureToCdtMapId"));
-
-                    b.Property<int>("CdtCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Default")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("VisitToProcedureMapId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProcedureToCdtMapId");
-
-                    b.HasIndex("CdtCodeId");
-
-                    b.HasIndex("VisitToProcedureMapId");
-
-                    b.ToTable("ProcedureToCdtMap");
-                });
-
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureType", b =>
                 {
                     b.Property<int?>("ProcedureTypeId")
@@ -665,47 +633,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.HasKey("VisitOrderRuleId");
 
                     b.ToTable("visit_order_rule", (string)null);
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
-                {
-                    b.Property<int>("VisitToProcedureMapId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VisitToProcedureMapId"));
-
-                    b.Property<string>("Arch")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ProcedureTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Surface")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ToothNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VisitId")
-                        .HasColumnType("int");
-
-                    b.HasKey("VisitToProcedureMapId");
-
-                    b.HasIndex("ProcedureTypeId");
-
-                    b.HasIndex("VisitId");
-
-                    b.ToTable("VisitToProcedureMaps");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -975,25 +902,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                     b.Navigation("ProcedureCategory");
                 });
 
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.ProcedureToCdtMap", b =>
-                {
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.CdtCode", "CdtCode")
-                        .WithMany()
-                        .HasForeignKey("CdtCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", "VisitToProcedureMap")
-                        .WithMany("ProcedureToCdtMaps")
-                        .HasForeignKey("VisitToProcedureMapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CdtCode");
-
-                    b.Navigation("VisitToProcedureMap");
-                });
-
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPlan", b =>
                 {
                     b.HasOne("DentalTreatmentPlanner.Server.Models.Facility", "Facility")
@@ -1030,23 +938,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("TreatmentPlan");
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
-                {
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.ProcedureType", "ProcedureType")
-                        .WithMany()
-                        .HasForeignKey("ProcedureTypeId");
-
-                    b.HasOne("DentalTreatmentPlanner.Server.Models.Visit", "Visit")
-                        .WithMany("VisitToProcedureMaps")
-                        .HasForeignKey("VisitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProcedureType");
-
-                    b.Navigation("Visit");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1152,16 +1043,6 @@ namespace DentalTreatmentPlanner.Server.Migrations
             modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.TreatmentPlan", b =>
                 {
                     b.Navigation("Visits");
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.Visit", b =>
-                {
-                    b.Navigation("VisitToProcedureMaps");
-                });
-
-            modelBuilder.Entity("DentalTreatmentPlanner.Server.Models.VisitToProcedureMap", b =>
-                {
-                    b.Navigation("ProcedureToCdtMaps");
                 });
 #pragma warning restore 612, 618
         }
