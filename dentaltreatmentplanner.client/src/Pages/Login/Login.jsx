@@ -18,7 +18,7 @@ import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { Backdrop, CircularProgress } from '@mui/material';
 
 import { useDispatch } from 'react-redux';
-import { setIsUserLoggedIn, setIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
+import { setIsUserLoggedIn, setIsSuperAdmin, setFacilityName, setFacilityId } from '../../Redux/ReduxSlices/User/userSlice';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -26,7 +26,6 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
-    const { setBusinessName } = useBusiness(); 
     const [loading, setLoading] = useState(false); 
 
 
@@ -51,10 +50,12 @@ const Login = () => {
             console.log("isSuperAdmin", isSuperAdmin);
             dispatch(setIsSuperAdmin(isSuperAdmin));
             const facilityName = response.user?.facility?.name;
+            const facilityId = response.user?.facility?.facilityId;
+            dispatch(setFacilityName(facilityName));
+            dispatch(setFacilityId(facilityId));
             localStorage.setItem('businessName', facilityName);
             localStorage.setItem('isLoggedIn', 'true');
             dispatch(setIsUserLoggedIn(true));
-            setBusinessName(facilityName); 
             navigate("/dashboard");
         } else {
             // Handle failed login

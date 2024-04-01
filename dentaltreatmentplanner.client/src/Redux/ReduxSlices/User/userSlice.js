@@ -9,16 +9,19 @@ export const initializeUser = createAsyncThunk('user/initializeUser', async () =
 const userSlice = createSlice({
     name: 'user',
     initialState: {
-        businessName: '',
+        facilityName: '',
+        facilityId: '',
         isUserLoggedIn: false,
         isSuperAdmin: false,
 
         customerKey: '',
     },
     reducers: {
-        setBusinessName: (state, action) => {
-            state.businessName = action.payload;
-            localStorage.setItem('businessName', action.payload); 
+        setFacilityName: (state, action) => {
+            state.facilityName = action.payload;
+        },
+        setFacilityId: (state, action) => {
+            state.facilityId = action.payload;
         },
         setIsUserLoggedIn: (state, action) => {
             state.isUserLoggedIn = action.payload;
@@ -48,8 +51,10 @@ const userSlice = createSlice({
     },
 });
 
-export const { setBusinessName, setIsUserLoggedIn, resetUserState, setCustomerKey, setIsSuperAdmin } = userSlice.actions;
+export const { setFacilityName, setFacilityId, setIsUserLoggedIn, resetUserState, setCustomerKey, setIsSuperAdmin } = userSlice.actions;
 
+export const selectFacilityName = (state) => state.user.facilityName;
+export const selectFacilityId = (state) => state.user.facilityId;
 export const selectCustomerKey = (state) => state.user.customerKey;
 export const selectIsUserLoggedIn = (state) => state.user.isUserLoggedIn;
 export const selectIsSuperAdmin = (state) => state.user.isSuperAdmin;

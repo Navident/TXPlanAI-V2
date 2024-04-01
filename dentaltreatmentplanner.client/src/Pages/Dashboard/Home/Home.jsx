@@ -10,11 +10,13 @@ import RecentTxPlans from '../../../Components/RecentTxPlans';
 import { StyledLargeText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
 import { StyledHomeBoxBottomContainer, StyledSeparator } from '../../Dashboard/index.style'
 import TxPlansBoxLinesChart from '../../../Components/TxPlansBoxLinesChart';
+import { selectFacilityName } from '../../../Redux/ReduxSlices/User/userSlice';
+import { useSelector } from 'react-redux';
 
 const Home = () => {
     const navigate = useNavigate();
     const [inputText, setInputText] = useState('');
-    const { businessName } = useBusiness();
+    const facilityName = useSelector(selectFacilityName);
     const handleInputChange = (event) => {
         setInputText(event.target.value);
     };
@@ -27,7 +29,7 @@ const Home = () => {
         <div className="dashboard-right-side">
             <div className="dashboard-right-side-row">
                 <div className="dashboard-right-side-row-top-text-section">
-                    <div className="dashboard-text-header">Hi {businessName || 'The Dental Office'},</div>
+                    <div className="dashboard-text-header">Hi {facilityName || 'The Dental Office'},</div>
                     <div>
                         You can manage your providers, add patients, generate new tx plans,
                         or view/edit existing tx plans.

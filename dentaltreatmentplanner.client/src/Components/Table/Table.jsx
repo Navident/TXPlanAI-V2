@@ -57,7 +57,7 @@ const Table = ({
 		const rowBackgroundColor = isDefaultProcedure === false ? "#E8E7E7" : "transparent";
 
 		// when not in txconfig, wee want to display the red dropdown for default rows that have altchildren
-		const shouldDisplayRedDropdown = (insideTxConfig || (rowData.hasAltChildren));
+		const shouldDisplayRedDropdown = isDefaultProcedure && (insideTxConfig || rowData.hasAltChildren);
 
 		// Condition to display the swap icon for alternative procedure children rows when not in Tx config
 		const shouldDisplaySwapIcon = !insideTxConfig && isDefaultProcedure === false;

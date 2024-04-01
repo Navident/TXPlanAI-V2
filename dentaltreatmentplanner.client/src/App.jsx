@@ -23,7 +23,8 @@ import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
 import TreatmentPlanProvider from './Contexts/TreatmentPlanContext/TreatmentPlanProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
 import { Provider } from 'react-redux';
-import { store } from './Redux/ReduxStore/store';
+import { store, persistor } from './Redux/ReduxStore/store';
+import { PersistGate } from 'redux-persist/integration/react';
 import InitialDataLoader from './Components/InitialDataLoader';
 import { enableMapSet } from 'immer';
 function App() {
@@ -33,6 +34,7 @@ function App() {
         <BusinessProvider>
             <TreatmentPlanProvider>
                 <Provider store={store}>
+                    <PersistGate loading={null} persistor={persistor}>
                     <InitialDataLoader />
                 <div className="App">
                     <Routes>
@@ -64,6 +66,7 @@ function App() {
                     </Routes>
                     <AlertWrapper />
                         </div>
+                    </PersistGate>
                     </Provider>
             </TreatmentPlanProvider>
         </BusinessProvider>

@@ -5,7 +5,7 @@ import { getCdtCodes, getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer,
 
 export const BusinessProvider = ({ children }) => {
     // State hooks for business information
-    const [businessName, setBusinessName] = useState('');
+    //const [businessName, setBusinessName] = useState('');
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
     // State hooks for patients and filtering
@@ -26,20 +26,20 @@ export const BusinessProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     //state hooks for treatment plans
-    const [patientTreatmentPlans, setPatientTreatmentPlans] = useState([]);
+    //const [patientTreatmentPlans, setPatientTreatmentPlans] = useState([]);
     //const [subcategoryTreatmentPlans, setSubcategoryTreatmentPlans] = useState([]);
 
     // Effect hook for initializing business name from localStorage
-    useEffect(() => {
+/*    useEffect(() => {
         const storedBusinessName = localStorage.getItem('businessName');
         if (storedBusinessName) setBusinessName(storedBusinessName);
-    }, []);
+    }, []);*/
 
     // Effect hook for checking user login status
-    useEffect(() => {
+/*    useEffect(() => {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
         setIsUserLoggedIn(isLoggedIn);
-    }, []);
+    }, []);*/
 
     // Effect hook for fetching initial data when user is logged in
     useEffect(() => {
@@ -57,17 +57,17 @@ export const BusinessProvider = ({ children }) => {
 
     // Fetching initial data required by the application
     const fetchInitialData = async () => {
-        fetchDefaultCdtCodes();
-        fetchCustomCdtCodesForFacility();
-        fetchPatientsForFacility();
+        //fetchDefaultCdtCodes();
+        //fetchCustomCdtCodesForFacility();
+        //fetchPatientsForFacility();
         //fetchPayers();
         //fetchCategoriesSubcategoriesAndTxPlans();
-        fetchAllPatientTreatmentPlansForFacility();
+        //fetchAllPatientTreatmentPlansForFacility();
     };
 
     //method to reset state to fresh
     const resetAppStates = () => {
-        setBusinessName('');
+        //setBusinessName('');
         setIsUserLoggedIn(false);
         //setPatients([]);
         setSearchQuery('');
@@ -80,7 +80,7 @@ export const BusinessProvider = ({ children }) => {
         //setActiveCdtCodes([]);
         setCategories([]);
         setIsLoading(false);
-        setPatientTreatmentPlans([]);
+        //setPatientTreatmentPlans([]);
 
         // Clear user-specific localStorage items
         localStorage.removeItem('businessName');
@@ -94,7 +94,7 @@ export const BusinessProvider = ({ children }) => {
         setDefaultCdtCodes(codes);
     };
 
-    const fetchCustomCdtCodesForFacility = async () => {
+/*    const fetchCustomCdtCodesForFacility = async () => {
         try {
             const fetchedCdtCodes = await getCustomCdtCodesForFacility();
             console.log('Fetched Custom CDT Codes:', fetchedCdtCodes);
@@ -102,9 +102,9 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching CDT codes:', error);
         }
-    };
+    };*/
 
-    const fetchAllPatientTreatmentPlansForFacility = async () => {
+/*    const fetchAllPatientTreatmentPlansForFacility = async () => {
         try {
             const fetchedPatientTreatmentPlans = await getAllPatientTreatmentPlansForFacility();
             console.log('Fetched patient treatment plans in businessprovider:', fetchedPatientTreatmentPlans);
@@ -112,7 +112,7 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching patient treatment plans:', error);
         }
-    };
+    };*/
 
     const fetchPayers = async () => {
         try {
@@ -124,7 +124,7 @@ export const BusinessProvider = ({ children }) => {
         }
     };
 
-    const fetchFacilityPayerCdtCodeFees = useCallback(async (payerId) => {
+/*    const fetchFacilityPayerCdtCodeFees = useCallback(async (payerId) => {
         try {
             const fetchedFacilityPayerCdtCodeFees = await getFacilityPayerCdtCodesFeesByPayer(payerId);
             console.log('Fetched payer specific cdt code fees in businessprovider:', fetchedFacilityPayerCdtCodeFees);
@@ -132,11 +132,11 @@ export const BusinessProvider = ({ children }) => {
         } catch (error) {
             console.error('Error fetching payer specific fees:', error);
         }
-    }, []); 
+    }, []); */
 
 
     //this function will get the payer fees for a selected treatment plan
-    const fetchFeesForTreatmentPlan = async (treatmentPlanId) => {
+/*    const fetchFeesForTreatmentPlan = async (treatmentPlanId) => {
         // Find the treatment plan that matches the treatmentPlanId
         const matchingTreatmentPlan = patientTreatmentPlans.find(plan => plan.treatmentPlanId === Number(treatmentPlanId));
 
@@ -153,18 +153,18 @@ export const BusinessProvider = ({ children }) => {
 
         // Use the found payerId to fetch facility payer CDT code fees
         await fetchFacilityPayerCdtCodeFees(payerId);
-    };
+    };*/
 
 
 
-    const fetchPatientsForFacility = async () => {
+/*    const fetchPatientsForFacility = async () => {
         try {
             //const fetchedPatients = await getPatientsForUserFacility();
             //setPatients(fetchedPatients || []);
         } catch (error) {
             console.error('Error fetching patients:', error);
         }
-    };
+    };*/
 
 /*    const fetchCategoriesSubcategoriesAndTxPlans = async () => {
         setIsLoading(true);
@@ -237,7 +237,7 @@ export const BusinessProvider = ({ children }) => {
 
 
     // Refresh functions
-    const refreshPatients = async () => {
+/*    const refreshPatients = async () => {
         try {
             //const fetchedPatients = await getPatientsForUserFacility();
             //setPatients(fetchedPatients || []);
@@ -247,24 +247,24 @@ export const BusinessProvider = ({ children }) => {
     };
     const refreshPatientTreatmentPlans = async () => {
         await fetchAllPatientTreatmentPlansForFacility();
-    };
+    };*/
 
-    const removeTreatmentPlanById = (planId) => {
+/*    const removeTreatmentPlanById = (planId) => {
         setPatientTreatmentPlans(currentPlans => currentPlans.filter(plan => plan.treatmentPlanId !== planId));
-    };
+    };*/
 
     return (
         <BusinessContext.Provider value={{
-            businessName, setBusinessName,
+            //businessName, setBusinessName,
             //patients, setPatients,
             searchQuery, setSearchQuery,
             filteredPatients, setFilteredPatients,
             selectedPatient, setSelectedPatient,
-            refreshPatients,
-            removeTreatmentPlanById,
-            facilityCdtCodes, setFacilityCdtCodes, 
-            defaultCdtCodes, setDefaultCdtCodes,
-            isUserLoggedIn, setIsUserLoggedIn,
+            //refreshPatients,
+            //removeTreatmentPlanById,
+            //facilityCdtCodes, setFacilityCdtCodes, 
+            //defaultCdtCodes, setDefaultCdtCodes,
+            //isUserLoggedIn, setIsUserLoggedIn,
             //payers, setPayers,
             //facilityPayerCdtCodeFees, setFacilityPayerCdtCodeFees,
             categories,
@@ -272,9 +272,9 @@ export const BusinessProvider = ({ children }) => {
             //fetchFacilityPayerCdtCodeFees,
             //activeCdtCodes, setActiveCdtCodes,
             resetAppStates,
-            patientTreatmentPlans, setPatientTreatmentPlans,
-            fetchFeesForTreatmentPlan,
-            refreshPatientTreatmentPlans,
+            //patientTreatmentPlans, setPatientTreatmentPlans,
+            //fetchFeesForTreatmentPlan,
+            //refreshPatientTreatmentPlans,
             fetchPayers,
             //subcategoryTreatmentPlans, setSubcategoryTreatmentPlans
             

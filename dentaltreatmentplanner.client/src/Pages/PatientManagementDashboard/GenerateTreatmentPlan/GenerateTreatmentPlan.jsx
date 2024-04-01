@@ -29,7 +29,8 @@ import {
 import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
-
+import appInsights from '../../../Utils/AppInsights';
+import { selectFacilityName, selectFacilityId } from '../../../Redux/ReduxSlices/User/userSlice';
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
@@ -40,8 +41,10 @@ const GenerateTreatmentPlan = () => {
 	const [inputText, setInputText] = useState("");
 	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
 	const selectedPatient = useSelector(selectSelectedPatient);
-
 	const [isLoading, setIsLoading] = useState(false);
+
+	const facilityName = useSelector(selectFacilityName);
+	const facilityId = useSelector(selectFacilityId);
 
 	useEffect(() => {
 		return () => {
@@ -81,6 +84,18 @@ const GenerateTreatmentPlan = () => {
 		console.log("inputText sent to ai", inputText);
 		const aiResponse = await fetchOpenAIResponse(inputText);
 		console.log("aiResponsePreprocessedInputText", aiResponse);
+
+		appInsights.trackEvent({
+			name: "TreatmentPlan",
+			properties: {
+				facilityName: facilityName,
+				facilityId: facilityId,
+				inputText: inputText,
+				aiResponse: aiResponse
+			}
+		});
+
+
 		const parsedResponse = JSON.parse(aiResponse);
 		console.log("parsedResponse", parsedResponse);
 
@@ -120,7 +135,7 @@ const GenerateTreatmentPlan = () => {
 						visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
 						VisitToProcedureMapDtos: visit.procedures.map((procedureMap) => ({
 							...procedureMap,
-							procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => ({  // Corrected here
+							procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => ({ 
 								...cdtMap,
 								toothNumber: sanitizedToothNumber,
 								surface,
@@ -147,7 +162,7 @@ const GenerateTreatmentPlan = () => {
 
 
 	function combineVisitsIntoOne(allVisits) {
-		let combinedProcedures = []; // Correctly named and initialized here
+		let combinedProcedures = [];
 
 		allVisits.forEach((visit) => {
 			visit.VisitToProcedureMapDtos.forEach((procedureMap) => {
@@ -158,8 +173,8 @@ const GenerateTreatmentPlan = () => {
 						visitToProcedureMapId: procedureMap.visitToProcedureMapId,
 						originLineIndex: visit.originLineIndex,
 						visitNumber: visit.visitNumber,
-						orderWithinVisit: procedureMap.order, // Assuming 'order' correctly reflects within-visit ordering
-					})) // Corrected: Added missing parenthesis here
+						orderWithinVisit: procedureMap.order, 
+					})) 
 				});
 			});
 		});
@@ -175,7 +190,7 @@ const GenerateTreatmentPlan = () => {
 		return {
 			visitId: `temp-${Date.now()}`,
 			description: "Table 1",
-			procedures: combinedProcedures, // Correctly using combinedProcedures here
+			procedures: combinedProcedures, 
 			originLineIndex: 0,
 			visitNumber: 1
 		};

@@ -1548,6 +1548,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 .Select(tp => new RetrievePatientTreatmentPlanDto
                 {
                     TreatmentPlanId = tp.TreatmentPlanId,
+                    Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
                     CreatedUserId = tp.CreatedUserId,
                     CreatedAt = tp.CreatedAt,

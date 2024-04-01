@@ -64,11 +64,8 @@ const TreatmentPlanConfiguration = ({
 		type: "",
 		message: "",
 	});
-	const { facilityCdtCodes, defaultCdtCodes } = useBusiness();
-	const combinedCdtCodes = useMemo(
-		() => [...defaultCdtCodes, ...facilityCdtCodes],
-		[defaultCdtCodes, facilityCdtCodes]
-	);
+	const combinedCdtCodes = useSelector(selectCombinedCdtCodes);
+
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
@@ -95,9 +92,6 @@ const TreatmentPlanConfiguration = ({
 		console.log("allRows:", allRows);
 	}, [allRows]);
 
-	useEffect(() => {
-		console.log("isSuperAdmin state:", isSuperAdmin);
-	}, [combinedCdtCodes]);
 
 	useEffect(() => {
 		console.log("dynamicRowValues state:", dynamicRowValues);
@@ -875,6 +869,10 @@ const TreatmentPlanConfiguration = ({
 
 	const createTableRow = (row, visitId, headers, index) => {
 		const isStaticRow = row.isStatic;
+		const alternatives = alternativeRows[visitId] || [];
+		const isDefaultRow = row.selectedCdtCode ? row.selectedCdtCode.default : (row.hasOwnProperty('default') ? row.default : null);
+		const hasAltChildren = alternatives.some(alt => alt.visitToProcedureMapId === row.visitToProcedureMapId);
+
 		const hasAltInId = row.id.includes('alt');
 		let rowData = isStaticRow
 			? constructStaticRowData(row)
@@ -900,6 +898,8 @@ const TreatmentPlanConfiguration = ({
 			data: rowData,
 			backgroundColor: null,
 			parentId: row.parentId,
+			default: isDefaultRow,
+			hasAltChildren, 
 		};
 	};
 

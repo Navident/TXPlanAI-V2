@@ -45,7 +45,7 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady, selectAlternativeProcedures } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady, selectCombinedCdtCodes, selectAlternativeProcedures } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
@@ -71,11 +71,8 @@ const TreatmentPlanOutput = ({
 	const [localUpdatedVisits, setLocalUpdatedVisits] = useState([]);
 
 	const [combinedVisits, setCombinedVisits] = useState([]);
-	const { facilityCdtCodes, defaultCdtCodes } = useBusiness();
-	const combinedCdtCodes = useMemo(
-		() => [...defaultCdtCodes, ...facilityCdtCodes],
-		[defaultCdtCodes, facilityCdtCodes]
-	);
+	const combinedCdtCodes = useSelector(selectCombinedCdtCodes);
+
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
@@ -99,7 +96,7 @@ const TreatmentPlanOutput = ({
 		const newCheckedRows = [];
 		Object.values(allRows).forEach(visitRows => {
 			visitRows.forEach(row => {
-				if (row.selectedCdtCode && selectedCategories.has(row.selectedCdtCode.originalVisitCategory)) {
+				if (row.selectedCdtCode && Array.from(selectedCategories).includes(row.selectedCdtCode.originalVisitCategory)) {
 					newCheckedRows.push(row.id); 
 				}
 			});

@@ -9,7 +9,6 @@ import PatientTreatmentPlanCustomizer from "../PatientTreatmentPlanCustomizer/Pa
 import PatientList from "../../Components/PatientList/PatientList";
 import logo from "../../assets/navident-logo.svg";
 import { Outlet } from "react-router-dom";
-import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import backButton from "../../assets/back-button.svg";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -18,9 +17,12 @@ import {
 	StyledMainContentWrapper,
 	StyledContentArea,
 } from "../../GlobalStyledComponents";
+import { selectFacilityName } from '../../Redux/ReduxSlices/User/userSlice';
+import { useSelector } from 'react-redux';
 
 const PatientManagementDashboard = () => {
-	const { businessName } = useBusiness();
+	const facilityName = useSelector(selectFacilityName);
+
 	const location = useLocation();
 	const navigate = useNavigate();
 	const isCreatingNewPatient = location.pathname.includes(
@@ -51,7 +53,7 @@ const PatientManagementDashboard = () => {
 						/>
 					}
 					rightCornerElement={
-						<div className="headerbar-business-name">{businessName}</div>
+						<div className="headerbar-business-name">{facilityName}</div>
 					}
 					centerLogo={false}
 				/>
@@ -66,7 +68,7 @@ const PatientManagementDashboard = () => {
 						/>
 					}
 					rightCornerElement={
-						<div className="headerbar-business-name">{businessName}</div>
+						<div className="headerbar-business-name">{facilityName}</div>
 					}
 					className="dashboard-header"
 					showDropdownArrow={true}

@@ -28,7 +28,6 @@ import {
     updateTreatmentPlanDescription
 
 } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { selectSelectedPatient, selectFilteredPatients,  setSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 

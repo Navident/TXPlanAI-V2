@@ -31,12 +31,11 @@ import TxViewCustomizationToolbar from "../../Components/TxViewCustomizationTool
 
 import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../Components/PaymentTotals/index";
-
+import { selectFacilityName } from '../../Redux/ReduxSlices/User/userSlice';
 
 const PatientTreatmentPlanCustomizer = () => {
 	const dispatch = useDispatch();
 	const { treatmentPlanId } = useParams();
-	const { businessName, fetchFacilityPayerCdtCodeFees } = useBusiness();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
 	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
@@ -44,6 +43,7 @@ const PatientTreatmentPlanCustomizer = () => {
 	const grandUcrTotal = useSelector(selectGrandUcrTotal);
 	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
 	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
+	const facilityName = useSelector(selectFacilityName);
 
 	useEffect(() => {
 		return () => {
@@ -91,7 +91,7 @@ const PatientTreatmentPlanCustomizer = () => {
 						/>
 					}
 					rightCornerElement={
-						<div className="headerbar-business-name">{businessName}</div>
+						<div className="headerbar-business-name">{facilityName}</div>
 					}
 					className="dashboard-header"
 					showDropdownArrow={true}

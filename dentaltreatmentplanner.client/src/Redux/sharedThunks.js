@@ -110,8 +110,7 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
     'shared/fetchInitialDataIfLoggedIn',
     async (_, { dispatch, getState }) => {
         const isUserLoggedIn = getState().user.isUserLoggedIn;
-        const isUserLoggedInLocalStorage = localStorage.getItem('isLoggedIn') === 'true';
-        const isLoggedIn = isUserLoggedIn || isUserLoggedInLocalStorage;
+        const isLoggedIn = isUserLoggedIn;
 
         if (isLoggedIn) { 
             console.log("Running fetchInitialDataIfLoggedIn now");

@@ -6,14 +6,16 @@ import './Dashboard.css';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import { StyledAppContainer, StyledMainContentWrapper, StyledContentArea  } from '../../GlobalStyledComponents';
+import { selectFacilityName } from '../../Redux/ReduxSlices/User/userSlice';
 
 const Dashboard = () => {
-    const { businessName, categories, isLoading } = useBusiness();
+    const { categories, isLoading } = useBusiness();
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const facilityName = useSelector(selectFacilityName);
 
     useEffect(() => {
         // Check if the alert has been shown in this session
@@ -34,7 +36,7 @@ const Dashboard = () => {
             <StyledAppContainer>
                 <HeaderBar
                     leftCornerElement={<img src={logo} alt="Logo" className="navident-logo" onClick={handleLogoClick} />}
-                    rightCornerElement={<div className="headerbar-business-name">{businessName}</div>}
+                    rightCornerElement={<div className="headerbar-business-name">{facilityName}</div>}
                     className="dashboard-header"
                     showDropdownArrow={true}
                 />

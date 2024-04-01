@@ -13,10 +13,14 @@ import { UI_COLORS } from '../../../Theme';
 import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    selectFacilityCdtCodes,
+    fetchCustomCdtCodesForFacility
+} from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 const CustomCdtCodes = () => {
-    const { facilityCdtCodes } = useBusiness(); 
+    const facilityCdtCodes = useSelector(selectFacilityCdtCodes);
     const [inputText, setInputText] = useState('');
     const [rowsData, setRowsData] = useState([]);
     const headers = ["CDT Code", "Description", ""];
@@ -233,6 +237,7 @@ const CustomCdtCodes = () => {
         const response = await updateCustomFacilityCdtCodes(updateData);
         if (response) { 
             dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
+            dispatch(fetchCustomCdtCodesForFacility());
         } else {
             dispatch(showAlert({ type: 'error', message: 'Failed to save changes' }));
         }
