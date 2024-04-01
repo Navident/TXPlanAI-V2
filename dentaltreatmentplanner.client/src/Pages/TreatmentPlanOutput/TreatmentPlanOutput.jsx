@@ -176,10 +176,11 @@ const TreatmentPlanOutput = ({
 	}, [treatmentPlans]);
 
 	useEffect(() => {
-
-		onAllRowsUpdate(allRows); // Pass allRows up to the parent component
-
+		if (typeof onAllRowsUpdate === 'function') {
+			onAllRowsUpdate(allRows); 
+		}
 	}, [allRows, onAllRowsUpdate]);
+
 
 	useEffect(() => {
 		setLocalUpdatedVisits(treatmentPlan.visits);

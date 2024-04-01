@@ -5,7 +5,6 @@ import twitterIconSmall from '../../assets/twitter-small-icon.svg';
 import googleIconSmall from '../../assets/google-small-icon.svg';
 import facebookIconSmall from '../../assets/facebook-small-icon.svg';
 import appleIconSmall from '../../assets/apple-small-icon.svg';
-import userIcon from '../../assets/user-icon.svg';
 import { TextField } from "@mui/material";
 import { useState } from 'react';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
@@ -14,9 +13,8 @@ import backButton from '../../assets/back-button.svg';
 import { loginUser } from '../../ClientServices/apiService';
 import './Login.css'; 
 import Alert from "../../Components/Common/Alert/Alert";
-import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { Backdrop, CircularProgress } from '@mui/material';
-
+import { fetchInitialDataIfLoggedIn } from '../../Redux/sharedThunks';
 import { useDispatch } from 'react-redux';
 import { setIsUserLoggedIn, setIsSuperAdmin, setFacilityName, setFacilityId } from '../../Redux/ReduxSlices/User/userSlice';
 
@@ -56,6 +54,7 @@ const Login = () => {
             localStorage.setItem('businessName', facilityName);
             localStorage.setItem('isLoggedIn', 'true');
             dispatch(setIsUserLoggedIn(true));
+            dispatch(fetchInitialDataIfLoggedIn());
             navigate("/dashboard");
         } else {
             // Handle failed login
