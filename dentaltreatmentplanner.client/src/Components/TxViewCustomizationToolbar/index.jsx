@@ -159,8 +159,17 @@ const TxViewCustomizationToolbar = ({ immediateSave = false }) => {
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
                         <StyledPrintImportBtnContainer>
-                            <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
-                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Import into EHR" height="30px" onClick={handleExportClick} />
+                            <>
+                                Print
+                                <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
+                                
+                            </>
+                            
+                            <>
+                                Export
+                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Export to EHR" height="30px" onClick={handleExportClick} />
+                                
+                            </>
                         </StyledPrintImportBtnContainer>
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>
