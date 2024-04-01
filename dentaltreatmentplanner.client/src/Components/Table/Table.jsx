@@ -52,7 +52,7 @@ const Table = ({
 		const rowIdentifier = rowData.id || rowData.tempId || "";
 		const isDefaultProcedure = rowData.default;
 		const isAltCodeRow = rowIdentifier.startsWith('dynamic-alt-code') || rowIdentifier.startsWith('static-alt-code');
-		const isRowActive = expandedRows.has(rowIdentifier);
+		const isRowActive = expandedRows && typeof expandedRows.has === 'function' ? expandedRows.has(rowIdentifier) : false;
 
 		const isLastRow = rowIndex === rows.length - 1;
 		const rowBackgroundColor = rowData.backgroundColor ? rowData.backgroundColor
