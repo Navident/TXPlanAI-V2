@@ -7,5 +7,6 @@
         public string ProcStatus { get; set; } = "TP"; // Procedure Status, defaulting to "TP" for Treatment Plan
         public string procCode { get; set; } // Procedure Code
         public string priority { get; set; } // Priority
+        public string? ToothRange { get; set; } //// Tooth Range - only for fluoride treatments
     }
 }

@@ -67,7 +67,8 @@ namespace DentalTreatmentPlanner.Server.Services
                     procedure.Surf,
                     procedure.ProcStatus,
                     procedure.procCode,
-                    procedure.priority
+                    procedure.priority,
+                    procedure.ToothRange
                 };
 
                 try

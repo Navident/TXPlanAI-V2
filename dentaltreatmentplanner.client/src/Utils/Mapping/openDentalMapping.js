@@ -43,7 +43,7 @@ function adjustSurfaceForOpenDental(toothNumber, originalSurface) {
 }
 
 function addFluorideTreatmentToothRange(selectedCdtCode, procedureDto) {
-    if (selectedCdtCode.originalVisitCategory === "fluoride") {
+    if (selectedCdtCode.originalVisitCategory.toLowerCase() === "fluoride".toLowerCase()) {
         procedureDto.ToothRange = "1-32"; // Add ToothRange for fluoride treatments
     }
 }
