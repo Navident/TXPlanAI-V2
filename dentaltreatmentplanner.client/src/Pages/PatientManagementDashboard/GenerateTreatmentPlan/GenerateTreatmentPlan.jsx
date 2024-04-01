@@ -29,7 +29,7 @@ import {
 import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
-import appInsights from '../../../Utils/AppInsights';
+import appInsights from '../../../Utils/appInsights';
 import { selectFacilityName, selectFacilityId } from '../../../Redux/ReduxSlices/User/userSlice';
 
 const GenerateTreatmentPlan = () => {
