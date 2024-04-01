@@ -46,6 +46,13 @@ const GenerateTreatmentPlan = () => {
 	const facilityName = useSelector(selectFacilityName);
 	const facilityId = useSelector(selectFacilityId);
 
+
+	const [allRowsFromChild, setAllRowsFromChild] = useState({});
+
+	const handleAllRowsUpdate = (newAllRows) => {
+		setAllRowsFromChild(newAllRows);
+	};
+
 	useEffect(() => {
 		return () => {
 			// Reset treatmentPlans when component unmounts
@@ -287,7 +294,7 @@ const GenerateTreatmentPlan = () => {
 				</div>
 			</div>
 			<div className="treatment-plan-output-section rounded-box box-shadow">
-				<TxViewCustomizationToolbar />
+				<TxViewCustomizationToolbar allRows={allRowsFromChild} />
 				<StyledSeparator customMarginTop="0px" />
 				<StyledContainerWithTableInner>
 					<StyledTitleAndPaymentTotalsContainer>
@@ -334,6 +341,7 @@ const GenerateTreatmentPlan = () => {
 								}
 								showToothNumber={true}
 								isInGenerateTreatmentPlanContext={true}
+								onAllRowsUpdate={handleAllRowsUpdate}
 							/>
 						))
 					)}

@@ -314,6 +314,8 @@ nav {
 .back-btn-arrow {
     height: 37px;
     width: auto;
+    z-index: 100;
+    cursor: pointer;
 }
 
 

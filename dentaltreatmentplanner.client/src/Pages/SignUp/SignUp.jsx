@@ -28,7 +28,7 @@ const Signup = () => {
 
     const handleRegister = () => {
         if (!email) {
-            alert('Please enter an email address or username.');
+            alert('Please enter an email address.');
             return;
         }
         if (password !== confirmPassword) {
@@ -73,6 +73,16 @@ const Signup = () => {
         }
     };
 
+    const privacyPolicyLines = privacyPolicyContent.split('\n');
+    const contentToDisplay = privacyPolicyLines.slice(2, privacyPolicyLines.length - 2); // Ignore first 2 and last 2 lines
+
+    const formattedContent = contentToDisplay.map((line, index) => (
+        <span key={index}>
+            {line}
+            <br />
+        </span>
+    ));
+
 
     return (
         <div className="signup-wrapper">
@@ -81,7 +91,7 @@ const Signup = () => {
                 onClose={() => setShowAlert(false)}
                 onAgree={handleAgree}
                 title="Terms of Use for Beta Testers"
-                content={privacyPolicyContent}
+                content={formattedContent}
             />
             <div className="login-signup-container">
                 <HeaderBar
@@ -92,7 +102,7 @@ const Signup = () => {
                 <div className="login-signup-content box-shadow">
                     <div className="login-signup-header large-text">Create an account</div>
                     <div className="login-signup-input-field">
-                        <div className="textbox-label light-grey-text">Email Address or user name</div>
+                        <div className="textbox-label light-grey-text">Email Address</div>
                         <TextField
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}

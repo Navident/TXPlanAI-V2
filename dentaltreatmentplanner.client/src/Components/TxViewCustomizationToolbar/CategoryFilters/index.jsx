@@ -16,8 +16,9 @@ const CategoryFilters = () => {
     const dispatch = useDispatch();
     const activeTxCategories = useSelector(selectActiveTxCategories);
     const selectedCategories = useSelector(selectSelectedCategories);
-    console.log("Type of selectedCategories:", typeof selectedCategories);
-    console.log("Value of selectedCategories:", selectedCategories);
+
+
+
     useEffect(() => {
         console.log("activeTxCategories:", activeTxCategories);
     }, [activeTxCategories]);
@@ -30,6 +31,7 @@ const CategoryFilters = () => {
     }));
 
     const handleCheckboxChange = (event, label) => {
+        console.log("change in the checkbox occurred");
         dispatch(updateSelectedCategories(label));
     };
 

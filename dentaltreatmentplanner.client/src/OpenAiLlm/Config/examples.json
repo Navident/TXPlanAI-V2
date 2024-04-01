@@ -1,179 +1,178 @@
-
-  [
-    {
-      "role": "user",
-      "content": "#5 mod comp"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#5\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#8 DOB5 composite"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#8\", \"surface\": \"D, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#7 DO composite\n#9 MOB5 composite\n#12 DOL/5 composite"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#7\", \"surface\": \"D, O\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#9\", \"surface\": \"M, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#12\", \"surface\": \"D, O, LV\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "UR Srp 1-3"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 1-3 Teeth\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15 routine ext\n#5, 7, 9, 12 implant, pre fab abutments"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#10\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#14\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"Routine Extraction\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "45 mins iv sedation"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"treatments\": [\"Initial IV Sedation\", \"IV Sedation\", \"IV Sedation\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "membrane"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"treatments\": [\"Resorbable Membrane\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#12-14 acc bridge"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"ACC Retainer Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#9-11 implant bridge with acc crowns"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Single Implant\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#21 bone graft, ext, implant, with pfm"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#21\", \"treatments\": [\"Bone Graft Ridge Preservation\", \"Surgical Extraction\", \"Single Implant\", \"Implant Supported PFM Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "irrigation"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LL\", \"treatments\": [\"Gingival Irrigation\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "upper irrigation"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#12 porcelain crown"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#8 porcelain veneer"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#8\", \"treatments\": [\"Indirect Veneer\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#9 composite veneer"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Direct Veneer\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#12-15 exts, aveloplasty"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#14\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#15\", \"treatments\": [\"Surgical Extraction\"]},\n{\"arch\": \"UL\", \"treatments\": [\"Alveoloplasty with Exts 4+ Teeth\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "srp"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"LR\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"LL\", \"treatments\": [\"SRP 4+ Teeth\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "POE"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"treatments\": [\"Recall\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#12-14 implant bridge"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#22-24 implants with pfm"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "membrane"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"Flag\": \"true\", \"treatments\": [\"Resorbable Membrane\"]}]"
-    },
-    {
-      "role": "user",
-      "content": "#12 crown"
-    },
-    {
-      "role": "assistant",
-      "content": "[{\"Flag\": \"true\", \"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
-    }
-  ]
+[
+  {
+    "role": "user",
+    "content": "#5 mod comp"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#5\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#8 DOB5 composite"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#8\", \"surface\": \"D, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#7 DO composite\n#9 MOB5 composite\n#12 DOL/5 composite"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#7\", \"surface\": \"D, O\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#9\", \"surface\": \"M, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#12\", \"surface\": \"D, O, LV\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "UR Srp 1-3"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 1-3 Teeth\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15 routine ext\n#5, 7, 9, 12 implant, pre fab abutments"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#10\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#14\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"Routine Extraction\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "45 mins iv sedation"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"treatments\": [\"Initial IV Sedation\", \"IV Sedation\", \"IV Sedation\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "membrane"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"treatments\": [\"Resorbable Membrane\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#12-14 acc bridge"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"ACC Retainer Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#9-11 implant bridge with acc crowns"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Single Implant\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#21 bone graft, ext, implant, with pfm"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#21\", \"treatments\": [\"Bone Graft Ridge Preservation\", \"Surgical Extraction\", \"Single Implant\", \"Implant Supported PFM Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "irrigation"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LL\", \"treatments\": [\"Gingival Irrigation\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "upper irrigation"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#12 porcelain crown"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#8 porcelain veneer"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#8\", \"treatments\": [\"Indirect Veneer\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#9 composite veneer"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Direct Veneer\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#12-15 exts, aveloplasty"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#14\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#15\", \"treatments\": [\"Surgical Extraction\"]},\n{\"arch\": \"UL\", \"treatments\": [\"Alveoloplasty with Exts 4+ Teeth\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "srp"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"LR\", \"treatments\": [\"SRP 4+ Teeth\"]}]\n[{\"arch\": \"LL\", \"treatments\": [\"SRP 4+ Teeth\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "POE"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"treatments\": [\"Recall\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#12-14 implant bridge"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#22-24 implants with pfm"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "membrane"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"treatments\": [\"Resorbable Membrane\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "#12 crown"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
+  }
+]

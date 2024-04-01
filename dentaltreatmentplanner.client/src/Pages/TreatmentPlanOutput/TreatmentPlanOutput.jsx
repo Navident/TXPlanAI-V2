@@ -62,6 +62,7 @@ const TreatmentPlanOutput = ({
 	onDeleteVisit,
 	showToothNumber,
 	isInGenerateTreatmentPlanContext,
+	onAllRowsUpdate
 }) => {
 	const dispatch = useDispatch();
 	const [allRows, setAllRows] = useState({});
@@ -90,7 +91,8 @@ const TreatmentPlanOutput = ({
 	const payers = useSelector(selectPayersForFacility);
 	const selectedPayer = useSelector(selectSelectedPayer);
 	const selectedPatient = useSelector(selectSelectedPatient);
-	const [activeParentRow, setActiveParentRow] = useState(null);
+	// Initialize expandedRows as a Set to keep track of all expanded parent rows.
+	const [expandedRows, setExpandedRows] = useState(new Set());
 
 	useEffect(() => {
 		const newCheckedRows = [];
@@ -138,47 +140,53 @@ const TreatmentPlanOutput = ({
 	const [alternativeRows, setAlternativeRows] = useState({});
 
 	useEffect(() => {
-		console.log("we went in the initial load conditional");
-		const visits = treatmentPlan.visits || [];
-		const newAllRows = {}; // Default procedures
-		const newAlternativeRows = {}; // Non-default procedures for later access
+		if (isInitialLoad.current) {
+			console.log("we went in the initial load conditional");
+			const visits = treatmentPlan.visits || [];
+			const newAllRows = {}; // Default procedures
+			const newAlternativeRows = {}; // Non-default procedures for later access
 
-		visits.forEach(visit => {
-			const visitId = visit.visitId;
-			newAllRows[visitId] = [];
-			newAlternativeRows[visitId] = [];
+			visits.forEach(visit => {
+				const visitId = visit.visitId;
+				newAllRows[visitId] = [];
+				newAlternativeRows[visitId] = [];
 
-			(visit.procedures || []).forEach((procedureMap, procIndex) => {
-				(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
-					const row = createInitialStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
+				(visit.procedures || []).forEach((procedureMap, procIndex) => {
+					(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
+						const row = createInitialStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
-					if (cdtMap.default) {
-						newAllRows[visitId].push(row);
-					} else {
-						newAlternativeRows[visitId].push(row);
-					}
+						if (cdtMap.default) {
+							newAllRows[visitId].push(row);
+						} else {
+							newAlternativeRows[visitId].push(row);
+						}
+					});
 				});
+
+				// Include a dynamic row at the end of each visit in allRows
+				const initialRowId = `initial-${visitId}`;
+				newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
 			});
 
-			// Include a dynamic row at the end of each visit in allRows
-			const initialRowId = `initial-${visitId}`;
-			newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
-		});
+			setAllRows(newAllRows);
+			setAlternativeRows(newAlternativeRows);
+			dispatch(setVisitOrder(visits.map(visit => visit.visitId)));
 
-		setAllRows(newAllRows);
-		setAlternativeRows(newAlternativeRows);
-		dispatch(setVisitOrder(visits.map(visit => visit.visitId)));
-
-		isInitialLoad.current = false;
+			isInitialLoad.current = false;
+		}
 	}, [treatmentPlans]);
 
+	useEffect(() => {
+
+		onAllRowsUpdate(allRows); // Pass allRows up to the parent component
+
+	}, [allRows, onAllRowsUpdate]);
 
 	useEffect(() => {
 		setLocalUpdatedVisits(treatmentPlan.visits);
 	}, [treatmentPlan.visits]);
 
 	const handleGroupRows = useCallback(() => {
-
 		if (checkedRows.length === 0) {
 			dispatch(showAlert({ type: 'warning', message: 'Please select rows before you press the group button' }));
 			console.log('No rows are checked. Exiting without creating a new visit.');
@@ -190,6 +198,9 @@ const TreatmentPlanOutput = ({
 		let newAllRows = { ...allRows }; // Make a shallow copy of allRows to modify
 		let groupedRows = [];
 
+		// Log checked rows
+		console.log('Checked rows:', checkedRows);
+
 		// Iterate over all visits to filter out the checked rows and accumulate them for the new group
 		Object.entries(allRows).forEach(([visitId, rows]) => {
 			const remainingRows = rows.filter(row => !checkedRows.includes(row.id));
@@ -199,12 +210,16 @@ const TreatmentPlanOutput = ({
 			if (remainingRows.length > 1) {
 				newAllRows[visitId] = remainingRows;
 			} else {
-				delete newAllRows[visitId]; 
+				delete newAllRows[visitId];
 			}
 		});
 
+		// Log grouped rows and newAllRows state before calling handleAddVisit
+		console.log('Grouped rows:', groupedRows);
+		console.log('newAllRows before adding new visit:', newAllRows);
+
 		// Use handleAddVisit to add the new visit with grouped rows
-		handleAddVisit(newGroupVisitId, groupedRows, newAllRows); 
+		handleAddVisit(newGroupVisitId, groupedRows, newAllRows);
 
 		// Clear checked rows after grouping
 		dispatch(clearCheckedRows());
@@ -213,36 +228,48 @@ const TreatmentPlanOutput = ({
 
 
 
-const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
-    const visitId = `temp-${Date.now()}`;
-    const initialRowId = `initial-${visitId}`;
 
-    const newVisit = {
-        visitId: visitId,
-        treatment_plan_id: treatmentPlan.treatmentPlanId,
-        visitNumber: treatmentPlan.visits.length + 1, 
-        description: "Table " + (treatmentPlan.visits.length + 1),
-    };
+	const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows = null) => {
+		const visitId = customVisitId || `temp-${Date.now()}`;
+		const initialRowId = `initial-${visitId}`;
 
-    onAddVisit(newVisit);
+		const newVisit = {
+			visitId: visitId,
+			treatment_plan_id: treatmentPlan.treatmentPlanId,
+			visitNumber: treatmentPlan.visits.length + 1,
+			description: "Table " + (treatmentPlan.visits.length + 1),
+		};
 
-    const dynamicRow = createDynamicRowv1(visitId, initialRowId);
-    const newRows = [...groupedRows, dynamicRow];
+		// Log new visit details
+		console.log('Adding new visit:', newVisit);
+		console.log('Grouped rows to be added to new visit:', groupedRows);
 
-    const newVisitOrder = [...visitOrder, visitId];
-    dispatch(setVisitOrder(newVisitOrder));
+		onAddVisit(newVisit);
 
-    // Handling updatedAllRows
-    const finalAllRows = updatedAllRows ? { ...updatedAllRows, [visitId]: newRows } : null;
-    if (finalAllRows) {
-        setAllRows(finalAllRows);
-    } else {
-        setAllRows(prevRows => ({
-            ...prevRows,
-            [visitId]: newRows,
-        }));
-    }
+		const dynamicRow = createDynamicRowv1(visitId, initialRowId);
+		const newRows = [...groupedRows, dynamicRow];
+
+		// Log newRows to confirm grouped rows and dynamic row are included
+		console.log('New rows for new visit:', newRows);
+
+		const newVisitOrder = [...visitOrder, visitId];
+		dispatch(setVisitOrder(newVisitOrder));
+
+		// Handling updatedAllRows
+		const finalAllRows = updatedAllRows ? { ...updatedAllRows, [visitId]: newRows } : null;
+		if (finalAllRows) {
+			setAllRows(finalAllRows);
+		} else {
+			setAllRows(prevRows => ({
+				...prevRows,
+				[visitId]: newRows,
+			}));
+		}
+
+		// Log final allRows state after update
+		console.log('All rows after adding new visit:', finalAllRows ? finalAllRows : 'Updated within setAllRows');
 	};
+
 
 
 	const createInitialStaticRows = (item, visitId, index, procedureMap = null) => {
@@ -1105,7 +1132,8 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 			backgroundColor,
 			parentId: row.parentId,
 			hasAltChildren, 
-			default: isDefaultRow
+			default: isDefaultRow,
+			category
 		};
 	};
 
@@ -1325,23 +1353,42 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 
 	const expandRows = (rows, rowIndex, visitId, currentRow, alternativeRows) => {
 		let newRows = []; // Temporarily hold new rows to be added
+		let addedCdtMapIds = new Set(); // To track which procedureToCdtMapIds have been added
+
+		// Pre-populate the set with the current row's procedureToCdtMapId to avoid adding it as a duplicate
+		addedCdtMapIds.add(currentRow.selectedCdtCode.procedureToCdtMapId);
+
+		console.log(`debug-Expanding row at index: ${rowIndex} with visitId: ${visitId} and currentRow.id: ${currentRow.id}`);
 
 		// Check if there are alternative rows for the current visitId
 		const alternatives = alternativeRows[visitId];
 		if (alternatives && alternatives.length > 0) {
-			// Filter alternative rows that match the current default row's visitToProcedureMapId
-			const matchingAlternatives = alternatives.filter(alt => alt.visitToProcedureMapId === currentRow.visitToProcedureMapId);
-			// Create a static row for each matching alternative
-			matchingAlternatives.forEach((altRow, index) => {
-				const altRowId = `alt-${rowIndex}-${index}`;
-				newRows.push(createStaticRowForAltCode(altRow, visitId, altRowId, currentRow.id));
+			console.log(`debug-${alternatives.length} alternative(s) found for visitId: ${visitId}`);
+
+			// Loop through each alternative to check and add if not already processed
+			alternatives.forEach((alt, altIndex) => {
+				// Ensure that selectedCdtCode exists and the procedureToCdtMapId hasn't been added already
+				if (alt.selectedCdtCode && !addedCdtMapIds.has(alt.selectedCdtCode.procedureToCdtMapId)) {
+					// This alternative's procedureToCdtMapId is unique, proceed to add
+					const altRowId = `alt-${rowIndex}-${altIndex}`; // Ensure unique ID for each alternative row
+					console.log(`debug-Adding alternative row: ${altRowId} with procedureToCdtMapId: ${alt.selectedCdtCode.procedureToCdtMapId}`);
+					newRows.push(createStaticRowForAltCode(alt, visitId, altRowId, currentRow.id));
+					// Mark this procedureToCdtMapId as added to prevent future duplicates
+					addedCdtMapIds.add(alt.selectedCdtCode.procedureToCdtMapId);
+				}
 			});
 		}
 
-		// Insert new rows into the correct position
-		rows.splice(rowIndex + 1, 0, ...newRows); // Use spread operator to add all new rows at once
-	};
+		// Find the correct position to insert newRows
+		let insertPosition = rowIndex + 1;
+		while (insertPosition < rows.length && rows[insertPosition].parentId === currentRow.id) {
+			console.log(`debug-Checking insert position: ${insertPosition} (parentId matches)`);
+			insertPosition++;
+		}
 
+		console.log(`debug-Inserting new rows at position: ${insertPosition}`);
+		rows.splice(insertPosition, 0, ...newRows);
+	};
 
 	const handleRedDropdownIconClick = (rowId) => {
 		setAllRows((prevAllRows) => {
@@ -1350,30 +1397,23 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 				const rowIndex = rows.findIndex(row => row.id === rowId);
 				if (rowIndex === -1) return; // Skip if the row doesn't exist in this visit.
 
-				const currentRow = rows[rowIndex];
-
-				// Check if the row is currently expanded
-				const isExpanded = activeParentRow === rowId;
-
-				if (isExpanded) {
+				// Toggle expansion without affecting other rows
+				if (expandedRows.has(rowId)) {
 					collapseRows(rows, rowIndex);
-					setActiveParentRow(null); // Reset active parent row since we are collapsing
+					setExpandedRows(prev => {
+						const newExpanded = new Set(prev);
+						newExpanded.delete(rowId);
+						return newExpanded;
+					});
 				} else {
-					// If another row was previously expanded, first collapse it
-					if (activeParentRow) {
-						const prevRowIndex = rows.findIndex(row => row.id === activeParentRow);
-						if (prevRowIndex !== -1) {
-							collapseRows(rows, prevRowIndex);
-						}
-					}
-					// Pass alternativeRows to expandRows function
-					expandRows(rows, rowIndex, visitId, currentRow, alternativeRows);
-					setActiveParentRow(rowId); // Set new active parent row
+					expandRows(rows, rowIndex, visitId, rows[rowIndex], alternativeRows);
+					setExpandedRows(prev => new Set(prev).add(rowId));
 				}
 			});
 			return updatedAllRows;
 		});
 	};
+
 
 
 
@@ -1475,7 +1515,7 @@ const handleAddVisit = (customVisitId = null, groupedRows = [], updatedAllRows =
 							dragImageIconSrc={dragIcon}
 							onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
 							onRedDropdownIconClick={handleRedDropdownIconClick}
-							activeParentRow={activeParentRow}
+							expandedRows={expandedRows}
 							onSwapAltRow={handleSwapAltRow}
 						/>
 						<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />

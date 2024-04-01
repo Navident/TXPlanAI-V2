@@ -29,15 +29,15 @@ const Table = ({
 	columnWidths = [],
 	displayCheckmark = true,
 	onRedDropdownIconClick,
-	activeParentRow,
+	expandedRows,
 	insideTxConfig = false,
 	onSwapAltRow,
 }) => {
+
+
 	const dispatch = useDispatch();
 	const checkedRows = useSelector(selectCheckedRows);
 	const isRowChecked = (rowId) => checkedRows.includes(rowId);
-
-	
 
 	const handleCheckboxChange = (rowId) => {
 		dispatch(toggleRowChecked(rowId));
@@ -52,17 +52,19 @@ const Table = ({
 		const rowIdentifier = rowData.id || rowData.tempId || "";
 		const isDefaultProcedure = rowData.default;
 		const isAltCodeRow = rowIdentifier.startsWith('dynamic-alt-code') || rowIdentifier.startsWith('static-alt-code');
-		const isRowActive = rowIdentifier === activeParentRow;
-		const isLastRow = rowIndex === rows.length - 1;
-		const rowBackgroundColor = isDefaultProcedure === false ? "#E8E7E7" : "transparent";
+		const isRowActive = expandedRows.has(rowIdentifier);
 
+		const isLastRow = rowIndex === rows.length - 1;
+		const rowBackgroundColor = rowData.backgroundColor ? rowData.backgroundColor
+			: isDefaultProcedure === false ? "#E8E7E7"
+				: "transparent";		
 		// when not in txconfig, wee want to display the red dropdown for default rows that have altchildren
 		const shouldDisplayRedDropdown = isDefaultProcedure && (insideTxConfig || rowData.hasAltChildren);
 
 		// Condition to display the swap icon for alternative procedure children rows when not in Tx config
 		const shouldDisplaySwapIcon = !insideTxConfig && isDefaultProcedure === false;
 
-
+		//const category = rowData.category;
 
 		return (
 			<Draggable key={`row-${tableId}-${rowIndex}`} draggableId={`row-${tableId}-${rowIndex}`} index={rowIndex} type="row">

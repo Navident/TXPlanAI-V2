@@ -22,7 +22,7 @@ import {
 import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import printIcon from "../../assets/printer-icon.svg";
 import importIcon from "../../assets/import-icon.svg";
-import { mapToOpenDentalTreatmentPlanDto } from "../../Utils/Mapping/openDentalMapping";
+import { mapToOpenDentalTreatmentPlanDtoByAllRows } from "../../Utils/Mapping/openDentalMapping";
 import { importTreatmentPlanToOpenDental } from '../../ClientServices/apiService';
 import {
     selectAllTreatmentPlans,
@@ -32,7 +32,7 @@ import {
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 
-const TxViewCustomizationToolbar = ({ immediateSave = false }) => {
+const TxViewCustomizationToolbar = ({ immediateSave = false, allRows }) => {
     const dispatch = useDispatch();
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -106,7 +106,7 @@ const TxViewCustomizationToolbar = ({ immediateSave = false }) => {
     const handleAgreeExportClick = async (inputValue) => {
         // here we map the treatment plan to the dto 
         const patientIdIntInputValue = parseInt(inputValue, 10);
-        const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDto(treatmentPlans, patientIdIntInputValue);
+        const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDtoByAllRows(allRows, patientIdIntInputValue);
 
         // sending the entire treatment plan to the backend in one go
         const success = await importTreatmentPlanToOpenDental(openDentalTreatmentPlanDto);

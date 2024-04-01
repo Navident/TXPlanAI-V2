@@ -24,7 +24,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['categoriesSubcategories', 'patients', 'treatmentPlans', 'cdtCodeAndPayers',  'user'  ] //this is the reducers that persist
+    whitelist: ['categoriesSubcategories', 'patients', 'cdtCodeAndPayers',  'user'  ] //this is the reducers that persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
