@@ -72,7 +72,7 @@ const TreatmentPlanConfiguration = ({
 	const columnWidths = ["5%", "5%", "20%", "55%", "15%"];
 	const isSuperAdmin = useSelector(selectIsSuperAdmin);
 	const [dynamicRowValues, setDynamicRowValues] = useState({});
-	const [activeParentRow, setActiveParentRow] = useState(null);
+	const [expandedRows, setExpandedRows] = useState(new Set());
 	const store = useStore();
 	const handleCloseAlert = () => {
 		setAlertInfo({ ...alertInfo, open: false });
@@ -81,11 +81,6 @@ const TreatmentPlanConfiguration = ({
 	useEffect(() => {
 		console.log("current treatmentPlan:", treatmentPlan);
 	}, [treatmentPlan]);
-
-
-	useEffect(() => {
-		console.log("activeParentRow:", activeParentRow);
-	}, [activeParentRow]);
 
 
 	useEffect(() => {
@@ -1052,25 +1047,17 @@ const TreatmentPlanConfiguration = ({
 				const rowIndex = rows.findIndex(row => row.id === rowId);
 				if (rowIndex === -1) return; // Skip if the row doesn't exist in this visit.
 
-				const currentRow = rows[rowIndex];
-
-				// Check if the row is currently expanded
-				const isExpanded = activeParentRow === rowId;
-
-				if (isExpanded) {
+				// Toggle expansion without affecting other rows
+				if (expandedRows.has(rowId)) {
 					collapseRows(rows, rowIndex);
-					setActiveParentRow(null); // Reset active parent row since we are collapsing
+					setExpandedRows(prev => {
+						const newExpanded = new Set(prev);
+						newExpanded.delete(rowId);
+						return newExpanded;
+					});
 				} else {
-					// If another row was previously expanded, first collapse it
-					if (activeParentRow) {
-						const prevRowIndex = rows.findIndex(row => row.id === activeParentRow);
-						if (prevRowIndex !== -1) {
-							collapseRows(rows, prevRowIndex);
-						}
-					}
-					// Pass alternativeRows to expandRows function
-					expandRows(rows, rowIndex, visitId, currentRow, alternativeRows);
-					setActiveParentRow(rowId); // Set new active parent row
+					expandRows(rows, rowIndex, visitId, rows[rowIndex], alternativeRows);
+					setExpandedRows(prev => new Set(prev).add(rowId));
 				}
 			});
 			return updatedAllRows;
@@ -1268,7 +1255,7 @@ const convertToStaticRowForAltCode = (selectedCdtCode, visitId, rowId, rowsForVi
 							columnWidths={columnWidths}
 							displayCheckmark={false}
 							onRedDropdownIconClick={handleRedDropdownIconClick}
-							activeParentRow={activeParentRow}
+							expandedRows={expandedRows}
 							insideTxConfig={true}
 						/>
 					</div>

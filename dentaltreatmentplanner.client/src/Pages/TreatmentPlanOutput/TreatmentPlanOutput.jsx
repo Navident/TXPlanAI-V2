@@ -91,7 +91,6 @@ const TreatmentPlanOutput = ({
 	const payers = useSelector(selectPayersForFacility);
 	const selectedPayer = useSelector(selectSelectedPayer);
 	const selectedPatient = useSelector(selectSelectedPatient);
-	// Initialize expandedRows as a Set to keep track of all expanded parent rows.
 	const [expandedRows, setExpandedRows] = useState(new Set());
 
 	useEffect(() => {
