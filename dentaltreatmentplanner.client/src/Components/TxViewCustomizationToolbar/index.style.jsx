@@ -36,6 +36,12 @@ export const StyledPrintImportButton = styled.img`
     height: ${props => props.height || '25px'};
 `;
 
+export const StyledPrintExportBtnWithText = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+`;
 
 export const StyledPrintSaveBtnContainer = styled.div`
     display: flex;
@@ -47,7 +53,7 @@ export const StyledPrintSaveBtnContainer = styled.div`
 export const StyledPrintImportBtnContainer = styled.div`
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: 20px;
     align-items: center;
 `;
 

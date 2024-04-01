@@ -3,7 +3,8 @@ import {
     StyledPrintImportButton,
     StyledPrintSaveBtnContainer,
     StyledFlexAlignContainer,
-    StyledPrintImportBtnContainer
+    StyledPrintImportBtnContainer,
+    StyledPrintExportBtnWithText
 } from "./index.style";
 import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import CategoryFilters from "./CategoryFilters/index";
@@ -159,17 +160,15 @@ const TxViewCustomizationToolbar = ({ immediateSave = false }) => {
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
                         <StyledPrintImportBtnContainer>
-                            <>
-                                Print
-                                <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
-                                
-                            </>
+                            <StyledPrintExportBtnWithText>
+                                <div>Print</div>
+                                <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" /> 
+                            </StyledPrintExportBtnWithText>
                             
-                            <>
-                                Export
-                            <StyledPrintImportButton src={importIcon} alt="import Icon" title="Export to EHR" height="30px" onClick={handleExportClick} />
-                                
-                            </>
+                            <StyledPrintExportBtnWithText>
+                                <div>Export</div>
+                                <StyledPrintImportButton src={importIcon} alt="import Icon" title="Export to EHR" height="30px" onClick={handleExportClick} />
+                            </StyledPrintExportBtnWithText>
                         </StyledPrintImportBtnContainer>
                         <SaveButtonRow onSave={handleSaveButtonClick} />
                     </StyledPrintSaveBtnContainer>
