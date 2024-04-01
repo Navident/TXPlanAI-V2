@@ -358,6 +358,7 @@ nav {
 @media (max-width: 800px) {
     .header-left-corner-container {
         max-width: 140px;
+        z-index: 100;
     }
 
     .navbar-menu-container {
