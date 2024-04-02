@@ -24,23 +24,6 @@ export const mapToOpenDentalTreatmentPlanDto = ( treatmentPlans, patientId) => {
     return openDentalTreatmentPlanDto;
 };
 
-function adjustSurfaceForOpenDental(toothNumber, originalSurface) {
-    // Handle cases where the originalSurface is undefined, null, or an empty string
-    if (!originalSurface) {
-        return null; // Explicitly return null for no surface
-    }
-
-    const toothNum = parseInt(toothNumber.replace('#', ''), 10);
-    const isToothNumInRange = (toothNum >= 6 && toothNum <= 11) || (toothNum >= 22 && toothNum <= 27);
-
-    let adjustedSurface = originalSurface;
-    if (isToothNumInRange) {
-        if (originalSurface === "B") adjustedSurface = "F";
-        if (originalSurface === "O") adjustedSurface = "I";
-    }
-
-    return adjustedSurface;
-}
 
 function addFluorideTreatmentToothRange(selectedCdtCode, procedureDto) {
     if (selectedCdtCode.originalVisitCategory.toLowerCase() === "fluoride".toLowerCase()) {
@@ -67,11 +50,9 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
             
             const selectedCdtCode = procedure.selectedCdtCode;
             if (selectedCdtCode && selectedCdtCode.code) {
-                const adjustedSurface = adjustSurfaceForOpenDental(procedure.toothNumber, selectedCdtCode.surface);
-
                 const procedureDto = {
                     ToothNum: procedure.toothNumber.replace('#', ''),
-                    Surf: adjustedSurface,
+                    Surf: selectedCdtCode.surface ? selectedCdtCode.surface : null,
                     ProcStatus: "TP",
                     procCode: selectedCdtCode.code,
                     priority: (visitIndex + 1).toString() // Adding 1 because indices start at 0

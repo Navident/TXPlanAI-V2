@@ -85,12 +85,28 @@ const GenerateTreatmentPlan = () => {
 		return Array.from(uniqueCategories);
 	}
 
+	// Utility function to adjust surface values based on tooth number
+	function adjustSurfaceValues(toothNumber, surface) {
+		// Define the tooth numbers range for adjustment
+		const teethNumbersForAdjustment = [6, 7, 8, 9, 10, 11, 22, 23, 24, 25, 26, 27];
+		// Convert toothNumber to integer
+		const num = parseInt(toothNumber, 10);
+
+		// Check if the tooth number is within the range for adjustment
+		if (teethNumbersForAdjustment.includes(num)) {
+			// Replace 'B' with 'F' and 'O' with 'I' in the surface string
+			return surface.replace(/B/g, 'F').replace(/O/g, 'I');
+		}
+		// Return the original surface if no adjustment is needed
+		return surface;
+	}
+
 
 	// Utility function to preprocess input text and maintain order
 	async function preprocessInputText(inputText) {
 		console.log("inputText sent to ai", inputText);
 		const aiResponse = await fetchOpenAIResponse(inputText);
-		console.log("aiResponsePreprocessedInputText", aiResponse);
+		console.log("ai response", aiResponse);
 
 		appInsights.trackEvent({
 			name: "TreatmentPlan",
@@ -108,6 +124,7 @@ const GenerateTreatmentPlan = () => {
 
 		// Wrap parsedResponse in an array if it's not already one
 		const responseArray = Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse];
+		console.log("responseArray", responseArray);
 
 		return responseArray.map((item, index) => ({
 			...item,
@@ -132,6 +149,7 @@ const GenerateTreatmentPlan = () => {
 
 		for (const item of treatmentEntries) {
 			const { arch, toothNumber, surface, treatments, originalOrder } = item;
+			const adjustedSurface = adjustSurfaceValues(toothNumber, surface);
 			// Removing "#" from tooth number if present, else default to an empty string
 			const sanitizedToothNumber = toothNumber ? toothNumber.replace('#', '') : '';
 			for (const [treatmentIndex, treatment] of treatments.entries()) {
@@ -145,7 +163,7 @@ const GenerateTreatmentPlan = () => {
 							procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => ({ 
 								...cdtMap,
 								toothNumber: sanitizedToothNumber,
-								surface,
+								surface: adjustedSurface,
 								arch,
 								originalVisitCategory: plan.procedureCategoryName,
 							})),
