@@ -54,6 +54,7 @@ import PaymentTotals from "../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 import InputAdornment from '@mui/material/InputAdornment';
 
+
 const TreatmentPlanOutput = ({
 	treatmentPlan,
 	treatmentPlans,

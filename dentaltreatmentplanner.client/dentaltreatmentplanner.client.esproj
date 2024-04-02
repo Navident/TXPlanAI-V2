@@ -31,6 +31,7 @@
     <Folder Include="src\Pages\Dashboard\AccountInfo\" />
     <Folder Include="src\Pages\Login\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
+    <Folder Include="src\Pages\PatientManagementDashboard\GenerateTreatmentPlan\EmptyStatePlaceholder\" />
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Redux\ReduxSlices\User\" />
     <Folder Include="src\Theme\" />

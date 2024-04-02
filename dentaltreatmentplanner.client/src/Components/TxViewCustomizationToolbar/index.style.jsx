@@ -6,6 +6,7 @@ export const StyledTxToolbarContainer = styled.div`
     justify-content: center;
     position: sticky;
     top:-20px;
+    height: 79px;
     z-index: 100;
     padding: 20px;
     background-color:white;

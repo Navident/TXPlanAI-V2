@@ -49,7 +49,7 @@ export const StyledContainerWithTableInner = styled.div`
     flex-direction: column;
     padding: 30px;
     gap: 20px;
-
+        height: calc(100% - 79px);
 `;
 export const StyledAppContainer = styled.div`
     background-color: #eeeef3;

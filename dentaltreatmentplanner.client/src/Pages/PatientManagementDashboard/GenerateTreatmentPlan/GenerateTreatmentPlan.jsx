@@ -1,6 +1,6 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
-import { TextField } from "@mui/material";
+import { TextField, InputAdornment } from '@mui/material';
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
@@ -31,6 +31,7 @@ import PaymentTotals from "../../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
 import appInsights from '../../../Utils/appInsights';
 import { selectFacilityName, selectFacilityId } from '../../../Redux/ReduxSlices/User/userSlice';
+import EmptyStatePlaceholder from './EmptyStatePlaceholder';
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
@@ -276,7 +277,7 @@ const GenerateTreatmentPlan = () => {
 						What can I help you treatment plan today?
 					</div>
 					<TextField
-						label="Input your text"
+						label="Input your treatments"
 						multiline
 						minRows={3}
 						value={inputText}
@@ -315,6 +316,7 @@ const GenerateTreatmentPlan = () => {
 				<TxViewCustomizationToolbar allRows={allRowsFromChild} />
 				<StyledSeparator customMarginTop="0px" />
 				<StyledContainerWithTableInner>
+					{treatmentPlans.length > 0 && !isLoading && (
 					<StyledTitleAndPaymentTotalsContainer>
 						<div style={{ flex: 1 }}></div> 
 						<StyledLargeText>Treatment Plan</StyledLargeText>
@@ -329,6 +331,7 @@ const GenerateTreatmentPlan = () => {
 							)}
 						</div> 
 					</StyledTitleAndPaymentTotalsContainer>
+					)}
 
 					{isLoading ? (
 						<div
@@ -341,7 +344,7 @@ const GenerateTreatmentPlan = () => {
 						>
 							<CircularProgress style={{ color: "#7777a1" }} />
 						</div>
-					) : (
+					) : treatmentPlans.length > 0 ? (
 						treatmentPlans.map((plan, index) => (
 							<TreatmentPlanOutput
 								key={`treatment-plan-${index}`}
@@ -362,6 +365,8 @@ const GenerateTreatmentPlan = () => {
 								onAllRowsUpdate={handleAllRowsUpdate}
 							/>
 						))
+					) : (
+					<EmptyStatePlaceholder />
 					)}
 				</StyledContainerWithTableInner>
 			</div>
