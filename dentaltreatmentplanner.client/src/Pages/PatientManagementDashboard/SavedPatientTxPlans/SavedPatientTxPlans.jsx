@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import UniversalTable from "../../../Components/Common/UniversalTable/UniversalTable";
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import "./SavedPatientTxPlans.css";
-import useTreatmentPlan from "../../../Contexts/TreatmentPlanContext/useTreatmentPlan";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import {

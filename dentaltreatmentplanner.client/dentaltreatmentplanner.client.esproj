@@ -13,6 +13,7 @@
     <Folder Include="src\Components\Common\Alert\" />
     <Folder Include="src\Components\Common\GoBack\" />
     <Folder Include="src\Components\Common\Checkbox\" />
+    <Folder Include="src\Components\Common\MultilineTextfield\" />
     <Folder Include="src\Components\Common\ToggleButtonGroup\" />
     <Folder Include="src\Components\Common\SaveButtonRow\" />
     <Folder Include="src\Components\Common\PopupAlert\" />

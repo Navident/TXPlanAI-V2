@@ -1,6 +1,6 @@
 import './Landing.css';
 import { useNavigate } from 'react-router-dom';
-import dentalHero from "../../assets/home-hero.jpg";
+import dentalHero from "../../assets/home-hero.webp";
 import { TextField, Button } from "@mui/material";
 import HeaderBar from "../../Components/Common/HeaderBar/HeaderBar";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";

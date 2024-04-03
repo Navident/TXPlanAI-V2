@@ -1,4 +1,5 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
+import MultilineTextfield from "../../../Components/Common/MultilineTextfield/index";
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
 import { TextField, InputAdornment } from '@mui/material';
 import PenIcon from "../../../assets/pen-icon.svg";
@@ -276,30 +277,10 @@ const GenerateTreatmentPlan = () => {
 					<div className="large-text">
 						What can I help you treatment plan today?
 					</div>
-					<TextField
+					<MultilineTextfield
 						label="Input your treatments"
-						multiline
-						minRows={3}
 						value={inputText}
 						onChange={handleInputChange}
-						sx={{
-							width: "100%",
-							backgroundColor: "white",
-							"& label.Mui-focused": {
-								color: "#7777a1",
-							},
-							"& .MuiOutlinedInput-root": {
-								"& fieldset": {
-									borderColor: "#ccc",
-								},
-								"&:hover fieldset": {
-									borderColor: "#7777a1",
-								},
-								"&.Mui-focused fieldset": {
-									borderColor: "#7777a1",
-								},
-							},
-						}}
 					/>
 					<RoundedButton
 						text="Generate Treatment Plan"

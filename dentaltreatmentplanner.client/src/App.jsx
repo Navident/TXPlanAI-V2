@@ -32,7 +32,6 @@ function App() {
     enableMapSet();
     return (
         <BusinessProvider>
-            <TreatmentPlanProvider>
                 <Provider store={store}>
                     <PersistGate loading={null} persistor={persistor}>
                     <InitialDataLoader />
@@ -68,7 +67,6 @@ function App() {
                         </div>
                     </PersistGate>
                     </Provider>
-            </TreatmentPlanProvider>
         </BusinessProvider>
     );
 }
