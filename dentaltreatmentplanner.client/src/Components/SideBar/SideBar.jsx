@@ -7,11 +7,21 @@ import homeIcon from '../../assets/home-icon.svg';
 import homeIconActive from '../../assets/home-icon-selected.svg';
 import newTxPlanIcon from '../../assets/new-tx-plan-icon.svg';
 import savedTxPlansIcon from '../../assets/saved-tx-plans-icon.svg';
+import savedTxPlansIconActive from '../../assets/saved-tx-plans-icon-active.svg';
 import providersIcon from '../../assets/providers-icon.svg';
+
 import cdtCodesIcon from '../../assets/cdt-codes-icon.svg';
+import cdtCodesIconActive from '../../assets/cdt-codes-icon-active.svg';
+
 import settingsIcon from '../../assets/tx-plan-settings-icon.svg';
-import settingsIconActive from '../../assets/settings-icon-active.svg';
-import settingsIcon2 from '../../assets/tx-plan-settings-icon.svg';
+import settingsIconActive from '../../assets/tx-plan-settings-icon-active.svg';
+
+import accountInfoIconActive from '../../assets/account-info-icon-active.svg';
+import accountInfoIcon from '../../assets/account-info-icon.svg';
+
+
+import feeSchedulingIcon from '../../assets/fee-scheduling-icon.svg';
+import feeSchedulingIconActive from '../../assets/fee-scheduling-icon-active.svg';
 
 const SideBar = () => {
     const navigate = useNavigate();
@@ -20,12 +30,12 @@ const SideBar = () => {
 
     const items = [
         { imgSrc: homeIcon, imgSrcSelected: homeIconActive, text: "Home", path: "" },
-        { imgSrc: newTxPlanIcon, imgSrcSelected: newTxPlanIcon, text: "Fee Schedule", path: "feescheduling" },
-        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIcon, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans" },
+        { imgSrc: feeSchedulingIcon, imgSrcSelected: feeSchedulingIconActive, text: "Fee Schedule", path: "feescheduling" },
+        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIconActive, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans" },
         { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers" },
-        { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIcon, text: "Custom CDT Codes", path: "customcdtCodes" },
+        { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIconActive, text: "Custom CDT Codes", path: "customcdtCodes" },
         { imgSrc: settingsIcon, imgSrcSelected: settingsIconActive, text: "TX Plan Settings", path: "defaultprocedures" },
-        { imgSrc: settingsIcon2, imgSrcSelected: settingsIconActive, text: "Account Info", path: "accountinfo" }
+        { imgSrc: accountInfoIcon, imgSrcSelected: accountInfoIconActive, text: "Account Info", path: "accountinfo" }
 
     ];
 
