@@ -507,7 +507,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 {
                     TreatmentPlanId = tp.TreatmentPlanId,
                     PayerId = tp.PayerId,
-                    //Description = tp.Description,
+                    Description = tp.Description,
                     ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
 
                     // Mapping each visit of the treatment plan to a VisitDto
@@ -1067,7 +1067,7 @@ namespace DentalTreatmentPlanner.Server.Services
                                 ProcedureTypeId = procedureMapDto.ProcedureTypeId,
                             };
 
-                            // Assuming ProcedureToCdtMaps are part of your DTO
+                            
                             foreach (var cdtMapDto in procedureMapDto.ProcedureToCdtMaps)
                             {
                                 ProcedureToCdtMap newCdtMap = new ProcedureToCdtMap
@@ -1100,7 +1100,7 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-        public async Task<TreatmentPlan> CreateNewTreatmentPlanForPatientFromCombinedAsyncPriorHippa(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
+        public async Task<RetrievePatientTreatmentPlanDto> CreateNewTreatmentPlanForPatientFromCombinedAsyncPriorHippa(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
         {
             // Start a new database transaction
             using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -1201,9 +1201,31 @@ namespace DentalTreatmentPlanner.Server.Services
                     // Commit the transaction after successful operation
                     await transaction.CommitAsync();
 
-                    // Return the newly created treatment plan with all related entities
-                    return newTreatmentPlan;
+                    // After committing the transaction, re-query the treatment plan with related entities
+                    var retrievedTreatmentPlan = await _context.TreatmentPlans
+                        .Where(tp => tp.TreatmentPlanId == newTreatmentPlan.TreatmentPlanId)
+                        .Include(tp => tp.Visits)
+                            .ThenInclude(v => v.VisitToProcedureMaps)
+                                .ThenInclude(vtpm => vtpm.ProcedureToCdtMaps)
+                                    .ThenInclude(ptcm => ptcm.CdtCode)
+                        .Select(tp => new RetrievePatientTreatmentPlanDto
+                        {
+                            TreatmentPlanId = tp.TreatmentPlanId,
+                            Description = tp.Description,
+                            CreatedAt = tp.CreatedAt,
+                            Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                            {
+                                VisitId = v.VisitId,
+                                Description = v.Description,
+                                VisitNumber = v.VisitNumber,
+                                Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
+                            }).ToList()
+                        })
+                        .FirstOrDefaultAsync();
+
+                    return retrievedTreatmentPlan;
                 }
+
                 catch (Exception ex)
                 {
                     // Rollback the transaction in case of an exception

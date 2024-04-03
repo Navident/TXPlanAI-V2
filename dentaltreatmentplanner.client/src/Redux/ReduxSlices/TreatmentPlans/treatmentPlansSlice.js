@@ -57,18 +57,18 @@ const addCdtCodeToVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visit
     });
 };
 
-const deleteCdtCodeFromVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visitId, visitCdtCodeMapIdToDelete) => {
+const deleteProcedureFromVisitInTreatmentPlan = (treatmentPlans, treatmentPlanId, visitId, visitToProcedureMapIdToDelete) => {
     return treatmentPlans.map(plan => {
         if (plan.treatmentPlanId === treatmentPlanId) {
             return {
                 ...plan,
                 visits: plan.visits.map(visit => {
                     if (visit.visitId === visitId) {
-                        // Filter out the cdtCode by visitCdtCodeMapId
-                        const updatedCdtCodes = visit.cdtCodes.filter(cdtCode => cdtCode.visitCdtCodeMapId !== visitCdtCodeMapIdToDelete);
+                        // Filter out the procedure by visitToProcedureMapId
+                        const updatedProcedures = visit.procedures.filter(procedure => procedure.visitToProcedureMapId !== visitToProcedureMapIdToDelete);
                         return {
                             ...visit,
-                            cdtCodes: updatedCdtCodes,
+                            procedures: updatedProcedures,
                         };
                     }
                     return visit;
@@ -199,9 +199,14 @@ export const treatmentPlansSlice = createSlice({
             state.treatmentPlans = addCdtCodeToVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, newCdtCode);
         },
 
-        onDeleteCdtCode: (state, action) => {
-            const { treatmentPlanId, visitId, visitCdtCodeMapIdToDelete } = action.payload;
-            state.treatmentPlans = deleteCdtCodeFromVisitInTreatmentPlan(current(state.treatmentPlans), treatmentPlanId, visitId, visitCdtCodeMapIdToDelete);
+        onDeleteProcedure: (state, action) => {
+            const { treatmentPlanId, visitId, visitToProcedureMapIdToDelete } = action.payload;
+            state.treatmentPlans = deleteProcedureFromVisitInTreatmentPlan(
+                current(state.treatmentPlans),
+                treatmentPlanId,
+                visitId,
+                visitToProcedureMapIdToDelete
+            );
         },
 
         onDeleteTemporaryVisit: (state, action) => {
@@ -225,7 +230,7 @@ export const {
     handleAddVisit,
     onDeleteVisit,
     onUpdateVisitsInTreatmentPlan,
-    handleAddCdtCode, onDeleteCdtCode,
+    handleAddCdtCode, onDeleteProcedure,
     onDeleteTemporaryVisit,
     addTreatmentPlan, setPatientTreatmentPlans, removeTreatmentPlanById,
     setVisitOrder,

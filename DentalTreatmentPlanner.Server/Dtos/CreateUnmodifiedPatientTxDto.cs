@@ -7,6 +7,7 @@
         public int? ToothNumber { get; set; }
         public int? PatientId { get; set; }
         public int? PayerId { get; set; }
+        public DateTime CreatedAt { get; set; }
         public ICollection<CreatePatientVisitDto> Visits { get; set; }
     }
 }

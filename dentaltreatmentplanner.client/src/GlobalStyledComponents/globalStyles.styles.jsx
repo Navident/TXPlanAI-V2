@@ -175,11 +175,14 @@ export const StyledAddButtonCellContainer = styled.div`
 
 export const StyledRedCircleWithArrowDropdownContainer = styled.div`
   position: relative;
-  width: 20px; 
-  height: 20px; 
-  background-image: url(${props => props.src});
-  background-size: cover;
-  background-position: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #C10000; /* Adjust the border thickness as needed */
+  border-radius: 50%; /* This creates the circle shape */
+  background-color: white; /* Set the background color to white */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
 
   &::after {
@@ -189,9 +192,9 @@ export const StyledRedCircleWithArrowDropdownContainer = styled.div`
     top: 50%;
     width: 0;
     height: 0;
-    border-left: 4px solid transparent; 
-    border-right: 4px solid transparent; 
-    border-top: 5px solid red; 
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #C10000; 
     transition: transform 0.3s ease;
     transform: translate(-50%, -50%) ${({ isExpanded }) => isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
   }

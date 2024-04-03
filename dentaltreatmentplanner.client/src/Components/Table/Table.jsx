@@ -91,11 +91,11 @@ const Table = ({
 
 										{/* Conditionally render the StyledRedCircleWithArrowDropdownContainer */}
 										{shouldDisplayRedDropdown && !shouldDisplaySwapIcon && (
-											<StyledRedCircleWithArrowDropdownContainer
-												src={redDropdownCircle}
-												isExpanded={isRowActive}
-												onClick={(e) => toggleDropdown(rowData.id, e.currentTarget)}
-											/>
+										<StyledRedCircleWithArrowDropdownContainer
+											isExpanded={isRowActive}
+											onClick={(e) => toggleDropdown(rowData.id, e.currentTarget)}
+										/>
+
 										)}
 
 										{/* Conditionally render the swap icon for alternative procedure children rows */}
@@ -121,7 +121,6 @@ const Table = ({
 
 
 	const toggleDropdown = (id, target) => {
-		// Your existing logic when red dropdown is clicked
 		onRedDropdownIconClick(id, target);
 	};
 

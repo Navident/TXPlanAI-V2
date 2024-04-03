@@ -47,7 +47,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady, selectCombinedCdtCodes, selectAlternativeProcedures } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
-import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteCdtCode } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { onDeleteTemporaryVisit, selectPatientTreatmentPlans, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteProcedure } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
 import PaymentTotals from "../../Components/PaymentTotals/index";
@@ -93,6 +93,7 @@ const TreatmentPlanOutput = ({
 	const selectedPayer = useSelector(selectSelectedPayer);
 	const selectedPatient = useSelector(selectSelectedPatient);
 	const [expandedRows, setExpandedRows] = useState(new Set());
+	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 
 	useEffect(() => {
 		const newCheckedRows = [];
@@ -131,6 +132,10 @@ const TreatmentPlanOutput = ({
 	useEffect(() => {
 		console.log("alternativeRows:", alternativeRows);
 	}, [allRows]);
+
+	useEffect(() => {
+		console.log("patientTreatmentPlans:", patientTreatmentPlans);
+	}, [patientTreatmentPlans]);
 
 	useEffect(() => {
 		setCombinedVisits(treatmentPlan.visits);
@@ -274,8 +279,7 @@ const TreatmentPlanOutput = ({
 
 
 	const createInitialStaticRows = (item, visitId, index, procedureMap = null) => {
-		// Assuming `item` could either be a CDT map directly or part of a procedure map
-		// If `procedureMap` is provided, `item` is considered part of it; otherwise, `item` is a direct CDT map
+
 		let selectedPayerDetails;
 
 		const cdtMap = procedureMap ? item : (item || {});
@@ -646,14 +650,20 @@ const TreatmentPlanOutput = ({
 
 	const handleDeleteRow = (visitId, rowId, row) => {
 		console.log("row in delete", row);
-		const rowVisitCdtCodeMapId = row.visitCdtCodeMapId;
-		dispatch(onDeleteCdtCode({ treatmentPlanId: treatmentPlan.treatmentPlanId, visitId, visitCdtCodeMapIdToDelete: rowVisitCdtCodeMapId }));
+		// Assuming row corresponds to a procedure within a visit
+		const rowVisitToProcedureMapId = row.visitToProcedureMapId;
+		dispatch(onDeleteProcedure({
+			treatmentPlanId: treatmentPlan.treatmentPlanId,
+			visitId,
+			visitToProcedureMapIdToDelete: rowVisitToProcedureMapId
+		}));
 		setAllRows((prevRows) => {
 			const updatedRows = prevRows[visitId].filter((row) => row.id !== rowId);
 			return { ...prevRows, [visitId]: updatedRows };
 		});
 		setDeletedRowIds((prevIds) => [...prevIds, rowId]);
 	};
+
 
 	const handleDeleteVisit = (visitId) => {
 		// Check if the visitId starts with "temp-" to identify temporary visits
@@ -719,8 +729,8 @@ const TreatmentPlanOutput = ({
 
 	const handleUpdateTreatmentPlan = async () => {
 		try {
-			// Check if in generate treatment plan context and no treatment plan ID exists
-			if (isInGenerateTreatmentPlanContext) {
+			// if in generate treatment plan page and no tx ID exists yet then we only do a create
+			if (isInGenerateTreatmentPlanContext && treatmentPlan.treatmentPlanId === null) {
 				// Logic for creating a new treatment plan
 				const newTreatmentPlanResponse = await createNewCombinedTreatmentPlanForPatient(
 					treatmentPlan,
@@ -739,7 +749,7 @@ const TreatmentPlanOutput = ({
 				dispatch(showAlert({ type: 'success', message: 'New treatment plan created successfully' }));
 
 			
-
+			// if BOTH of the top if conditions are not true then we only do an update to an existing tx plan
 			} else { 
 				console.log("Proceeding with the update logic.");
 				const tempVisitIds = visitOrder.filter((visitId) =>

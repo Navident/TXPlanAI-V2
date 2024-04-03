@@ -27,7 +27,9 @@ const CustomCheckbox = ({ label, checked, onChange, color }) => {
                 sx={{
                     marginLeft: 0, 
                     marginRight: 0, 
-
+                    '& .MuiFormControlLabel-label': {
+                        marginLeft: 0.5, 
+                    }
                 }}
             />
         </FormGroup>
