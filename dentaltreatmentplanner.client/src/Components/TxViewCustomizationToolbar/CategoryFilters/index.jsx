@@ -16,9 +16,6 @@ const CategoryFilters = () => {
     const dispatch = useDispatch();
     const activeTxCategories = useSelector(selectActiveTxCategories);
     const selectedCategories = useSelector(selectSelectedCategories);
-
-
-
     useEffect(() => {
         console.log("activeTxCategories:", activeTxCategories);
     }, [activeTxCategories]);

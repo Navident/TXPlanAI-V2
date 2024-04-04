@@ -100,7 +100,7 @@ const PatientTreatmentPlanCustomizer = () => {
 					<StyledContentArea>
 						<GoBack text="Go Back" />
 						<StyledRoundedBoxContainer height="auto">
-							<TxViewCustomizationToolbar immediateSave={true} />
+							<TxViewCustomizationToolbar immediateSave={true} hideGroupBtnAndFilters={true} />
 							<StyledSeparator customMarginTop="0px" />
 							<StyledContainerWithTableInner>
 								<StyledTitleAndPaymentTotalsContainer>

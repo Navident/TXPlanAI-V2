@@ -70,6 +70,10 @@ export const tableViewControlSlice = createSlice({
         clearUpdateRequest: (state) => {
             state.updateRequested = false;
         },
+        resetCategoryFilters: (state) => {
+            state.activeTxCategories = [];
+            state.selectedCategories.clear(); 
+        },
     },
 });
 
@@ -84,7 +88,8 @@ export const {
     toggleGroupActive,
     addCategory,
     updateCheckedRows,
-    requestUpdateTreatmentPlan, clearUpdateRequest
+    requestUpdateTreatmentPlan, clearUpdateRequest,
+    resetCategoryFilters,
 } = tableViewControlSlice.actions;
 
 //selectors

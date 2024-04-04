@@ -1376,8 +1376,11 @@ const TreatmentPlanOutput = ({
 		if (alternatives && alternatives.length > 0) {
 			console.log(`debug-${alternatives.length} alternative(s) found for visitId: ${visitId}`);
 
-			// Loop through each alternative to check and add if not already processed
-			alternatives.forEach((alt, altIndex) => {
+			// Filter alternatives to include only those matching the currentRow's visitToProcedureMapId
+			const matchingAlternatives = alternatives.filter(alt => alt.visitToProcedureMapId === currentRow.visitToProcedureMapId);
+
+			// Loop through each matching alternative to check and add if not already processed
+			matchingAlternatives.forEach((alt, altIndex) => {
 				// Ensure that selectedCdtCode exists and the procedureToCdtMapId hasn't been added already
 				if (alt.selectedCdtCode && !addedCdtMapIds.has(alt.selectedCdtCode.procedureToCdtMapId)) {
 					// This alternative's procedureToCdtMapId is unique, proceed to add
@@ -1400,6 +1403,7 @@ const TreatmentPlanOutput = ({
 		console.log(`debug-Inserting new rows at position: ${insertPosition}`);
 		rows.splice(insertPosition, 0, ...newRows);
 	};
+
 
 	const handleRedDropdownIconClick = (rowId) => {
 		setAllRows((prevAllRows) => {

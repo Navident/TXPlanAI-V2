@@ -32,7 +32,7 @@ import {
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 
-const TxViewCustomizationToolbar = ({ immediateSave = false, allRows }) => {
+const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupBtnAndFilters }) => {
     const dispatch = useDispatch();
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -42,12 +42,24 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows }) => {
     const [textFieldWidth, setTextFieldWidth] = useState('');
     const [alertDialogInputValue, setAlertDialogInputValue] = useState('');
 
+    useEffect(() => {
+        // On component mount, we check if we should pre-populate the patient ID
+        const patientID = extractPatientIdFromUrl();
+        if (patientID) {
+            setAlertDialogInputValue(patientID);
+        }
+    }, []);
+
+    const extractPatientIdFromUrl = () => {
+        const searchParams = new URLSearchParams(window.location.search);
+        return searchParams.get('patientID'); 
+    };
 
     const handleSaveButtonClick = () => {
         if (immediateSave) {
             // Perform the immediate save 
             console.log('Performing immediate save...');
-            dispatch(updateTreatmentPlanDescription({ treatmentPlanId: treatmentPlans[0].treatmentPlanId, description: 'Default Description' })); // Example
+            dispatch(updateTreatmentPlanDescription({ treatmentPlanId: treatmentPlans[0].treatmentPlanId, description: 'Default Description' })); 
             dispatch(requestUpdateTreatmentPlan());
         } else {
             // Popup before save 
@@ -142,21 +154,25 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows }) => {
             />
 
             <ToolbarContainer>
-                <StyledFlexAlignContainer justify="flex-start">
-                    <RoundedButton
-                        text="Group"
-                        onClick={handleGroupClick}
-                        backgroundColor={UI_COLORS.light_grey2}
-                        textColor="white"
-                        border={false}
-                        borderRadius="4px"
-                        height="39px"
-                        width="150px"
-                    />
-                </StyledFlexAlignContainer>
-                <StyledFlexAlignContainer justify="center">
-                    <CategoryFilters />
-                </StyledFlexAlignContainer>
+                {!hideGroupBtnAndFilters && (
+                    <StyledFlexAlignContainer justify="flex-start">
+                        <RoundedButton
+                            text="Group"
+                            onClick={handleGroupClick}
+                            backgroundColor={UI_COLORS.light_grey2}
+                            textColor="white"
+                            border={false}
+                            borderRadius="4px"
+                            height="39px"
+                            width="150px"
+                        />
+                    </StyledFlexAlignContainer>
+                )}
+                {!hideGroupBtnAndFilters && (
+                    <StyledFlexAlignContainer justify="center">
+                        <CategoryFilters />
+                    </StyledFlexAlignContainer>
+                )}
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
                         <StyledPrintImportBtnContainer>

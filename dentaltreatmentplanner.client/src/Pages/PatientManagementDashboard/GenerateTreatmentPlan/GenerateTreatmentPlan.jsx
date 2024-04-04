@@ -15,7 +15,7 @@ import { fetchOpenAIResponse } from "../../../OpenAiLlm/gptRunner";
 import { CircularProgress } from "@mui/material";
 import {
 	setActiveTxCategories,
-
+	resetCategoryFilters
 } from "../../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
@@ -59,6 +59,13 @@ const GenerateTreatmentPlan = () => {
 		return () => {
 			// Reset treatmentPlans when component unmounts
 			dispatch(setTreatmentPlans([]));
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
+		// Reset category filters when component unmounts
+		return () => {
+			dispatch(resetCategoryFilters());
 		};
 	}, [dispatch]);
 
