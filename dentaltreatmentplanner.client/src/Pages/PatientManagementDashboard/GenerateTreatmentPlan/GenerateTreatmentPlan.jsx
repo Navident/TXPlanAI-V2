@@ -96,12 +96,18 @@ const GenerateTreatmentPlan = () => {
 
 		// Check if the tooth number is within the range for adjustment
 		if (teethNumbersForAdjustment.includes(num)) {
-			// Replace 'B' with 'F' and 'O' with 'I' in the surface string
-			return surface.replace(/B/g, 'F').replace(/O/g, 'I');
+			// Ensure surface is a string to avoid errors calling .replace on undefined
+			if (typeof surface === 'string') {
+				// Replace 'B' with 'F' and 'O' with 'I' in the surface string
+				return surface.replace(/B/g, 'F').replace(/O/g, 'I');
+			} else {
+				return ''; 
+			}
 		}
-		// Return the original surface if no adjustment is needed
-		return surface;
+		// Return the original surface if no adjustment is needed or if surface is undefined
+		return surface || '';
 	}
+
 
 
 	// Utility function to preprocess input text and maintain order
@@ -150,10 +156,16 @@ const GenerateTreatmentPlan = () => {
 		);
 
 		for (const item of treatmentEntries) {
+			console.log("Processing item:", item); 
 			const { arch, toothNumber, surface, treatments, originalOrder } = item;
+
+			if (toothNumber === undefined) {
+				console.error("Undefined toothNumber found in item:", item);
+				continue; // Skip this item 
+			}
+
 			const adjustedSurface = adjustSurfaceValues(toothNumber, surface);
-			// Removing "#" from tooth number if present, else default to an empty string
-			const sanitizedToothNumber = toothNumber ? toothNumber.replace('#', '') : '';
+			const sanitizedToothNumber = typeof toothNumber === 'string' ? toothNumber.replace('#', '') : '';
 			for (const [treatmentIndex, treatment] of treatments.entries()) {
 				const plan = plansMap.get(treatment.toLowerCase());
 				if (plan) {
