@@ -92,41 +92,41 @@ const TreatmentPlanConfiguration = ({
 	}, [dynamicRowValues]);
 
 	useEffect(() => {
-		if (isInitialLoad.current) {
-			console.log("we went in the initial load conditional");
-			const visits = treatmentPlan.visits || [];
-			const newAllRows = {}; // Default procedures
-			const newAlternativeRows = {}; // Non-default procedures for later access
+			if (isInitialLoad.current) {
+				console.log("we went in the initial load conditional");
+				const visits = treatmentPlan.visits || [];
+				const newAllRows = {}; // Default procedures
+				const newAlternativeRows = {}; // Non-default procedures for later access
 
-			visits.forEach(visit => {
-				const visitId = visit.visitId;
-				newAllRows[visitId] = [];
-				newAlternativeRows[visitId] = [];
+				visits.forEach(visit => {
+					const visitId = visit.visitId;
+					newAllRows[visitId] = [];
+					newAlternativeRows[visitId] = [];
 
-				(visit.procedures || []).forEach((procedureMap, procIndex) => {
-					(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
-						const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
+					(visit.procedures || []).forEach((procedureMap, procIndex) => {
+						(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
+							const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
-						if (cdtMap.default) {
-							newAllRows[visitId].push(row);
-						} else {
-							newAlternativeRows[visitId].push(row);
-						}
+							if (cdtMap.default) {
+								newAllRows[visitId].push(row);
+							} else {
+								newAlternativeRows[visitId].push(row);
+							}
+						});
 					});
+
+					// Include a dynamic row at the end of each visit in allRows
+					const initialRowId = `initial-${visitId}`;
+					newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
 				});
 
-				// Include a dynamic row at the end of each visit in allRows
-				const initialRowId = `initial-${visitId}`;
-				newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
-			});
+				setAllRows(newAllRows);
+				setAlternativeRows(newAlternativeRows);
+				dispatch(setVisitOrder(visits.map(visit => visit.visitId)));
 
-			setAllRows(newAllRows);
-			setAlternativeRows(newAlternativeRows);
-			dispatch(setVisitOrder(visits.map(visit => visit.visitId)));
-
-			isInitialLoad.current = false;
-		}
-	}, [treatmentPlans]);
+				isInitialLoad.current = false;
+			}
+	}, [treatmentPlan]);
 
 
 
@@ -351,7 +351,10 @@ const TreatmentPlanConfiguration = ({
 			}
 
 			// Decide which dynamic row to use based on whether the row to convert is a default procedure or not
-			const finalDynamicRow = rowToConvert.default ? createDynamicRowUponAddClick(visitId) : createDynamicRowForAltCode(visitId, rowToConvert);
+			const finalDynamicRow = rowToConvert.default === false
+				? createDynamicRowForAltCode(visitId, rowToConvert) // If false
+				: createDynamicRowUponAddClick(visitId); // If true or undefined
+
 
 			// Replace the row to be converted with the static row
 			newRows[rowIndexToConvert] = staticRow;
@@ -765,17 +768,18 @@ const TreatmentPlanConfiguration = ({
 		setAlternativeRows(prevAlternativeRows => {
 			// Retrieve existing alternative rows for the visit
 			const existingAlternativeRows = prevAlternativeRows[visitId] || [];
+
 			// Identify new or updated non-default rows from updatedAllRows
 			const newOrUpdateAlternativeRows = updatedAllRows[visitId].filter(row =>
 				!row.default && row.selectedCdtCode != null
 			);
 
 			// Create a merged list of unique alternative rows
-			const mergedAlternativeRowsMap = new Map(existingAlternativeRows.map(row => [row.id, row]));
+			const mergedAlternativeRowsMap = new Map(existingAlternativeRows.map(row => [row.procedureToCdtMapId, row]));
 
 			// Update or add new alternative rows into the map to ensure uniqueness
 			newOrUpdateAlternativeRows.forEach(row => {
-				mergedAlternativeRowsMap.set(row.id, row);
+				mergedAlternativeRowsMap.set(row.procedureToCdtMapId, row);
 			});
 
 			return {
@@ -784,6 +788,7 @@ const TreatmentPlanConfiguration = ({
 			};
 		});
 	};
+
 
 
 

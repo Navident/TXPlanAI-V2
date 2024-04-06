@@ -46,9 +46,8 @@ const ProceduresCustomizer = () => {
 		console.error("Error fetching subcategoryTreatmentPlans: ", error);
 	}
 
-	console.log("subcategoryTreatmentPlans: ", subcategoryTreatmentPlans);
 	const currentSubcategoryPlan = subcategoryTreatmentPlans?.find(plan => plan.procedureSubcategoryId === paramsSubcategoryId);
-
+	console.log("currentSubcategoryPlan:", currentSubcategoryPlan);
 	// Check if the names are defined, otherwise use fallbacks from the first treatment plan, if available.
 	const activeCategoryName = currentSubcategoryPlan?.procedureCategoryName ??
 		treatmentPlans[0]?.procedureCategoryName ??
@@ -100,42 +99,43 @@ const ProceduresCustomizer = () => {
 					<StyledTableLabelText>Procedure Sub-Category: {activeSubcategoryName}</StyledTableLabelText>
 
 					<div>
-						{treatmentPlans.length > 0 &&
-							treatmentPlans.map((plan, index) => {
-								return (
-									<TreatmentPlanConfiguration
-										key={`treatment-plan-${index}`}
-										treatmentPlan={plan}
-										includeExtraRow={true}
-										addProcedureElement={<span>+ Add Procedure</span>}
-										onAddVisit={(newVisit) =>
-											dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
-										}
-										onUpdateVisitsInTreatmentPlan={(
-											treatmentPlanId,
-											updatedVisits
-										) =>
-											handleUpdateVisitsInTreatmentPlan(
-												treatmentPlanId,
-												updatedVisits
-											)
-										}
-										onDeleteVisit={(treatmentPlanId, deletedVisitId) =>
-											handleDeleteVisitInTreatmentPlan(
-												treatmentPlanId,
-												deletedVisitId
-											)
-										}
-										showToothNumber={false}
-										isInGenerateTreatmentPlanContext={false}
-									/>
-								);
-							})}
+						{currentSubcategoryPlan && (
+							<TreatmentPlanConfiguration
+								key={`treatment-plan-${currentSubcategoryPlan.treatmentPlanId}`}  // Assuming each plan has a unique ID
+								treatmentPlan={currentSubcategoryPlan}
+								includeExtraRow={true}
+								addProcedureElement={<span>+ Add Procedure</span>}
+								onAddVisit={(newVisit) =>
+									dispatch(handleAddVisit({
+										treatmentPlanId: currentSubcategoryPlan.treatmentPlanId,
+										newVisit
+									}))
+								}
+								onUpdateVisitsInTreatmentPlan={(
+									treatmentPlanId,
+									updatedVisits
+								) =>
+									handleUpdateVisitsInTreatmentPlan(
+										treatmentPlanId,
+										updatedVisits
+									)
+								}
+								onDeleteVisit={(treatmentPlanId, deletedVisitId) =>
+									handleDeleteVisitInTreatmentPlan(
+										treatmentPlanId,
+										deletedVisitId
+									)
+								}
+								showToothNumber={false}
+								isInGenerateTreatmentPlanContext={false}
+							/>
+						)}
 					</div>
 				</StyledContainerWithTableInner>
 			</StyledRoundedBoxContainer>
 		</div>
 	);
+
 };
 
 export default ProceduresCustomizer;
