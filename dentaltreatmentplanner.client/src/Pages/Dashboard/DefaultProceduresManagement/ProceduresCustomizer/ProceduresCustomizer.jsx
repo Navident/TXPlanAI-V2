@@ -1,7 +1,6 @@
 import "./ProceduresCustomizer.css";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getTreatmentPlansBySubcategory } from "../../../../ClientServices/apiService";
 import TreatmentPlanConfiguration from "../../../../Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration";
 import {
 	addVisitToTreatmentPlan,
@@ -16,13 +15,13 @@ import {
 import GoBack from "../../../../Components/Common/GoBack/GoBack";
 import { useSelector, useDispatch } from 'react-redux';
 import {
-	selectAllSubcategoryTreatmentPlans,
 	setTreatmentPlans,
 	handleAddVisit,
 	onUpdateVisitsInTreatmentPlan,
 	onDeleteVisit,
 	selectAllTreatmentPlans
 } from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 
 
 const ProceduresCustomizer = () => {
@@ -31,9 +30,25 @@ const ProceduresCustomizer = () => {
 	const params = useParams();
 	const paramsSubcategoryId = Number(params.subcategory);
 	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
-	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
+	console.log(localStorage.getItem('jwtToken'));
 
-	const currentSubcategoryPlan = subcategoryTreatmentPlans.find(plan => plan && plan.procedureSubcategoryId === paramsSubcategoryId);
+	const {
+		data: subcategoryTreatmentPlans,
+		error,
+		isLoading
+	} = useGetAllSubcategoryTreatmentPlansQuery();
+
+	if (isLoading) {
+		console.log("Loading subcategoryTreatmentPlans...");
+	}
+
+	if (error) {
+		console.error("Error fetching subcategoryTreatmentPlans: ", error);
+	}
+
+	console.log("subcategoryTreatmentPlans: ", subcategoryTreatmentPlans);
+	const currentSubcategoryPlan = subcategoryTreatmentPlans?.find(plan => plan.procedureSubcategoryId === paramsSubcategoryId);
+
 	// Check if the names are defined, otherwise use fallbacks from the first treatment plan, if available.
 	const activeCategoryName = currentSubcategoryPlan?.procedureCategoryName ??
 		treatmentPlans[0]?.procedureCategoryName ??
@@ -45,7 +60,6 @@ const ProceduresCustomizer = () => {
 
 	useEffect(() => {
 		if (currentSubcategoryPlan) {
-			// Assuming you only want to dispatch the plans that match the current subcategory.
 			dispatch(setTreatmentPlans([currentSubcategoryPlan]));
 		}
 	}, [paramsSubcategoryId]);

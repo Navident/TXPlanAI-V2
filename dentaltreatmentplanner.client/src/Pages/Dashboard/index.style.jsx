@@ -44,5 +44,6 @@ export const StyledItemContainer = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;   
-
+    align-items: center;
+    height: 100%;
 `;

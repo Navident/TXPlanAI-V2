@@ -2,9 +2,6 @@ import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButto
 import { TextField } from "@mui/material";
 import  { useState } from 'react';
 import './CreateNewPatient.css';
-import { createPatient } from '../../../ClientServices/apiService';
-
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import Alert from '../../../Components/Common/Alert/Alert';
 
 const CreateNewPatient = () => {
@@ -12,13 +9,12 @@ const CreateNewPatient = () => {
     const [lastName, setLastName] = useState('');
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
-    const { refreshPatients } = useBusiness();
 
     const handleCloseAlert = () => {
         setAlertInfo({ ...alertInfo, open: false });
     };
 
-    const handleRegisterPatient = async () => {
+/*    const handleRegisterPatient = async () => {
         if (!firstName || !lastName || !dateOfBirth) {
             alert("Please fill in all fields.");
             return;
@@ -45,7 +41,7 @@ const CreateNewPatient = () => {
             console.error('Error creating patient:', error);
             alert("An error occurred while registering the patient.");
         }
-    };
+    };*/
 
     return (
         <div className="create-new-patient-wrapper">
@@ -132,7 +128,7 @@ const CreateNewPatient = () => {
                     textColor="white"
                     border={false}
                     className="purple-button-hover"
-                    onClick={handleRegisterPatient} 
+                    //onClick={handleRegisterPatient} 
                 />
                 </div>
         </div>

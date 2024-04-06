@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import RecentTxPlans from '../../../Components/RecentTxPlans';
 import { StyledLargeText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
 import { StyledHomeBoxBottomContainer, StyledSeparator } from '../../Dashboard/index.style'

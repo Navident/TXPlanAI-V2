@@ -10,12 +10,11 @@ import { useState } from 'react';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { useNavigate } from 'react-router-dom';
 import backButton from '../../assets/back-button.svg';
-import { loginUser } from '../../ClientServices/apiService';
 import './Login.css'; 
 import Alert from "../../Components/Common/Alert/Alert";
 import { Backdrop, CircularProgress } from '@mui/material';
-import { fetchInitialDataIfLoggedIn } from '../../Redux/sharedThunks';
 import { useDispatch } from 'react-redux';
+import { useLoginUserMutation } from '../../Redux/ReduxSlices/User/userApiSlice';
 import { setIsUserLoggedIn, setIsSuperAdmin, setFacilityName, setFacilityId } from '../../Redux/ReduxSlices/User/userSlice';
 
 const Login = () => {
@@ -24,41 +23,33 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
-    const [loading, setLoading] = useState(false); 
+    const [loginUser, { isLoading }] = useLoginUserMutation();
 
-
-    const handleEmailChange = (event) => {
-        setEmail(event.target.value);
-    };
-
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    };
+    const handleEmailChange = (event) => setEmail(event.target.value);
+    const handlePasswordChange = (event) => setPassword(event.target.value);
 
     const handleLoginClick = async () => {
-        setLoading(true);
-        const credentials = { email, password };
-        const response = await loginUser(credentials);
+        try {
+            const response = await loginUser({ email, password }).unwrap(); 
 
-        setLoading(false); 
-
-        if (response.isSuccess) {
             console.log("response in login: ", response);
-            const isSuperAdmin = response.isSuperAdmin;
+            const { token, isSuperAdmin, user } = response;
             console.log("isSuperAdmin", isSuperAdmin);
+
+            // Set local user state
             dispatch(setIsSuperAdmin(isSuperAdmin));
-            const facilityName = response.user?.facility?.name;
-            const facilityId = response.user?.facility?.facilityId;
-            dispatch(setFacilityName(facilityName));
-            dispatch(setFacilityId(facilityId));
-            localStorage.setItem('businessName', facilityName);
+            dispatch(setFacilityName(user?.facility?.name));
+            dispatch(setFacilityId(user?.facility?.facilityId));
+            localStorage.setItem('jwtToken', token);
+            console.log("jwttoken after setting: ", localStorage.getItem('jwtToken'));
+            localStorage.setItem('businessName', user?.facility?.name);
             localStorage.setItem('isLoggedIn', 'true');
             dispatch(setIsUserLoggedIn(true));
-            dispatch(fetchInitialDataIfLoggedIn());
+           
             navigate("/dashboard");
-        } else {
+        } catch (error) {
             // Handle failed login
-            console.error('Login failed:', response.message);
+            console.error('Login failed:', error);
             setAlertInfo({ open: true, type: 'error', message: 'Invalid login' });
         }
     };
@@ -73,7 +64,7 @@ const Login = () => {
 
     return (
         <div className="login-wrapper">
-            <Backdrop open={loading} style={{ zIndex: 1000 }}>
+            <Backdrop open={isLoading} style={{ zIndex: 1000 }}>
                 <CircularProgress style={{ color: 'rgb(162, 225, 201)' }} />
             </Backdrop>
 

@@ -6,10 +6,7 @@ import {
 } from "../../GlobalStyledComponents";
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import {
-	generateTreatmentPlan,
-	getTreatmentPlanById,
-} from "../../ClientServices/apiService";
+
 import {
 	StyledAppContainer,
 	StyledMainContentWrapper,
@@ -21,16 +18,14 @@ import {
 import HeaderBar from "../../Components/Common/HeaderBar/HeaderBar";
 import logo from "../../assets/navident-logo.svg";
 import { useNavigate } from "react-router-dom";
-import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { CircularProgress } from "@mui/material";
 import { selectPatientTreatmentPlans, handleAddVisit, onDeleteVisit, setTreatmentPlans, selectAllTreatmentPlans, onUpdateVisitsInTreatmentPlan } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPayersForFacility } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import TxViewCustomizationToolbar from "../../Components/TxViewCustomizationToolbar/index";
 
 
-import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
-import PaymentTotals from "../../Components/PaymentTotals/index";
+/*import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+*/import PaymentTotals from "../../Components/PaymentTotals/index";
 import { selectFacilityName } from '../../Redux/ReduxSlices/User/userSlice';
 
 const PatientTreatmentPlanCustomizer = () => {
@@ -40,9 +35,9 @@ const PatientTreatmentPlanCustomizer = () => {
 	const [isLoading, setIsLoading] = useState(true); 
 	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
-	const grandUcrTotal = useSelector(selectGrandUcrTotal);
+/*	const grandUcrTotal = useSelector(selectGrandUcrTotal);
 	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
-	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
+	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);*/
 	const facilityName = useSelector(selectFacilityName);
 
 	useEffect(() => {
@@ -106,16 +101,7 @@ const PatientTreatmentPlanCustomizer = () => {
 								<StyledTitleAndPaymentTotalsContainer>
 									<div style={{ flex: 1 }}></div>
 									<StyledLargeText>Treatment Plan</StyledLargeText>
-									<div style={{ flex: 1 }}>
-										{areGrandTotalsReady && (
-											<PaymentTotals
-												ucrTotal={grandUcrTotal}
-												coPayTotal={grandCoPayTotal}
-												isGrandTotal={true}
-												justifyContent="end"
-											/>
-										)}
-									</div>
+									<div style={{ flex: 1 }}></div>
 								</StyledTitleAndPaymentTotalsContainer>
 
 								{isLoading ? (

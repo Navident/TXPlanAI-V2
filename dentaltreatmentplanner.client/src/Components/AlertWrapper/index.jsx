@@ -11,7 +11,7 @@ const AlertWrapper = () => {
         dispatch(closeAlert());
     };
 
-    return alertInfo.open ? (
+    return alertInfo?.open ? (
         <Alert
             open={alertInfo.open}
             handleClose={handleCloseAlert}

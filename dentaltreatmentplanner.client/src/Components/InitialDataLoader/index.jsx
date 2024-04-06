@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+/*import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchInitialDataIfLoggedIn } from '../../Redux/sharedThunks';
 import { initializeUser } from '../../Redux/ReduxSlices/User/userSlice';
@@ -17,3 +17,4 @@ const InitialDataLoader = () => {
     return null; 
 };
 export default InitialDataLoader;
+*/

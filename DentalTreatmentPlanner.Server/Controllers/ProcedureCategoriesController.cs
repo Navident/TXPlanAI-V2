@@ -23,12 +23,12 @@ namespace DentalTreatmentPlanner.Server.Controllers
             _service = service;
         }
 
-        [HttpGet("subcategories/{categoryName}")]
-        public async Task<ActionResult<IEnumerable<ProcedureSubCategoryDto>>> GetSubCategories(string categoryName)
+        [HttpGet("subcategories")]
+        public async Task<ActionResult<IEnumerable<ProcedureSubCategoryDto>>> GetAllSubCategories()
         {
             try
             {
-                var subCategories = await _service.GetSubCategoriesByCategoryNameAsync(categoryName);
+                var subCategories = await _service.GetAllSubCategoriesAsync(); 
                 return Ok(subCategories);
             }
             catch (Exception ex)
@@ -36,6 +36,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 return StatusCode(500, "Internal Server Error");
             }
         }
+
 
         [HttpGet("categories")]
         public async Task<ActionResult<IEnumerable<ProcedureCategoryDto>>> GetCategories()

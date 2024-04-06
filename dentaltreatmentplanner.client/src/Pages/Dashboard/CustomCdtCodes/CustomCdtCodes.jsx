@@ -5,28 +5,28 @@ import TextField from '@mui/material/TextField';
 import StandardTextfield from '../../../Components/Common/StandardTextfield/StandardTextfield';
 import UniversalTable from '../../../Components/Common/UniversalTable/UniversalTable';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
-import { updateCustomFacilityCdtCodes } from '../../../ClientServices/apiService';
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
 import { UI_COLORS } from '../../../Theme';
-import { useBusiness } from '../../../Contexts/BusinessContext/useBusiness';
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    selectFacilityCdtCodes,
-    fetchCustomCdtCodesForFacility
-} from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+
+import { useGetCustomCdtCodesQuery, useUpdateCustomFacilityCdtCodesMutation } from '../../../Redux/ReduxSlices/CdtCodes/cdtCodesApiSlice';
 
 const CustomCdtCodes = () => {
-    const facilityCdtCodes = useSelector(selectFacilityCdtCodes);
     const [inputText, setInputText] = useState('');
     const [rowsData, setRowsData] = useState([]);
     const headers = ["CDT Code", "Description", ""];
     const [deletedCdtCodes, setDeletedCdtCodes] = useState([]);
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
+
+    // RTK Query Hooks
+    const { data: facilityCdtCodes, isLoading, isError } = useGetCustomCdtCodesQuery();
+    const [updateCustomFacilityCdtCodes] = useUpdateCustomFacilityCdtCodesMutation();
+
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -234,12 +234,12 @@ const CustomCdtCodes = () => {
             EditedCdtCodes: editedCdtCodes,
             DeletedCdtCodeIds: deletedCdtCodeIds
         };
-        const response = await updateCustomFacilityCdtCodes(updateData);
-        if (response) { 
-            dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
-            dispatch(fetchCustomCdtCodesForFacility());
-        } else {
-            dispatch(showAlert({ type: 'error', message: 'Failed to save changes' }));
+        try {
+            const response = await updateCustomFacilityCdtCodes(updateData).unwrap();
+
+            dispatch(showAlert('success', 'Your changes were saved successfully!'));
+        } catch (err) {
+            dispatch(showAlert('error', 'Failed to save changes'));
         }
     };
     return (

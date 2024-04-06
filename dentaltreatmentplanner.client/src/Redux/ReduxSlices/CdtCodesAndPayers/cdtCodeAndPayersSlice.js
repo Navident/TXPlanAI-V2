@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+/*import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getAlternativeProceduresByFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
 
 const initialState = {
@@ -74,9 +74,6 @@ export const cdtCodeAndPayersSlice = createSlice({
         setSelectedPayer: (state, action) => {
             state.selectedPayer = action.payload;
         },
-        setActiveCdtCodes: (state, action) => {
-            state.activeCdtCodes = action.payload;
-        },
         setGrandUcrTotal: (state, action) => {
             state.grandUcrTotal = action.payload;
         },
@@ -86,44 +83,7 @@ export const cdtCodeAndPayersSlice = createSlice({
         setGrandTotalsReady: (state, action) => {
             state.areGrandTotalsReady = action.payload;
         },
-        addAlternativeProcedure: (state, action) => {
-            state.alternativeProcedures.push(action.payload);
-        },
-        updateAlternativeProcedure: (state, action) => {
-            const { tempId, alternativeProcedureId, updates } = action.payload;
-            const identifier = alternativeProcedureId ? 'alternativeProcedureId' : 'tempId';
-            const idValue = alternativeProcedureId || tempId;
 
-            const index = state.alternativeProcedures.findIndex(ap => ap[identifier] === idValue);
-            if (index !== -1) {
-                state.alternativeProcedures[index] = { ...state.alternativeProcedures[index], ...updates };
-            }
-        },
-        setAlternativeProcedures: (state, action) => {
-            state.alternativeProcedures = action.payload;
-        },
-        deleteAlternativeProcedure: (state, action) => {
-            const { tempId, alternativeProcedureId } = action.payload;
-            // This will prioritize deleting by alternativeProcedureId if it's provided
-            const idValue = alternativeProcedureId || tempId;
-            const identifier = alternativeProcedureId ? 'alternativeProcedureId' : 'tempId';
-
-            state.alternativeProcedures = state.alternativeProcedures.filter(ap => ap[identifier] !== idValue);
-        },
-        updateAlternativeProcedureVisitCdtCodeMapIds: (state, action) => {
-            const { newVisitCdtCodeMapIdMapping } = action.payload;
-            // Assuming you're using JSON.stringify and JSON.parse for deep copy
-            console.log("Before updating alternativeProcedures", JSON.parse(JSON.stringify(state.alternativeProcedures)));
-            console.log("newVisitCdtCodeMapIdMapping received", newVisitCdtCodeMapIdMapping);
-            state.alternativeProcedures.forEach(ap => {
-                if (newVisitCdtCodeMapIdMapping.has(ap.visitCdtCodeMapId)) {
-                    console.log(`Updating visitCdtCodeMapId from ${ap.visitCdtCodeMapId} to ${newVisitCdtCodeMapIdMapping.get(ap.visitCdtCodeMapId)} for alternativeProcedureId/tempId ${ap.alternativeProcedureId || ap.tempId}`);
-                    ap.visitCdtCodeMapId = newVisitCdtCodeMapIdMapping.get(ap.visitCdtCodeMapId);
-                }
-            });
-            console.log("After updating alternativeProcedures", JSON.parse(JSON.stringify(state.alternativeProcedures)));
-
-        },
     },
     extraReducers: (builder) => {
         builder
@@ -208,3 +168,4 @@ export const selectCombinedCdtCodes = (state) => {
 
 
 export default cdtCodeAndPayersSlice.reducer;
+*/

@@ -1,12 +1,8 @@
 import "./PatientManagementDashboard.css";
 import HeaderBar from "../../Components/Common/HeaderBar/HeaderBar";
 import GoBack from "../../Components/Common/GoBack/GoBack";
-
-import SearchPatient from "../../Components/SearchPatient/SearchPatient";
 import CreateNewPatient from "./CreateNewPatient/CreateNewPatient";
 import PatientTreatmentPlanCustomizer from "../PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer";
-
-import PatientList from "../../Components/PatientList/PatientList";
 import logo from "../../assets/navident-logo.svg";
 import { Outlet } from "react-router-dom";
 import backButton from "../../assets/back-button.svg";

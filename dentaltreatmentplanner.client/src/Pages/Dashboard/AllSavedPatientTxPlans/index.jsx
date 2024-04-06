@@ -2,10 +2,7 @@ import TextField from "@mui/material/TextField";
 import { useState, useEffect } from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 import searchIcon from "../../../assets/search-icon.svg";
-import {
-	getTreatmentPlansByPatient,
-	deleteTreatmentPlanById,
-} from "../../../ClientServices/apiService";
+
 import UniversalTable from "../../../Components/Common/UniversalTable/UniversalTable";
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +12,7 @@ import { selectPatientTreatmentPlans, removeTreatmentPlanById } from '../../../R
 import { useSelector, useDispatch } from 'react-redux';
 import PopupAlert from "../../../Components/Common/PopupAlert/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
+import { useDeleteTreatmentPlanByIdMutation } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 
 const AllSavedPatientTxPlans = () => {
 	const dispatch = useDispatch();
@@ -25,7 +23,7 @@ const AllSavedPatientTxPlans = () => {
 	const [dialogContent, setDialogContent] = useState('');
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [planToDelete, setPlanToDelete] = useState(null);
-
+	const [deleteTreatmentPlanById] = useDeleteTreatmentPlanByIdMutation();
 
 	const handleOpenClick = (planId) => {
 		navigate(`/customize-treatment-plan/${planId}`);
@@ -60,17 +58,24 @@ const AllSavedPatientTxPlans = () => {
 
 	const handleAgree = async () => {
 		if (planToDelete) {
-			const success = await deleteTreatmentPlanById(planToDelete);
-			if (success) {
-				dispatch(removeTreatmentPlanById(planToDelete));
+			try {
+				// Attempt to delete the treatment plan and await the result
+				await deleteTreatmentPlanById(planToDelete).unwrap();
+
+				// If successful, proceed with the following actions
+				dispatch(removeTreatmentPlanById(planToDelete)); 
 				dispatch(showAlert({ type: 'success', message: 'Successfully deleted treatment plan!' }));
-			} else {
+			} catch (error) {
+				// Handle any errors that occur during the deletion process
+				console.error("Error deleting treatment plan: ", error);
 				dispatch(showAlert({ type: 'error', message: 'Failed to delete treatment plan' }));
 			}
 		}
-		setIsDialogOpen(false);
+
+		setIsDialogOpen(false); // Close the dialog in both cases
 		setPlanToDelete(null); // Reset the planToDelete after handling
 	};
+
 
 
 	const headers = ["Date", "TX Description", "Treatment Plan ID", ""];

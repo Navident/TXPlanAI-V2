@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using static System.Net.WebRequestMethods;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DentalTreatmentPlanner.Server.Services
 {
@@ -1402,6 +1403,18 @@ namespace DentalTreatmentPlanner.Server.Services
                         .ToListAsync();
         }
 
+        public async Task<IEnumerable<ProcedureSubCategoryDto>> GetAllSubCategoriesAsync()
+        {
+            return await _context.ProcedureSubCategories
+                .Select(sc => new ProcedureSubCategoryDto
+                {
+                    ProcedureSubCategoryId = sc.ProcedureSubCategoryId,
+                    Name = sc.Name,
+                    ProcedureCategoryId = sc.ProcedureCategoryId, 
+                    ProcedureCategoryName = sc.ProcedureCategory.Name 
+                })
+                .ToListAsync();
+        }
 
         public async Task<IEnumerable<ProcedureSubCategoryDto>> GetSubCategoriesByCategoryNameAsync(string categoryName)
         {
@@ -1416,61 +1429,7 @@ namespace DentalTreatmentPlanner.Server.Services
                 .ToListAsync();
         }
 
-        // Method to retrieve treatment plans by procedure subcategory name
-        public async Task<IEnumerable<RetrieveTreatmentPlanDto>> GetTreatmentPlansBySubcategoryAsync(string subcategoryName, int? facilityId)
-        {
-            var subcategory = await _context.ProcedureSubCategories
-                                            .FirstOrDefaultAsync(sc => sc.Name == subcategoryName);
 
-            if (subcategory == null)
-            {
-                return Enumerable.Empty<RetrieveTreatmentPlanDto>();
-            }
-
-            int subcategoryId = subcategory.ProcedureSubCategoryId;
-
-            // Initialize the base query with necessary includes for eager loading
-            var baseQuery = _context.TreatmentPlans
-                .Include(tp => tp.Visits)
-                    .ThenInclude(v => v.VisitToProcedureMaps)
-                        .ThenInclude(vp => vp.ProcedureType)
-                .Include(tp => tp.Visits)
-                    .ThenInclude(v => v.VisitToProcedureMaps)
-                        .ThenInclude(vp => vp.ProcedureToCdtMaps)
-                            .ThenInclude(pcm => pcm.CdtCode)
-                .Where(tp => tp.ProcedureSubcategoryId == subcategoryId && tp.PatientId == null);
-
-            // Check for facility-specific treatment plans first if a facilityId is provided
-            IQueryable<TreatmentPlan> facilitySpecificQuery = baseQuery
-                .Where(tp => facilityId.HasValue && tp.FacilityId == facilityId);
-
-            // Check if any facility-specific plans are found
-            bool hasFacilitySpecificPlans = await facilitySpecificQuery.AnyAsync();
-
-            IQueryable<TreatmentPlan> query = hasFacilitySpecificPlans ? facilitySpecificQuery : baseQuery
-                .Where(tp => !facilityId.HasValue || tp.FacilityId == null);
-
-            var treatmentPlans = await query
-                .Select(tp => new RetrieveTreatmentPlanDto
-                {
-                    TreatmentPlanId = tp.TreatmentPlanId,
-                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
-                    ProcedureSubCategoryName = tp.ProcedureSubcategory.Name,
-                    FacilityId = tp.FacilityId,
-                    CreatedUserId = tp.CreatedUserId,
-                    ProcedureCategoryName = tp.ProcedureSubcategory.ProcedureCategory.Name,
-                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
-                    {
-                        VisitId = v.VisitId,
-                        Description = v.Description,
-                        VisitNumber = v.VisitNumber,
-                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            return treatmentPlans;
-        }
 
 
         private static List<VisitToProcedureMapDto> MapVisitToProcedureMapsToDto(IEnumerable<VisitToProcedureMap> visitToProcedureMaps)
@@ -1552,6 +1511,117 @@ namespace DentalTreatmentPlanner.Server.Services
 
             return treatmentPlans;
         }
+
+        // Method to retrieve treatment plans by procedure subcategory name
+        public async Task<IEnumerable<RetrieveTreatmentPlanDto>> GetTreatmentPlansBySubcategoryAsync(string subcategoryName, int? facilityId)
+        {
+            var subcategory = await _context.ProcedureSubCategories
+                                            .FirstOrDefaultAsync(sc => sc.Name == subcategoryName);
+
+            if (subcategory == null)
+            {
+                return Enumerable.Empty<RetrieveTreatmentPlanDto>();
+            }
+
+            int subcategoryId = subcategory.ProcedureSubCategoryId;
+
+            // Initialize the base query with necessary includes for eager loading
+            var baseQuery = _context.TreatmentPlans
+                .Include(tp => tp.Visits)
+                    .ThenInclude(v => v.VisitToProcedureMaps)
+                        .ThenInclude(vp => vp.ProcedureType)
+                .Include(tp => tp.Visits)
+                    .ThenInclude(v => v.VisitToProcedureMaps)
+                        .ThenInclude(vp => vp.ProcedureToCdtMaps)
+                            .ThenInclude(pcm => pcm.CdtCode)
+                .Where(tp => tp.ProcedureSubcategoryId == subcategoryId && tp.PatientId == null);
+
+            // Check for facility-specific treatment plans first if a facilityId is provided
+            IQueryable<TreatmentPlan> facilitySpecificQuery = baseQuery
+                .Where(tp => facilityId.HasValue && tp.FacilityId == facilityId);
+
+            // Check if any facility-specific plans are found
+            bool hasFacilitySpecificPlans = await facilitySpecificQuery.AnyAsync();
+
+            IQueryable<TreatmentPlan> query = hasFacilitySpecificPlans ? facilitySpecificQuery : baseQuery
+                .Where(tp => !facilityId.HasValue || tp.FacilityId == null);
+
+            var treatmentPlans = await query
+                .Select(tp => new RetrieveTreatmentPlanDto
+                {
+                    TreatmentPlanId = tp.TreatmentPlanId,
+                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
+                    ProcedureSubCategoryName = tp.ProcedureSubcategory.Name,
+                    FacilityId = tp.FacilityId,
+                    CreatedUserId = tp.CreatedUserId,
+                    ProcedureCategoryName = tp.ProcedureSubcategory.ProcedureCategory.Name,
+                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                    {
+                        VisitId = v.VisitId,
+                        Description = v.Description,
+                        VisitNumber = v.VisitNumber,
+                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return treatmentPlans;
+        }
+
+        public async Task<IEnumerable<RetrieveTreatmentPlanDto>> GetAllSubcategoryTreatmentPlansAsync(int? facilityId)
+        {
+            var treatmentPlans = await _context.TreatmentPlans
+                .Include(tp => tp.Visits)
+                    .ThenInclude(v => v.VisitToProcedureMaps)
+                        .ThenInclude(vp => vp.ProcedureType)
+                .Include(tp => tp.Visits)
+                    .ThenInclude(v => v.VisitToProcedureMaps)
+                        .ThenInclude(vp => vp.ProcedureToCdtMaps)
+                            .ThenInclude(pcm => pcm.CdtCode)
+                .Include(tp => tp.ProcedureSubcategory)
+                    .ThenInclude(subcategory => subcategory.ProcedureCategory)
+                .Where(tp => tp.PatientId == null && tp.ProcedureSubcategoryId.HasValue)
+                .ToListAsync();
+
+            // Corrected prioritization logic
+            var prioritizedTreatmentPlans = treatmentPlans
+                .GroupBy(tp => tp.ProcedureSubcategoryId)
+                .Select(g =>
+                {
+                    // If a specific facilityId is provided, prioritize matching treatment plans
+                    var facilitySpecificPlan = facilityId.HasValue
+                        ? g.FirstOrDefault(tp => tp.FacilityId == facilityId)
+                        : null;
+
+                    // If no facility-specific plan is found or facilityId is not provided, prioritize any facility-specific plan
+                    var defaultPlan = facilitySpecificPlan ?? g.FirstOrDefault(tp => !tp.FacilityId.HasValue);
+
+                    // Fallback to any plan if no facility-specific or default plan is found
+                    return facilitySpecificPlan ?? defaultPlan ?? g.First();
+                })
+                .Select(tp => new RetrieveTreatmentPlanDto
+                {
+                    TreatmentPlanId = tp.TreatmentPlanId,
+                    ProcedureSubcategoryId = tp.ProcedureSubcategoryId.Value,
+                    ProcedureSubCategoryName = tp.ProcedureSubcategory.Name,
+                    FacilityId = tp.FacilityId,
+                    CreatedUserId = tp.CreatedUserId,
+                    ProcedureCategoryName = tp.ProcedureSubcategory.ProcedureCategory.Name,
+                    Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                    {
+                        VisitId = v.VisitId,
+                        Description = v.Description,
+                        VisitNumber = v.VisitNumber,
+                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
+                    }).ToList()
+                })
+                .ToList();
+
+            return prioritizedTreatmentPlans;
+        }
+
+
+
 
 
 

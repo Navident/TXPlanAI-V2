@@ -2,10 +2,7 @@ import TextField from "@mui/material/TextField";
 import { useState, useEffect } from "react";
 import InputAdornment from "@mui/material/InputAdornment";
 import searchIcon from "../../../assets/search-icon.svg";
-import {
-	getTreatmentPlansByPatient,
-	deleteTreatmentPlanById,
-} from "../../../ClientServices/apiService";
+
 import { useParams } from "react-router-dom";
 import UniversalTable from "../../../Components/Common/UniversalTable/UniversalTable";
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
@@ -16,14 +13,14 @@ import {
 	StyledContainerWithTableInner,
 	StyledRoundedBoxContainer,
 } from "../../../GlobalStyledComponents";
-import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
+import { useDeleteTreatmentPlanByIdMutation } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 
 const SavedPatientTxPlans = () => {
 	const [inputText, setInputText] = useState("");
 	const { patientId } = useParams();
 	const navigate = useNavigate();
 	const [localTreatmentPlans, setLocalTreatmentPlans] = useState([]);
-
+	const [deleteTreatmentPlanById] = useDeleteTreatmentPlanByIdMutation();
 	useEffect(() => {
 		if (patientId) {
 			fetchTreatmentPlansByPatientId(patientId);
@@ -40,8 +37,8 @@ const SavedPatientTxPlans = () => {
 
 	const fetchTreatmentPlansByPatientId = async (id) => {
 		try {
-			const plans = await getTreatmentPlansByPatient(id);
-			setLocalTreatmentPlans(plans || []);
+			//const plans = await getTreatmentPlansByPatient(id);
+			//setLocalTreatmentPlans(plans || []);
 		} catch (error) {
 			console.error("Error fetching treatment plans:", error);
 		}
@@ -60,25 +57,25 @@ const SavedPatientTxPlans = () => {
 	};
 
 	const handleDeleteClick = async (planId) => {
-		const confirmed = window.confirm(
-			"Are you sure you want to delete this treatment plan?"
-		);
+		const confirmed = window.confirm("Are you sure you want to delete this treatment plan?");
 		console.log("selected plan id to delete: ", planId);
 		if (confirmed) {
-			const success = await deleteTreatmentPlanById(planId);
-			if (success) {
-				// Remove the deleted plan from local state to update the UI
-				const updatedPlans = localTreatmentPlans.filter(
-					(plan) => plan.treatmentPlanId !== planId
-				);
+			try {
+				// Attempt to delete the treatment plan
+				await deleteTreatmentPlanById(planId).unwrap();
+
+				// If the above line doesn't throw, the deletion was successful
+				const updatedPlans = localTreatmentPlans.filter((plan) => plan.treatmentPlanId !== planId);
 				setLocalTreatmentPlans(updatedPlans);
 				alert("Treatment plan deleted successfully.");
-			} else {
-				// Handle deletion failure (e.g., display an error message)
+			} catch (error) {
+				// If deletion fails, log the error and notify the user
+				console.error("Failed to delete treatment plan: ", error);
 				alert("Failed to delete treatment plan.");
 			}
 		}
 	};
+
 
 	const headers = ["Date", "Treatment Plan ID", ""];
 
@@ -116,7 +113,7 @@ const SavedPatientTxPlans = () => {
 
 	return (
 		<div className="dashboard-bottom-inner-row">
-			<PatientInfoSection />
+			{/*<PatientInfoSection />*/}
 			<div className="dashboard-right-side-row">
 				<div className="large-text">Saved Tx Plans</div>
 				<TextField

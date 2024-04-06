@@ -1,6 +1,5 @@
 import { useState } from "react";
 import RoundedButton from "../Common/RoundedButton/RoundedButton";
-import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
 	StyledPatientInfoInnerContainer,

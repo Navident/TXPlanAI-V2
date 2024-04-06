@@ -13,7 +13,7 @@ const userSlice = createSlice({
         facilityId: '',
         isUserLoggedIn: false,
         isSuperAdmin: false,
-
+        jwtToken: '', 
         customerKey: '',
     },
     reducers: {
@@ -39,6 +39,9 @@ const userSlice = createSlice({
         setIsSuperAdmin: (state, action) => {
             state.isSuperAdmin = action.payload;
             localStorage.setItem('isSuperAdmin', action.payload.toString()); 
+        },
+        setJwtToken: (state, action) => {
+            state.jwtToken = action.payload;
         },
     },
     extraReducers: (builder) => {

@@ -2,17 +2,16 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     open: false,
-    type: '', // Keep for existing alerts
-    message: '', // Keep for existing alerts
-    // Adding new properties for PopupAlertWrapper
+    type: '',
+    message: '',
     title: '',
     content: '',
     textInput: false,
     textInputWidth: '75px',
-    onAgree: null, // Function to execute on agree action, consider storing function references outside Redux
+    onAgree: null,
 };
 
-export const alertSlice = createSlice({
+const alertSlice = createSlice({
     name: 'alert',
     initialState,
     reducers: {
@@ -34,10 +33,8 @@ export const alertSlice = createSlice({
             state.content = content;
             state.textInput = textInput;
             state.textInputWidth = textInputWidth;
-            // Be cautious about storing function references in Redux state
             state.onAgree = onAgree;
         },
-        // Could reuse closeAlert for both types of alerts
     },
 });
 

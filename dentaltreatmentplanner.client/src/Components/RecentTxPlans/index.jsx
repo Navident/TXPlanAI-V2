@@ -1,7 +1,8 @@
 import {
 	StyledLightGrey2Text,
 	StyledRoundedBoxContainer,
-	StyledRoundedBoxContainerInner,
+    StyledRoundedBoxContainerInner,
+    StyledSpinnerContainer
 } from "../../GlobalStyledComponents";
 import {
 	StyledHomeBoxBottomContainer,
@@ -10,17 +11,25 @@ import {
 	StyledItemContainer,
 } from "../../Pages/Dashboard/index.style";
 import { useNavigate } from "react-router-dom";
-import { selectPatientTreatmentPlans } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { useSelector } from 'react-redux';
+import { useGetAllPatientTreatmentPlansForFacilityQuery } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
+import { CircularProgress } from "@mui/material";
 
 const RecentTxPlans = () => {
     const navigate = useNavigate();
-    const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
+    const {
+        data: patientTreatmentPlans,
+        isLoading,
+        isError,
+        error
+    } = useGetAllPatientTreatmentPlansForFacilityQuery();
 
     // Sort treatment plans by createdAt in descending order and filter out duplicates
-    const sortedPlans = [...patientTreatmentPlans]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5);
+    const sortedPlans = patientTreatmentPlans
+        ? [...patientTreatmentPlans]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 5)
+        : [];
+
 
     // Function to handle redirection to view all
     const handleViewAllClick = () => {
@@ -43,19 +52,30 @@ const RecentTxPlans = () => {
                 </StyledHomeBoxTopContainer>
                 <StyledSeparator />
                 <StyledHomeBoxBottomContainer itemsList>
-                    {sortedPlans.map((plan, index) => (
-                        <StyledItemContainer key={index}>
-                            <div>{plan.description}</div>
-                            {/* Add onClick handler to the edit text */}
-                            <StyledLightGrey2Text
-                                hoverEffect
-                                className="editText"
-                                onClick={() => handleEditClick(plan.treatmentPlanId)} // Assume plan has a property treatmentPlanId
-                            >
-                                Edit
-                            </StyledLightGrey2Text>
+                    {isLoading ? (
+                        <StyledItemContainer>
+                            <StyledSpinnerContainer>
+                                <CircularProgress style={{ color: "#7777a1" }} />
+                            </StyledSpinnerContainer>
                         </StyledItemContainer>
-                    ))}
+                    ) : isError ? (
+                        <StyledItemContainer>
+                            Error: {error?.data?.message || 'Failed to fetch treatment plans'}
+                        </StyledItemContainer>
+                    ) : (
+                        sortedPlans.map((plan, index) => (
+                            <StyledItemContainer key={index}>
+                                <div>{plan.description}</div>
+                                <StyledLightGrey2Text
+                                    hoverEffect
+                                    className="editText"
+                                    onClick={() => handleEditClick(plan.treatmentPlanId)}
+                                >
+                                    Edit
+                                </StyledLightGrey2Text>
+                            </StyledItemContainer>
+                        ))
+                    )}
                 </StyledHomeBoxBottomContainer>
             </StyledRoundedBoxContainerInner>
         </StyledRoundedBoxContainer>

@@ -20,31 +20,23 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 import {
-	selectAllSubcategoryTreatmentPlans,
 	setTreatmentPlans,
 	handleAddVisit,
 	onUpdateVisitsInTreatmentPlan,
 	onDeleteVisit,
 	selectAllTreatmentPlans
 } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
-import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
-import PaymentTotals from "../../../Components/PaymentTotals/index";
-import { selectSelectedPatient } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
 import appInsights from '../../../Utils/appInsights';
 import { selectFacilityName, selectFacilityId } from '../../../Redux/ReduxSlices/User/userSlice';
 import EmptyStatePlaceholder from './EmptyStatePlaceholder';
+import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
-	const subcategoryTreatmentPlans = useSelector(selectAllSubcategoryTreatmentPlans);
+	const { data: subcategoryTreatmentPlans } = useGetAllSubcategoryTreatmentPlansQuery();
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
-	const grandUcrTotal = useSelector(selectGrandUcrTotal);
-	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
-	const [inputText, setInputText] = useState("");
-	const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
-	const selectedPatient = useSelector(selectSelectedPatient);
 	const [isLoading, setIsLoading] = useState(false);
-
+	const [inputText, setInputText] = useState("");
 	const facilityName = useSelector(selectFacilityName);
 	const facilityId = useSelector(selectFacilityId);
 
@@ -75,11 +67,6 @@ const GenerateTreatmentPlan = () => {
 		}
 	}, [treatmentPlans]);
 
-	useEffect(() => {
-		if (selectedPatient) {
-			console.log("selectedPatient state in parent", selectedPatient);
-		}
-	}, [selectedPatient]);
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);
@@ -151,6 +138,7 @@ const GenerateTreatmentPlan = () => {
 	// Utility function to fetch and process treatments with order maintained
 	async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
 		console.log("Treatment entries (with original order):", treatmentEntries);
+		console.log(subcategoryTreatmentPlans);
 		let allVisits = [];
 		let globalVisitIdCounter = 0;
 
@@ -254,10 +242,7 @@ const GenerateTreatmentPlan = () => {
 			);
 			return;
 		}
-		//if (!selectedPatient) {
-		//	dispatch(showAlert({ type: 'error', message: 'Please select a patient before creating a treatment plan' }));
-		//	return;
-		//}
+
 		setIsLoading(true);
 
 		try {
@@ -321,14 +306,7 @@ const GenerateTreatmentPlan = () => {
 						<div style={{ flex: 1 }}></div> 
 						<StyledLargeText>Treatment Plan</StyledLargeText>
 						<div style={{ flex: 1 }}>
-							{areGrandTotalsReady && (
-								<PaymentTotals
-									ucrTotal={grandUcrTotal}
-									coPayTotal={grandCoPayTotal}
-									isGrandTotal={true}
-									justifyContent="end"
-								/>
-							)}
+
 						</div> 
 					</StyledTitleAndPaymentTotalsContainer>
 					)}

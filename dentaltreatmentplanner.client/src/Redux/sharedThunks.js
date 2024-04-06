@@ -1,12 +1,10 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getCategories, getSubCategoriesByCategoryName, getTreatmentPlansBySubcategory, getAllPatientTreatmentPlansForFacility, getCustomerKeyForUserFacility } from '../ClientServices/apiService';
+/*import { createAsyncThunk } from '@reduxjs/toolkit';
+import { getCategories } from '../ClientServices/apiService';
 import { setCategoriesAndSubcategories } from '../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import { setAllSubcategoryTreatmentPlans, setPatientTreatmentPlans } from './ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { fetchPayersWithCdtCodesFeesForFacility, fetchFacilityPayerCdtCodeFeesByPayer, setActiveCdtCodes, fetchCustomCdtCodesForFacility, fetchDefaultCdtCodes } from './ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
-import { setCustomerKey, selectIsUserLoggedIn } from './ReduxSlices/User/userSlice';
-import { fetchPatientsForFacility } from './ReduxSlices/Patients/patientsSlice';
-
-export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
+*/
+/*export const fetchAllPatientTreatmentPlansForFacility = createAsyncThunk(
     'shared/fetchAllPatientTreatmentPlansForFacility',
     async (_, { dispatch }) => {
         try {
@@ -62,7 +60,6 @@ export const fetchCategoriesSubcategoriesAndTxPlans = createAsyncThunk(
             dispatch(setActiveCdtCodes(extractedCdtCodeIds));
             console.log("extractedCdtCodeIds: ", extractedCdtCodeIds);
 
-            dispatch(setAllSubcategoryTreatmentPlans(allTreatmentPlans));
 
             return { categoriesWithSubcategories, allTreatmentPlans };
         } catch (error) {
@@ -90,21 +87,6 @@ const extractUniqueCdtCodeIds = (categoriesData) => {
         return Array.from(uniqueCdtCodeIds);
 };
 
-export const fetchAndSetCustomerKey = createAsyncThunk(
-    'shared/fetchAndSetCustomerKey',
-    async (_, { dispatch }) => {
-        try {
-            const response = await getCustomerKeyForUserFacility(); 
-            if (response && response.customerKey) {
-                console.log("found customer key: ", response.customerKey);
-                dispatch(setCustomerKey(response.customerKey));
-            }
-        } catch (error) {
-            console.error('Error fetching and setting customer key:', error);
-        }
-    }
-);
-
 
 export const fetchInitialDataIfLoggedIn = createAsyncThunk(
     'shared/fetchInitialDataIfLoggedIn',
@@ -118,11 +100,9 @@ export const fetchInitialDataIfLoggedIn = createAsyncThunk(
                 dispatch(fetchPayersWithCdtCodesFeesForFacility()),
                 dispatch(fetchCustomCdtCodesForFacility()), 
                 dispatch(fetchDefaultCdtCodes()), 
-                dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
-                dispatch(fetchAllPatientTreatmentPlansForFacility()),
-                dispatch(fetchAndSetCustomerKey()),
-                dispatch(fetchPatientsForFacility()),
+                //dispatch(fetchCategoriesSubcategoriesAndTxPlans()),
+                //dispatch(fetchAllPatientTreatmentPlansForFacility()),
             ]);
         }
     }
-);
+);*/

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getPatientsForUserFacility } from '../../../ClientServices/apiService';
+
 
 // Define initial state
 const initialState = {
@@ -11,18 +11,7 @@ const initialState = {
     error: null,
 };
 
-// Async thunk for fetching patients
-export const fetchPatientsForFacility = createAsyncThunk(
-    'patients/fetchPatientsForFacility',
-    async (_, { rejectWithValue }) => {
-        try {
-            const fetchedPatients = await getPatientsForUserFacility();
-            return fetchedPatients;
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
-    }
-);
+
 
 // Slice
 const patientsSlice = createSlice({
@@ -47,21 +36,7 @@ const patientsSlice = createSlice({
             state.selectedPatient = null;
         },
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchPatientsForFacility.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(fetchPatientsForFacility.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.patients = action.payload;
-                state.filteredPatients = action.payload;
-            })
-            .addCase(fetchPatientsForFacility.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload;
-            });
-    },
+
 });
 
 // Export actions

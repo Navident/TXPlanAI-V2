@@ -29,22 +29,23 @@ const SideBar = () => {
     const [hoveredItem, setHoveredItem] = useState(null);
 
     const items = [
-        { imgSrc: homeIcon, imgSrcSelected: homeIconActive, text: "Home", path: "" },
-        { imgSrc: feeSchedulingIcon, imgSrcSelected: feeSchedulingIconActive, text: "Fee Schedule", path: "feescheduling" },
-        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIconActive, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans" },
-        { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers" },
-        { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIconActive, text: "Custom CDT Codes", path: "customcdtCodes" },
-        { imgSrc: settingsIcon, imgSrcSelected: settingsIconActive, text: "TX Plan Settings", path: "defaultprocedures" },
-        { imgSrc: accountInfoIcon, imgSrcSelected: accountInfoIconActive, text: "Account Info", path: "accountinfo" }
-
+        { imgSrc: homeIcon, imgSrcSelected: homeIconActive, text: "Home", path: "", redirectEnabled: true },
+        { imgSrc: feeSchedulingIcon, imgSrcSelected: feeSchedulingIconActive, text: "Fee Schedule", path: "feescheduling", redirectEnabled: false },
+        { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIconActive, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans", redirectEnabled: true },
+        { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers", redirectEnabled: false }, // Disabled redirect
+        { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIconActive, text: "Custom CDT Codes", path: "customcdtCodes", redirectEnabled: true },
+        { imgSrc: settingsIcon, imgSrcSelected: settingsIconActive, text: "TX Plan Settings", path: "defaultprocedures", redirectEnabled: true },
+        { imgSrc: accountInfoIcon, imgSrcSelected: accountInfoIconActive, text: "Account Info", path: "accountinfo", redirectEnabled: true }
     ];
 
-    const handleItemClick = (path) => {
+
+    const handleItemClick = (path, redirectEnabled = true) => {
         let targetPath = path ? `/dashboard/${path}` : '/dashboard';
-        if (location.pathname !== targetPath) {
+        if (redirectEnabled && location.pathname !== targetPath) {
             navigate(targetPath);
         }
     };
+
 
     const isActive = (path) => {
         const currentPath = path ? `/dashboard/${path}` : '/dashboard';
@@ -73,7 +74,7 @@ const SideBar = () => {
                 {items.map((item, index) => (
                     <li key={index}
                         className={`sidebar-item ${isActive(item.path) ? 'active' : ''} ${hoveredItem === index ? 'hovered' : ''}`}
-                        onClick={() => handleItemClick(item.path)}
+                        onClick={() => handleItemClick(item.path, item.redirectEnabled)} 
                         onMouseEnter={() => handleMouseEnter(index)}
                         onMouseLeave={handleMouseLeave}>
                         <img src={isActive(item.path) ? item.imgSrcSelected : item.imgSrc} alt={item.text} className="sidebar-icon" />

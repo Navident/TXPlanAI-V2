@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
-import InputAdornment from '@mui/material/InputAdornment';
-import searchIcon from '../../../assets/search-icon.svg';
-import TextField from '@mui/material/TextField';
+
 import StandardTextfield from '../../../Components/Common/StandardTextfield/StandardTextfield';
 import UniversalTable from '../../../Components/Common/UniversalTable/UniversalTable';
 import { StyledRoundedBoxContainer, StyledAddButtonCellContainer, StyledClickableText, StyledEditIcon, StyledDeleteIcon, StyledEditDeleteIconsContainer, StyledSaveTextBtn, StyledLightGreyText, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
-import { updateFacilityCustomerKey, savePatientsFromOpenDentalToDatabase } from '../../../ClientServices/apiService';
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import deleteIcon from '../../../assets/delete-x.svg';
 import pencilEditIcon from '../../../assets/pencil-edit-icon.svg';
@@ -14,24 +11,39 @@ import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCustomerKey, setCustomerKey } from '../../../Redux/ReduxSlices/User/userSlice';
-import { fetchInitialDataIfLoggedIn } from '../../../Redux/sharedThunks';
-import { fetchPatientsForFacility } from '../../../Redux/ReduxSlices/Patients/patientsSlice';
+import { useUpdateFacilityCustomerKeyMutation, useGetCustomerKeyForUserFacilityQuery } from '../../../Redux/ReduxSlices/User/userApiSlice';
+import {
+    mapToUpdateCustomerKeyDto
+} from "../../../Utils/mappingUtils";
 
 const AccountInfo = () => {
     const [rowsData, setRowsData] = useState([]);
     const headers = ["Customer Key", ""];
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
-    const dispatch = useDispatch()
-    const customerKey = useSelector(selectCustomerKey);
+    const dispatch = useDispatch();
+
+
+    const {
+        data: customerKeyData,
+        isLoading: isCustomerKeyLoading,
+        error: customerKeyError
+    } = useGetCustomerKeyForUserFacilityQuery();
+
+    const [
+        updateFacilityCustomerKey,
+        { isLoading: isUpdating, isSuccess: isUpdateSuccess }
+    ] = useUpdateFacilityCustomerKeyMutation();
 
     useEffect(() => {
-        setRowsData([{
-            id: 'customerKey',
-            code: customerKey || '', 
-            isStatic: !!customerKey, 
-        }]);
-    }, [customerKey]);
+        if (customerKeyData) {
+            setRowsData([{
+                id: 'customerKey',
+                code: customerKeyData.customerKey || '',
+                isStatic: !!customerKeyData.customerKey,
+            }]);
+        }
+    }, [customerKeyData]);
 
 
     const renderStaticRow = (row, index) => ([
@@ -41,7 +53,7 @@ const AccountInfo = () => {
 
     const renderDynamicRow = (row, index) => {
         // Determine if the 'Add' button should be shown based on the emptiness of the 'code' (customer key) value
-        const isAddButtonRow = !customerKey && !row.isStatic;
+        const isAddButtonRow = !customerKeyData && !row.isStatic;
 
         const lastCell = isAddButtonRow ?
             createAddButtonCell() : // Assuming this function adds an 'Add' button
@@ -138,7 +150,7 @@ const AccountInfo = () => {
         const editedRow = rowsData.find(row => row.id === rowId);
 
         // Make sure we have the edited row and its code value is different from the original customerKey
-        if (editedRow && editedRow.code !== customerKey) {
+        if (editedRow && editedRow.code !== customerKeyData) {
             // Dispatch the action to update the customerKey in the Redux store with the edited value
             dispatch(setCustomerKey(editedRow.code));
         }
@@ -210,39 +222,19 @@ const AccountInfo = () => {
         }));
     };
 
-
-    const updateFacilityCustomerKeyFrontend = async (newCustomerKey) => {
-        const response = await updateFacilityCustomerKey(newCustomerKey);
-        if (response) {
-            dispatch(showAlert({ type: 'success', message: 'Customer key updated successfully!' }));
-        } else {
-            dispatch(showAlert({ type: 'error', message: 'Failed to update customer key' }));
-        }
-    };
-
     const handleSaveCustomerKey = async () => {
-        // Check if rowsData has at least one entry and extract the customer key
-        if (rowsData.length > 0) {
-            const currentCustomerKey = rowsData[0].code; 
-            console.log("currentCustomerKey during save", currentCustomerKey);
-            await updateFacilityCustomerKeyFrontend(currentCustomerKey);
-        } else {
-            console.log("No customer key available to save.");
-            // call updateFacilityCustomerKeyFrontend with null to delete the customer key
-            await updateFacilityCustomerKeyFrontend(null);
+        if (rowsData.length > 0 && rowsData[0].code !== customerKeyData?.customerKey) {
+            const payload = mapToUpdateCustomerKeyDto(rowsData[0].code);
+            console.log("Sending payload:", payload);
+            try {
+                await updateFacilityCustomerKey(payload).unwrap();
+                dispatch(showAlert({ type: 'success', message: 'Customer key updated successfully!' }));
+            } catch (error) {
+                console.error("Error updating customer key:", error);
+                dispatch(showAlert({ type: 'error', message: 'Failed to update customer key' }));
+            }
         }
-
-        const saveResult = await savePatientsFromOpenDentalToDatabase(); //before getting the patients for the facility we need to add/update the patients in the database
-        if (saveResult) {
-            dispatch(showAlert({ type: 'success', message: 'OpenDental patients integrated successfully!' }));
-        } else {
-            dispatch(showAlert({ type: 'error', message: 'Patient integration with OpenDental failed' }));
-        }
-
-        dispatch(fetchPatientsForFacility()); //we need to update the patients state after saving the customer key
     };
-
-
 
 
     return (

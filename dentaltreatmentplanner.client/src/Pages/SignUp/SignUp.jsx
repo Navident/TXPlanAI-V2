@@ -7,9 +7,9 @@ import logo from '../../assets/navident-logo.svg';
 import circleIcon from '../../assets/circle-icon.svg';
 import backButton from '../../assets/back-button.svg';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../../ClientServices/apiService';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 import privacyPolicyContent from './privacyPolicy';
+import { useRegisterUserMutation } from '../../Redux/ReduxSlices/User/userApiSlice';
 
 const Signup = () => {
     const [email, setEmail] = useState('');
@@ -21,6 +21,8 @@ const Signup = () => {
 
     // Add state to control the AlertDialog visibility
     const [showAlert, setShowAlert] = useState(false);
+
+    const [registerUser, { isLoading, error }] = useRegisterUserMutation();
 
     const handleBackClick = () => {
         navigate("/");
@@ -45,31 +47,23 @@ const Signup = () => {
     };
 
     const handleAgree = async () => {
-        // User has agreed, now hide the alert and proceed with registration
         setShowAlert(false);
-
-        // Construct the user data object
         const userData = {
             Email: email,
             PhoneNumber: phoneNumber,
             BusinessName: businessName,
             Password: password,
-            ConfirmPassword: confirmPassword
+            ConfirmPassword: confirmPassword,
         };
 
-        // Call the registerUser function with the user data
+        // Use the RTK Query hook for registration
         try {
-            const result = await registerUser(userData);
-            if (result && result.isSuccess) {
-                console.log('Registration successful', result);
-                navigate('/'); // navigate to the home page or dashboard as needed
-            } else {
-                console.error('Registration failed', result);
-                alert('Registration failed: ' + (result.errors || 'Unknown error'));
-            }
-        } catch (error) {
-            console.error('An error occurred during registration:', error);
-            alert('An error occurred during registration. Please try again later.');
+            const result = await registerUser(userData).unwrap();
+            console.log('Registration successful', result);
+            navigate('/'); 
+        } catch (apiError) {
+            console.error('Registration failed', apiError);
+            alert(`Registration failed: ${apiError.data?.errors || 'Unknown error'}`);
         }
     };
 

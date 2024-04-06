@@ -8,35 +8,42 @@ import InputAdornment from "@mui/material/InputAdornment";
 import searchIcon from "../../../assets/search-icon.svg";
 import TextField from "@mui/material/TextField";
 import { CircularProgress } from "@mui/material";
-import { useSelector } from 'react-redux';
-import { selectCategoriesAndSubcategories } from '../../../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesSlice';
 import {
 	StyledRoundedBoxContainer,
 	StyledLightGreyText,
 	StyledContainerWithTableInner,
 	StyledSemiboldBlackTitle,
 } from "../../../GlobalStyledComponents";
+import { useGetCategoriesQuery, useGetSubcategoriesQuery } from '../../../Redux/ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesApiSlice';
+
 
 const DefaultProcedures = () => {
-	const { isLoading } = useOutletContext();
-	const categories = useSelector(selectCategoriesAndSubcategories);
 	const [inputText, setInputText] = useState("");
 	const navigate = useNavigate();
+	// API call to fetch categories
+	const { data: categories = [], isLoading: categoriesLoading } = useGetCategoriesQuery();
+	// Log the categories data after it's fetched
+	console.log("Categories:", categories);
+
+	// API call to fetch subcategories
+	const { data: subcategories = [], isLoading: subcategoriesLoading } = useGetSubcategoriesQuery();
+	// Log the subcategories data after it's fetched
+	console.log("Subcategories:", subcategories);
 	const [selectedSubcategories, setSelectedSubcategories] = useState({});
 
 	const handleEditClick = (categoryId) => {
 		const subcategory = selectedSubcategories[categoryId];
 		console.log("subcategory in handleeditclick", subcategory);
-		console.log("subcategory.procedureSubcategoryId in handleeditclick", subcategory.procedureSubCategoryId); 
-		const category = categories.find(
-			(cat) => cat.procedureCategoryId === categoryId
-		)?.name;
+		console.log("subcategory.procedureSubcategoryId in handleeditclick", subcategory?.procedureSubCategoryId);
+
+		// Find the category name using the category ID for navigation
+		const category = categories.find(cat => cat.procedureCategoryId === categoryId)?.name;
+
 		if (subcategory && category) {
-			navigate(
-				`/dashboard/defaultprocedures/procedurescustomizer/${category}/${subcategory.procedureSubCategoryId}`
-			);
+			navigate(`/dashboard/defaultprocedures/procedurescustomizer/${category}/${subcategory.procedureSubCategoryId}`);
 		}
 	};
+
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value.toLowerCase());
@@ -63,6 +70,7 @@ const DefaultProcedures = () => {
 		return <Outlet />;
 	}
 
+	const isLoading = categoriesLoading || subcategoriesLoading;
 	if (isLoading) {
 		return (
 			<div className="default-procedure-management-wrapper">
@@ -122,8 +130,9 @@ const DefaultProcedures = () => {
 							key={category.procedureCategoryId}
 						>
 							<div className="dropdown-header large-text">{category.name}</div>
+							{/* Filter subcategories for the current category before passing to DropdownSearch */}
 							<DropdownSearch
-								items={category.subCategories}
+								items={subcategories.filter(subcategory => subcategory.procedureCategoryId === category.procedureCategoryId)}
 								onSelect={(subcategory) =>
 									handleSubcategorySelect(
 										category.procedureCategoryId,
@@ -149,6 +158,7 @@ const DefaultProcedures = () => {
 							</div>
 						</div>
 					))}
+
 				</StyledContainerWithTableInner>
 			</StyledRoundedBoxContainer>
 		</div>

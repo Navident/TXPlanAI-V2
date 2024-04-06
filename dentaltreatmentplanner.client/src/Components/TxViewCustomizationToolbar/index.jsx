@@ -1,12 +1,10 @@
 import {
-    StyledTxToolbarContainer,
     StyledPrintImportButton,
     StyledPrintSaveBtnContainer,
     StyledFlexAlignContainer,
     StyledPrintImportBtnContainer,
     StyledPrintExportBtnWithText
 } from "./index.style";
-import DropdownSearch from "../Common/DropdownSearch/DropdownSearch";
 import CategoryFilters from "./CategoryFilters/index";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import { UI_COLORS } from '../../Theme';
@@ -14,8 +12,6 @@ import { useState, useEffect, useRef } from 'react';
 import ToolbarContainer from "../../Components/Containers/ToolbarContainer/index";
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    selectSortBy,
-    selectInitialRenderComplete,
     toggleGroupActive,
     requestUpdateTreatmentPlan
 } from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
@@ -23,7 +19,6 @@ import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
 import printIcon from "../../assets/printer-icon.svg";
 import importIcon from "../../assets/import-icon.svg";
 import { mapToOpenDentalTreatmentPlanDtoByAllRows } from "../../Utils/Mapping/openDentalMapping";
-import { importTreatmentPlanToOpenDental } from '../../ClientServices/apiService';
 import {
     selectAllTreatmentPlans,
     updateTreatmentPlanDescription
@@ -31,6 +26,8 @@ import {
 } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
+import { useImportTreatmentPlanToOpenDentalMutation } from '../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupBtnAndFilters }) => {
     const dispatch = useDispatch();
@@ -41,6 +38,8 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
     const [dialogContent, setDialogContent] = useState('');
     const [textFieldWidth, setTextFieldWidth] = useState('');
     const [alertDialogInputValue, setAlertDialogInputValue] = useState('');
+
+    const [importTreatmentPlanToOpenDental, { isLoading, isError, isSuccess }] = useImportTreatmentPlanToOpenDentalMutation();
 
     useEffect(() => {
         // On component mount, we check if we should pre-populate the patient ID
@@ -116,25 +115,24 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
 
     const handleAgreeExportClick = async (inputValue) => {
-        // here we map the treatment plan to the dto 
         const patientIdIntInputValue = parseInt(inputValue, 10);
         const openDentalTreatmentPlanDto = mapToOpenDentalTreatmentPlanDtoByAllRows(allRows, patientIdIntInputValue);
 
-        // sending the entire treatment plan to the backend in one go
-        const success = await importTreatmentPlanToOpenDental(openDentalTreatmentPlanDto);
-
-        if (success) {
+        try {
+            await importTreatmentPlanToOpenDental(openDentalTreatmentPlanDto).unwrap();
             console.log("Treatment plan imported successfully.");
             dispatch(showAlert({ type: 'success', message: 'Treatment plan was successfully imported into your EHR!' }));
-        } else {
-            console.error("Failed to import treatment plan.");
+        } catch (error) {
+            console.error("Failed to import treatment plan.", error);
             dispatch(showAlert({ type: 'error', message: 'Failed to import into your EHR' }));
-
         }
     };
 
     return (
         <>
+            <Backdrop open={isLoading} style={{ zIndex: 1000 }}>
+                <CircularProgress style={{ color: 'rgb(162, 225, 201)' }} />
+            </Backdrop>
             <AlertDialog
                 title={dialogTitle}
                 content={dialogContent}

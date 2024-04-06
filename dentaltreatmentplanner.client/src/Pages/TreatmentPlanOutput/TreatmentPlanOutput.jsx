@@ -5,11 +5,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import DropdownSearch from "../../Components/Common/DropdownSearch/DropdownSearch";
 import { Droppable, Draggable, DragDropContext } from "react-beautiful-dnd";
 import {
-	updateTreatmentPlan,
 	createVisit,
 	createNewProcedures,
-	handleCreateNewTreatmentPlanFromDefault,
-	handleCreateNewTreatmentPlanForPatient,
 } from "../../ClientServices/apiService";
 import {
 	mapToUpdateTreatmentPlanDto,
@@ -17,7 +14,6 @@ import {
 } from "../../Utils/mappingUtils";
 import deleteIcon from "../../assets/delete-x.svg";
 import dragIcon from "../../assets/drag-icon.svg";
-import { useBusiness } from "../../Contexts/BusinessContext/useBusiness";
 import {
 	StyledContainerWithTableInner,
 	StyledAddButtonCellContainer,
@@ -45,15 +41,15 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
-import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady, selectCombinedCdtCodes, selectAlternativeProcedures } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+//import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
-import { onDeleteTemporaryVisit, selectPatientTreatmentPlans, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteProcedure } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
+import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteProcedure } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
 import StandardTextfield from '../../Components/Common/StandardTextfield/StandardTextfield';
-import PaymentTotals from "../../Components/PaymentTotals/index";
 import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patientsSlice';
 import InputAdornment from '@mui/material/InputAdornment';
-
+import { useCreateNewTreatmentPlanForPatientMutation, useUpdateTreatmentPlanMutation } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
+import { useCombinedCdtCodes } from '../../Utils/Hooks/useCombinedCdtCodes';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -73,7 +69,7 @@ const TreatmentPlanOutput = ({
 	const [localUpdatedVisits, setLocalUpdatedVisits] = useState([]);
 
 	const [combinedVisits, setCombinedVisits] = useState([]);
-	const combinedCdtCodes = useSelector(selectCombinedCdtCodes);
+	
 
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
@@ -89,11 +85,16 @@ const TreatmentPlanOutput = ({
 	const [editTableNameMode, setEditTableNameMode] = useState(null); 
 	const [editTableNameValue, setEditTableNameValue] = useState(''); 
 	const updateRequested = useSelector(selectUpdateRequested);
-	const payers = useSelector(selectPayersForFacility);
-	const selectedPayer = useSelector(selectSelectedPayer);
+/*	const payers = useSelector(selectPayersForFacility);
+	const selectedPayer = useSelector(selectSelectedPayer);*/
 	const selectedPatient = useSelector(selectSelectedPatient);
 	const [expandedRows, setExpandedRows] = useState(new Set());
-	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
+
+	const { combinedCdtCodes, isLoading: combinedCodesLoading, error: combinedCodesError } = useCombinedCdtCodes();
+	const [createNewTreatmentPlanForPatient, { isLoading: isLoadingCreate, isError: isErrorCreate, error: errorCreate }] = useCreateNewTreatmentPlanForPatientMutation();
+	const [updateTreatmentPlan, { isLoading: isLoadingUpdate, isError: isErrorUpdate, error: errorUpdate }] = useUpdateTreatmentPlanMutation();
+
+
 
 	useEffect(() => {
 		const newCheckedRows = [];
@@ -132,10 +133,6 @@ const TreatmentPlanOutput = ({
 	useEffect(() => {
 		console.log("alternativeRows:", alternativeRows);
 	}, [allRows]);
-
-	useEffect(() => {
-		console.log("patientTreatmentPlans:", patientTreatmentPlans);
-	}, [patientTreatmentPlans]);
 
 	useEffect(() => {
 		setCombinedVisits(treatmentPlan.visits);
@@ -280,30 +277,22 @@ const TreatmentPlanOutput = ({
 
 	const createInitialStaticRows = (item, visitId, index, procedureMap = null) => {
 
-		let selectedPayerDetails;
 
 		const cdtMap = procedureMap ? item : (item || {});
-		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === cdtMap.code);
 
-		// Default values for UCR Fee, Coverage Percent, and CoPay when fee details are available
-		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
-		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
-		const coPay = fee ? fee.coPay : "Not configured";
 		const surface = cdtMap.surface || procedureMap?.surface || "";
 		const arch = cdtMap.arch || procedureMap?.arch || "";
 
 		// Adjusting the row inputs to accommodate potential differences in data structure
 		const toothNumber = cdtMap.toothNumber || procedureMap?.toothNumber || "";
 		const code = cdtMap.code || procedureMap?.procedureCode || ""; // Assuming `procedureCode` could be an alternative key
-		const longDescription = cdtMap.longDescription || procedureMap?.description || ""; // Assuming `description` could be an alternative key
+		const longDescription = cdtMap.longDescription || procedureMap?.description || ""; 
 
 		const extraRowInput = [
 			toothNumber, 
 			code,
 			longDescription,
-			ucrFee,
-			coveragePercent,
-			coPay,
+
 			surface,
 			arch
 		];
@@ -382,22 +371,15 @@ const TreatmentPlanOutput = ({
 		originalDescription
 	) => {
 		// Find the payer details based on the context
-		let selectedPayerDetails;
+/*		let selectedPayerDetails;
 		if (!isInGenerateTreatmentPlanContext && treatmentPlan.payerId) {
 			const savedTxPayerId = treatmentPlan.payerId;
 			selectedPayerDetails = payers.find(payer => payer.payerId === savedTxPayerId);
 		} else if (isInGenerateTreatmentPlanContext && selectedPayer && selectedPayer.payerId) {
 			selectedPayerDetails = payers.find(payer => payer.payerId === selectedPayer.payerId);
-		}
+		}*/
 		const toothNumber = currentRow.selectedCdtCode?.toothNumber || "";
 
-		// Extract fee details for the selected CDT code
-		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === (selectedCdtCode ? selectedCdtCode.code : currentRow.selectedCdtCode?.code));
-
-		// Use extracted or default values
-		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
-		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
-		const coPay = fee ? fee.coPay : "Not configured";
 
 		const description = originalDescription || (selectedCdtCode ? selectedCdtCode.longDescription : currentRow.description);
 
@@ -428,9 +410,6 @@ const TreatmentPlanOutput = ({
 				toothNumber, // Ensure the tooth number is set here
 				updatedSelectedCdtCode.code,
 				description,
-				ucrFee,
-				coveragePercent,
-				coPay,
 				surface,
 				arch
 			],
@@ -451,18 +430,13 @@ const TreatmentPlanOutput = ({
 			(currentRow.selectedCdtCode && currentRow.selectedCdtCode.toothNumber) ||
 			"";
 
-		const ucrFee = currentRow.extraRowInput[3];
-		const coveragePercent = currentRow.extraRowInput[4];
-		const coPay = currentRow.extraRowInput[5];
-		const surf = currentRow.extraRowInput[6];
-		const arch = currentRow.extraRowInput[7];
+		const surf = currentRow.extraRowInput[3];
+		const arch = currentRow.extraRowInput[4];
 
 		const extraRowInput = [
 			toothNumber,
 			dropdownSearchElement,
-			ucrFee,
-			coveragePercent,
-			coPay,
+
 			surf,
 			arch
 		];
@@ -706,19 +680,19 @@ const TreatmentPlanOutput = ({
 	) => {
 		console.log("Attempting to create a new combined treatment plan...");
 		try {
-			const payerId = selectedPayer ? selectedPayer.payerId : null;
+			//const payerId = selectedPayer ? selectedPayer.payerId : null;
 
 			const patientId = selectedPatient && selectedPatient.patientId ? selectedPatient.patientId : null;
 
-			const newTreatmentPlan = await handleCreateNewTreatmentPlanForPatient(
+			const newTreatmentPlan = await createNewTreatmentPlanForPatient({
 				treatmentPlan,
 				allRows,
 				alternativeRows,
 				visitOrder,
-				patientId, 
-				payerId,
-				hasEdits
-			);
+				selectedPatientId: patientId,
+				//payerId,
+			}).unwrap(); 
+
 			console.log("New treatment plan created successfully:", newTreatmentPlan);
 			return newTreatmentPlan;
 		} catch (error) {
@@ -848,10 +822,10 @@ const TreatmentPlanOutput = ({
 					deletedVisitIds,
 					editedRows
 				);
-				const updatedTreatmentPlan = await updateTreatmentPlan(
-					treatmentPlan.treatmentPlanId,
-					updateDto
-				);
+				const updatedTreatmentPlan = await updateTreatmentPlan({
+					id: treatmentPlan.treatmentPlanId,
+					updatedData: updateDto
+				}).unwrap();
 
 				onUpdateVisitsInTreatmentPlan(
 					treatmentPlan.treatmentPlanId,
@@ -866,9 +840,7 @@ const TreatmentPlanOutput = ({
 		}
 	};
 
-	const getCdtCodeDetailsByCdtCodeId = (cdtCodeId) => {
-		return combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
-	};
+
 
 /*	const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
 		return visit.visitCdtCodeMaps.map(cdtCodeMap => {
@@ -905,9 +877,7 @@ const TreatmentPlanOutput = ({
 			"Tooth #",
 			"CDT Code",
 			"Description",
-			"UCR Fee",
-			"Coverage %",
-			"Co-Pay",
+
 			"Surf",
 			"Arch"
 		];
@@ -964,11 +934,8 @@ const TreatmentPlanOutput = ({
 
 	const constructDynamicRowData = (row, visitId) => {
 		// Extracting other properties as before
-		const ucrFee = row.extraRowInput[2];
-		const coveragePercent = row.extraRowInput[3];
-		const coPay = row.extraRowInput[4];
-		const surf = row.extraRowInput[5];
-		const arch = row.extraRowInput[6];
+		const surf = row.extraRowInput[3];
+		const arch = row.extraRowInput[4];
 
 		const dropdownKey = `dropdown-${row.id}`;
 		const cdtDropdown = (
@@ -999,7 +966,7 @@ const TreatmentPlanOutput = ({
 			/>
 		);
 
-		return [toothNumberInput, cdtDropdown, row.description, ucrFee, coveragePercent, coPay, surf, arch];
+		return [toothNumberInput, cdtDropdown, row.description, surf, arch];
 	};
 
 
@@ -1304,43 +1271,6 @@ const TreatmentPlanOutput = ({
 		};
 	};
 
-	const calculateTotalsForVisit = (visitRows) => {
-		let ucrTotal = 0;
-		let coPayTotal = 0;
-
-		visitRows.forEach(row => {
-			if (row.isStatic) {
-				const ucrFee = parseFloat(row.extraRowInput[3]);
-				const coPay = parseFloat(row.extraRowInput[5]);
-
-				if (!isNaN(ucrFee)) {
-					ucrTotal += ucrFee;
-				}
-
-				if (!isNaN(coPay)) {
-					coPayTotal += coPay;
-				}
-			}
-		});
-
-		return { ucrTotal, coPayTotal };
-	};
-
-	const calculateGrandTotals = (allRows) => {
-		let grandUcrTotal = 0;
-		let grandCoPayTotal = 0;
-
-		if (allRows) {
-			console.log("we went inside the if condition")
-			Object.values(allRows).forEach(visitRows => {
-				const { ucrTotal, coPayTotal } = calculateTotalsForVisit(visitRows);
-				grandUcrTotal += ucrTotal;
-				grandCoPayTotal += coPayTotal;
-			});
-		}
-
-		return { grandUcrTotal, grandCoPayTotal };
-	};
 
 	const collapseRows = (rows, rowIndex) => {
 		// Assuming the row at rowIndex is the default procedure,
@@ -1485,12 +1415,12 @@ const TreatmentPlanOutput = ({
 				allRows[visitIdStr]
 			);
 		});
-		const { ucrTotal, coPayTotal } = calculateTotalsForVisit(allRows[visitIdStr]);
+/*		const { ucrTotal, coPayTotal } = calculateTotalsForVisit(allRows[visitIdStr]);
 		const { grandUcrTotal, grandCoPayTotal } = calculateGrandTotals(allRows);
 		// Dispatch actions to update the totals in the store
 		dispatch(setGrandUcrTotal(grandUcrTotal));
 		dispatch(setGrandCoPayTotal(grandCoPayTotal));
-		dispatch(setGrandTotalsReady(true));
+		dispatch(setGrandTotalsReady(true));*/
 		console.log("Visit before return", visit);
 		return (
 			<Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
@@ -1533,7 +1463,7 @@ const TreatmentPlanOutput = ({
 							expandedRows={expandedRows}
 							onSwapAltRow={handleSwapAltRow}
 						/>
-						<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />
+						{/*<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />*/}
 					</div>
 
 				)}

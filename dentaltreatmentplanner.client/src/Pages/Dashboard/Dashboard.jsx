@@ -5,14 +5,12 @@ import SideBar from "../../Components/SideBar/SideBar";
 import './Dashboard.css';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useBusiness } from '../../Contexts/BusinessContext/useBusiness';
 import { useDispatch, useSelector } from 'react-redux';
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import { StyledAppContainer, StyledMainContentWrapper, StyledContentArea  } from '../../GlobalStyledComponents';
 import { selectFacilityName } from '../../Redux/ReduxSlices/User/userSlice';
 
 const Dashboard = () => {
-    const { categories, isLoading } = useBusiness();
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const facilityName = useSelector(selectFacilityName);
@@ -43,7 +41,7 @@ const Dashboard = () => {
                 <StyledMainContentWrapper>
                     <SideBar />
                     <StyledContentArea>                       
-                        <Outlet context={{ categories, isLoading }} />
+                        <Outlet />
                     </StyledContentArea>
                 </StyledMainContentWrapper>
             </StyledAppContainer>

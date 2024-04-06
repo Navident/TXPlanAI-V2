@@ -258,9 +258,8 @@ public class TreatmentPlansController : ControllerBase
     }
 
 
-    // GET: api/TreatmentPlans/Subcategory/5
-    [HttpGet("Subcategory/{subcategoryName}")]
-    public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetTreatmentPlansBySubcategory(string subcategoryName)
+    [HttpGet("allsubcategorytreatmentplansforfacility")]
+    public async Task<ActionResult<IEnumerable<RetrieveTreatmentPlanDto>>> GetAllSubcategoryTreatmentPlans()
     {
         string username = GetUsernameFromToken();
         if (string.IsNullOrEmpty(username))
@@ -274,7 +273,8 @@ public class TreatmentPlansController : ControllerBase
             return Unauthorized();
         }
 
-        var treatmentPlans = await _dentalTreatmentPlannerService.GetTreatmentPlansBySubcategoryAsync(subcategoryName, user.FacilityId);
+        // Assuming the updated method is now named GetAllTreatmentPlansAsync
+        var treatmentPlans = await _dentalTreatmentPlannerService.GetAllSubcategoryTreatmentPlansAsync(user.FacilityId);
         if (treatmentPlans == null || !treatmentPlans.Any())
         {
             return NotFound();
@@ -282,6 +282,7 @@ public class TreatmentPlansController : ControllerBase
 
         return Ok(treatmentPlans);
     }
+
 
     // GET: api/TreatmentPlans/Patient/5
     [HttpGet("Patient/{patientId}")]

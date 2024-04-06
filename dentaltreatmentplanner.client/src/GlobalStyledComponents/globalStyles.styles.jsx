@@ -107,7 +107,7 @@ export const StyledRoundedBoxContainer = styled.div`
     width: 100%;
     height: ${({ height }) => height || '100%'};
      flex-grow: ${({ flexGrow }) => flexGrow ?? 1};
-
+     z-index: 10;
     border-radius: 15px;
 
     -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -208,4 +208,12 @@ export const StyledDragCircleContainer = styled.div`
     gap: 10px;
     width: fit-content
   }
+`;
+
+export const StyledSpinnerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; 
+  width: 100%;
 `;
