@@ -85,7 +85,7 @@ jobs:
     - name: Deploy to Azure Staging WebApp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'DentalTreatmentPlanner-staging'  # Staging App 
+        app-name: 'dentaltreatmentplanner/staging'  # Staging App 
         package: publish
         publish-profile: ${{ secrets.AZURE_STAGING_PUBLISH_PROFILE }}
 
