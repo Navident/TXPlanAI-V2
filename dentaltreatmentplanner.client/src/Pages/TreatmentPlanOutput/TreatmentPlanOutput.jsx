@@ -1273,7 +1273,6 @@ const TreatmentPlanOutput = ({
 
 
 	const collapseRows = (rows, rowIndex) => {
-		// Assuming the row at rowIndex is the default procedure,
 		// and its ID is used as parentId for its alternatives.
 
 		const currentRow = rows[rowIndex];

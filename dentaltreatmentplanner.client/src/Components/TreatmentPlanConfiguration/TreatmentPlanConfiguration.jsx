@@ -880,7 +880,7 @@ const TreatmentPlanConfiguration = ({
 			'default' in row ? row.default : null;
 		const hasAltChildren = alternatives.some(alt => alt.visitToProcedureMapId === row.visitToProcedureMapId);
 
-		const hasAltInId = row.id.includes('alt');
+		const hasAltInId = row.id && row.id.includes('alt');
 		let rowData = isStaticRow
 			? constructStaticRowData(row)
 			: constructDynamicRowData(row, visitId);
@@ -1020,13 +1020,25 @@ const TreatmentPlanConfiguration = ({
 
 
 	const collapseRows = (rows, rowIndex) => {
-		// Remove all related alternative procedure rows
+		// Assuming the row at `rowIndex` is the default row
+		// we will start looking for alternative rows immediately after it.
+		const parentRowId = rows[rowIndex].id;
+
+		// We need to remove rows until we find the next default row or the 'initial' row, or exhaust the list.
 		const rowsToRemove = rows.slice(rowIndex + 1).findIndex(row =>
-			!row.id.startsWith("dynamic-alt-code") && !row.id.startsWith("static-alt-code")
+			row.default === true || row.id.includes('initial') // Stop at the next default row or the 'initial' row
 		);
+
+		// Calculate the count of rows to remove:
+		// if no default or 'initial' row is found in the slice, remove all rows after the parent
+		// else, stop right before the 'initial' row if it's the next row to stop at
 		const removeCount = rowsToRemove === -1 ? rows.length - rowIndex - 1 : rowsToRemove;
+
+		// Remove the alternative rows starting right after the parent row
 		rows.splice(rowIndex + 1, removeCount);
 	};
+
+
 
 
 	const expandRows = (rows, rowIndex, visitId, currentRow, alternativeRows) => {
@@ -1038,9 +1050,8 @@ const TreatmentPlanConfiguration = ({
 			// Filter alternative rows that match the current default row's visitToProcedureMapId
 			const matchingAlternatives = alternatives.filter(alt => alt.visitToProcedureMapId === currentRow.visitToProcedureMapId);
 			// Create a static row for each matching alternative
-			matchingAlternatives.forEach((altRow, index) => {
-				const altRowId = `alt-${rowIndex}-${index}`;
-				newRows.push(createStaticRowForAltCode(altRow, visitId, altRowId, currentRow.id));
+			matchingAlternatives.forEach((altRow) => {
+				newRows.push(createStaticRowForAltCode(altRow, visitId, currentRow.id));
 			});
 		}
 
@@ -1051,6 +1062,7 @@ const TreatmentPlanConfiguration = ({
 		// Insert new rows into the correct position
 		rows.splice(rowIndex + 1, 0, ...newRows); // Use spread operator to add all new rows at once
 	};
+
 
 
 	const handleRedDropdownIconClick = (rowId) => {
@@ -1078,28 +1090,28 @@ const TreatmentPlanConfiguration = ({
 	};
 
 
-
-	const createStaticRowForAltCode = (procedureToCdtMapDto, visitId, baseRowId, parentId) => {
+	const createStaticRowForAltCode = (procedureToCdtMapDto, visitId, parentId) => {
 		const description = procedureToCdtMapDto.selectedCdtCode.userDescription || 'Description not provided';
-		const cdtCode = procedureToCdtMapDto.selectedCdtCode.code; 
+		const cdtCode = procedureToCdtMapDto.selectedCdtCode.code;
 
-		const extraRowInput = [
-			cdtCode,
-			description
-		];
+		// Use existing `procedureToCdtMapId` if available, otherwise use `tempId`
+		const rowId = procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId ?
+			`static-alt-code-${visitId}-${procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId}` :
+			procedureToCdtMapDto.tempId;
 
 		return {
-			id: `static-alt-code-${visitId}-${baseRowId}`,
+			id: rowId,
 			procedureToCdtMapId: procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId,
 			visitToProcedureMapId: procedureToCdtMapDto.visitToProcedureMapId,
 			description: description,
 			default: procedureToCdtMapDto.default,
 			selectedCdtCode: procedureToCdtMapDto.selectedCdtCode,
 			isStatic: true,
-			extraRowInput,
+			extraRowInput: [cdtCode, description],
 			parentId
 		};
 	};
+
 
 
 	const handleInputChange = (visitId, rowId, field, value) => {
