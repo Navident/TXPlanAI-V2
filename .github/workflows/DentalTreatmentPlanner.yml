@@ -32,17 +32,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.SWASHBUCKLE_DOTNET_CORE_VERSION }}
-    - name: Install Azure CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    - name: Install PowerShell
-      run: |
-        wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo add-apt-repository universe
-        sudo apt-get install -y powershell
-
 
     # Dynamically create .env.production for React app - start
     - name: Create .env.production file for React app
@@ -68,35 +57,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/master'
     steps:
     - name: Download artifact from build job
       uses: actions/download-artifact@v3
       with:
         name: webapp
-        path: publish
-    - name: Deploy to Azure Production WebApp
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'DentalTreatmentPlanner'  # Production App 
-        package: publish
-        publish-profile: ${{ secrets.AZURE_PROD_PUBLISH_PROFILE }}
-
-  deploy-staging:
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/development'
-    steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v3
-      with:
-        name: webapp
-        path: publish
-    - name: Deploy to Azure Staging WebApp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: 'dentaltreatmentplanner'  # Staging App 
-        slot-name: 'staging'
-        package: publish
-        publish-profile: ${{ secrets.AZURE_STAGING_PUBLISH_PROFILE }}
-
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+        publish-profile: ${{ secrets.DentalTreatmentPlanner_1517 }}
