@@ -3,7 +3,6 @@ on:
   push:
     branches:
     - master
-    - development
 env:
   AZURE_WEBAPP_NAME: DentalTreatmentPlanner
   AZURE_WEBAPP_PACKAGE_PATH: DentalTreatmentPlanner.Server/publish
