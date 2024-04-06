@@ -19,9 +19,9 @@ builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Debug);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-var vaultUri = Environment.GetEnvironmentVariable("VaultUri");
-
-var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+//var vaultUri = Environment.GetEnvironmentVariable("VaultUri");
+var vaultUri = "https://navidentkeyvault.vault.azure.net/";
+var keyVaultEndpoint = new Uri(vaultUri);  
 builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
 // Add DbContext using SQL Server Provider
