@@ -46,7 +46,7 @@ namespace DentalTreatmentPlanner.Server.Services
 
 
 
-        public async Task ImportToOpenDental(OpenDentalTreatmentPlanDto treatmentPlan, int facilityId)
+        public async Task<string> ImportToOpenDental(OpenDentalTreatmentPlanDto treatmentPlan, int facilityId)
         {
             // Retrieve the Facility to get the CustomerKey
             var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
@@ -57,6 +57,8 @@ namespace DentalTreatmentPlanner.Server.Services
             }
 
             var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+            StringBuilder errorMessages = new StringBuilder();
+
             foreach (var procedure in treatmentPlan.Procedures)
             {
                 var newProcedureData = new
@@ -71,33 +73,26 @@ namespace DentalTreatmentPlanner.Server.Services
                     procedure.ToothRange
                 };
 
-                try
+                var content = HttpClientExtensions.CreateJsonContentWithoutCharset(newProcedureData);
+                _logger.LogInformation($"Sending request to OpenDental API: {_openDentalApiUrl}/procedurelogs");
+
+                var response = await httpClient.PostAsync($"{_openDentalApiUrl}/procedurelogs", content);
+                if (!response.IsSuccessStatusCode)
                 {
-                    var content = HttpClientExtensions.CreateJsonContentWithoutCharset(newProcedureData);
-
-                    _logger.LogInformation($"Sending request to OpenDental API: {_openDentalApiUrl}/procedurelogs");
-
-
-                    var response = await httpClient.PostAsync($"{_openDentalApiUrl}/procedurelogs", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        _logger.LogInformation($"Successfully imported procedure to OpenDental for PatNum: {treatmentPlan.PatNum}");
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        _logger.LogError($"Failed to import procedure to OpenDental. Status: {response.StatusCode}, Details: {errorContent}");
-                        _logger.LogError($"Response Headers: {JsonConvert.SerializeObject(response.Headers)}");
-                        _logger.LogError($"Request Content-Type: {content.Headers.ContentType}");
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Exception occurred while importing procedure to OpenDental.");
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Failed to import procedure to OpenDental. Status: {response.StatusCode}, Details: {errorContent}");
+                    errorMessages.AppendLine($"Procedure Code: {procedure.procCode} - Error: {errorContent}");
                 }
             }
+
+            if (errorMessages.Length > 0)
+            {
+                throw new Exception("Failed to import some procedures: " + errorMessages.ToString());
+            }
+
+            return "Successfully imported all procedures.";
         }
+
 
 
 

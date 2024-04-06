@@ -79,14 +79,16 @@ namespace DentalTreatmentPlanner.Server.Controllers
 
             try
             {
-                await _openDentalService.ImportToOpenDental(treatmentPlan, facilityId.Value);
-                return Ok();
+                var result = await _openDentalService.ImportToOpenDental(treatmentPlan, facilityId.Value);
+                return Ok(new { message = result });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while importing the treatment plan.");
+                return BadRequest(new { error = ex.Message });
             }
         }
+
+
 
         [HttpPost("savePatientsFromOpenDentalToDatabase")]
         public async Task<IActionResult> SavePatientsFromOpenDentalToDatabase()

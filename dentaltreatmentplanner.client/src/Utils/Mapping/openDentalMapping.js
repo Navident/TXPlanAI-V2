@@ -39,7 +39,7 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
         Procedures: []
     };
 
-    // Use Object.entries to iterate through allRows object and get both the procedures and their visit index
+    // iterate through allRows object and get both the procedures and their visit index
     Object.entries(allRows).forEach(([visitKey, procedures], visitIndex) => {
         procedures.forEach((procedure) => {
             // Skip rows without visitToProcedureMapId or if it's an initial row template
@@ -52,7 +52,7 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
             if (selectedCdtCode && selectedCdtCode.code) {
                 const procedureDto = {
                     ToothNum: procedure.toothNumber.replace('#', ''),
-                    Surf: selectedCdtCode.surface ? selectedCdtCode.surface : null,
+                    Surf: selectedCdtCode.surface ? selectedCdtCode.surface : (selectedCdtCode.arch ? selectedCdtCode.arch : null),
                     ProcStatus: "TP",
                     procCode: selectedCdtCode.code,
                     priority: (visitIndex + 1).toString() // Adding 1 because indices start at 0
@@ -64,6 +64,6 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
             }
         });
     });
-
+    console.log("DTO before return:", openDentalTreatmentPlanDto);
     return openDentalTreatmentPlanDto;
 };
