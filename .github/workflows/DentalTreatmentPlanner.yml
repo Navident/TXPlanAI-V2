@@ -33,6 +33,17 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.SWASHBUCKLE_DOTNET_CORE_VERSION }}
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    - name: Install PowerShell
+      run: |
+        wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo add-apt-repository universe
+        sudo apt-get install -y powershell
+
 
     # Dynamically create .env.production for React app - start
     - name: Create .env.production file for React app
