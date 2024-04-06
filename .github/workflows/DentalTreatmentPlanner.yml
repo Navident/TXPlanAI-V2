@@ -87,6 +87,6 @@ jobs:
       with:
         app-name: 'dentaltreatmentplanner'  # Staging App 
         slot-name: 'staging'
-        package: myapp  
+        package: publish
         publish-profile: ${{ secrets.AZURE_STAGING_PUBLISH_PROFILE }}
 
