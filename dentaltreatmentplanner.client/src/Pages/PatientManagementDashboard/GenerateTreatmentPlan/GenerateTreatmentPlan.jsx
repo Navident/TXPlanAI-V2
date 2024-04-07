@@ -27,9 +27,10 @@ import {
 	selectAllTreatmentPlans
 } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import appInsights from '../../../Utils/appInsights';
-import { selectFacilityName, selectFacilityId } from '../../../Redux/ReduxSlices/User/userSlice';
+import { selectFacilityName, selectFacilityId, selectIsUserLoggedIn } from '../../../Redux/ReduxSlices/User/userSlice';
 import EmptyStatePlaceholder from './EmptyStatePlaceholder';
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
+import { useNavigate } from 'react-router-dom';
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
@@ -39,9 +40,9 @@ const GenerateTreatmentPlan = () => {
 	const [inputText, setInputText] = useState("");
 	const facilityName = useSelector(selectFacilityName);
 	const facilityId = useSelector(selectFacilityId);
-
-
 	const [allRowsFromChild, setAllRowsFromChild] = useState({});
+	const navigate = useNavigate();
+	const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
 
 	const handleAllRowsUpdate = (newAllRows) => {
 		setAllRowsFromChild(newAllRows);
@@ -67,6 +68,13 @@ const GenerateTreatmentPlan = () => {
 		}
 	}, [treatmentPlans]);
 
+	useEffect(() => {
+		dispatch(setTreatmentPlans([]));
+		// Check if the user is logged in, if not redirect to the login page
+		if (!isUserLoggedIn) {
+			navigate('/login');
+		}
+	}, [isUserLoggedIn, navigate]);
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);

@@ -1164,16 +1164,24 @@ const TreatmentPlanOutput = ({
 
 	const synchronizeAlternativeRows2 = (visitId, updatedRows) => {
 		const updatedAlternativeRows = updatedRows.filter(row =>
-			// Ensure selectedCdtCode is not null before checking the 'default' property
 			row.selectedCdtCode != null &&
 			row.selectedCdtCode.default === false // Not default
 		);
 
-		setAlternativeRows(prevAlternativeRows => ({
-			...prevAlternativeRows,
-			[visitId]: updatedAlternativeRows,
-		}));
+		setAlternativeRows(prevAlternativeRows => {
+			// Merge existing alternative rows with the new alternative rows
+			const existingAlternativeRows = prevAlternativeRows[visitId] || [];
+			const mergedAlternativeRows = [...existingAlternativeRows.filter(row =>
+				!updatedAlternativeRows.some(updatedRow => updatedRow.id === row.id)
+			), ...updatedAlternativeRows];
+
+			return {
+				...prevAlternativeRows,
+				[visitId]: mergedAlternativeRows,
+			};
+		});
 	};
+
 
 
 
@@ -1205,7 +1213,7 @@ const TreatmentPlanOutput = ({
 
 			// Swap specified indexes of the extraRowInput array if applicable
 			if (defaultRowCopy.extraRowInput && alternativeRowCopy.extraRowInput) {
-				[0, 3, 4, 5, 6, 7].forEach(index => {
+				[0, 3, 4].forEach(index => {
 					[defaultRowCopy.extraRowInput[index], alternativeRowCopy.extraRowInput[index]] =
 						[alternativeRowCopy.extraRowInput[index], defaultRowCopy.extraRowInput[index]];
 				});
@@ -1367,16 +1375,17 @@ const TreatmentPlanOutput = ({
 			procedureToCdtMapDto.selectedCdtCode.longDescription ||
 			'Description not provided';
 		const cdtCode = procedureToCdtMapDto.selectedCdtCode.code;
+		const rowId = procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId;
 
 		return {
-			id: `static-alt-code-${visitId}-${baseRowId}`,
+			id: `static-alt-code-${visitId}-${rowId}`,
 			procedureToCdtMapId: procedureToCdtMapDto.selectedCdtCode.procedureToCdtMapId,
 			visitToProcedureMapId: procedureToCdtMapDto.visitToProcedureMapId,
 			description: description,
 			default: procedureToCdtMapDto.default,
 			selectedCdtCode: procedureToCdtMapDto.selectedCdtCode,
 			isStatic: true,
-			extraRowInput: ["", cdtCode, description, "", "", "", "", ""],
+			extraRowInput: ["", cdtCode, description, "", ""],
 			parentId
 		};
 	};
