@@ -28,6 +28,7 @@ import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 import { useImportTreatmentPlanToOpenDentalMutation } from '../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
 import { Backdrop, CircularProgress } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupBtnAndFilters }) => {
     const dispatch = useDispatch();
@@ -41,13 +42,21 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
     const [importTreatmentPlanToOpenDental, { isLoading, isError, isSuccess }] = useImportTreatmentPlanToOpenDentalMutation();
 
+    const location = useLocation();
+
     useEffect(() => {
-        // On component mount, we check if we should pre-populate the patient ID
+        // Function to extract the patient ID from the URL
+        const extractPatientIdFromUrl = () => {
+            const searchParams = new URLSearchParams(location.search);
+            return searchParams.get('patientID');
+        };
+
+        // Set the patient ID when the component mounts or when the URL changes
         const patientID = extractPatientIdFromUrl();
         if (patientID) {
             setAlertDialogInputValue(patientID);
         }
-    }, []);
+    }, [location]);
 
     const extractPatientIdFromUrl = () => {
         const searchParams = new URLSearchParams(window.location.search);
