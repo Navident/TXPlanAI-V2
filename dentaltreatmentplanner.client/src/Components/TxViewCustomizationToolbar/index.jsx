@@ -44,7 +44,7 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
     const extractPatientIdFromUrl = () => {
         const searchParams = new URLSearchParams(window.location.search);
-        return searchParams.get('patientid'); 
+        return searchParams.get('patientID'); 
     };
 
     const handleSaveButtonClick = () => {
