@@ -28,7 +28,6 @@ import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 import AlertDialog from "../../Components/Common/PopupAlert/index";
 import { useImportTreatmentPlanToOpenDentalMutation } from '../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
 import { Backdrop, CircularProgress } from '@mui/material';
-import { useLocation } from 'react-router-dom';
 
 const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupBtnAndFilters }) => {
     const dispatch = useDispatch();
@@ -42,25 +41,10 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
     const [importTreatmentPlanToOpenDental, { isLoading, isError, isSuccess }] = useImportTreatmentPlanToOpenDentalMutation();
 
-    const location = useLocation();
-
-    useEffect(() => {
-        // Function to extract the patient ID from the URL
-        const extractPatientIdFromUrl = () => {
-            const searchParams = new URLSearchParams(location.search);
-            return searchParams.get('patientID');
-        };
-
-        // Set the patient ID when the component mounts or when the URL changes
-        const patientID = extractPatientIdFromUrl();
-        if (patientID) {
-            setAlertDialogInputValue(patientID);
-        }
-    }, [location]);
 
     const extractPatientIdFromUrl = () => {
         const searchParams = new URLSearchParams(window.location.search);
-        return searchParams.get('patientID'); 
+        return searchParams.get('patientid'); 
     };
 
     const handleSaveButtonClick = () => {
@@ -81,20 +65,21 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
 
     const handleExportClick = () => {
+        const patientID = extractPatientIdFromUrl();
+        setAlertDialogInputValue(patientID || ''); // If patientID is not found, fallback to an empty string
         setIsDialogOpen(true);
         setCurrentAction('export');
         setDialogTitle("Export Treatment Plan");
         setDialogContent("Please enter the patient ID to export this treatment plan into OpenDental.");
-        setTextFieldWidth('75px'); 
+        setTextFieldWidth('75px');
     };
 
 
+
+
     const handleClose = () => {
-        setIsDialogOpen(false); // Close the AlertDialog
-        setCurrentAction(null); // Reset the current action
-        setDialogTitle(''); // Reset dialog title
-        setDialogContent(''); // Reset dialog content
-        setAlertDialogInputValue(''); // Reset the input field
+        setIsDialogOpen(false);
+ 
     };
 
 
@@ -147,6 +132,15 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
                 content={dialogContent}
                 open={isDialogOpen}
                 onClose={handleClose}
+                TransitionProps={{
+                    onExited: () => {
+                        // Reset dialog content after the exit transition has completed
+                        setCurrentAction(null);
+                        setDialogTitle('');
+                        setDialogContent('');
+                        setAlertDialogInputValue('');
+                    }
+                }}
                 onAgree={() => {
                     if (currentAction === 'save') {
                         handleConfirmSaveClick(alertDialogInputValue);
