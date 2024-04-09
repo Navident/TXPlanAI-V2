@@ -73,36 +73,60 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeR
 
 
 
-export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows, visitOrder) => {
-    const newPlanVisits = visitOrder.map(visitId => {
-        const visitRows = allRows[visitId];
-        const validRows = visitRows.filter(row => row.selectedCdtCode !== null);
+export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows, alternativeRows, visitOrder) => {
+    const newPlanVisits = visitOrder.map((visitId, index) => {
+        const visit = treatmentPlan.visits.find(v => v.visitId === visitId);
+        const visitIdStr = visitId.toString();
+        const defaultRows = allRows[visitIdStr] || [];
+        const nonDefaultRows = alternativeRows[visitIdStr] || [];
+
+        const nonDefaultRowIds = new Set(nonDefaultRows.map(row => row.id));
+        const filteredDefaultRows = defaultRows.filter(row => !nonDefaultRowIds.has(row.id));
+        const combinedRows = [...filteredDefaultRows, ...nonDefaultRows];
+
+        const visitToProcedureMaps = combinedRows
+            .filter(row => row.selectedCdtCode !== null) // Ensure only rows with a selected CDT code are included
+            .map((row, rowIdx) => {
+                const defaultValue = row.default ?? row.selectedCdtCode?.default;
+
+                return {
+                    VisitToProcedureMapId: row.visitToProcedureMapId, 
+                    Order: rowIdx,
+                    ToothNumber: row.selectedCdtCode.toothNumber ? parseInt(row.selectedCdtCode.toothNumber) : null,
+                    ProcedureTypeId: row.procedureTypeId,
+                    Surface: row.surface,
+                    Arch: row.arch,
+                    ProcedureToCdtMaps: [{
+                        ProcedureToCdtMapId: row.selectedCdtCode.procedureToCdtMapId,
+                        CdtCodeId: row.selectedCdtCode.cdtCodeId,
+                        Default: defaultValue,
+                        UserDescription: row.selectedCdtCode.userDescription,
+                        Code: row.selectedCdtCode.code,
+                        LongDescription: row.selectedCdtCode.longDescription,
+                    }]
+                };
+            });
+
 
         return {
-            Description: treatmentPlan.description || null, 
-            VisitToProcedureMaps: validRows.map(row => ({
-                Order: row.order, 
-                ToothNumber: row.toothNumber,
-                Surface: row.surface || null,
-                Arch: row.arch || null,
-                ProcedureToCdtMaps: [{
-                    CdtCodeId: row.selectedCdtCode.cdtCodeId,
-                    Default: false, 
-                    UserDescription: row.description || null,
-                }],
-            })),
+            visitId: String(visitId).startsWith('temp-') ? null : visitId,
+            description: visit?.description,
+            VisitToProcedureMaps: visitToProcedureMaps,
         };
     });
 
     const newTreatmentPlanDto = {
-        Description: treatmentPlan.description || null,
+        Description: treatmentPlan.description,
         ProcedureSubcategoryId: treatmentPlan.procedureSubcategoryId,
+        ToothNumber: treatmentPlan.toothNumber ? parseInt(treatmentPlan.toothNumber.match(/\d+/)[0]) : null,
         Visits: newPlanVisits,
     };
 
     console.log('Mapped DTO for new treatment plan:', newTreatmentPlanDto);
     return newTreatmentPlanDto;
 };
+
+
 
 
 

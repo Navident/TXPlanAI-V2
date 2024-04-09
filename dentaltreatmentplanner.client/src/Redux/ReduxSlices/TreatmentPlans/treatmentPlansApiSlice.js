@@ -49,8 +49,8 @@ export const treatmentPlansApiSlice = createApi({
         }),
 
         createNewTreatmentPlanFromDefault: builder.mutation({
-            query: ({ treatmentPlan, allRows, visitOrder }) => {
-                const body = mapToCreateNewTreatmentPlanFromDefaultDto(treatmentPlan, allRows, visitOrder);
+            query: ({ treatmentPlan, allRows, alternativeRows, visitOrder }) => {
+                const body = mapToCreateNewTreatmentPlanFromDefaultDto(treatmentPlan, allRows, alternativeRows, visitOrder);
                 return {
                     url: '/newfromdefault',
                     method: 'POST',

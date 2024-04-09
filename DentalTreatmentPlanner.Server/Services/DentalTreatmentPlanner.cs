@@ -900,73 +900,7 @@ namespace DentalTreatmentPlanner.Server.Services
         }
 
 
-        public async Task<TreatmentPlan> CreateNewTreatmentPlanFromDefaultAsync(CreateNewTxPlanFromDefaultDto createNewTxPlanFromDefaultDto, int facilityId)
-        {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    // Create a new treatment plan based on the default
-                    TreatmentPlan newTreatmentPlan = new TreatmentPlan
-                    {
-                        //Description = createNewTxPlanFromDefaultDto.Description,
-                        ProcedureSubcategoryId = createNewTxPlanFromDefaultDto.ProcedureSubcategoryId,
-                        FacilityId = facilityId,
-                    };
 
-                    foreach (var visitDto in createNewTxPlanFromDefaultDto.Visits)
-                    {
-                        Visit newVisit = new Visit
-                        {
-                            Description = visitDto.Description,
-                            //VisitNumber = visitDto.VisitNumber,
-                            TreatmentPlan = newTreatmentPlan
-                        };
-
-                        foreach (var procedureDto in visitDto.VisitToProcedureMaps)
-                        {
-                            VisitToProcedureMap newVisitToProcedure = new VisitToProcedureMap
-                            {
-                                Order = procedureDto.Order,
-                                ToothNumber = procedureDto.ToothNumber,
-                                Surface = procedureDto.Surface,
-                                Arch = procedureDto.Arch,
-                                Visit = newVisit // Linking back to the Visit
-                            };
-
-                            foreach (var procedureToCdtDto in procedureDto.ProcedureToCdtMaps)
-                            {
-                                ProcedureToCdtMap newProcedureToCdt = new ProcedureToCdtMap
-                                {
-                                    UserDescription = procedureToCdtDto.UserDescription,
-                                    CdtCodeId = procedureToCdtDto.CdtCodeId,
-                                    Default = procedureToCdtDto.Default,
-                                    VisitToProcedureMap = newVisitToProcedure
-                                };
-
-                                newVisitToProcedure.ProcedureToCdtMaps.Add(newProcedureToCdt);
-                            }
-
-                            newVisit.VisitToProcedureMaps.Add(newVisitToProcedure);
-                        }
-
-                        newTreatmentPlan.Visits.Add(newVisit);
-                    }
-
-                    // Save the new treatment plan to the database
-                    await _context.TreatmentPlans.AddAsync(newTreatmentPlan);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return newTreatmentPlan;
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    Console.WriteLine($"Error occurred: {ex.Message}");
-                    throw;
-                }
-            }
-        }
 
 
         public async Task<bool> DeleteTreatmentPlanByIdAsync(int treatmentPlanId)
@@ -1094,6 +1028,140 @@ namespace DentalTreatmentPlanner.Server.Services
                 }
                 catch (Exception ex)
                 {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error occurred: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+                public async Task<RetrievePatientTreatmentPlanDto> CreateNewTreatmentPlanFromDefaultAsync(CreateUnmodifiedPatientTxDto createUnmodifiedPatientTxDto, int facilityId)
+        {
+            // Start a new database transaction
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Create and save a new TreatmentPlan entity
+                    TreatmentPlan newTreatmentPlan = new TreatmentPlan
+                    {
+                        Description = createUnmodifiedPatientTxDto.Description,
+                        ProcedureSubcategoryId = createUnmodifiedPatientTxDto.ProcedureSubcategoryId,
+                        FacilityId = facilityId,
+                    };
+
+                    _context.TreatmentPlans.Add(newTreatmentPlan);
+                    await _context.SaveChangesAsync();
+
+                    // Initialize mappings to track VisitToProcedureMap IDs and entities
+                    Dictionary<int, int> visitToProcedureMapIdMapping = new Dictionary<int, int>();
+                    Dictionary<int, VisitToProcedureMap> newProcedureMaps = new Dictionary<int, VisitToProcedureMap>();
+
+                    // Iterate over all visits in the DTO
+                    foreach (var visitDto in createUnmodifiedPatientTxDto.Visits)
+                    {
+                        // Create and save a new Visit entity
+                        Visit newVisit = new Visit
+                        {
+                            TreatmentPlanId = newTreatmentPlan.TreatmentPlanId,
+                            Description = visitDto.Description,
+                            VisitNumber = visitDto.VisitNumber,
+                        };
+
+                        _context.Visits.Add(newVisit);
+                        await _context.SaveChangesAsync();
+
+                        // Iterate over all procedure maps within the visit
+                        foreach (var procedureMapDto in visitDto.VisitToProcedureMaps)
+                        {
+                            VisitToProcedureMap newProcedureMap;
+
+                            // Check if this procedure map ID has already been processed
+                            if (!visitToProcedureMapIdMapping.TryGetValue(procedureMapDto.VisitToProcedureMapId, out int newVisitToProcedureMapId))
+                            {
+                                // Create a new VisitToProcedureMap entity for new procedure maps
+                                newProcedureMap = new VisitToProcedureMap
+                                {
+                                    VisitId = newVisit.VisitId,
+                                    Order = procedureMapDto.Order,
+                                    ToothNumber = procedureMapDto.ToothNumber,
+                                    Surface = procedureMapDto.Surface,
+                                    Arch = procedureMapDto.Arch,
+                                    ProcedureTypeId = procedureMapDto.ProcedureTypeId,
+                                };
+
+                                _context.VisitToProcedureMaps.Add(newProcedureMap);
+                                await _context.SaveChangesAsync(); // Save to generate a new ID
+
+                                // Update mappings with the new VisitToProcedureMap ID
+                                newVisitToProcedureMapId = newProcedureMap.VisitToProcedureMapId;
+                                visitToProcedureMapIdMapping[procedureMapDto.VisitToProcedureMapId] = newVisitToProcedureMapId;
+                                newProcedureMaps[newVisitToProcedureMapId] = newProcedureMap;
+
+                                Console.WriteLine($"New VisitToProcedureMap created for VisitToProcedureMapId {procedureMapDto.VisitToProcedureMapId}, new ID: {newVisitToProcedureMapId}");
+                            }
+                            else
+                            {
+                                // Use the existing VisitToProcedureMap entity for procedure maps that have already been processed
+                                newProcedureMap = newProcedureMaps[newVisitToProcedureMapId];
+                                Console.WriteLine($"Using existing VisitToProcedureMap with new ID: {newVisitToProcedureMapId} for old VisitToProcedureMapId {procedureMapDto.VisitToProcedureMapId}");
+                            }
+
+                            // Add ProcedureToCdtMap entities to the VisitToProcedureMap
+                            foreach (var cdtMapDto in procedureMapDto.ProcedureToCdtMaps)
+                            {
+                                newProcedureMap.ProcedureToCdtMaps.Add(new ProcedureToCdtMap
+                                {
+                                    UserDescription = cdtMapDto.UserDescription,
+                                    CdtCodeId = cdtMapDto.CdtCodeId,
+                                    Default = cdtMapDto.Default,
+                                });
+                                Console.WriteLine($"Attempting to add ProcedureToCdtMap with CdtCodeId: {cdtMapDto.CdtCodeId}, Default: {cdtMapDto.Default} to VisitToProcedureMapId {newVisitToProcedureMapId}");
+                            }
+                            Console.WriteLine($"Total ProcedureToCdtMaps now in VisitToProcedureMap {newVisitToProcedureMapId}: {newProcedureMap.ProcedureToCdtMaps.Count}");
+                        }
+                    }
+
+                    foreach (var entry in newProcedureMaps.Values)
+                    {
+                        Console.WriteLine($"Before Save: VisitToProcedureMapId {entry.VisitToProcedureMapId} has {entry.ProcedureToCdtMaps.Count} ProcedureToCdtMaps");
+                    }
+
+                    // Final save to ensure all changes are persisted
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Final SaveChangesAsync called for all changes.");
+
+                    // Commit the transaction after successful operation
+                    await transaction.CommitAsync();
+
+                    // After committing the transaction, re-query the treatment plan with related entities
+                    var retrievedTreatmentPlan = await _context.TreatmentPlans
+                        .Where(tp => tp.TreatmentPlanId == newTreatmentPlan.TreatmentPlanId)
+                        .Include(tp => tp.Visits)
+                            .ThenInclude(v => v.VisitToProcedureMaps)
+                                .ThenInclude(vtpm => vtpm.ProcedureToCdtMaps)
+                                    .ThenInclude(ptcm => ptcm.CdtCode)
+                        .Select(tp => new RetrievePatientTreatmentPlanDto
+                        {
+                            TreatmentPlanId = tp.TreatmentPlanId,
+                            Description = tp.Description,
+                            CreatedAt = tp.CreatedAt,
+                            Visits = tp.Visits.Select(v => new RetrieveVisitDto
+                            {
+                                VisitId = v.VisitId,
+                                Description = v.Description,
+                                VisitNumber = v.VisitNumber,
+                                Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
+                            }).ToList()
+                        })
+                        .FirstOrDefaultAsync();
+
+                    return retrievedTreatmentPlan;
+                }
+
+                catch (Exception ex)
+                {
+                    // Rollback the transaction in case of an exception
                     await transaction.RollbackAsync();
                     Console.WriteLine($"Error occurred: {ex.Message}");
                     throw;

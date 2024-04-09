@@ -508,10 +508,11 @@ const TreatmentPlanConfiguration = ({
 	const createNewTreatmentPlanFromDefault = async (
 		treatmentPlan,
 		allRows,
+		alternativeRows,
 		visitOrder
 	) => {
 		try {
-			const newTreatmentPlan = await createNewTreatmentPlanFromDefaultMutation({ treatmentPlan, allRows, visitOrder }).unwrap();
+			const newTreatmentPlan = await createNewTreatmentPlanFromDefaultMutation({ treatmentPlan, allRows, alternativeRows, visitOrder }).unwrap();
 			// Show success alert
 			setAlertInfo({
 				open: true,
@@ -529,11 +530,20 @@ const TreatmentPlanConfiguration = ({
 	const handleUpdateTreatmentPlan = async () => {
 		console.log("Treatment Plan before updating:", treatmentPlan);
 		try {
-			let newTreatmentPlanCreated = false;
+			let newTreatmentPlan = null;
 
+			// Check if a new treatment plan needs to be created
 			if (treatmentPlan.facilityId === null && !isSuperAdmin) {
-				await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, visitOrder);
-				newTreatmentPlanCreated = true;
+				newTreatmentPlan = await createNewTreatmentPlanFromDefault(treatmentPlan, allRows, alternativeRows, visitOrder);
+				if (!newTreatmentPlan) {
+					console.error("Failed to create new treatment plan.");
+					setAlertInfo({
+						open: true,
+						type: "error",
+						message: "Failed to create a new treatment plan. No changes were made.",
+					});
+					return;  // Stop execution if the new treatment plan wasn't created
+				}
 			}
 
 			const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith("temp-"));

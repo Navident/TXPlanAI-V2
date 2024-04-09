@@ -57,8 +57,7 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
             // Popup before save 
             setIsDialogOpen(true);
             setCurrentAction('save');
-            setDialogTitle("Save Treatment Plan");
-            setDialogContent("Please enter a short description for this treatment plan. This description will allow you to identify it later.");
+             setDialogContent("Please enter a short description for this treatment plan. This description will allow you to identify it later.");
             setTextFieldWidth('100%');
         }
     };
