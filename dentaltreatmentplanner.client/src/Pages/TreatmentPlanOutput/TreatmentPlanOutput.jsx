@@ -243,17 +243,12 @@ const TreatmentPlanOutput = ({
 			description: "Table " + (treatmentPlan.visits.length + 1),
 		};
 
-		// Log new visit details
-		console.log('Adding new visit:', newVisit);
-		console.log('Grouped rows to be added to new visit:', groupedRows);
-
+	
 		onAddVisit(newVisit);
 
 		const dynamicRow = createDynamicRowv1(visitId, initialRowId);
 		const newRows = [...groupedRows, dynamicRow];
 
-		// Log newRows to confirm grouped rows and dynamic row are included
-		console.log('New rows for new visit:', newRows);
 
 		const newVisitOrder = [...visitOrder, visitId];
 		dispatch(setVisitOrder(newVisitOrder));

@@ -7,9 +7,6 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeR
         const defaultRows = allRows[visitIdStr] || [];
         const nonDefaultRows = alternativeRows[visitIdStr] || [];
 
-        // No need to create a set of identifiers from nonDefaultRows or filter out defaultRows based on nonDefaultRowIds.
-        // Just make sure not to duplicate entries if they somehow exist in both defaultRows and nonDefaultRows.
-
         // Combine default and alternative rows, prioritizing non-default rows
         // Remove any potential duplicates that might exist between the two
         const uniqueRowIds = new Set(nonDefaultRows.map(row => row.id));
