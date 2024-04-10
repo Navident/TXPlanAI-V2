@@ -29,25 +29,26 @@ export const mapToOpenDentalTreatmentPlanDto = ( treatmentPlans, patientId) => {
 };
 
 
-function addFluorideTreatmentToothRange(selectedCdtCode, procedureDto) {
-    if (selectedCdtCode.originalVisitCategory.toLowerCase() === "fluoride".toLowerCase()) {
+function adjustToothNumberAndRange(selectedCdtCode, procedureDto) {
+    const category = selectedCdtCode.originalVisitCategory.toLowerCase();
+    if (category === "fluoride") {
         procedureDto.ToothRange = "1-32"; // Add ToothRange for fluoride treatments
+    } else if (category === "bone-grafts" || category === "membrane") {
+        procedureDto.ToothNum = ""; // Ensure the tooth number is an empty string
     }
 }
 
-
 export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => {
-
     // Generate current date in YYYY-MM-DD format
     const currentDate = new Date().toISOString().slice(0, 10);
 
     const openDentalTreatmentPlanDto = {
         PatNum: patientId,
-        ProcDate: currentDate
+        ProcDate: currentDate,
         Procedures: []
     };
 
-    // iterate through allRows object and get both the procedures and their visit index
+    // Iterate through allRows object and get both the procedures and their visit index
     Object.entries(allRows).forEach(([visitKey, procedures], visitIndex) => {
         procedures.forEach((procedure) => {
             // Skip rows without visitToProcedureMapId or if it's an initial row template
@@ -55,7 +56,6 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
                 return;
             }
 
-            
             const selectedCdtCode = procedure.selectedCdtCode;
             if (selectedCdtCode && selectedCdtCode.code) {
                 const procedureDto = {
@@ -66,12 +66,13 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
                     priority: (visitIndex + 1).toString() // Adding 1 because indices start at 0
                 };
 
-                addFluorideTreatmentToothRange(selectedCdtCode, procedureDto);
+                adjustToothNumberAndRange(selectedCdtCode, procedureDto);
 
                 openDentalTreatmentPlanDto.Procedures.push(procedureDto);
             }
         });
     });
+
     console.log("DTO before return:", openDentalTreatmentPlanDto);
     return openDentalTreatmentPlanDto;
 };
