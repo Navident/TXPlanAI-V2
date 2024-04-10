@@ -1,8 +1,12 @@
 export const mapToOpenDentalTreatmentPlanDto = ( treatmentPlans, patientId) => {
     const currentPlan = treatmentPlans[0];
+
+    // Generate current date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().slice(0, 10);
+
     const openDentalTreatmentPlanDto = {
         PatNum: patientId, // This needs to be dynamic, we have a way to get this already
-        ProcDate: "2024-03-09", // This should be dynamic
+        ProcDate: currentDate,
         Procedures: []
     };
 
@@ -33,9 +37,13 @@ function addFluorideTreatmentToothRange(selectedCdtCode, procedureDto) {
 
 
 export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => {
+
+    // Generate current date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().slice(0, 10);
+
     const openDentalTreatmentPlanDto = {
         PatNum: patientId,
-        ProcDate: "2024-03-09", // make this dynamic
+        ProcDate: currentDate
         Procedures: []
     };
 
