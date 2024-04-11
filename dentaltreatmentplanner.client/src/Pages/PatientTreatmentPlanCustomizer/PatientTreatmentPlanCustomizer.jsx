@@ -33,7 +33,8 @@ const PatientTreatmentPlanCustomizer = () => {
 	const { treatmentPlanId } = useParams();
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(true); 
-	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
+	const location = useLocation();
+	const treatmentPlan = location.state?.plan;
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 /*	const grandUcrTotal = useSelector(selectGrandUcrTotal);
 	const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
@@ -49,9 +50,8 @@ const PatientTreatmentPlanCustomizer = () => {
 
 	useEffect(() => {
 		const fetchPlanAndFees = async () => {
-			if (treatmentPlanId && patientTreatmentPlans.length > 0) {
-				const id = parseInt(treatmentPlanId, 10);
-				const foundPlan = patientTreatmentPlans.find(plan => parseInt(plan.treatmentPlanId, 10) === id);
+			if (treatmentPlanId ) {
+				const foundPlan = treatmentPlan;
 				dispatch(setTreatmentPlans([foundPlan]));
 
 				setIsLoading(false); 
@@ -61,7 +61,7 @@ const PatientTreatmentPlanCustomizer = () => {
 		};
 
 		fetchPlanAndFees();
-	}, [treatmentPlanId, patientTreatmentPlans]);
+	}, [treatmentPlanId, treatmentPlan]);
 
 	useEffect(() => {
 		if (treatmentPlans) {

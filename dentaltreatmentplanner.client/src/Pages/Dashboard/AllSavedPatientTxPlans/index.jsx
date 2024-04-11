@@ -12,22 +12,29 @@ import { selectPatientTreatmentPlans, removeTreatmentPlanById } from '../../../R
 import { useSelector, useDispatch } from 'react-redux';
 import PopupAlert from "../../../Components/Common/PopupAlert/index";
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
-import { useDeleteTreatmentPlanByIdMutation } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
+import { useGetAllPatientTreatmentPlansForFacilityQuery, useDeleteTreatmentPlanByIdMutation } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 
 const AllSavedPatientTxPlans = () => {
 	const dispatch = useDispatch();
 	const [inputText, setInputText] = useState("");
 	const navigate = useNavigate();
-	const patientTreatmentPlans = useSelector(selectPatientTreatmentPlans);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [dialogContent, setDialogContent] = useState('');
 	const [dialogTitle, setDialogTitle] = useState('');
 	const [planToDelete, setPlanToDelete] = useState(null);
 	const [deleteTreatmentPlanById] = useDeleteTreatmentPlanByIdMutation();
 
-	const handleOpenClick = (planId) => {
-		navigate(`/customize-treatment-plan/${planId}`);
+	const {
+		data: patientTreatmentPlans = [],
+		isLoading,
+		isError,
+		error
+	} = useGetAllPatientTreatmentPlansForFacilityQuery();
+
+	const handleOpenClick = (plan) => {
+		navigate(`/customize-treatment-plan/${plan.treatmentPlanId}`, { state: { plan } });
 	};
+
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value.toLowerCase());
@@ -59,21 +66,15 @@ const AllSavedPatientTxPlans = () => {
 	const handleAgree = async () => {
 		if (planToDelete) {
 			try {
-				// Attempt to delete the treatment plan and await the result
 				await deleteTreatmentPlanById(planToDelete).unwrap();
-
-				// If successful, proceed with the following actions
-				dispatch(removeTreatmentPlanById(planToDelete)); 
-				dispatch(showAlert({ type: 'success', message: 'Successfully deleted treatment plan!' }));
+				alert('Successfully deleted treatment plan!');
 			} catch (error) {
-				// Handle any errors that occur during the deletion process
 				console.error("Error deleting treatment plan: ", error);
-				dispatch(showAlert({ type: 'error', message: 'Failed to delete treatment plan' }));
+				alert('Failed to delete treatment plan');
 			}
+			setIsDialogOpen(false);
+			setPlanToDelete(null);
 		}
-
-		setIsDialogOpen(false); // Close the dialog in both cases
-		setPlanToDelete(null); // Reset the planToDelete after handling
 	};
 
 
@@ -95,8 +96,9 @@ const AllSavedPatientTxPlans = () => {
 					border={false}
 					width="120px"
 					className="purple-button-hover"
-					onClick={() => handleOpenClick(plan.treatmentPlanId)}
+					onClick={() => handleOpenClick(plan)}
 				/>
+
 				<RoundedButton
 					text="Delete"
 					backgroundColor="white"
