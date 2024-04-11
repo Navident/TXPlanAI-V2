@@ -214,5 +214,13 @@
   {
     "role": "assistant",
     "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
+  },
+  {
+    "role": "user",
+    "content": "implant bridge 22-27 \nmaxillary veneers 6-11 \nzirocnia FPD from 2-5 \ncrowns on 12-14 with build ups \nRCT 2,5,14"
+  },
+  {
+    "role": "assistant",
+    "content": "[{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#25\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#26\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#27\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#2\", \"treatments\": [\"Root Canal Molar\", \"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#3\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Root Canal Pre-Molar\", \"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Root Canal Molar\", \"Build Up without Post\", \"ACC Crown\"]}]"
   }
 ]
