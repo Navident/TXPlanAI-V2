@@ -18,7 +18,7 @@ export const mapToOpenDentalTreatmentPlanDto = ( treatmentPlans, patientId) => {
                 Surf: item.surface || null,
                 ProcStatus: "TP",
                 procCode: item.code,
-                priority: visit.visitNumber.toString()  // This should be dynamic, the priority should be the visit number that the procedure is in
+                priority: visit.visitNumber.toString()  // the priority should be the visit number that the procedure is in
             };
 
             openDentalTreatmentPlanDto.Procedures.push(procedureDto);
