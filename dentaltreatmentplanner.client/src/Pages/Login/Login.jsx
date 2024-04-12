@@ -15,7 +15,7 @@ import Alert from "../../Components/Common/Alert/Alert";
 import { Backdrop, CircularProgress } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useLoginUserMutation } from '../../Redux/ReduxSlices/User/userApiSlice';
-import { setIsUserLoggedIn, setIsSuperAdmin, setFacilityName, setFacilityId } from '../../Redux/ReduxSlices/User/userSlice';
+import { setUserDetails } from '../../Redux/ReduxSlices/User/userSlice';
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -30,22 +30,15 @@ const Login = () => {
 
     const handleLoginClick = async () => {
         try {
-            const response = await loginUser({ email, password }).unwrap(); 
-
-            console.log("response in login: ", response);
-            const { token, isSuperAdmin, user } = response;
-            console.log("isSuperAdmin", isSuperAdmin);
-
-            // Set local user state
-            dispatch(setIsSuperAdmin(isSuperAdmin));
-            dispatch(setFacilityName(user?.facility?.name));
-            dispatch(setFacilityId(user?.facility?.facilityId));
-            localStorage.setItem('jwtToken', token);
-            console.log("jwttoken after setting: ", localStorage.getItem('jwtToken'));
-            localStorage.setItem('businessName', user?.facility?.name);
-            localStorage.setItem('isLoggedIn', 'true');
-            dispatch(setIsUserLoggedIn(true));
-           
+            const response = await loginUser({ email, password }).unwrap();
+            console.log("API response:", response);
+            dispatch(setUserDetails({
+                jwtToken: response.token,
+                isUserLoggedIn: true,
+                isSuperAdmin: response.isSuperAdmin,
+                facilityName: response.user.facility.name,
+                facilityId: response.user.facility.facilityId,
+            }));
             navigate("/dashboard");
         } catch (error) {
             // Handle failed login

@@ -1,7 +1,6 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import MultilineTextfield from "../../../Components/Common/MultilineTextfield/index";
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
-import { TextField, InputAdornment } from '@mui/material';
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
@@ -30,19 +29,19 @@ import appInsights from '../../../Utils/appInsights';
 import { selectFacilityName, selectFacilityId, selectIsUserLoggedIn } from '../../../Redux/ReduxSlices/User/userSlice';
 import EmptyStatePlaceholder from './EmptyStatePlaceholder';
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
-import { useNavigate } from 'react-router-dom';
+import LoginPopup from './LoginPopup';
 
 const GenerateTreatmentPlan = () => {
 	const dispatch = useDispatch();
-	const { data: subcategoryTreatmentPlans } = useGetAllSubcategoryTreatmentPlansQuery();
+	const { data: subcategoryTreatmentPlans, refetch } = useGetAllSubcategoryTreatmentPlansQuery();
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 	const [isLoading, setIsLoading] = useState(false);
 	const [inputText, setInputText] = useState("");
 	const facilityName = useSelector(selectFacilityName);
 	const facilityId = useSelector(selectFacilityId);
 	const [allRowsFromChild, setAllRowsFromChild] = useState({});
-	const navigate = useNavigate();
 	const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
+	const [showLoginPopup, setShowLoginPopup] = useState(false);
 
 	const handleAllRowsUpdate = (newAllRows) => {
 		setAllRowsFromChild(newAllRows);
@@ -70,11 +69,16 @@ const GenerateTreatmentPlan = () => {
 
 	useEffect(() => {
 		dispatch(setTreatmentPlans([]));
-		// Check if the user is logged in, if not redirect to the login page
+	}, [dispatch]);
+
+	useEffect(() => {
 		if (!isUserLoggedIn) {
-			navigate('/login');
+			setShowLoginPopup(true);
+		} else {
+			setShowLoginPopup(false);
+			refetch(); // Refetch subcategory treatment plans when user logs in
 		}
-	}, [isUserLoggedIn, navigate]);
+	}, [isUserLoggedIn, refetch]);
 
 	const handleInputChange = (event) => {
 		setInputText(event.target.value);
@@ -281,6 +285,12 @@ const GenerateTreatmentPlan = () => {
 
 	return (
 		<div className="dashboard-bottom-inner-row">
+			{showLoginPopup && (
+				<LoginPopup
+					open={showLoginPopup}
+					onClose={() => setShowLoginPopup(false)}
+				/>
+			)}
 			{/* <PatientInfoSection /> */}
 			{/* <div className="large-text">Create New TX Plan</div> */}
 			<div className="create-treatment-plan-section rounded-box box-shadow">

@@ -5,24 +5,29 @@ import { API_BASE_URL } from '../../../Utils/constants';
 
 const TREATMENT_PLANS_API_URL = `${API_BASE_URL}/TreatmentPlans`;
 
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('jwtToken');
-    return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
-
 // Create a new API slice
 export const treatmentPlansApiSlice = createApi({
     reducerPath: 'treatmentPlansApi',
     baseQuery: fetchBaseQuery({
         baseUrl: TREATMENT_PLANS_API_URL,
-        prepareHeaders: (headers) => {
-            // Retrieve the token from localStorage
-            const token = localStorage.getItem('jwtToken');
-            // If token exists, set Authorization header
+        prepareHeaders: (headers, { getState }) => {
+            // Try to get the token from localStorage first
+            let token = localStorage.getItem('jwtToken');
+            console.log("Token in local storage:", token);
+
+            // If no token in localStorage, try to get it from Redux state
+            if (!token) {
+                const state = getState();
+                token = state.user.jwtToken; 
+                console.log("Token from Redux state:", token);
+            }
+
+            // Set the Authorization header if a token is found
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`);
+                console.log("Token found in Redux state:", token);
             }
-            // Set 'Content-Type' header for all requests
+
             headers.set('Content-Type', 'application/json');
             return headers;
         },

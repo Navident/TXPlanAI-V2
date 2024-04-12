@@ -189,7 +189,7 @@
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Root Canal Molar\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Root Canal Molar\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
   },
   {
     "role": "user",
@@ -197,7 +197,7 @@
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"Single Implant\", \"Custom Abutment\", \"Abutment Supported ACC Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"PFM Retainer Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"Single Implant\", \"Custom Abutment\", \"Abutment Supported ACC Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"PFM Retainer Crown\"]}]"
   },
   {
     "role": "user",
@@ -205,7 +205,7 @@
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Pre-Fabricated Abutment\", \"Abutment Supported PFM Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Pre-Fabricated Abutment\", \"Abutment Supported PFM Crown\"]}]"
   },
   {
     "role": "user",
@@ -213,7 +213,7 @@
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
   },
   {
     "role": "user",
