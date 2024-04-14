@@ -18,19 +18,23 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeR
             .filter(row => row.isStatic && !deletedRowIds.includes(row.id)) // Now including all existing alternative procedures unless explicitly deleted.
             .map((row, idx) => {
                 const { selectedCdtCode, visitToProcedureMapId, procedureTypeId, toothNumber, surface, arch } = row;
+                const archValue = (arch === "default") ? null : arch;
+
                 return {
                     VisitToProcedureMapId: visitToProcedureMapId,
                     ProcedureTypeId: procedureTypeId,
                     Order: idx,
                     ToothNumber: toothNumber,
                     Surface: surface,
-                    Arch: arch,
+                    Arch: archValue,
+                    Repeatable: row.repeatable !== undefined ? row.repeatable : true,
+                    AssignArch: row.assignArch !== undefined ? row.assignArch : true,
+                    AssignToothNumber: row.assignToothNumber !== undefined ? row.assignToothNumber : true,
                     ProcedureToCdtMaps: [
                         {
                             ProcedureToCdtMapId: selectedCdtCode.procedureToCdtMapId,
                             CdtCodeId: selectedCdtCode.cdtCodeId,
                             Default: row.default !== undefined ? row.default : null,
-                            Repeatable: row.repeatable !== undefined ? row.repeatable : true,
                             UserDescription: selectedCdtCode.userDescription,
                             Code: selectedCdtCode.code,
                             LongDescription: selectedCdtCode.longDescription,

@@ -12,6 +12,10 @@ namespace DentalTreatmentPlanner.Server.Dtos
         public int? ProcedureTypeId { get; set; }
         public string? Surface { get; set; }
         public string? Arch { get; set; }
+        public bool Repeatable { get; set; }
+        public bool AssignToothNumber { get; set; }
+        public bool AssignArch { get; set; }
+
         // This will hold the mapped CDT codes for the procedure
         public List<ProcedureToCdtMapDto> ProcedureToCdtMaps { get; set; } = new List<ProcedureToCdtMapDto>();
 

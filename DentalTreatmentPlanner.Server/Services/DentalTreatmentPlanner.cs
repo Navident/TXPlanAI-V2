@@ -1330,13 +1330,14 @@ namespace DentalTreatmentPlanner.Server.Services
                     procedureMap.ProcedureTypeId = procedureMapDto.ProcedureTypeId;
                     procedureMap.Surface = procedureMapDto.Surface;
                     procedureMap.Arch = procedureMapDto.Arch;
+                    procedureMap.Repeatable = procedureMapDto.Repeatable;
+                    procedureMap.AssignToothNumber = procedureMapDto.AssignToothNumber;
+                    procedureMap.AssignArch = procedureMapDto.AssignArch;
 
                     // Iterate only over default ProcedureToCdtMaps within this VisitToProcedureMap
                     foreach (var cdtMapDto in procedureMapDto.ProcedureToCdtMaps.Where(c => c.Default))
                     {
                         var cdtMap = procedureMap.ProcedureToCdtMaps.FirstOrDefault(c => c.ProcedureToCdtMapId == cdtMapDto.ProcedureToCdtMapId);
-
-
                         if (cdtMap != null)
                         {
                             if (cdtMap.CdtCodeId != cdtMapDto.CdtCodeId)
@@ -1344,14 +1345,8 @@ namespace DentalTreatmentPlanner.Server.Services
                                 Console.WriteLine($"Updating existing CdtMapId: {cdtMapDto.ProcedureToCdtMapId} with new CdtCodeId: {cdtMapDto.CdtCodeId}");
                                 cdtMap.CdtCodeId = cdtMapDto.CdtCodeId;
                             }
-                            if (cdtMap.Repeatable != cdtMapDto.Repeatable)
-                            {
-                                Console.WriteLine($"Updating existing CdtMapId: {cdtMapDto.ProcedureToCdtMapId} with new Repeatable: {cdtMapDto.Repeatable}");
-                                cdtMap.Repeatable = cdtMapDto.Repeatable;
-                            }
-                        } 
-
-                        else if (cdtMap == null)
+                        }
+                        else
                         {
                             Console.WriteLine($"Adding new CDT map for ProcedureMapId: {procedureMapDto.VisitToProcedureMapId}");
 
@@ -1379,14 +1374,16 @@ namespace DentalTreatmentPlanner.Server.Services
                         ProcedureTypeId = procedureMapDto.ProcedureTypeId,
                         Surface = procedureMapDto.Surface,
                         Arch = procedureMapDto.Arch,
+                        Repeatable = procedureMapDto.Repeatable,
+                        AssignToothNumber = procedureMapDto.AssignToothNumber,
+                        AssignArch = procedureMapDto.AssignArch,
                         ProcedureToCdtMaps = procedureMapDto.ProcedureToCdtMaps
                             .Where(c => c.Default)
                             .Select(cdtDto => new ProcedureToCdtMap
                             {
                                 UserDescription = cdtDto.UserDescription,
                                 CdtCodeId = cdtDto.CdtCodeId,
-                                Default = true,
-                                Repeatable = cdtDto.Repeatable
+                                Default = true
                             }).ToList()
                     };
                     visit.VisitToProcedureMaps.Add(newProcedureMap);
@@ -1406,8 +1403,8 @@ namespace DentalTreatmentPlanner.Server.Services
                 visit.VisitToProcedureMaps.Remove(procedureMap);
             }
             Console.WriteLine($"Update complete. Number of procedure maps after update: {visit.VisitToProcedureMaps.Count}");
-
         }
+
 
 
 
@@ -1521,7 +1518,6 @@ namespace DentalTreatmentPlanner.Server.Services
                     CdtCodeId = pcm.CdtCodeId,
                     UserDescription = pcm.UserDescription,
                     Default = pcm.Default,
-                    Repeatable = pcm.Repeatable,
                     Code = pcm.CdtCode?.Code ?? string.Empty,
                     LongDescription = pcm.CdtCode.LongDescription
                 }).ToList();
@@ -1535,9 +1531,13 @@ namespace DentalTreatmentPlanner.Server.Services
                     Arch = vpm.Arch,
                     ProcedureTypeId = vpm.ProcedureTypeId,
                     ProcedureToCdtMaps = procedureToCdtMapDtos,
+                    Repeatable = vpm.Repeatable,
+                    AssignToothNumber = vpm.AssignToothNumber,
+                    AssignArch = vpm.AssignArch,
                 };
             }).ToList();
         }
+
 
 
         public async Task<IEnumerable<RetrievePatientTreatmentPlanDto>> GetAllPatientTreatmentPlansForFacilityAsync(int facilityId)

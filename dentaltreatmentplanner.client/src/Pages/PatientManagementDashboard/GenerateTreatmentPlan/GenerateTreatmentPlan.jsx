@@ -142,7 +142,7 @@ const GenerateTreatmentPlan = () => {
         console.log(subcategoryTreatmentPlans);
         let allVisits = [];
         let globalVisitIdCounter = 0;
-        let nonRepeatableAdded = new Set();
+        let nonRepeatableAdded = new Set(); 
 
         const plansMap = new Map(
             subcategoryTreatmentPlans.map((plan) => [
@@ -169,27 +169,24 @@ const GenerateTreatmentPlan = () => {
                     const clonedVisits = plan.visits.map((visit) => ({
                         ...visit,
                         visitId: `custom-${originalOrder}-${treatmentIndex}-${globalVisitIdCounter++}`,
-                        VisitToProcedureMapDtos: visit.visitToProcedureMaps.map((procedureMap) => ({
-                            ...procedureMap,
-                            procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => {
-                                const uniqueIdentifier = `${cdtMap.procedureToCdtMapId}`;
-                                if (cdtMap.repeatable === false) {
-                                    if (nonRepeatableAdded.has(uniqueIdentifier)) {
-                                        return null;
-                                    }
-                                    nonRepeatableAdded.add(uniqueIdentifier);
-                                }
-                                return {
+                        VisitToProcedureMapDtos: visit.visitToProcedureMaps.map((procedureMap) => {
+                            // Check if the procedureMap is repeatable. If not, ensure it's not already added.
+                            if (!procedureMap.repeatable && nonRepeatableAdded.has(procedureMap.visitToProcedureMapId)) {
+                                return null; // Skip adding this procedureMap
+                            }
+                            nonRepeatableAdded.add(procedureMap.visitToProcedureMapId);
+
+                            return {
+                                ...procedureMap,
+                                procedureToCdtMaps: procedureMap.procedureToCdtMaps.map((cdtMap) => ({
                                     ...cdtMap,
-                                    toothNumber: sanitizedToothNumber,
+                                    toothNumber: procedureMap.assignToothNumber ? sanitizedToothNumber : null,
                                     surface: adjustedSurface,
-                                    arch,
+                                    arch: procedureMap.assignArch ? arch : null,
                                     originalVisitCategory: plan.procedureCategoryName,
-                                };
-                            }).filter(cdtMap => cdtMap !== null)
-                        })),
-                        originLineIndex: originalOrder,
-                        procedureCategoryName: plan.procedureCategoryName,
+                                })),
+                            };
+                        }).filter(procedureMap => procedureMap !== null)
                     }));
                     allVisits.push(...clonedVisits);
                 }
@@ -201,6 +198,7 @@ const GenerateTreatmentPlan = () => {
         );
         return allVisits;
     }
+
 
     function combineVisitsIntoOne(allVisits) {
         let combinedProcedures = [];

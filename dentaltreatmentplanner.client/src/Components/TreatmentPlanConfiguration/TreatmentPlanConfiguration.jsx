@@ -66,7 +66,7 @@ const TreatmentPlanConfiguration = ({
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
-	const columnWidths = ["5%", "5%", "20%", "50%", "5%", "15%"];
+	const columnWidths = ["5%", "5%", "20%", "35%", "5%", "10%", "5%", "15%"];
 	const isSuperAdmin = useSelector(selectIsSuperAdmin);
 	const [dynamicRowValues, setDynamicRowValues] = useState({});
 	const [expandedRows, setExpandedRows] = useState(new Set());
@@ -76,6 +76,11 @@ const TreatmentPlanConfiguration = ({
 	const [visits, setVisits] = useState(treatmentPlan.visits || []);
 	const [visitOrder, setVisitOrder] = useState(visits.map(visit => visit.visitId));
 
+	const archOptions = [
+		{ value: 'default', label: 'Default' },
+		{ value: 'ul', label: 'Upper Left' },
+		{ value: 'l', label: 'Lower' }
+	];
 
 	const handleCloseAlert = () => {
 		setAlertInfo({ ...alertInfo, open: false });
@@ -155,7 +160,10 @@ const TreatmentPlanConfiguration = ({
 			visitToProcedureMapId: procedureMap.visitToProcedureMapId,
 			description: cdtMap.longDescription,
 			default: cdtMap.default,
-			repeatable: cdtMap.repeatable,
+			arch: procedureMap.arch,
+			repeatable: procedureMap.repeatable,
+			assignToothNumber: procedureMap.assignToothNumber,
+			assignArch: procedureMap.assignArch,
 			selectedCdtCode: cdtMap,
 			isStatic: true,
 			extraRowInput
@@ -231,6 +239,9 @@ const TreatmentPlanConfiguration = ({
 			description, 
 			default: true,
 			repeatable: isNewRow ? true : (currentRow.repeatable ?? true),
+			assignToothNumber: isNewRow ? true : (currentRow.assignToothNumber ?? true),
+			assignArch: isNewRow ? true : (currentRow.assignArch ?? true),
+
 			extraRowInput: showToothNumber
 				? [
 						treatmentPlan.toothNumber,
@@ -249,6 +260,7 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	const convertToDynamicRow = (currentRow, visitId) => {
+		// Existing dropdown for CDT codes
 		const dropdownSearchElement = createCDTCodeDropdown(
 			currentRow.id,
 			visitId,
@@ -257,22 +269,37 @@ const TreatmentPlanConfiguration = ({
 			currentRow.selectedCdtCode
 		);
 
-		const extraRowInput = showToothNumber
-			? [
-					currentRow.selectedCdtCode
-						? currentRow.selectedCdtCode.toothNumber
-						: "",
-					dropdownSearchElement,
-			  ]
-			: [dropdownSearchElement];
+		const archDropdown = createArchDropdown(currentRow, visitId, handleArchSelect);
+
+
+		const extraRowInput =  [dropdownSearchElement, archDropdown];
 
 		return {
 			...currentRow,
 			id: `dynamic-${visitId}-${Date.now()}`,
 			extraRowInput,
 			isStatic: false,
-			isEditing: true, // Indicate this row is being edited
+			isEditing: true,
 		};
+	};
+
+	const handleArchSelect = (selectedOption, visitId, rowId) => {
+		setAllRows((prevRows) => {
+			const rows = [...prevRows[visitId]];
+			const rowIndex = rows.findIndex((row) => row.id === rowId);
+
+			if (rowIndex !== -1) {
+				rows[rowIndex] = {
+					...rows[rowIndex],
+					arch: selectedOption.value
+				};
+			}
+
+			return {
+				...prevRows,
+				[visitId]: rows
+			};
+		});
 	};
 
 	const handleSelect = (selectedCode, visitId, rowId) => {
@@ -644,39 +671,6 @@ const TreatmentPlanConfiguration = ({
 	};
 
 
-	const getCdtCodeDetailsByCdtCodeId = (cdtCodeId) => {
-		return combinedCdtCodes.find(c => c.cdtCodeId === cdtCodeId);
-	};
-
-	//const transformVisitCdtCodeMapsToCdtCodes = (visit) => {
-	//	return visit.visitCdtCodeMaps.map(cdtCodeMap => {
-	//		const cdtCodeDetails = getCdtCodeDetailsByCdtCodeId(cdtCodeMap.cdtCodeId);
-	//		return {
-	//			cdtCodeId: cdtCodeMap.cdtCodeId,
-	//			code: cdtCodeDetails?.code,
-	//			longDescription: cdtCodeDetails?.longDescription,a
-	//			createdAt: cdtCodeMap.createdAt,
-	//			modifiedAt: cdtCodeMap.modifiedAt,
-	//			order: cdtCodeMap.order,
-	//			procedureTypeId: cdtCodeMap.procedureTypeId,
-	//			toothNumber: cdtCodeMap.toothNumber,
-	//			visitCdtCodeMapId: cdtCodeMap.visitCdtCodeMapId,
-	//			visitId: cdtCodeMap.visitId,
-	//		};
-	//	});
-	//};
-
-	//const adjustUpdatedTreatmentPlanStructure = (updatedTreatmentPlan, originalTreatmentPlan) => {
-	//	// Reinsert the category names from the original treatment plan
-	//	updatedTreatmentPlan.procedureCategoryName = originalTreatmentPlan.procedureCategoryName;
-	//	updatedTreatmentPlan.procedureSubCategoryName = originalTreatmentPlan.procedureSubCategoryName;
-
-	//	updatedTreatmentPlan.visits.forEach(visit => {
-	//		visit.cdtCodes = transformVisitCdtCodeMapsToCdtCodes(visit);
-	//		delete visit.visitCdtCodeMaps;
-	//	});
-	//};
-
 
 	const lockDimensions = () => {
 		const tables = document.querySelectorAll(".tx-table");
@@ -694,43 +688,61 @@ const TreatmentPlanConfiguration = ({
 	};
 
 	const createHeaders = () => {
-		let headers = showToothNumber
-			? ["Tooth #", "CDT Code", "Description", "Repeatable"]
-			: ["", "CDT Code", "Description", "Repeatable"];
+		let headers =  ["", "CDT Code", "Description", "Repeatable", "Assign Tooth #", "Assign Arch"];
 		return headers;
 	};
 
 	const constructStaticRowData = (row) => {
-
 		let baseData = ["", row.extraRowInput[0], row.extraRowInput[1]];
 
-		// Add the checkbox only if the row is a default row, otherwise add an empty string
-		if (row.default) {
-			baseData.push(
+		// Add the checkbox for repeatable
+		baseData.push(
+			<CustomCheckbox
+				label=""
+				checked={row.repeatable}
+				onChange={(e) => handleCheckboxChange(row.id, 'repeatable', e.target.checked)}
+				color={UI_COLORS.purple}
+			/>
+		);
+
+		// Add the checkbox for assignToothNumber
+		baseData.push(
+			<CustomCheckbox
+				label=""
+				checked={row.assignToothNumber}
+				onChange={(e) => handleCheckboxChange(row.id, 'assignToothNumber', e.target.checked)}
+				color={UI_COLORS.purple}
+			/>
+		);
+
+		// Add the checkbox for assignArch with arch value next to it
+		let archLabel = row.assignArch ? (row.arch || "default") : "";
+		baseData.push(
+			<div style={{ display: 'flex', alignItems: 'center' }}>
 				<CustomCheckbox
 					label=""
-					checked={row.repeatable}
-					onChange={(e) => handleCheckboxChange(row.id, e.target.checked)}
+					checked={row.assignArch}
+					onChange={(e) => handleCheckboxChange(row.id, 'assignArch', e.target.checked)}
 					color={UI_COLORS.purple}
 				/>
-			);
-		} else {
-			// Add an empty string to maintain the column alignment
-			baseData.push("");
-		}
+				<span style={{ marginLeft: 8 }}>{archLabel}</span>
+			</div>
+		);
 
 		return baseData;
 	};
 
 
 
-	const handleCheckboxChange = (rowId, isChecked) => {
+
+
+	const handleCheckboxChange = (rowId, property, isChecked) => {
 		const updatedAllRows = { ...allRows };
 
 		Object.keys(updatedAllRows).forEach(visitId => {
 			updatedAllRows[visitId] = updatedAllRows[visitId].map(row => {
 				if (row.id === rowId) {
-					return { ...row, repeatable: isChecked };
+					return { ...row, [property]: isChecked };
 				}
 				return row;
 			});
@@ -739,6 +751,17 @@ const TreatmentPlanConfiguration = ({
 		setAllRows(updatedAllRows); // Update the state with the new row data
 	};
 
+	const createArchDropdown = (row, visitId, handleArchSelect, width = 150) => (
+		<DropdownSearch
+			key={`archDropdown-${row.id}`}
+			items={archOptions}
+			selectedItem={row.arch ? { value: row.arch, label: archOptions.find(opt => opt.value === row.arch).label } : archOptions[0]}
+			onSelect={(selectedOption) => handleArchSelect(selectedOption, visitId, row.id)}
+			valueKey="value"
+			labelKey="label"
+			width={width} 
+		/>
+	);
 
 	const constructDynamicRowData = (row, visitId) => {
 		const dropdownKey = `dropdown-${row.id}`;
@@ -748,38 +771,44 @@ const TreatmentPlanConfiguration = ({
 				items={combinedCdtCodes}
 				selectedItem={row.selectedCdtCode}
 				onSelect={(selectedCode) => handleSelect(selectedCode, visitId, row.id)}
-				itemLabelFormatter={(cdtCode) =>
-					`${cdtCode.code} - ${cdtCode.longDescription}`
-				}
+				itemLabelFormatter={(cdtCode) => `${cdtCode.code} - ${cdtCode.longDescription}`}
 				valueKey="code"
 				labelKey="longDescription"
 			/>
 		);
 
-		// Check if the row has textFieldProps indicating it's a dynamic row requiring a TextField
-		if (row.textFieldProps) {
-			// Retrieve the current text field value from dynamicRowValues
-			// This ensures the text field displays the most up-to-date value
-			const textFieldValue = dynamicRowValues[row.id] || "";
+		let archDropdownContent = "";
+		// Check if the row is the initial dynamic row, and do not add the "archDropdown"
+		if (!row.id.includes(`initial-${visitId}`)) {
+			archDropdownContent = createArchDropdown(row, visitId, handleArchSelect);
+		}
 
+		let dynamicRowData = ["", cdtDropdown, row.description];
+
+		dynamicRowData.push(""); // Placeholder for "Repeatable" 
+		dynamicRowData.push(""); // Placeholder for "Assign Tooth #"
+		dynamicRowData.push(archDropdownContent); // Either archDropdown or empty string
+
+		if (row.textFieldProps) {
+			const textFieldValue = dynamicRowValues[row.id] || "";
 			const textField = (
 				<StandardTextfield
 					key={`textfield-${row.id}`}
 					label={row.textFieldProps.label}
-					value={textFieldValue}  // Use the dynamically updated value
+					value={textFieldValue}
 					onChange={(e) => handleDescriptionChange(e, visitId, row.id)}
 					borderColor={row.textFieldProps.borderColor}
 					width={row.textFieldProps.width}
 				/>
 			);
-
-			// Return the array including the TextField for rendering 
-			return ["", cdtDropdown, textField, ""];
+			dynamicRowData[2] = textField; // Replace description with textField
 		}
 
-		// For non-dynamic rows
-		return showToothNumber ? ["", cdtDropdown, row.description] : ["", cdtDropdown, row.description, ""];
+		return dynamicRowData;
 	};
+
+
+
 
 
 	const handleCancelEdit = (rowId, visitId) => {

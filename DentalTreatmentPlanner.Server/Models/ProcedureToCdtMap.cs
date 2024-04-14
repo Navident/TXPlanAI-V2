@@ -8,7 +8,6 @@ namespace DentalTreatmentPlanner.Server.Models
         public ProcedureToCdtMap()
         {
             CreatedAt = DateTime.UtcNow;
-            Repeatable = true; 
         }
 
         public int ProcedureToCdtMapId { get; set; }
@@ -20,8 +19,6 @@ namespace DentalTreatmentPlanner.Server.Models
         public int CdtCodeId { get; set; }
 
         public bool Default { get; set; }
-
-        public bool Repeatable { get; set; }
 
         public DateTime CreatedAt { get; private set; }
         public DateTime? ModifiedAt { get; set; }
