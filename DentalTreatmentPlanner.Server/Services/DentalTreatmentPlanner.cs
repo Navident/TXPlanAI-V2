@@ -793,7 +793,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         throw new KeyNotFoundException("Treatment plan not found.");
                     }
 
-                    treatmentPlan.ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId;
+                    //treatmentPlan.ProcedureSubcategoryId = updateTreatmentPlanDto.ProcedureSubcategoryId;
 
                     foreach (var visitDto in updateTreatmentPlanDto.Visits)
                     {
@@ -1146,6 +1146,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             TreatmentPlanId = tp.TreatmentPlanId,
                             Description = tp.Description,
                             CreatedAt = tp.CreatedAt,
+                            ProcedureSubcategoryId = tp.ProcedureSubcategoryId,
                             Visits = tp.Visits.Select(v => new RetrieveVisitDto
                             {
                                 VisitId = v.VisitId,

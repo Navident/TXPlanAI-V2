@@ -38,6 +38,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useCreateNewTreatmentPlanFromDefaultMutation, useUpdateTreatmentPlanMutation } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import { useCombinedCdtCodes } from '../../Utils/Hooks/useCombinedCdtCodes';
 import CustomCheckbox from "../Common/Checkbox/index";
+import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const TreatmentPlanConfiguration = ({
 	treatmentPlan,
@@ -539,7 +540,16 @@ const TreatmentPlanConfiguration = ({
 					});
 					return;  // Stop execution if the new treatment plan wasn't created
 				}
+
 			}
+			if (newTreatmentPlan && newTreatmentPlan.treatmentPlanId) {
+				//adjustUpdatedTreatmentPlanStructure(newTreatmentPlanResponse, treatmentPlan);
+
+				treatmentPlan = newTreatmentPlan;
+				dispatch(showAlert({ type: 'success', message: 'New treatment plan created successfully' }));
+			}
+
+			
 
 			const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith("temp-"));
 			const createVisitPromises = tempVisitIds.map(tempVisitId => {
