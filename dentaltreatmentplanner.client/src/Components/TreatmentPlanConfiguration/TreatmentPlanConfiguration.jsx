@@ -37,6 +37,7 @@ import { selectIsSuperAdmin } from '../../Redux/ReduxSlices/User/userSlice';
 import { useSelector, useDispatch } from "react-redux";
 import { useCreateNewTreatmentPlanFromDefaultMutation, useUpdateTreatmentPlanMutation } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import { useCombinedCdtCodes } from '../../Utils/Hooks/useCombinedCdtCodes';
+import CustomCheckbox from "../Common/Checkbox/index";
 
 const TreatmentPlanConfiguration = ({
 	treatmentPlan,
@@ -64,7 +65,7 @@ const TreatmentPlanConfiguration = ({
 	const [editingRowId, setEditingRowId] = useState(null);
 	const [originalRowData, setOriginalRowData] = useState(null);
 	const [editedRows, setEditedRows] = useState([]);
-	const columnWidths = ["5%", "5%", "20%", "55%", "15%"];
+	const columnWidths = ["5%", "5%", "20%", "50%", "5%", "15%"];
 	const isSuperAdmin = useSelector(selectIsSuperAdmin);
 	const [dynamicRowValues, setDynamicRowValues] = useState({});
 	const [expandedRows, setExpandedRows] = useState(new Set());
@@ -105,7 +106,7 @@ const TreatmentPlanConfiguration = ({
 			newAllRows[visitId] = [];
 			newAlternativeRows[visitId] = [];
 
-			(visit.procedures || []).forEach((procedureMap, procIndex) => {
+			(visit.visitToProcedureMaps || []).forEach((procedureMap, procIndex) => {
 				(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
 					const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
@@ -153,6 +154,7 @@ const TreatmentPlanConfiguration = ({
 			visitToProcedureMapId: procedureMap.visitToProcedureMapId,
 			description: cdtMap.longDescription,
 			default: cdtMap.default,
+			repeatable: cdtMap.repeatable,
 			selectedCdtCode: cdtMap,
 			isStatic: true,
 			extraRowInput
@@ -227,6 +229,7 @@ const TreatmentPlanConfiguration = ({
 			selectedCdtCode: selectedCdtCode || currentRow.selectedCdtCode,
 			description, 
 			default: true,
+			repeatable: isNewRow ? true : (currentRow.repeatable ?? true),
 			extraRowInput: showToothNumber
 				? [
 						treatmentPlan.toothNumber,
@@ -682,28 +685,50 @@ const TreatmentPlanConfiguration = ({
 
 	const createHeaders = () => {
 		let headers = showToothNumber
-			? ["Tooth #", "CDT Code", "Description"]
-			: ["", "CDT Code", "Description"];
+			? ["Tooth #", "CDT Code", "Description", "Repeatable"]
+			: ["", "CDT Code", "Description", "Repeatable"];
 		return headers;
 	};
 
 	const constructStaticRowData = (row) => {
-		if (showToothNumber) {
-			if (!isInGenerateTreatmentPlanContext) {
-				return [
-					row.extraRowInput[0],
-					row.extraRowInput[1],
-					row.extraRowInput[2],
-				];
-			}
-			return [row.extraRowInput[0], row.extraRowInput[1], row.extraRowInput[2]]; // Tooth number, CDT code, Description
+
+		let baseData = ["", row.extraRowInput[0], row.extraRowInput[1]];
+
+		// Add the checkbox only if the row is a default row, otherwise add an empty string
+		if (row.default) {
+			baseData.push(
+				<CustomCheckbox
+					label=""
+					checked={row.repeatable}
+					onChange={(e) => handleCheckboxChange(row.id, e.target.checked)}
+					color={UI_COLORS.purple}
+				/>
+			);
 		} else {
-			if (!isInGenerateTreatmentPlanContext) {
-				return ["", row.extraRowInput[0], row.extraRowInput[1]];
-			}
-			return ["", row.extraRowInput[0], row.extraRowInput[1]]; // Placeholder for Tooth number, CDT code, Description shifted
+			// Add an empty string to maintain the column alignment
+			baseData.push("");
 		}
+
+		return baseData;
 	};
+
+
+
+	const handleCheckboxChange = (rowId, isChecked) => {
+		const updatedAllRows = { ...allRows };
+
+		Object.keys(updatedAllRows).forEach(visitId => {
+			updatedAllRows[visitId] = updatedAllRows[visitId].map(row => {
+				if (row.id === rowId) {
+					return { ...row, repeatable: isChecked };
+				}
+				return row;
+			});
+		});
+
+		setAllRows(updatedAllRows); // Update the state with the new row data
+	};
+
 
 	const constructDynamicRowData = (row, visitId) => {
 		const dropdownKey = `dropdown-${row.id}`;
@@ -739,11 +764,11 @@ const TreatmentPlanConfiguration = ({
 			);
 
 			// Return the array including the TextField for rendering 
-			return showToothNumber ? ["", cdtDropdown, textField] : ["", cdtDropdown, textField];
+			return ["", cdtDropdown, textField, ""];
 		}
 
 		// For non-dynamic rows
-		return showToothNumber ? ["", cdtDropdown, row.description] : ["", cdtDropdown, row.description];
+		return showToothNumber ? ["", cdtDropdown, row.description] : ["", cdtDropdown, row.description, ""];
 	};
 
 
@@ -771,17 +796,23 @@ const TreatmentPlanConfiguration = ({
 			// Retrieve existing alternative rows for the visit
 			const existingAlternativeRows = prevAlternativeRows[visitId] || [];
 
+			// Create a set of all current ids in updatedAllRows for this visit to check against
+			const updatedAllRowIds = new Set(updatedAllRows[visitId].map(row => row.id));
+
+			// Filter existing alternative rows to remove any that no longer exist in updatedAllRows
+			const filteredAlternativeRows = existingAlternativeRows.filter(row => updatedAllRowIds.has(row.id));
+
 			// Identify new or updated non-default rows from updatedAllRows
 			const newOrUpdateAlternativeRows = updatedAllRows[visitId].filter(row =>
 				!row.default && row.selectedCdtCode != null
 			);
 
 			// Create a merged list of unique alternative rows
-			const mergedAlternativeRowsMap = new Map(existingAlternativeRows.map(row => [row.procedureToCdtMapId, row]));
+			const mergedAlternativeRowsMap = new Map(filteredAlternativeRows.map(row => [row.id, row]));
 
 			// Update or add new alternative rows into the map to ensure uniqueness
 			newOrUpdateAlternativeRows.forEach(row => {
-				mergedAlternativeRowsMap.set(row.procedureToCdtMapId, row);
+				mergedAlternativeRowsMap.set(row.id, row);
 			});
 
 			return {
@@ -790,6 +821,7 @@ const TreatmentPlanConfiguration = ({
 			};
 		});
 	};
+
 
 
 

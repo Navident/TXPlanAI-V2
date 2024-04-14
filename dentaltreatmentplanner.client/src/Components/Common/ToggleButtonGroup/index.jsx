@@ -16,7 +16,6 @@ const CustomToggleButtonGroup = () => {
     const handleChange = (event, newSortBy) => {
         if (newSortBy !== null) {
             dispatch(setSortBy(newSortBy));
-            console.log("new sortBy is: ", newSortBy);
         }
     };
 

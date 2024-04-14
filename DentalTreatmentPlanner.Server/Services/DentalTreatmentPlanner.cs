@@ -519,7 +519,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         VisitNumber = v.VisitNumber,
 
                         // Now mapping procedures and CDT codes for each visit
-                        Procedures = v.VisitToProcedureMaps.Select(vp => new VisitToProcedureMapDto
+                        VisitToProcedureMaps = v.VisitToProcedureMaps.Select(vp => new VisitToProcedureMapDto
                         {
                             ProcedureTypeId = vp.ProcedureTypeId,
                             Order = vp.Order,
@@ -560,7 +560,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         Description = v.Description,
                         VisitNumber = v.VisitNumber,
 
-                        Procedures = v.VisitToProcedureMaps.Select(vp => new VisitToProcedureMapDto
+                        VisitToProcedureMaps = v.VisitToProcedureMaps.Select(vp => new VisitToProcedureMapDto
                         {
                             ProcedureTypeId = vp.ProcedureTypeId,
                             Order = vp.Order,
@@ -618,7 +618,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         await _context.SaveChangesAsync();
 
                         // For each procedure in the visit
-                        foreach (var procedureDto in visitDto.Procedures)
+                        foreach (var procedureDto in visitDto.VisitToProcedureMaps)
                         {
                             var visitToProcedureMap = new VisitToProcedureMap
                             {
@@ -1151,7 +1151,7 @@ namespace DentalTreatmentPlanner.Server.Services
                                 VisitId = v.VisitId,
                                 Description = v.Description,
                                 VisitNumber = v.VisitNumber,
-                                Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
+                                VisitToProcedureMaps = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
                             }).ToList()
                         })
                         .FirstOrDefaultAsync();
@@ -1287,7 +1287,7 @@ namespace DentalTreatmentPlanner.Server.Services
                                 VisitId = v.VisitId,
                                 Description = v.Description,
                                 VisitNumber = v.VisitNumber,
-                                Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
+                                VisitToProcedureMaps = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) // Use the existing method
                             }).ToList()
                         })
                         .FirstOrDefaultAsync();
@@ -1335,13 +1335,21 @@ namespace DentalTreatmentPlanner.Server.Services
                     {
                         var cdtMap = procedureMap.ProcedureToCdtMaps.FirstOrDefault(c => c.ProcedureToCdtMapId == cdtMapDto.ProcedureToCdtMapId);
 
-                        if (cdtMap != null && cdtMap.CdtCodeId != cdtMapDto.CdtCodeId)
-                        {
-                            Console.WriteLine($"Updating existing CdtMapId: {cdtMapDto.ProcedureToCdtMapId} with new CdtCodeId: {cdtMapDto.CdtCodeId}");
 
-                            // Update properties if CdtCodeId has changed
-                            cdtMap.CdtCodeId = cdtMapDto.CdtCodeId;
-                        }
+                        if (cdtMap != null)
+                        {
+                            if (cdtMap.CdtCodeId != cdtMapDto.CdtCodeId)
+                            {
+                                Console.WriteLine($"Updating existing CdtMapId: {cdtMapDto.ProcedureToCdtMapId} with new CdtCodeId: {cdtMapDto.CdtCodeId}");
+                                cdtMap.CdtCodeId = cdtMapDto.CdtCodeId;
+                            }
+                            if (cdtMap.Repeatable != cdtMapDto.Repeatable)
+                            {
+                                Console.WriteLine($"Updating existing CdtMapId: {cdtMapDto.ProcedureToCdtMapId} with new Repeatable: {cdtMapDto.Repeatable}");
+                                cdtMap.Repeatable = cdtMapDto.Repeatable;
+                            }
+                        } 
+
                         else if (cdtMap == null)
                         {
                             Console.WriteLine($"Adding new CDT map for ProcedureMapId: {procedureMapDto.VisitToProcedureMapId}");
@@ -1376,7 +1384,8 @@ namespace DentalTreatmentPlanner.Server.Services
                             {
                                 UserDescription = cdtDto.UserDescription,
                                 CdtCodeId = cdtDto.CdtCodeId,
-                                Default = true
+                                Default = true,
+                                Repeatable = cdtDto.Repeatable
                             }).ToList()
                     };
                     visit.VisitToProcedureMaps.Add(newProcedureMap);
@@ -1511,6 +1520,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     CdtCodeId = pcm.CdtCodeId,
                     UserDescription = pcm.UserDescription,
                     Default = pcm.Default,
+                    Repeatable = pcm.Repeatable,
                     Code = pcm.CdtCode?.Code ?? string.Empty,
                     LongDescription = pcm.CdtCode.LongDescription
                 }).ToList();
@@ -1556,7 +1566,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         Description = v.Description,
                         VisitNumber = v.VisitNumber,
 
-                        Procedures = v.VisitToProcedureMaps.Select(vtp => new VisitToProcedureMapDto
+                        VisitToProcedureMaps = v.VisitToProcedureMaps.Select(vtp => new VisitToProcedureMapDto
                         {
                             Order = vtp.Order,
                             ProcedureTypeId = vtp.ProcedureTypeId,
@@ -1628,7 +1638,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         VisitId = v.VisitId,
                         Description = v.Description,
                         VisitNumber = v.VisitNumber,
-                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
+                        VisitToProcedureMaps = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
                     }).ToList()
                 })
                 .ToListAsync();
@@ -1651,7 +1661,6 @@ namespace DentalTreatmentPlanner.Server.Services
                 .Where(tp => tp.PatientId == null && tp.ProcedureSubcategoryId.HasValue)
                 .ToListAsync();
 
-            // Corrected prioritization logic
             var prioritizedTreatmentPlans = treatmentPlans
                 .GroupBy(tp => tp.ProcedureSubcategoryId)
                 .Select(g =>
@@ -1680,7 +1689,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         VisitId = v.VisitId,
                         Description = v.Description,
                         VisitNumber = v.VisitNumber,
-                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
+                        VisitToProcedureMaps = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps)
                     }).ToList()
                 })
                 .ToList();
@@ -1719,7 +1728,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         VisitId = v.VisitId,
                         Description = v.Description,
                         VisitNumber = v.VisitNumber,
-                        Procedures = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) 
+                        VisitToProcedureMaps = MapVisitToProcedureMapsToDto(v.VisitToProcedureMaps) 
                     }).ToList()
                 })
                 .ToListAsync();
@@ -1756,7 +1765,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         VisitNumber = v.VisitNumber,
 
                         // Adjust the DTO mapping for the new structure
-                        Procedures = v.VisitToProcedureMaps.Select(vtp => new VisitToProcedureMapDto
+                        VisitToProcedureMaps = v.VisitToProcedureMaps.Select(vtp => new VisitToProcedureMapDto
                         {
                             Order = vtp.Order,
                             ProcedureTypeId = vtp.ProcedureTypeId,

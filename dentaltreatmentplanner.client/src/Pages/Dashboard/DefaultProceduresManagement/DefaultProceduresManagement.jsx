@@ -22,19 +22,15 @@ const DefaultProcedures = () => {
 	const navigate = useNavigate();
 	// API call to fetch categories
 	const { data: categories = [], isLoading: categoriesLoading } = useGetCategoriesQuery();
-	// Log the categories data after it's fetched
-	console.log("Categories:", categories);
+
 
 	// API call to fetch subcategories
 	const { data: subcategories = [], isLoading: subcategoriesLoading } = useGetSubcategoriesQuery();
-	// Log the subcategories data after it's fetched
-	console.log("Subcategories:", subcategories);
+
 	const [selectedSubcategories, setSelectedSubcategories] = useState({});
 
 	const handleEditClick = (categoryId) => {
 		const subcategory = selectedSubcategories[categoryId];
-		console.log("subcategory in handleeditclick", subcategory);
-		console.log("subcategory.procedureSubcategoryId in handleeditclick", subcategory?.procedureSubCategoryId);
 
 		// Find the category name using the category ID for navigation
 		const category = categories.find(cat => cat.procedureCategoryId === categoryId)?.name;
@@ -56,15 +52,24 @@ const DefaultProcedures = () => {
 		}));
 	};
 
+	const categoryMatchesSearch = (category) => {
+		return category.name.toLowerCase().includes(inputText);
+	};
+
+	const subcategoryMatchesSearch = (categoryId) => {
+		return subcategories.some(sub =>
+			sub.procedureCategoryId === categoryId &&
+			sub.name.toLowerCase().includes(inputText)
+		);
+	};
+
 	// Filter categories based on inputText
-	const filteredCategories = inputText
-		? categories.filter(category => category.name.toLowerCase().includes(inputText))
-		: categories;
+	const filteredCategories = categories.filter(category =>
+		categoryMatchesSearch(category) || subcategoryMatchesSearch(category.procedureCategoryId)
+	);
 
 	// Check if current route is for editing a specific treatment plan
-	const isEditingTreatmentPlan = location.pathname.includes(
-		"/procedurescustomizer/"
-	);
+	const isEditingTreatmentPlan = location.pathname.includes("/procedurescustomizer/");
 
 	if (isEditingTreatmentPlan) {
 		return <Outlet />;
@@ -125,23 +130,14 @@ const DefaultProcedures = () => {
 			<StyledRoundedBoxContainer>
 				<StyledContainerWithTableInner>
 					{filteredCategories.map((category) => (
-						<div
-							className="dropdown-container"
-							key={category.procedureCategoryId}
-						>
+						<div className="dropdown-container" key={category.procedureCategoryId}>
 							<div className="dropdown-header large-text">{category.name}</div>
-							{/* Filter subcategories for the current category before passing to DropdownSearch */}
 							<DropdownSearch
 								items={subcategories.filter(subcategory => subcategory.procedureCategoryId === category.procedureCategoryId)}
 								onSelect={(subcategory) =>
-									handleSubcategorySelect(
-										category.procedureCategoryId,
-										subcategory
-									)
+									handleSubcategorySelect(category.procedureCategoryId, subcategory)
 								}
-								selectedItem={
-									selectedSubcategories[category.procedureCategoryId]
-								}
+								selectedItem={selectedSubcategories[category.procedureCategoryId]}
 								valueKey="procedureSubCategoryId"
 								labelKey="name"
 								width="100%"
@@ -149,16 +145,12 @@ const DefaultProcedures = () => {
 							/>
 							<div className="light-grey-text">
 								Make a selection, then click{" "}
-								<span
-									className="underlined-text"
-									onClick={() => handleEditClick(category.procedureCategoryId)}
-								>
+								<span className="underlined-text" onClick={() => handleEditClick(category.procedureCategoryId)}>
 									Edit
 								</span>
 							</div>
 						</div>
 					))}
-
 				</StyledContainerWithTableInner>
 			</StyledRoundedBoxContainer>
 		</div>

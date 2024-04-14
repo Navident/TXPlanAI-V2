@@ -130,7 +130,6 @@ const CustomCdtCodes = () => {
 
     const handleEditRow = (rowId) => {
         const originalRow = rowsData.find(row => row.id === rowId);
-        console.log("Original row data:", originalRow); 
         setOriginalRowData(originalRow);
         setEditingRowId(rowId);
         setRowsData(prevRowsData => prevRowsData.map(row => {
@@ -180,7 +179,6 @@ const CustomCdtCodes = () => {
     }
 
     function createDeleteIconCell(row, index) {
-        console.log("Creating delete icon cell for row:", row.id);
         const isNotLastRow = index !== rowsData.length - 1;
         if (row.isStatic && isNotLastRow) {
             return (

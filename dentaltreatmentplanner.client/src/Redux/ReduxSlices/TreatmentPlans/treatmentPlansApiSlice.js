@@ -13,19 +13,16 @@ export const treatmentPlansApiSlice = createApi({
         prepareHeaders: (headers, { getState }) => {
             // Try to get the token from localStorage first
             let token = localStorage.getItem('jwtToken');
-            console.log("Token in local storage:", token);
 
             // If no token in localStorage, try to get it from Redux state
             if (!token) {
                 const state = getState();
                 token = state.user.jwtToken; 
-                console.log("Token from Redux state:", token);
             }
 
             // Set the Authorization header if a token is found
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`);
-                console.log("Token found in Redux state:", token);
             }
 
             headers.set('Content-Type', 'application/json');

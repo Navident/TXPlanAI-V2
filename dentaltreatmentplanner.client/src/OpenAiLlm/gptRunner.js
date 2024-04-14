@@ -8,7 +8,6 @@ export async function fetchOpenAIResponse(userQuery) {
         model: API_CONFIG.model,
         messages: [{ "role": "system", "content": instructions.content }, ...examples, { "role": "user", "content": userQuery }]
     });
-    console.log("Headers being sent:", API_CONFIG.headers);
 
     const response = await fetch(API_CONFIG.endpoint, { method: "POST", headers: API_CONFIG.headers, body });
 

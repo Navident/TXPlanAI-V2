@@ -29,8 +29,6 @@ const ProceduresCustomizer = () => {
 	const treatmentPlans = useSelector(selectAllTreatmentPlans);
 	const params = useParams();
 	const paramsSubcategoryId = Number(params.subcategory);
-	console.log("subcategoryid passed from params is: ", paramsSubcategoryId);
-	console.log(localStorage.getItem('jwtToken'));
 
 	const {
 		data: subcategoryTreatmentPlans,
@@ -47,7 +45,6 @@ const ProceduresCustomizer = () => {
 	}
 
 	const currentSubcategoryPlan = subcategoryTreatmentPlans?.find(plan => plan.procedureSubcategoryId === paramsSubcategoryId);
-	console.log("currentSubcategoryPlan:", currentSubcategoryPlan);
 	// Check if the names are defined, otherwise use fallbacks from the first treatment plan, if available.
 	const activeCategoryName = currentSubcategoryPlan?.procedureCategoryName ??
 		treatmentPlans[0]?.procedureCategoryName ??

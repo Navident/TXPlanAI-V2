@@ -135,7 +135,9 @@ const TreatmentPlanOutput = ({
 	}, [allRows]);
 
 	useEffect(() => {
-		setCombinedVisits(treatmentPlan.visits);
+		if (isInGenerateTreatmentPlanContext) {
+			setCombinedVisits(treatmentPlan.visits);
+		}
 	}, [treatmentPlan, isInGenerateTreatmentPlanContext]);
 
 
@@ -153,7 +155,7 @@ const TreatmentPlanOutput = ({
 				newAllRows[visitId] = [];
 				newAlternativeRows[visitId] = [];
 
-				(visit.procedures || []).forEach((procedureMap, procIndex) => {
+				(visit.visitToProcedureMaps || []).forEach((procedureMap, procIndex) => {
 					(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
 						const row = createInitialStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
@@ -186,7 +188,9 @@ const TreatmentPlanOutput = ({
 
 
 	useEffect(() => {
-		setLocalUpdatedVisits(treatmentPlan.visits);
+		if (isInGenerateTreatmentPlanContext) {
+			setLocalUpdatedVisits(treatmentPlan.visits);
+		}
 	}, [treatmentPlan.visits]);
 
 	const handleGroupRows = useCallback(() => {

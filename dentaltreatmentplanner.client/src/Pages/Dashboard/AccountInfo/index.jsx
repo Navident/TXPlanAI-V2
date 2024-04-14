@@ -134,7 +134,6 @@ const AccountInfo = () => {
     }
     const handleEditRow = (rowId) => {
         const originalRow = rowsData.find(row => row.id === rowId);
-        console.log("Original row data:", originalRow);
         setOriginalRowData(originalRow);
         setEditingRowId(rowId);
         setRowsData(prevRowsData => prevRowsData.map(row => {
@@ -225,7 +224,6 @@ const AccountInfo = () => {
     const handleSaveCustomerKey = async () => {
         if (rowsData.length > 0 && rowsData[0].code !== customerKeyData?.customerKey) {
             const payload = mapToUpdateCustomerKeyDto(rowsData[0].code);
-            console.log("Sending payload:", payload);
             try {
                 await updateFacilityCustomerKey(payload).unwrap();
                 dispatch(showAlert({ type: 'success', message: 'Customer key updated successfully!' }));

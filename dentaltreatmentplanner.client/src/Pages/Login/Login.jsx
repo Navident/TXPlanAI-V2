@@ -31,7 +31,6 @@ const Login = () => {
     const handleLoginClick = async () => {
         try {
             const response = await loginUser({ email, password }).unwrap();
-            console.log("API response:", response);
             dispatch(setUserDetails({
                 jwtToken: response.token,
                 isUserLoggedIn: true,
@@ -48,7 +47,6 @@ const Login = () => {
     };
 
     const handleBackClick = () => {
-        console.log("back button clicked");
         navigate("/"); 
     };
     const handleCloseAlert = () => {

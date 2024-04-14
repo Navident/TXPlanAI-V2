@@ -37,8 +37,8 @@ const RecentTxPlans = () => {
     };
 
     // Function to handle edit click, redirects to customize treatment plan
-    const handleEditClick = (planId) => {
-        navigate(`/customize-treatment-plan/${planId}`);
+    const handleEditClick = (plan) => {
+        navigate(`/customize-treatment-plan/${plan.treatmentPlanId}`, { state: { plan } });
     };
 
     return (
@@ -69,7 +69,7 @@ const RecentTxPlans = () => {
                                 <StyledLightGrey2Text
                                     hoverEffect
                                     className="editText"
-                                    onClick={() => handleEditClick(plan.treatmentPlanId)}
+                                    onClick={() => handleEditClick(plan)}
                                 >
                                     Edit
                                 </StyledLightGrey2Text>

@@ -30,6 +30,7 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeR
                             ProcedureToCdtMapId: selectedCdtCode.procedureToCdtMapId,
                             CdtCodeId: selectedCdtCode.cdtCodeId,
                             Default: row.default !== undefined ? row.default : null,
+                            Repeatable: row.repeatable !== undefined ? row.repeatable : true,
                             UserDescription: selectedCdtCode.userDescription,
                             Code: selectedCdtCode.code,
                             LongDescription: selectedCdtCode.longDescription,
