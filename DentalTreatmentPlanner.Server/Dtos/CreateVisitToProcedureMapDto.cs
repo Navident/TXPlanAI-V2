@@ -2,7 +2,7 @@
 {
     public class CreateVisitToProcedureMapDto
     {
-        public int VisitToProcedureMapId { get; set; }
+        public int? VisitToProcedureMapId { get; set; }
 
         public int Order { get; set; }
         public int? ToothNumber { get; set; }

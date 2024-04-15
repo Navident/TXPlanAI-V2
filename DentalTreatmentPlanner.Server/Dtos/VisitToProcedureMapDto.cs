@@ -5,7 +5,7 @@ namespace DentalTreatmentPlanner.Server.Dtos
     public class VisitToProcedureMapDto
     {
 
-        public int VisitToProcedureMapId { get; set; }
+        public int? VisitToProcedureMapId { get; set; }
         public int? VisitId { get; set; }
         public int Order { get; set; }
         public int? ToothNumber { get; set; }

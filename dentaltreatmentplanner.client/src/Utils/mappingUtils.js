@@ -17,11 +17,11 @@ export const mapToUpdateTreatmentPlanDto = (treatmentPlan, allRows, alternativeR
         const visitToProcedureMapDtos = combinedRows
             .filter(row => row.isStatic && !deletedRowIds.includes(row.id)) // Now including all existing alternative procedures unless explicitly deleted.
             .map((row, idx) => {
-                const { selectedCdtCode, visitToProcedureMapId, procedureTypeId, toothNumber, surface, arch } = row;
+                const { selectedCdtCode, procedureTypeId, toothNumber, surface, arch } = row;
                 const archValue = (arch === "default") ? null : arch;
 
                 return {
-                    VisitToProcedureMapId: visitToProcedureMapId,
+                    VisitToProcedureMapId: row.visitToProcedureMapId || null, 
                     ProcedureTypeId: procedureTypeId,
                     Order: idx,
                     ToothNumber: toothNumber,
@@ -92,7 +92,7 @@ export const mapToCreateNewTreatmentPlanFromDefaultDto = (treatmentPlan, allRows
                 const defaultValue = row.default ?? row.selectedCdtCode?.default;
 
                 return {
-                    VisitToProcedureMapId: row.visitToProcedureMapId, 
+                    VisitToProcedureMapId: row.visitToProcedureMapId || null, 
                     Order: rowIdx,
                     ToothNumber: row.selectedCdtCode.toothNumber ? parseInt(row.selectedCdtCode.toothNumber) : null,
                     ProcedureTypeId: row.procedureTypeId,
@@ -147,7 +147,7 @@ export const mapToCreateNewCombinedTreatmentPlanForPatient = (treatmentPlan, all
             .filter(row => row.selectedCdtCode !== null) // Ensure only rows with a selected CDT code are included
             .map((row, rowIdx) => {
                 return {
-                    VisitToProcedureMapId: row.visitToProcedureMapId, // Adjust according to your real data structure
+                    VisitToProcedureMapId: row.visitToProcedureMapId, 
                     Order: rowIdx,
                     ToothNumber: row.selectedCdtCode.toothNumber ? parseInt(row.selectedCdtCode.toothNumber) : null,
                     ProcedureTypeId: row.procedureTypeId,

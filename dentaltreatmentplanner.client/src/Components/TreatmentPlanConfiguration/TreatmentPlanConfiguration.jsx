@@ -783,8 +783,8 @@ const TreatmentPlanConfiguration = ({
 		);
 
 		let archDropdownContent = "";
-		// Check if the row is the initial dynamic row, and do not add the "archDropdown"
-		if (!row.id.includes(`initial-${visitId}`)) {
+		// Exclude the "archDropdown" for initial dynamic row and dynamic rows for alternative CDT codes
+		if (!row.id.includes(`initial-${visitId}`) && !row.id.startsWith(`dynamic-alt-code-${visitId}`)) {
 			archDropdownContent = createArchDropdown(row, visitId, handleArchSelect);
 		}
 
@@ -811,6 +811,7 @@ const TreatmentPlanConfiguration = ({
 
 		return dynamicRowData;
 	};
+
 
 
 
