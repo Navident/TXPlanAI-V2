@@ -621,19 +621,17 @@ const TreatmentPlanOutput = ({
 		
 	};
 
-	const handleDeleteRow = (visitId, rowId, row) => {
-		console.log("row in delete", row);
-		// Assuming row corresponds to a procedure within a visit
-		const rowVisitToProcedureMapId = row.visitToProcedureMapId;
-		dispatch(onDeleteProcedure({
-			treatmentPlanId: treatmentPlan.treatmentPlanId,
-			visitId,
-			visitToProcedureMapIdToDelete: rowVisitToProcedureMapId
-		}));
+	const handleDeleteRow = (visitId, rowId) => {
+		// Proceed to remove the row visually from the UI
 		setAllRows((prevRows) => {
-			const updatedRows = prevRows[visitId].filter((row) => row.id !== rowId);
+			const updatedRows = prevRows[visitId].filter((r) => r.id !== rowId);
+
+			// After filtering out the deleted row, synchronize alternativeRows
+			synchronizeAlternativeRows(visitId, { ...prevRows, [visitId]: updatedRows });
+
 			return { ...prevRows, [visitId]: updatedRows };
 		});
+
 		setDeletedRowIds((prevIds) => [...prevIds, rowId]);
 	};
 
