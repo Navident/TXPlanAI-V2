@@ -202,26 +202,27 @@ const GenerateTreatmentPlan = () => {
 
     function combineVisitsIntoOne(allVisits) {
         let combinedProcedures = [];
-        allVisits.forEach((visit) => {
-            visit.VisitToProcedureMapDtos.forEach((procedureMap) => {
+        let currentOrder = 0; // This will keep track of the overall order across all visits
+
+        allVisits.forEach((visit, index) => {
+            // Sort the procedures within the visit according to their original 'order'
+            const sortedVisitProcedures = visit.VisitToProcedureMapDtos.sort((a, b) => a.order - b.order);
+
+            sortedVisitProcedures.forEach((procedureMap) => {
                 combinedProcedures.push({
                     ...procedureMap,
+                    order: currentOrder++, // Assign and then increment the current order
                     procedureToCdtMaps: procedureMap.procedureToCdtMaps.map(cdtMap => ({
                         ...cdtMap,
                         visitToProcedureMapId: procedureMap.visitToProcedureMapId,
                         originLineIndex: visit.originLineIndex,
                         visitNumber: visit.visitNumber,
-                        orderWithinVisit: procedureMap.order,
                     }))
                 });
             });
         });
-        combinedProcedures.sort(
-            (a, b) =>
-                a.originLineIndex - b.originLineIndex ||
-                a.visitNumber - b.visitNumber ||
-                a.orderWithinVisit - b.orderWithinVisit
-        );
+
+        // No longer necessary to sort by 'order' here because it is controlled by 'currentOrder'
         return {
             visitId: `temp-${Date.now()}`,
             description: "Table 1",
@@ -230,6 +231,7 @@ const GenerateTreatmentPlan = () => {
             visitNumber: 1
         };
     }
+
 
     const handleGenerateTreatmentPlan = async () => {
         if (!inputText.trim()) {

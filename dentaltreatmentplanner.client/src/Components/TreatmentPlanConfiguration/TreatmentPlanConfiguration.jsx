@@ -117,7 +117,10 @@ const TreatmentPlanConfiguration = ({
 			newAllRows[visitId] = [];
 			newAlternativeRows[visitId] = [];
 
-			(visit.visitToProcedureMaps || []).forEach((procedureMap, procIndex) => {
+			// Create a deep copy of the visitToProcedureMaps and sort it
+			const sortedProcedureMaps = [...(visit.visitToProcedureMaps || [])].sort((a, b) => a.order - b.order);
+
+			sortedProcedureMaps.forEach((procedureMap, procIndex) => {
 				(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
 					const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
@@ -136,6 +139,7 @@ const TreatmentPlanConfiguration = ({
 		setAllRows(newAllRows);
 		setAlternativeRows(newAlternativeRows);
 	}, [visits]);
+
 
 
 
