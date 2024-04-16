@@ -186,7 +186,8 @@ const GenerateTreatmentPlan = () => {
                                     originalVisitCategory: plan.procedureCategoryName,
                                 })),
                             };
-                        }).filter(procedureMap => procedureMap !== null)
+                        }).filter(procedureMap => procedureMap !== null),
+                        procedureCategoryName: plan.procedureCategoryName, 
                     }));
                     allVisits.push(...clonedVisits);
                 }

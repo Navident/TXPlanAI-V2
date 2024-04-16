@@ -78,12 +78,12 @@ const TreatmentPlanConfiguration = ({
 
 	const archOptions = [
 		{ value: 'default', label: 'Default' },
-		{ value: 'u', label: 'Upper' },
-		{ value: 'ul', label: 'Upper Left' },
-		{ value: 'l', label: 'Lower' },
-		{ value: 'ur', label: 'Upper Right' }, 
-		{ value: 'lr', label: 'Lower Right' },  
-		{ value: 'll', label: 'Lower Left' }   
+		{ value: 'U', label: 'Upper' },
+		{ value: 'UL', label: 'Upper Left' },
+		{ value: 'L', label: 'Lower' },
+		{ value: 'UR', label: 'Upper Right' }, 
+		{ value: 'LR', label: 'Lower Right' },  
+		{ value: 'LL', label: 'Lower Left' }   
 	];
 
 
@@ -407,15 +407,6 @@ const TreatmentPlanConfiguration = ({
 			return updatedAllRows;
 		});
 	}
-
-
-
-
-
-
-
-
-
 
 	function createAddButtonCell(visitId, rowId, hasAltInId = false) {
 		// If hasAltInId is true, use grey; otherwise, use purple.
