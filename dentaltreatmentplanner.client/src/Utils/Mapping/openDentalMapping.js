@@ -58,9 +58,12 @@ export const mapToOpenDentalTreatmentPlanDtoByAllRows = (allRows, patientId) => 
 
             const selectedCdtCode = procedure.selectedCdtCode;
             if (selectedCdtCode && selectedCdtCode.code) {
+                const surf = selectedCdtCode.surface || procedure.surface ||
+                    selectedCdtCode.arch || procedure.arch || null;
+
                 const procedureDto = {
                     ToothNum: procedure.toothNumber.replace('#', ''),
-                    Surf: selectedCdtCode.surface ? selectedCdtCode.surface : (selectedCdtCode.arch ? selectedCdtCode.arch : null),
+                    Surf: surf,
                     ProcStatus: "TP",
                     procCode: selectedCdtCode.code,
                     priority: (visitIndex + 1).toString() // Adding 1 because indices start at 0

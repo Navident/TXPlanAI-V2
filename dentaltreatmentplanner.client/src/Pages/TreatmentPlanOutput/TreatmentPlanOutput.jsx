@@ -301,6 +301,8 @@ const TreatmentPlanOutput = ({
 			visitToProcedureMapId: procedureMap?.visitToProcedureMapId || cdtMap.visitToProcedureMapId, // Adjust based on the presence of a procedure map
 			description: longDescription,
 			selectedCdtCode: cdtMap,
+			arch: arch,
+			surface: surface,
 			toothNumber,
 			isStatic: true,
 			extraRowInput,
