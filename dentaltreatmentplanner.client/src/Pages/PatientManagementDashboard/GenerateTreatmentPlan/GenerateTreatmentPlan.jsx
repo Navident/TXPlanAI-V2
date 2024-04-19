@@ -10,7 +10,7 @@ import {
     StyledSeparator,
     StyledTitleAndPaymentTotalsContainer
 } from "../../../GlobalStyledComponents";
-import { fetchOpenAIResponse } from "../../../OpenAi/LLM/gptRunner";
+import { fetchOpenAIResponse } from "../../../OpenAI/LLM/gptRunner";
 import { CircularProgress } from "@mui/material";
 import {
     setActiveTxCategories,
@@ -35,7 +35,7 @@ import EmptyStatePlaceholder from './EmptyStatePlaceholder';
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import LoginPopup from './LoginPopup';
 import MicIcon from '@mui/icons-material/Mic';
-import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAi/Whisper/whisperService";
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
 
 const GenerateTreatmentPlan = () => {
     const dispatch = useDispatch();
