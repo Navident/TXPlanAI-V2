@@ -10,7 +10,7 @@ import {
     StyledSeparator,
     StyledTitleAndPaymentTotalsContainer
 } from "../../../GlobalStyledComponents";
-import { fetchOpenAIResponse } from "../../../OpenAi/Llm/gptRunner";
+import { fetchOpenAIResponse } from "../../../OpenAi/LLM/gptRunner";
 import { CircularProgress } from "@mui/material";
 import {
     setActiveTxCategories,
