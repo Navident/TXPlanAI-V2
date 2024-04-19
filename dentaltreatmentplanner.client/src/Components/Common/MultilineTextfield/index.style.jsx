@@ -26,3 +26,7 @@ export const StyledTextfieldArea = styled.textarea`
         opacity: 1; 
     }
 `;
+
+export const StyledTextfieldWrap = styled.div`
+    position: relative;
+`;

@@ -10,7 +10,7 @@ import {
     StyledSeparator,
     StyledTitleAndPaymentTotalsContainer
 } from "../../../GlobalStyledComponents";
-import { fetchOpenAIResponse } from "../../../OpenAiLlm/gptRunner";
+import { fetchOpenAIResponse } from "../../../OpenAi/Llm/gptRunner";
 import { CircularProgress } from "@mui/material";
 import {
     setActiveTxCategories,
@@ -34,6 +34,8 @@ import {
 import EmptyStatePlaceholder from './EmptyStatePlaceholder';
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import LoginPopup from './LoginPopup';
+import MicIcon from '@mui/icons-material/Mic';
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAi/Whisper/whisperService";
 
 const GenerateTreatmentPlan = () => {
     const dispatch = useDispatch();
@@ -46,6 +48,8 @@ const GenerateTreatmentPlan = () => {
     const [allRowsFromChild, setAllRowsFromChild] = useState({});
     const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
+    const [recording, setRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState(null);
 
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
@@ -270,6 +274,42 @@ const GenerateTreatmentPlan = () => {
         }
     };
 
+
+
+    const handleMicClick = () => {
+        if (!recording) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    const recorder = new MediaRecorder(stream);
+                    setMediaRecorder(recorder);
+                    recorder.start();
+                    setRecording(true);
+
+                    recorder.ondataavailable = async (event) => {
+                        if (recorder.state === 'inactive') {
+                            const audioFile = new File([event.data], "audio.webm", { type: 'audio/webm' });
+                            const transcribedText = await transcribeAudio(audioFile);
+                            if (transcribedText) {
+                                const processedText = await postProcessTranscriptWithGPT(transcribedText);
+                                setInputText(processedText);
+                            }
+                        }
+                    };
+
+                    recorder.onstop = () => {
+                        setRecording(false);
+                    };
+                }).catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    showAlert("error", "Failed to access microphone.");
+                });
+        } else {
+            mediaRecorder.stop();
+        }
+    };
+
+
+
     return (
         <div className="dashboard-bottom-inner-row">
             {showLoginPopup && (
@@ -288,6 +328,7 @@ const GenerateTreatmentPlan = () => {
                         label="Input your treatments"
                         value={inputText}
                         onChange={handleInputChange}
+                        onMicClick={handleMicClick}
                     />
                     <RoundedButton
                         text="Generate Treatment Plan"

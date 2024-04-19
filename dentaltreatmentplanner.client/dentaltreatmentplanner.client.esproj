@@ -27,6 +27,7 @@
     <Folder Include="src\Components\TxViewCustomizationToolbar\CategoryFilters\" />
     <Folder Include="src\GlobalStyledComponents\" />
     <Folder Include="src\OpenAiLlm\Config\" />
+    <Folder Include="src\OpenAiLlm\LLM\" />
     <Folder Include="src\Pages\Dashboard\FeeScheduling\EditFacilityFeeScheduling\" />
     <Folder Include="src\Pages\Dashboard\AllSavedPatientTxPlans\" />
     <Folder Include="src\Pages\Dashboard\AccountInfo\" />
