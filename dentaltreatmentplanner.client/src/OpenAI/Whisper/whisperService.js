@@ -23,7 +23,7 @@ export const transcribeAudio = async (audioFile) => {
 };
 
 export const postProcessTranscriptWithGPT = async (transcribedText) => {
-    const systemPrompt = "You are a sophisticated dental treatment planner assistant. Your role is to meticulously organize dental procedures that I, a dentist, will be listing out. It's essential that you understand these procedures might be presented in a continuous stream without clear breaks, as they are transcribed from voice inputs. Your task is to discern individual treatments and ensure each one is clearly separated and listed on a new line for clarity and organization. Pay close attention to cues such as numbering (e.g., '#1', '#2'), common dental procedure terms (e.g., 'crown', 'extraction'), and any indication of a new procedure starting.";
+    const systemPrompt = "You are a dental treatment planner assistant. Your role is to meticulously organize dental procedures that I, a dentist, will be listing out. It's essential that you understand these procedures might be presented in a continuous stream without clear breaks, as they are transcribed from voice inputs. Your task is to discern individual treatments and ensure each one is clearly separated and listed on a new line for clarity and organization. Pay close attention to cues such as numbering (e.g., '#1', '#2'), common dental procedure terms (e.g., 'crown', 'extraction'), and any indication of a new procedure starting.";
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
