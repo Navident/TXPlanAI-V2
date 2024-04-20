@@ -36,6 +36,7 @@ import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSli
 import LoginPopup from './LoginPopup';
 import MicIcon from '@mui/icons-material/Mic';
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
+import AudioPopup from "../../../Components/AudioPopup/index";
 
 const GenerateTreatmentPlan = () => {
     const dispatch = useDispatch();
@@ -48,8 +49,6 @@ const GenerateTreatmentPlan = () => {
     const [allRowsFromChild, setAllRowsFromChild] = useState({});
     const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
-    const [recording, setRecording] = useState(false);
-    const [mediaRecorder, setMediaRecorder] = useState(null);
 
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
@@ -273,39 +272,87 @@ const GenerateTreatmentPlan = () => {
             setIsLoading(false);
         }
     };
-
-
+    const [stream, setStream] = useState(null); 
+    const [showAudioPopup, setShowAudioPopup] = useState(false);
+    const [recording, setRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState(null);
 
     const handleMicClick = () => {
         if (!recording) {
+            // Stop the previous stream if it's still running
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                setStream(null);  // Ensure the stream is cleared
+            }
+
             navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    const recorder = new MediaRecorder(stream);
+                .then(newStream => {
+                    setStream(newStream);
+                    const recorder = new MediaRecorder(newStream);
                     setMediaRecorder(recorder);
                     recorder.start();
                     setRecording(true);
+                    setShowAudioPopup(true);
 
                     recorder.ondataavailable = async (event) => {
                         if (recorder.state === 'inactive') {
                             const audioFile = new File([event.data], "audio.webm", { type: 'audio/webm' });
-                            const transcribedText = await transcribeAudio(audioFile);
-                            if (transcribedText) {
-                                const processedText = await postProcessTranscriptWithGPT(transcribedText);
-                                setInputText(processedText);
-                            }
+                            processAudioFile(audioFile);
                         }
                     };
 
                     recorder.onstop = () => {
                         setRecording(false);
+                        newStream.getTracks().forEach(track => track.stop());
+                        setStream(null);
                     };
                 }).catch(error => {
                     console.error('Error accessing microphone:', error);
                     showAlert("error", "Failed to access microphone.");
                 });
-        } else {
-            mediaRecorder.stop();
         }
+    };
+
+
+
+    const processAudioFile = async (audioFile) => {
+        const transcribedText = await transcribeAudio(audioFile);
+        if (transcribedText) {
+            const processedText = await postProcessTranscriptWithGPT(transcribedText);
+            console.log("processed text: ", processedText);
+            setInputText(processedText); // Update the state with the processed text
+        }
+        setShowAudioPopup(false); // Close the popup after processing
+    };
+
+    const stopAndProcessRecording = () => {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop(); // This will trigger the 'ondataavailable' event
+            // Ensure that all tracks of the stream are stopped
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                setStream(null); // Clear the stream
+            }
+            setRecording(false); // Reset recording state
+            setShowAudioPopup(false); // Optionally close the popup if that's the desired flow
+        }
+    };
+
+
+    const handleClose = () => {
+        // Function to close the popup
+        setShowAudioPopup(false);
+        // Check if the mediaRecorder is recording and stop it if so
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop(); // This will also trigger the 'ondataavailable' event, but we'll ignore the file
+            mediaRecorder.ondataavailable = () => { }; // Override the handler to prevent processing
+        }
+        // Whether it's recording or not, ensure all tracks are stopped
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            setStream(null); // Clear the stream
+        }
+        setRecording(false); // Reset recording state
     };
 
 
@@ -318,6 +365,12 @@ const GenerateTreatmentPlan = () => {
                     onClose={() => setShowLoginPopup(false)}
                 />
             )}
+            <AudioPopup
+                open={showAudioPopup}
+                stopRecording={stopAndProcessRecording} // Pass the function to stop recording
+                onClose={handleClose}
+            />
+
             <div className="create-treatment-plan-section rounded-box box-shadow">
                 <div className="create-treatment-plan-section-inner">
                     <img src={PenIcon} alt="Edit" />

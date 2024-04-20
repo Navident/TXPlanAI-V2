@@ -9,7 +9,18 @@ import StandardTextField from '../../../Components/Common/StandardTextfield/Stan
 import { useState } from 'react';
 
 
-function AlertDialog({ title, content, open, onClose, onAgree, textInput = false, textInputWidth = "75px", inputValue, onInputChange }) {
+function AlertDialog({
+    title,
+    content,
+    open,
+    onClose,
+    onAgree,
+    textInput = false,
+    textInputWidth = "75px",
+    inputValue,
+    onInputChange,
+    showActions = true  // New prop with default value
+}) {
     const purple = UI_COLORS.purple;
 
     const handleTextSubmit = () => {
@@ -31,32 +42,35 @@ function AlertDialog({ title, content, open, onClose, onAgree, textInput = false
                     <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                         <StandardTextField
                             style={{ width: textInputWidth }}
-                            value={inputValue} 
-                            onChange={onInputChange} 
+                            value={inputValue}
+                            onChange={onInputChange}
                             borderColor={purple}
                         />
                     </div>
                 )}
             </DialogContent>
-            <DialogActions>
-                {!textInput ? (
-                    <>
-                        <Button onClick={onClose} style={{ color: purple }}>
-                            Disagree
+            {showActions && (
+                <DialogActions>
+                    {!textInput ? (
+                        <>
+                            <Button onClick={onClose} style={{ color: purple }}>
+                                Disagree
+                            </Button>
+                            <Button onClick={onAgree} autoFocus style={{ color: purple }}>
+                                Agree
+                            </Button>
+                        </>
+                    ) : (
+                        <Button onClick={handleTextSubmit} style={{ color: purple }}>
+                            Submit
                         </Button>
-                        <Button onClick={onAgree} autoFocus style={{ color: purple }}>
-                            Agree
-                        </Button>
-                    </>
-                ) : (
-                    <Button onClick={handleTextSubmit} style={{ color: purple }}>
-                        Submit
-                    </Button>
-                )}
-            </DialogActions>
+                    )}
+                </DialogActions>
+            )}
         </Dialog>
     );
 }
 
 export default AlertDialog;
+
 
