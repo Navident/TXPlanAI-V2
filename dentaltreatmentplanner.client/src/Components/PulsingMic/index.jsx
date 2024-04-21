@@ -5,7 +5,7 @@ function PulsingMic({ stopRecording }) {
         <div className="container">
             <button id="speech" className="btn type2" onClick={stopRecording}>
                 <div className="pulse-ring"></div>
-                <MicIcon />
+                <MicIcon style={{ width: '27px', height: 'auto' }} />
             </button>
         </div>
     );

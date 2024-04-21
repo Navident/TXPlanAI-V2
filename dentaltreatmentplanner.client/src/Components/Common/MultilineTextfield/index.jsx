@@ -16,9 +16,11 @@ const MultiLineTextfield = ({ label, value, onChange, placeholder, onMicClick })
                 onClick={onMicClick}
                 style={{
                     position: 'absolute',
-                    bottom: '10px',
-                    right: '10px',
-                    cursor: 'pointer'
+                    bottom: '-24px',
+                    left: '0px',
+                    cursor: 'pointer',
+                    width: '27px',
+                    height: 'auto'
                 }}
             />
         </StyledTextfieldWrap>

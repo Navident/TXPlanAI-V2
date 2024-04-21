@@ -49,6 +49,10 @@ const GenerateTreatmentPlan = () => {
     const [allRowsFromChild, setAllRowsFromChild] = useState({});
     const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
     const [showLoginPopup, setShowLoginPopup] = useState(false);
+    const [stream, setStream] = useState(null);
+    const [showAudioPopup, setShowAudioPopup] = useState(false);
+    const [recording, setRecording] = useState(false);
+    const [mediaRecorder, setMediaRecorder] = useState(null);
 
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
@@ -272,10 +276,7 @@ const GenerateTreatmentPlan = () => {
             setIsLoading(false);
         }
     };
-    const [stream, setStream] = useState(null); 
-    const [showAudioPopup, setShowAudioPopup] = useState(false);
-    const [recording, setRecording] = useState(false);
-    const [mediaRecorder, setMediaRecorder] = useState(null);
+
 
     const handleMicClick = () => {
         if (!recording) {
@@ -320,31 +321,33 @@ const GenerateTreatmentPlan = () => {
         if (transcribedText) {
             const processedText = await postProcessTranscriptWithGPT(transcribedText);
             console.log("processed text: ", processedText);
-            setInputText(processedText); // Update the state with the processed text
+            // Append the new processed text onto the next line
+            setInputText(prevText => prevText ? `${prevText}\n${processedText}` : processedText);
         }
         setShowAudioPopup(false); // Close the popup after processing
     };
 
+
     const stopAndProcessRecording = () => {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop(); // This will trigger the 'ondataavailable' event
+            mediaRecorder.stop(); 
             // Ensure that all tracks of the stream are stopped
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 setStream(null); // Clear the stream
             }
             setRecording(false); // Reset recording state
-            setShowAudioPopup(false); // Optionally close the popup if that's the desired flow
+            setShowAudioPopup(false); // close the popup
         }
     };
 
 
     const handleClose = () => {
-        // Function to close the popup
+        // close the popup
         setShowAudioPopup(false);
         // Check if the mediaRecorder is recording and stop it if so
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop(); // This will also trigger the 'ondataavailable' event, but we'll ignore the file
+            mediaRecorder.stop(); 
             mediaRecorder.ondataavailable = () => { }; // Override the handler to prevent processing
         }
         // Whether it's recording or not, ensure all tracks are stopped
@@ -367,7 +370,7 @@ const GenerateTreatmentPlan = () => {
             )}
             <AudioPopup
                 open={showAudioPopup}
-                stopRecording={stopAndProcessRecording} // Pass the function to stop recording
+                stopRecording={stopAndProcessRecording} 
                 onClose={handleClose}
             />
 
