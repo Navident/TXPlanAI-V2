@@ -32,23 +32,17 @@ export const postProcessTranscriptWithGPT = async (transcribedText) => {
         listed on a new line for clarity and organization. Pay close attention to cues 
         such as numbering (e.g., '#1', '#2'), common dental procedure terms (e.g., 
         'crown', 'extraction'), and any indication of a new procedure starting. 
-        For example, I might say 'tooth number 5 MOD composite number 6 extraction 
-        bone graft implant number 7-9 veneers upper left and lower right SRP', 
+        For example, I might say 'tooth number 5 MOD composite number 6 extraction
+        bone graft implant number 7-9 veneers upper left and lower right SRP',
         you would then respond with:
-        '#5 MOD composite\n
-        #6 extraction, bone graft, implant\n
-        #7-9 veneers\n
-        upper left and lower right SRP'.
+        '#5 MOD composite\n#6 extraction, bone graft, implant\n#7-9 veneers\nupper left and lower right SRP'.
         Keep in mind that the procedure category SRP is a special case because
         the procedure name includes digits at the end of it, not to be confused with
         tooth numbers.
         For an example including SRP, I might say 'Number 3 MOD composite number 6 extraction
         bone graft implant number 12 root canal with post upper right and lower left SRP one to three',
         you would then respond with:
-        '#3 MOD composite\n
-        #6 extraction, bone graft, implant\n
-        #12 root canal with post\n
-        upper right and lower left SRP 1-3'.
+        '#3 MOD composite\n#6 extraction, bone graft, implant\n#12 root canal with post\nupper right and lower left SRP 1-3'.
     `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {

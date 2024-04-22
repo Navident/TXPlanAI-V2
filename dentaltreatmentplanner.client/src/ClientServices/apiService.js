@@ -270,7 +270,7 @@ export const createNewProcedures = async (newProcedures) => {
         if (response.ok) {
             const responseData = await response.json();
             console.log('New procedures created successfully:', responseData);
-            return responseData; // Optionally return data for further processing
+            return responseData; 
         } else {
             const responseText = await response.text();
             console.error('Failed to create new procedures. Status:', response.status, response.statusText);
