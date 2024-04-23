@@ -15,20 +15,16 @@ import {
 import deleteIcon from "../../assets/delete-x.svg";
 import dragIcon from "../../assets/drag-icon.svg";
 import {
-	StyledContainerWithTableInner,
 	StyledAddButtonCellContainer,
 	StyledClickableText,
 	StyledEditIcon,
 	StyledDeleteIcon,
 	StyledEditDeleteIconsContainer,
-	StyledSaveTextBtn,
-	StyledLightGreyText,
-	StyledRoundedBoxContainerInner,
-	StyledSemiboldBlackTitle,
 	TableHeader
 } from "../../GlobalStyledComponents";
 import { UI_COLORS } from "../../Theme";
 import pencilEditIcon from "../../assets/pencil-edit-icon.svg";
+import upDownArrowIcon from "../../assets/up-arrow-icon.svg";
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 import {
 	selectCheckedRows,
@@ -41,6 +37,13 @@ import {
 } from "../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { showAlert } from '../../Redux/ReduxSlices/Alerts/alertSlice';
+import {
+	StyledArrowIcon,
+	StyledTableHeaderContainer,
+	StyledArrowIconContainer,
+	StyledVisitSection,
+	StyledBottomAddVisitSection
+} from "./index.style";
 //import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteProcedure } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
@@ -276,15 +279,13 @@ const TreatmentPlanOutput = ({
 
 	const createInitialStaticRows = (item, visitId, index, procedureMap = null) => {
 
-
 		const cdtMap = procedureMap ? item : (item || {});
 
 		const surface = cdtMap.surface || procedureMap?.surface || "";
 		const arch = cdtMap.arch || procedureMap?.arch || "";
 
-		// Adjusting the row inputs to accommodate potential differences in data structure
 		const toothNumber = cdtMap.toothNumber || procedureMap?.toothNumber || "";
-		const code = cdtMap.code || procedureMap?.procedureCode || ""; // Assuming `procedureCode` could be an alternative key
+		const code = cdtMap.code || procedureMap?.procedureCode || ""; 
 		const longDescription = cdtMap.longDescription || procedureMap?.description || ""; 
 
 		const extraRowInput = [
@@ -298,7 +299,7 @@ const TreatmentPlanOutput = ({
 
 		return {
 			id: `static-${visitId}-${index}`,
-			visitToProcedureMapId: procedureMap?.visitToProcedureMapId || cdtMap.visitToProcedureMapId, // Adjust based on the presence of a procedure map
+			visitToProcedureMapId: procedureMap?.visitToProcedureMapId || cdtMap.visitToProcedureMapId, 
 			description: longDescription,
 			selectedCdtCode: cdtMap,
 			arch: arch,
@@ -618,10 +619,25 @@ const TreatmentPlanOutput = ({
 		});
 
 		console.log("Updated visits before dispatch:", updatedVisits);
-		onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
-
-		
+		onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);		
 	};
+
+	const moveVisitUp = (index) => {
+		if (index > 0) {
+			const newOrder = reorder(visitOrder, index, index - 1);
+			dispatch(setVisitOrder(newOrder));
+			reorderAllRows(newOrder);
+		}
+	};
+
+	const moveVisitDown = (index) => {
+		if (index < visitOrder.length - 1) {
+			const newOrder = reorder(visitOrder, index, index + 1);
+			dispatch(setVisitOrder(newOrder));
+			reorderAllRows(newOrder);
+		}
+	};
+
 
 	const handleDeleteRow = (visitId, rowId) => {
 		// Proceed to remove the row visually from the UI
@@ -1422,60 +1438,77 @@ const TreatmentPlanOutput = ({
 				allRows[visitIdStr]
 			);
 		});
-/*		const { ucrTotal, coPayTotal } = calculateTotalsForVisit(allRows[visitIdStr]);
-		const { grandUcrTotal, grandCoPayTotal } = calculateGrandTotals(allRows);
-		// Dispatch actions to update the totals in the store
-		dispatch(setGrandUcrTotal(grandUcrTotal));
-		dispatch(setGrandCoPayTotal(grandCoPayTotal));
-		dispatch(setGrandTotalsReady(true));*/
+
 		console.log("Visit before return", visit);
 		return (
 			<Draggable key={draggableKey} draggableId={`visit-${visit.visitId}`} index={index} type="table">
 				{(provided) => (
-					<div ref={provided.innerRef} {...provided.draggableProps} className={`visit-section ${index > 0 ? 'visit-separator' : ''}`}>
-						<TableHeader {...provided.dragHandleProps}>
-							{editTableNameMode === visit.visitId ? (
-								<StandardTextfield
-									value={editTableNameValue}
-									onChange={handleEditChange}
-									inputProps={{
-										onBlur: handleEditBlur(visit.visitId),
-									}}
-									borderColor={UI_COLORS.purple}
-									width="300px"
-									autoFocus 
+					<StyledVisitSection
+						ref={provided.innerRef}
+						{...provided.draggableProps}
+						isSeparator={index > 0}
+					>
+						<StyledArrowIconContainer>
+							{index > 0 && (
+								<StyledArrowIcon
+									src={upDownArrowIcon}  // Assuming this is the correct icon for "Up"
+									alt="Up Arrow Icon"
+									onClick={() => moveVisitUp(index)}
 								/>
-							) : (
-								<>
-									{visitDescription}
-									<StyledEditIcon
-										src={pencilEditIcon}
-										alt="Edit Icon"
-										onClick={() => handleEditClick(visit.visitId, visitDescription)}
-									/>
-								</>
 							)}
-						</TableHeader>
-						<Table
-							headers={headers}
-							rows={tableRows}
-							onDragEnd={onDragEnd}
-							tableId={`table-${visit.visitId}`}
-							enableDragDrop={true}
-							deleteImageIconSrc={deleteIcon}
-							deleteImageIconSrcHeader={deleteIcon}
-							dragImageIconSrc={dragIcon}
-							onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
-							onRedDropdownIconClick={handleRedDropdownIconClick}
-							expandedRows={expandedRows}
-							onSwapAltRow={handleSwapAltRow}
-						/>
-						{/*<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />*/}
-					</div>
-
+							{index < visitOrder.length - 1 && (
+								<StyledArrowIcon
+									src={upDownArrowIcon}  // Assuming this needs to be updated for "Down"
+									alt="Down Arrow Icon"
+									faceDown={true}
+									onClick={() => moveVisitDown(index)}
+								/>
+							)}
+						</StyledArrowIconContainer>
+						<StyledTableHeaderContainer>
+							<TableHeader {...provided.dragHandleProps}>
+								{editTableNameMode === visit.visitId ? (
+									<StandardTextfield
+										value={editTableNameValue}
+										onChange={handleEditChange}
+										inputProps={{
+											onBlur: handleEditBlur(visit.visitId),
+										}}
+										borderColor={UI_COLORS.purple}
+										width="300px"
+										autoFocus
+									/>
+								) : (
+									<>
+										{visitDescription}
+										<StyledEditIcon
+											src={pencilEditIcon}
+											alt="Edit Icon"
+											onClick={() => handleEditClick(visit.visitId, visitDescription)}
+										/>
+									</>
+								)}
+							</TableHeader>
+							<Table
+								headers={headers}
+								rows={tableRows}
+								onDragEnd={onDragEnd}
+								tableId={`table-${visit.visitId}`}
+								enableDragDrop={true}
+								deleteImageIconSrc={deleteIcon}
+								deleteImageIconSrcHeader={deleteIcon}
+								dragImageIconSrc={dragIcon}
+								onDeleteVisit={() => handleDeleteVisit(visit.visitId)}
+								onRedDropdownIconClick={handleRedDropdownIconClick}
+								expandedRows={expandedRows}
+								onSwapAltRow={handleSwapAltRow}
+							/>
+						</StyledTableHeaderContainer>
+					</StyledVisitSection>
 				)}
 			</Draggable>
 		);
+
 	};
 
 	return (
@@ -1485,7 +1518,6 @@ const TreatmentPlanOutput = ({
 					onDragEnd={(result) =>
 						result.type === "table" ? onTableDragEnd(result) : onDragEnd(result)
 					}
-
 				>
 					<Droppable
 						droppableId="visits-droppable"
@@ -1493,31 +1525,31 @@ const TreatmentPlanOutput = ({
 						direction="vertical"
 					>
 						{(provided) => (
-							<div
-								{...provided.droppableProps}
-								ref={provided.innerRef}
-								className="table-container"
-							>
-								{visitOrder.map((visitId, index) =>
-									renderVisit(visitId, index)
-								)}
 
-								{provided.placeholder}
+								<div
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									className="output-table-container"
+								>
+									{visitOrder.map((visitId, index) =>
+										renderVisit(visitId, index)
+									)}
 
-							</div>
-
+									{provided.placeholder}
+								</div>
+					
 						)}
 					</Droppable>
 				</DragDropContext>
-
 			)}
-			<div className="bottom-tx-plan-buttons">
+			<StyledBottomAddVisitSection>
 				<div className="add-visit-btn-container" onClick={handleAddVisit}>
 					+ Add Treatment Table
 				</div>
-			</div>
+			</StyledBottomAddVisitSection>
 		</>
 	);
+
 };
 
 TreatmentPlanOutput.propTypes = {
