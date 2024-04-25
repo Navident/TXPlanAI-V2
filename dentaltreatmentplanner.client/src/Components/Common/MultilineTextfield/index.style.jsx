@@ -10,6 +10,7 @@ export const StyledTextfieldArea = styled.textarea`
     padding: 10px;
     box-sizing: border-box;
     resize: vertical;
+    
 
     &:focus {
         border-color: #7777a1;
@@ -29,4 +30,5 @@ export const StyledTextfieldArea = styled.textarea`
 
 export const StyledTextfieldWrap = styled.div`
     position: relative;
+    flex: 1;
 `;

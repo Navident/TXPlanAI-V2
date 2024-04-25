@@ -35,6 +35,7 @@
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
     <Folder Include="src\Pages\PatientManagementDashboard\GenerateTreatmentPlan\EmptyStatePlaceholder\" />
     <Folder Include="src\Pages\PatientManagementDashboard\GenerateTreatmentPlan\LoginPopup\" />
+    <Folder Include="src\Pages\PatientTreatmentPlanCustomizer\" />
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Redux\ReduxSlices\CdtCodes\" />
     <Folder Include="src\Redux\ReduxSlices\OpenDental\" />

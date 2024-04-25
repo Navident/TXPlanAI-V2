@@ -12,7 +12,8 @@ import AccountInfo from "./Pages/Dashboard/AccountInfo/index";
 
 import ProceduresCustomizer from "./Pages/Dashboard/DefaultProceduresManagement/ProceduresCustomizer/ProceduresCustomizer";
 import PatientManagementDashboard from './Pages/PatientManagementDashboard/PatientManagementDashboard';
-import GenerateTreatmentPlan from './Pages/PatientManagementDashboard/GenerateTreatmentPlan/GenerateTreatmentPlan';
+import GenerateTreatmentPlanV2 from './Pages/PatientManagementDashboard/GenerateTreatmentPlan/GenerateTxV2';
+
 import CreateNewPatient from './Pages/PatientManagementDashboard/CreateNewPatient/CreateNewPatient';
 import SavedPatientTxPlans from './Pages/PatientManagementDashboard/SavedPatientTxPlans/SavedPatientTxPlans';
 import PatientTreatmentPlanCustomizer from './Pages/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
@@ -49,7 +50,7 @@ function App() {
                             </Route> 
 
                             <Route path="/PatientManagementDashboard" element={<PatientManagementDashboard />}>
-                                <Route index element={<GenerateTreatmentPlan />} />
+                                <Route index element={<GenerateTreatmentPlanV2 />} />
                                 <Route path="create-new-patient" element={<CreateNewPatient />} />
                                 <Route path="saved-patient-tx-plans/:patientId" element={<SavedPatientTxPlans />} />
                             </Route> 

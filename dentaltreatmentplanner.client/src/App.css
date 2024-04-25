@@ -41,6 +41,15 @@
 .visit-section{
     margin-bottom: 20px;
 }
+.textfield-row {
+    display: flex;
+    flex-direction: row;
+
+}
+
+    .textfield-row .multiline-textfield {
+        flex: 1;
+    }
 
 .sidebar-container {
     background-color: white;

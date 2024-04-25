@@ -6,23 +6,14 @@ const MultiLineTextfield = ({ label, value, onChange, placeholder, onMicClick })
 
     return (
         <StyledTextfieldWrap>
+            {label && <label>{label}</label>} 
             <StyledTextfieldArea
                 value={value}
                 onChange={onChange}
                 rows={5}
                 placeholder={multilinePlaceholder}
             />
-            <MicIcon
-                onClick={onMicClick}
-                style={{
-                    position: 'absolute',
-                    bottom: '-24px',
-                    left: '0px',
-                    cursor: 'pointer',
-                    width: '27px',
-                    height: 'auto'
-                }}
-            />
+
         </StyledTextfieldWrap>
     );
 };
