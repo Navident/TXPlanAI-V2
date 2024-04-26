@@ -33,7 +33,7 @@ export const postProcessTranscriptWithGPT = async (transcribedText) => {
 
         Categories are defined as:
         - 'Existing': These are pre-existing treatments or dental work already present.
-        - 'Conditions': These are dental issues or conditions that need addressing.
+        - 'Conditions': These are dental issues or conditions that need addressing. Any tooth that is reported missing always belongs in the Conditions category.
         - 'Treatments': These are new treatments or procedures that will be applied.
 
         Pay close attention to cues such as numbering (e.g., '#1', '#2'), common dental 
