@@ -107,38 +107,41 @@ const TreatmentPlanConfiguration = ({
 	useEffect(() => {
 		console.log("dynamicRowValues state:", dynamicRowValues);
 	}, [dynamicRowValues]);
-
 	useEffect(() => {
-		const newAllRows = {};
-		const newAlternativeRows = {};
+		const newAllRows = { ...allRows };
+		const newAlternativeRows = { ...alternativeRows };
 
 		visits.forEach(visit => {
 			const visitId = visit.visitId;
-			newAllRows[visitId] = [];
-			newAlternativeRows[visitId] = [];
+			// Check if the visit is already processed
+			if (!newAllRows[visitId]) {
+				newAllRows[visitId] = [];
+				newAlternativeRows[visitId] = [];
 
-			// Create a deep copy of the visitToProcedureMaps and sort it
-			const sortedProcedureMaps = [...(visit.visitToProcedureMaps || [])].sort((a, b) => a.order - b.order);
+				// Create a deep copy of the visitToProcedureMaps and sort it
+				const sortedProcedureMaps = [...(visit.visitToProcedureMaps || [])].sort((a, b) => a.order - b.order);
 
-			sortedProcedureMaps.forEach((procedureMap, procIndex) => {
-				(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
-					const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
+				sortedProcedureMaps.forEach((procedureMap, procIndex) => {
+					(procedureMap.procedureToCdtMaps || []).forEach((cdtMap, cdtIndex) => {
+						const row = createStaticRows(cdtMap, visitId, `${procIndex}-${cdtIndex}`, procedureMap);
 
-					if (cdtMap.default) {
-						newAllRows[visitId].push(row);
-					} else {
-						newAlternativeRows[visitId].push(row);
-					}
+						if (cdtMap.default) {
+							newAllRows[visitId].push(row);
+						} else {
+							newAlternativeRows[visitId].push(row);
+						}
+					});
 				});
-			});
 
-			const initialRowId = `initial-${visitId}`;
-			newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
+				const initialRowId = `initial-${visitId}`;
+				newAllRows[visitId].push(createDynamicRowv1(visitId, initialRowId));
+			}
 		});
 
 		setAllRows(newAllRows);
 		setAlternativeRows(newAlternativeRows);
 	}, [visits]);
+
 
 
 
@@ -436,6 +439,21 @@ const TreatmentPlanConfiguration = ({
 		return result;
 	};
 
+	function adjustAlternativeRowsToNewOrder(reorderedAllRows, currentAlternativeRows) {
+		const updatedAlternativeRows = currentAlternativeRows.map(altRow => {
+			const newParentIndex = reorderedAllRows.findIndex(row => row.visitToProcedureMapId === altRow.visitToProcedureMapId);
+			if (newParentIndex !== -1) {
+				return {
+					...altRow,
+					parentRowIndex: newParentIndex  
+				};
+			}
+			return altRow;
+		});
+		return updatedAlternativeRows;
+	}
+
+
 	const onDragEnd = (result) => {
 		if (!result.destination) {
 			return;
@@ -449,18 +467,28 @@ const TreatmentPlanConfiguration = ({
 				return;
 			}
 
+			// Reorder rows based on drag and drop
 			const reorderedRows = reorder(
 				rows,
 				result.source.index,
 				result.destination.index
 			);
 
+			// Reassociate alternativeRows with the new order of allRows
+			const updatedAlternativeRows = adjustAlternativeRowsToNewOrder(reorderedRows, alternativeRows[tableId]);
+
 			setAllRows((prevRows) => ({
 				...prevRows,
 				[tableId]: reorderedRows,
 			}));
+
+			setAlternativeRows((prevAltRows) => ({
+				...prevAltRows,
+				[tableId]: updatedAlternativeRows
+			}));
 		}
 	};
+
 
 	const reorderAllRows = (newVisitOrder) => {
 		const reorderedRows = {};
@@ -570,96 +598,22 @@ const TreatmentPlanConfiguration = ({
 
 			}
 			if (newTreatmentPlan && newTreatmentPlan.treatmentPlanId) {
-				//adjustUpdatedTreatmentPlanStructure(newTreatmentPlanResponse, treatmentPlan);
-
 				treatmentPlan = newTreatmentPlan;
 				dispatch(showAlert({ type: 'success', message: 'New treatment plan created successfully' }));
+				return;
 			}
 
-			
+			// Prepare the full update DTO using existing mapping functions or similar logic
+			const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, allRows, alternativeRows, visitOrder, deletedRowIds);
 
-			const tempVisitIds = visitOrder.filter(visitId => String(visitId).startsWith("temp-"));
-			const createVisitPromises = tempVisitIds.map(tempVisitId => {
-				const visitData = mapToCreateVisitDto(treatmentPlan, allRows, tempVisitId);
-				return createVisit(visitData, tempVisitId);
-			});
-
-			const createdVisits = await Promise.all(createVisitPromises);
-			const visitIdMap = createdVisits.reduce((acc, visitResponse) => {
-				acc[visitResponse.tempVisitId] = visitResponse.visit.visitId;
-				return acc;
-			}, {});
-
-			const deepCopyAllRows = JSON.parse(JSON.stringify(allRows));
-			Object.keys(deepCopyAllRows).forEach(visitId => {
-				if (visitIdMap[visitId]) {
-					deepCopyAllRows[visitIdMap[visitId]] = deepCopyAllRows[visitId];
-					delete deepCopyAllRows[visitId];
-				}
-			});
-
-			setAllRows(deepCopyAllRows);
-
-			const newProcedures = [];
-			Object.keys(deepCopyAllRows).forEach(visitId => {
-				deepCopyAllRows[visitId].forEach(row => {
-					if (!row.procedureToCdtMapId && row.selectedCdtCode && typeof row.selectedCdtCode.cdtCodeId !== 'undefined') {
-						newProcedures.push({
-							visitId: visitId,
-							cdtCodeId: row.selectedCdtCode.cdtCodeId,
-							order: 0, 
-						});
-					}
-				});
-			});
-
-			console.log("newProcedures: ", newProcedures);
-			const newProcedureResponse = await createNewProcedures(newProcedures);
-			newProcedureResponse.forEach(proc => {
-				const { visitId, procedureToCdtMapId, cdtCodeId } = proc;
-				const rows = deepCopyAllRows[visitId];
-				if (!rows) {
-					return;
-				}
-				const rowIndex = rows.findIndex(row => row.selectedCdtCode && row.selectedCdtCode.cdtCodeId === cdtCodeId);
-				if (rowIndex > -1) {
-					rows[rowIndex].procedureToCdtMapId = procedureToCdtMapId;
-				}
-			});
-
-			const updatedVisitOrder = visitOrder.map(visitId => visitIdMap[visitId] || visitId);
-
-			const updatedVisits = treatmentPlan.visits.map(visit => {
-				const actualVisitId = visitIdMap[visit.visitId] || visit.visitId;
-				const updatedProcedures = deepCopyAllRows[actualVisitId]
-					? deepCopyAllRows[actualVisitId]
-						.filter(row => row.selectedCdtCode !== null)
-						.map(row => ({
-							procedureToCdtMapId: row.procedureToCdtMapId, 
-							cdtCodeId: row.selectedCdtCode.cdtCodeId,
-							description: row.description,
-						}))
-					: visit.procedures;
-
-				return {
-					...visit,
-					visitId: actualVisitId,
-					procedures: updatedProcedures,
-				};
-			});
-
-			setLocalUpdatedVisits(updatedVisits);
-			setVisitOrder(updatedVisitOrder);
-			setAllRows(deepCopyAllRows);
-
-			const updateDto = mapToUpdateTreatmentPlanDto(treatmentPlan, deepCopyAllRows, alternativeRows, updatedVisitOrder, deletedRowIds, deletedVisitIds, editedRows);
-			const updatedTreatmentPlan = await updateTreatmentPlan({ id: treatmentPlan.treatmentPlanId, updatedData: updateDto }).unwrap();
+			const id = treatmentPlan.treatmentPlanId; 
+			// Call the single backend API method that handles all the logic
+			const updatedTreatmentPlan = await updateTreatmentPlan({ id, updatedData: updateDto }).unwrap();
 
 			dispatch(updateSubcategoryTreatmentPlan(updatedTreatmentPlan));
-			onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedVisits);
+			onUpdateVisitsInTreatmentPlan(treatmentPlan.treatmentPlanId, updatedTreatmentPlan.visits);
 
 			console.log("Updated Treatment Plan:", updatedTreatmentPlan);
-
 			setAlertInfo({
 				open: true,
 				type: "success",
@@ -667,6 +621,14 @@ const TreatmentPlanConfiguration = ({
 			});
 		} catch (error) {
 			console.error("Error updating treatment plan:", error);
+			// Extracting error message from the response object
+			const errorMessage = error.data?.message || error.message || "An unspecified error occurred.";
+
+			setAlertInfo({
+				open: true,
+				type: "error",
+				message: `Failed to update the treatment plan: ${errorMessage}`,
+			});
 		}
 	};
 
@@ -695,42 +657,36 @@ const TreatmentPlanConfiguration = ({
 	const constructStaticRowData = (row) => {
 		let baseData = ["", row.extraRowInput[0], row.extraRowInput[1]];
 
-		// Add the checkbox for repeatable
-		baseData.push(
-			<CustomCheckbox
-				label=""
-				checked={row.repeatable}
-				onChange={(e) => handleCheckboxChange(row.id, 'repeatable', e.target.checked)}
-				color={UI_COLORS.purple}
-			/>
-		);
+		// Conditionally add either a checkbox or an empty string based on whether the row is default or alternative
+		const checkboxOrEmpty = (value, handleChange, color) => {
+			return row.default ? (
+				<CustomCheckbox
+					label=""
+					checked={value}
+					onChange={(e) => handleChange(row.id, e.target.checked)}
+					color={color}
+				/>
+			) : ""; // Display empty string for non-default rows
+		};
 
-		// Add the checkbox for assignToothNumber
-		baseData.push(
-			<CustomCheckbox
-				label=""
-				checked={row.assignToothNumber}
-				onChange={(e) => handleCheckboxChange(row.id, 'assignToothNumber', e.target.checked)}
-				color={UI_COLORS.purple}
-			/>
-		);
+		// Add the checkbox or empty string for repeatable
+		baseData.push(checkboxOrEmpty(row.repeatable, (id, checked) => handleCheckboxChange(id, 'repeatable', checked), UI_COLORS.purple));
 
-		// Add the checkbox for assignArch with arch value next to it
+		// Add the checkbox or empty string for assignToothNumber
+		baseData.push(checkboxOrEmpty(row.assignToothNumber, (id, checked) => handleCheckboxChange(id, 'assignToothNumber', checked), UI_COLORS.purple));
+
+		// Add the checkbox or empty string for assignArch, with arch value next to it if applicable
 		let archLabel = row.assignArch ? (row.arch || "default") : "";
 		baseData.push(
 			<div style={{ display: 'flex', alignItems: 'center' }}>
-				<CustomCheckbox
-					label=""
-					checked={row.assignArch}
-					onChange={(e) => handleCheckboxChange(row.id, 'assignArch', e.target.checked)}
-					color={UI_COLORS.purple}
-				/>
+				{checkboxOrEmpty(row.assignArch, (id, checked) => handleCheckboxChange(id, 'assignArch', checked), UI_COLORS.purple)}
 				<span style={{ marginLeft: 8 }}>{archLabel}</span>
 			</div>
 		);
 
 		return baseData;
 	};
+
 
 
 
@@ -836,11 +792,14 @@ const TreatmentPlanConfiguration = ({
 			// Retrieve existing alternative rows for the visit
 			const existingAlternativeRows = prevAlternativeRows[visitId] || [];
 
+			// Adjust indices to align with the current order of allRows
+			const realignedAlternativeRows = adjustAlternativeRowsToNewOrder(updatedAllRows[visitId], existingAlternativeRows);
+
 			// Create a set of all current ids in updatedAllRows for this visit to check against
 			const updatedAllRowIds = new Set(updatedAllRows[visitId].map(row => row.id));
 
 			// Filter existing alternative rows to remove any that no longer exist in updatedAllRows
-			const filteredAlternativeRows = existingAlternativeRows.filter(row => updatedAllRowIds.has(row.id));
+			const filteredAlternativeRows = realignedAlternativeRows.filter(row => updatedAllRowIds.has(row.id));
 
 			// Identify new or updated non-default rows from updatedAllRows
 			const newOrUpdateAlternativeRows = updatedAllRows[visitId].filter(row =>
@@ -1080,18 +1039,23 @@ const TreatmentPlanConfiguration = ({
 		const dynamicRow = createDynamicRowv1(visitId, initialRowId);
 		const newRows = [dynamicRow];
 
-		setAllRows(prevRows => ({
-			...prevRows,
-			[visitId]: newRows,
-		}));
+		setAllRows(prevRows => {
+			const updatedAllRows = {
+				...prevRows,
+				[visitId]: newRows,
+			};
+
+			return updatedAllRows;
+		});
 	};
 
 
 
 
 
+
 	const collapseRows = (rows, rowIndex) => {
-		// Assuming the row at `rowIndex` is the default row
+		// the row at `rowIndex` is the default row
 		// we will start looking for alternative rows immediately after it.
 		const parentRowId = rows[rowIndex].id;
 

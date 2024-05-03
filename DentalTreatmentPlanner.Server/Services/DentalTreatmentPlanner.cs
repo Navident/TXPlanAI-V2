@@ -742,8 +742,6 @@ namespace DentalTreatmentPlanner.Server.Services
                             Order = newProc.Order,
                         };
 
-                        // If your NewProcedureDto includes details to create ProcedureToCdtMap entries, do it here
-
                         newProcedureMaps.Add(newProcedureMap);
                     }
 
@@ -784,7 +782,7 @@ namespace DentalTreatmentPlanner.Server.Services
                             .ThenInclude(v => v.VisitToProcedureMaps)
                                 .ThenInclude(vpm => vpm.ProcedureToCdtMaps)
                         .Include(tp => tp.ProcedureSubcategory)
-                            .ThenInclude(sc => sc.ProcedureCategory) // Ensure the ProcedureCategory is eagerly loaded
+                            .ThenInclude(sc => sc.ProcedureCategory)
                         .FirstOrDefaultAsync(tp => tp.TreatmentPlanId == updateTreatmentPlanDto.TreatmentPlanId);
 
                     if (treatmentPlan == null)
@@ -792,26 +790,39 @@ namespace DentalTreatmentPlanner.Server.Services
                         throw new KeyNotFoundException("Treatment plan not found.");
                     }
 
+                    // Removal logic
+                    var dtoVisitIds = new HashSet<int>(updateTreatmentPlanDto.Visits.Select(v => v.VisitId).Where(id => id.HasValue).Select(id => id.Value));
+                    var visitsToRemove = treatmentPlan.Visits.Where(v => !dtoVisitIds.Contains(v.VisitId)).ToList();
+                    foreach (var visit in visitsToRemove)
+                    {
+                        _context.Visits.Remove(visit);
+                    }
+
+                    // Update logic
                     foreach (var visitDto in updateTreatmentPlanDto.Visits)
                     {
                         var visit = treatmentPlan.Visits.FirstOrDefault(v => v.VisitId == visitDto.VisitId);
-                        if (visit != null)
+                        if (visit == null)
+                        {
+                            visit = new Visit
+                            {
+                                TreatmentPlanId = treatmentPlan.TreatmentPlanId,
+                                Description = visitDto.Description,
+                                VisitNumber = visitDto.VisitNumber
+                            };
+                            treatmentPlan.Visits.Add(visit);
+                        }
+                        else
                         {
                             visit.VisitNumber = visitDto.VisitNumber;
-                            await UpdateVisitProcedures(visit, visitDto.VisitToProcedureMapDtos, _context);
                         }
+
+                        await UpdateVisitProcedures(visit, visitDto.VisitToProcedureMapDtos, _context);
                     }
 
-                    foreach (var deletedVisitId in updateTreatmentPlanDto.DeletedVisitIds)
-                    {
-                        var visitToDelete = treatmentPlan.Visits.FirstOrDefault(v => v.VisitId == deletedVisitId);
-                        if (visitToDelete != null)
-                        {
-                            _context.Visits.Remove(visitToDelete);
-                        }
-                    }
+                    await _context.SaveChangesAsync(); // Save all changes including additions, updates, and deletions
 
-                    // Re-fetch the updated treatmentPlan from the database with all changes
+
                     await _context.Entry(treatmentPlan).ReloadAsync();
                     await _context.Entry(treatmentPlan).Collection(tp => tp.Visits).LoadAsync();
                     foreach (var visit in treatmentPlan.Visits)
@@ -822,19 +833,6 @@ namespace DentalTreatmentPlanner.Server.Services
                             await _context.Entry(vtpm).Collection(vpm => vpm.ProcedureToCdtMaps).LoadAsync();
                         }
                     }
-
-                    var allProcedureToCdtMapInfo = treatmentPlan.Visits
-                        .SelectMany(visit => visit.VisitToProcedureMaps
-                            .SelectMany(vtpm => vtpm.ProcedureToCdtMaps
-                                .Select(ptcm => (ProcedureToCdtMapDto: new ProcedureToCdtMapDto
-                                {
-                                    UserDescription = ptcm.UserDescription,
-                                    CdtCodeId = ptcm.CdtCodeId,
-                                    Default = ptcm.Default
-                                }, VisitToProcedureMapId: vtpm.VisitToProcedureMapId))))
-                        .ToList();
-
-                    await CreateUpdateDeleteProcedureToCdtMaps(allProcedureToCdtMapInfo, updateTreatmentPlanDto.TreatmentPlanId);
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
@@ -849,65 +847,7 @@ namespace DentalTreatmentPlanner.Server.Services
             }
         }
 
-
-
-
-        public async Task CreateUpdateDeleteProcedureToCdtMaps(List<(ProcedureToCdtMapDto ProcedureToCdtMapDto, int VisitToProcedureMapId)> procedureToCdtMapsInfo, int treatmentPlanId)
-        {
-            // First, filter out only the alternative (non-default) procedures from the provided tuples
-            var nonDefaultProcedureToCdtMapsInfo = procedureToCdtMapsInfo.Where(info => !info.ProcedureToCdtMapDto.Default).ToList();
-
-            // Load all non-default ProcedureToCdtMaps associated with the specified treatment plan
-            var existingProcedureToCdtMaps = await _context.ProcedureToCdtMaps
-                .Where(ptcm => !ptcm.Default && _context.VisitToProcedureMaps
-                    .Any(vtpm => vtpm.VisitToProcedureMapId == ptcm.VisitToProcedureMapId &&
-                                 _context.Visits
-                                     .Any(v => v.VisitId == vtpm.VisitId &&
-                                               _context.TreatmentPlans
-                                                   .Any(tp => tp.TreatmentPlanId == v.TreatmentPlanId &&
-                                                              tp.TreatmentPlanId == treatmentPlanId))))
-                .ToListAsync();
-
-            // Extract IDs of provided non-default ProcedureToCdtMaps for comparison
-            var providedIds = nonDefaultProcedureToCdtMapsInfo
-                .Select(info => info.ProcedureToCdtMapDto.ProcedureToCdtMapId)
-                .ToList();
-
-            // Iterate over each provided DTO to update existing maps or create new ones
-            foreach (var (dto, visitToProcedureMapId) in nonDefaultProcedureToCdtMapsInfo)
-            {
-                if (dto.ProcedureToCdtMapId > 0) // DTO has an ID, indicating an existing map
-                {
-                    // Find the existing map to update
-                    var existingMap = existingProcedureToCdtMaps.FirstOrDefault(ptcm => ptcm.ProcedureToCdtMapId == dto.ProcedureToCdtMapId);
-                    if (existingMap != null) // Check if the existing map was found
-                    {
-                        // Update properties of the existing map
-                        existingMap.CdtCodeId = dto.CdtCodeId;
-                        existingMap.UserDescription = dto.UserDescription;
-                    }
-                }
-                else // DTO does not have an ID, indicating a new map to create
-                {
-                    // Create a new map with details from the DTO
-                    var newMap = new ProcedureToCdtMap
-                    {
-                        VisitToProcedureMapId = visitToProcedureMapId,
-                        CdtCodeId = dto.CdtCodeId,
-                        Default = false, // Since we're only dealing with alternative procedures
-                        UserDescription = dto.UserDescription,
-                    };
-                    _context.ProcedureToCdtMaps.Add(newMap); // Add the new map to the context
-                }
-            }
-
-            // Identify non-default maps to delete: those not present in the provided DTOs but existing in the database
-            var mapsToDelete = existingProcedureToCdtMaps.Where(ptcm => !providedIds.Contains(ptcm.ProcedureToCdtMapId)).ToList();
-            _context.ProcedureToCdtMaps.RemoveRange(mapsToDelete); // Remove these maps from the context
-
-            await _context.SaveChangesAsync(); // Save all changes to the database
-        }
-
+        
 
 
 
@@ -1330,21 +1270,20 @@ namespace DentalTreatmentPlanner.Server.Services
 
 
 
-        private async Task UpdateVisitProcedures(Visit visit, ICollection<VisitToProcedureMapDto> updatedProcedureMaps, DbContext _context)
+        private async Task UpdateVisitProcedures(Visit visit, ICollection<VisitToProcedureMapDto> updatedProcedureMaps, ApplicationDbContext _context)
         {
             Console.WriteLine($"Starting update for Visit ID: {visit.VisitId}. Number of procedure maps before update: {visit.VisitToProcedureMaps.Count}");
 
-            // List to track newly added procedure maps
-            var newlyAddedProcedureMaps = new List<VisitToProcedureMap>();
-
+            var allProcedureToCdtMaps = new List<ProcedureToCdtMap>();
+            var newMaps = new List<VisitToProcedureMap>();
+            // Iterate over each provided DTO to update or create new VisitToProcedureMaps and their ProcedureToCdtMaps
             foreach (var procedureMapDto in updatedProcedureMaps)
             {
                 var procedureMap = visit.VisitToProcedureMaps.FirstOrDefault(v => v.VisitToProcedureMapId == procedureMapDto.VisitToProcedureMapId);
                 if (procedureMap != null)
                 {
                     Console.WriteLine($"Updating existing ProcedureMapId: {procedureMapDto.VisitToProcedureMapId}");
-
-                    // Update properties of VisitToProcedureMap
+                    // Update existing VisitToProcedureMap properties
                     procedureMap.Order = procedureMapDto.Order;
                     procedureMap.ToothNumber = procedureMapDto.ToothNumber;
                     procedureMap.ProcedureTypeId = procedureMapDto.ProcedureTypeId;
@@ -1353,11 +1292,13 @@ namespace DentalTreatmentPlanner.Server.Services
                     procedureMap.Repeatable = procedureMapDto.Repeatable;
                     procedureMap.AssignToothNumber = procedureMapDto.AssignToothNumber;
                     procedureMap.AssignArch = procedureMapDto.AssignArch;
+
+                    // Update associated ProcedureToCdtMaps
+                    UpdateProcedureToCdtMaps(procedureMap, procedureMapDto.ProcedureToCdtMaps);
                 }
                 else
                 {
                     Console.WriteLine($"Creating new ProcedureMap for VisitId: {visit.VisitId}");
-
                     var newProcedureMap = new VisitToProcedureMap
                     {
                         VisitId = visit.VisitId,
@@ -1369,47 +1310,64 @@ namespace DentalTreatmentPlanner.Server.Services
                         Repeatable = procedureMapDto.Repeatable,
                         AssignToothNumber = procedureMapDto.AssignToothNumber,
                         AssignArch = procedureMapDto.AssignArch,
-                        ProcedureToCdtMaps = procedureMapDto.ProcedureToCdtMaps
-                            .Where(c => c.Default)
-                            .Select(cdtDto => new ProcedureToCdtMap
-                            {
-                                UserDescription = cdtDto.UserDescription,
-                                CdtCodeId = cdtDto.CdtCodeId,
-                                Default = true
-                            }).ToList()
+                        ProcedureToCdtMaps = procedureMapDto.ProcedureToCdtMaps.Select(cdtDto => new ProcedureToCdtMap
+                        {
+                            UserDescription = cdtDto.UserDescription,
+                            CdtCodeId = cdtDto.CdtCodeId,
+                            Default = cdtDto.Default
+                        }).ToList()
                     };
                     visit.VisitToProcedureMaps.Add(newProcedureMap);
-                    newlyAddedProcedureMaps.Add(newProcedureMap); // Track newly added maps
+                    newMaps.Add(newProcedureMap); // Add this new map to the tracking list
+
                 }
             }
 
             await _context.SaveChangesAsync();
 
-            // Refresh and load the latest state if needed
+            // Refresh and load the latest state
             await _context.Entry(visit).Collection(v => v.VisitToProcedureMaps).LoadAsync();
 
-            // Perform the removal check
-            var procedureMapsToRemove = visit.VisitToProcedureMaps
-                .Where(v => v.VisitToProcedureMapId > 0 && // Checks if the ID is greater than 0
-                            !newlyAddedProcedureMaps.Contains(v) && // Ensure not to remove newly added maps
-                            !updatedProcedureMaps.Any(up => up.VisitToProcedureMapId == v.VisitToProcedureMapId))
-                .ToList();
-
-            foreach (var procedureMap in procedureMapsToRemove)
-            {
-                Console.WriteLine($"Removing ProcedureMapId: {procedureMap.VisitToProcedureMapId}");
-                visit.VisitToProcedureMaps.Remove(procedureMap);
-            }
-
+            // Remove maps that are not in the updated DTOs and not newly created
+            var mapsToRemove = visit.VisitToProcedureMaps.Where(vtpm => !updatedProcedureMaps.Any(up => up.VisitToProcedureMapId == vtpm.VisitToProcedureMapId) && !newMaps.Contains(vtpm)).ToList();
+            _context.VisitToProcedureMaps.RemoveRange(mapsToRemove);
             await _context.SaveChangesAsync();
+
             Console.WriteLine($"Update complete. Number of procedure maps after update: {visit.VisitToProcedureMaps.Count}");
         }
 
+        private void UpdateProcedureToCdtMaps(VisitToProcedureMap procedureMap, ICollection<ProcedureToCdtMapDto> procedureToCdtMapDtos)
+        {
+            var existingMaps = procedureMap.ProcedureToCdtMaps.ToList();
+            foreach (var dto in procedureToCdtMapDtos)
+            {
+                var map = existingMaps.FirstOrDefault(m => m.ProcedureToCdtMapId == dto.ProcedureToCdtMapId);
+                if (map != null)
+                {
+                    map.UserDescription = dto.UserDescription;
+                    map.CdtCodeId = dto.CdtCodeId;
+                    map.Default = dto.Default;
+                }
+                else
+                {
+                    procedureMap.ProcedureToCdtMaps.Add(new ProcedureToCdtMap
+                    {
+                        VisitToProcedureMapId = procedureMap.VisitToProcedureMapId,
+                        CdtCodeId = dto.CdtCodeId,
+                        Default = dto.Default,
+                        UserDescription = dto.UserDescription
+                    });
+                }
+            }
 
-
-
-
-
+            // Remove old maps not in the new DTOs
+            var dtoIds = procedureToCdtMapDtos.Select(dto => dto.ProcedureToCdtMapId).ToList();
+            var mapsToDelete = existingMaps.Where(m => !dtoIds.Contains(m.ProcedureToCdtMapId)).ToList();
+            foreach (var map in mapsToDelete)
+            {
+                procedureMap.ProcedureToCdtMaps.Remove(map);
+            }
+        }
 
 
 

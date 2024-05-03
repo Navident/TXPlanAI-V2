@@ -10,6 +10,5 @@
         public int? PayerId { get; set; }
 
         public ICollection<UpdateVisitDto> Visits { get; set; } = new List<UpdateVisitDto>();
-        public ICollection<int> DeletedVisitIds { get; set; } = new List<int>();
     }
 }

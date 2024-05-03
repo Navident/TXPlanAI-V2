@@ -17,4 +17,6 @@
     flex-direction: column;
     gap: 20px;
     flex-grow: 1;
+    min-width: 100%;
+    width: fit-content;
 }
