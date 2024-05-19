@@ -88,6 +88,81 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
+        [HttpGet("allergies/{patNum}")]
+        public async Task<ActionResult<IEnumerable<OpenDentalAllergiesDto>>> GetAllergiesForPatient(int patNum)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var allergies = await _openDentalService.GetAllergiesForPatient(patNum, facilityId.Value);
+                if (!allergies.Any())
+                {
+                    return NotFound("No allergies found for this patient.");
+                }
+                return Ok(allergies);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Failed to retrieve allergies.");
+                return StatusCode(500, "Internal server error while retrieving allergies.");
+            }
+        }
+
+
+        [HttpGet("diseases/{patNum}")]
+        public async Task<ActionResult<IEnumerable<OpenDentalDiseasesDto>>> GetDiseasesForPatient(int patNum)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var diseases = await _openDentalService.GetDiseasesForPatient(patNum, facilityId.Value);
+                if (!diseases.Any())
+                {
+                    return NotFound("No diseases found for this patient.");
+                }
+                return Ok(diseases);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Failed to retrieve diseases.");
+                return StatusCode(500, "Internal server error while retrieving diseases.");
+            }
+        }
+
+        [HttpGet("medications/{patNum}")]
+        public async Task<ActionResult<IEnumerable<OpenDentalMedicationPatDto>>> GetMedicationsForPatient(int patNum)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var medications = await _openDentalService.GetMedicationsForPatient(patNum, facilityId.Value);
+                if (!medications.Any())
+                {
+                    return NotFound("No medications found for this patient.");
+                }
+                return Ok(medications);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Failed to retrieve medications.");
+                return StatusCode(500, "Internal server error while retrieving medications.");
+            }
+        }
 
 
         [HttpPost("savePatientsFromOpenDentalToDatabase")]

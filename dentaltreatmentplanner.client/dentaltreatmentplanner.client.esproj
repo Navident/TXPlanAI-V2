@@ -22,6 +22,7 @@
     <Folder Include="src\Components\DropdownHeaderPopup\" />
     <Folder Include="src\Components\InitialDataLoader\" />
     <Folder Include="src\Components\AudioPopup\" />
+    <Folder Include="src\Components\TreeView\" />
     <Folder Include="src\Components\PulsingMic\" />
     <Folder Include="src\Components\PaymentTotals\" />
     <Folder Include="src\Components\TxPlansBoxLinesChart\" />
@@ -33,10 +34,12 @@
     <Folder Include="src\Pages\Dashboard\AccountInfo\" />
     <Folder Include="src\Pages\Login\" />
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
-    <Folder Include="src\Pages\PatientManagementDashboard\GenerateTreatmentPlan\EmptyStatePlaceholder\" />
-    <Folder Include="src\Pages\PatientManagementDashboard\GenerateTreatmentPlan\LoginPopup\" />
+    <Folder Include="src\Components\Common\EmptyStatePlaceholder\" />
+    <Folder Include="src\Components\Common\LoginPopup\" />
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Redux\ReduxSlices\CdtCodes\" />
+    <Folder Include="src\Redux\ReduxSlices\AudioRecorder\" />
+    <Folder Include="src\Redux\ReduxSlices\CompExamTabs\" />
     <Folder Include="src\Redux\ReduxSlices\OpenDental\" />
     <Folder Include="src\Redux\ReduxSlices\Payers\" />
     <Folder Include="src\Redux\ReduxSlices\User\" />

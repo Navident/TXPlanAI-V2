@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import InputAdornment from '@mui/material/InputAdornment';
 import searchIcon from '../../../assets/search-icon.svg';
 import createNewButton from '../../../assets/create-new-plus-button.svg';
+import createNewNotes from '../../../assets/create-new-plus-button.svg';
 import RecentTxPlans from '../../../Components/RecentTxPlans';
 import { StyledLargeText, StyledLightGreyText, StyledRoundedBoxContainer, StyledRoundedBoxContainerInner } from '../../../GlobalStyledComponents';
 import { StyledHomeBoxBottomContainer, StyledSeparator } from '../../Dashboard/index.style'
@@ -23,6 +24,10 @@ const Home = () => {
         navigate("/PatientManagementDashboard"); 
 
     };
+    const handleCreateNewNotesClick = () => {
+        navigate("/PatientManagementDashboard/smart-notes");
+    };
+
 
     return (
         <div className="dashboard-right-side">
@@ -80,14 +85,18 @@ const Home = () => {
                         </StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
                 </StyledRoundedBoxContainer>
-                <RecentTxPlans />
                 <StyledRoundedBoxContainer>
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
-                        <div className="large-text">Providers</div>
+                        <div className="large-text">Smart Notes</div>
                         <StyledSeparator />
-                        <StyledHomeBoxBottomContainer></StyledHomeBoxBottomContainer>
+                        <StyledHomeBoxBottomContainer>
+                            <img src={createNewNotes} alt="Create New Notes" onClick={handleCreateNewNotesClick} />
+
+                        </StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
                 </StyledRoundedBoxContainer>
+                <RecentTxPlans />
+
             </div>
             <div className="dashboard-right-side-row">
                 <TxPlansBoxLinesChart />

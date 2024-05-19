@@ -3,16 +3,16 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import StandardTextField from '../../../../Components/Common/StandardTextfield/StandardTextfield';
+import StandardTextField from '../StandardTextfield/StandardTextfield';
 import { useState } from 'react';
-import { UI_COLORS } from '../../../../Theme';
-import NavidentShortLogo from "../../../../assets/navident-short-logo.svg";
+import { UI_COLORS } from '../../../Theme';
+import NavidentShortLogo from "../../../assets/navident-short-logo.svg";
 import { StyledSmallLogo } from "./index.style";
 import { useDispatch } from 'react-redux';
-import { useLoginUserMutation } from '../../../../Redux/ReduxSlices/User/userApiSlice';
-import { setUserDetails } from '../../../../Redux/ReduxSlices/User/userSlice';
+import { useLoginUserMutation } from '../../../Redux/ReduxSlices/User/userApiSlice';
+import { setUserDetails } from '../../../Redux/ReduxSlices/User/userSlice';
 import { Backdrop, CircularProgress } from '@mui/material';
-import { showAlert } from '../../../../Redux/ReduxSlices/Alerts/alertSlice';
+import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 function LoginPopup({ open, onClose }) {
     const dispatch = useDispatch();

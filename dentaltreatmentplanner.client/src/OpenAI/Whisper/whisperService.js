@@ -1,6 +1,8 @@
 
 
 export const transcribeAudio = async (audioFile) => {
+    console.log("audioFile details:", audioFile, typeof audioFile);
+
     const formData = new FormData();
     formData.append("file", audioFile);
     formData.append("model", "whisper-1");
@@ -22,29 +24,8 @@ export const transcribeAudio = async (audioFile) => {
     }
 };
 
-export const postProcessTranscriptWithGPT = async (transcribedText) => {
-    const promptInstructions = `
-        You are a dental treatment planner assistant. Your role is to meticulously 
-        organize dental procedures that I, a dentist, will be listing out. It's essential 
-        that you understand these procedures might be presented in a continuous stream 
-        without clear breaks, as they are transcribed from voice inputs. Your task is 
-        to discern individual treatments and ensure each one is clearly separated and 
-        listed on a new line for clarity and organization. Pay close attention to cues 
-        such as numbering (e.g., '#1', '#2'), common dental procedure terms (e.g., 
-        'crown', 'extraction'), and any indication of a new procedure starting. 
-        For example, I might say 'tooth number 5 MOD composite number 6 extraction
-        bone graft implant number 7-9 veneers upper left and lower right SRP',
-        you would then respond with:
-        '#5 MOD composite\n#6 extraction, bone graft, implant\n#7-9 veneers\nupper left and lower right SRP'.
-        Keep in mind that the procedure category SRP is a special case because
-        the procedure name includes digits at the end of it, not to be confused with
-        tooth numbers.
-        For an example including SRP, I might say 'Number 3 MOD composite number 6 extraction
-        bone graft implant number 12 root canal with post upper right and lower left SRP one to three',
-        you would then respond with:
-        '#3 MOD composite\n#6 extraction, bone graft, implant\n#12 root canal with post\nupper right and lower left SRP 1-3'.
-    `;
-
+export const postProcessTranscriptWithGPT = async (transcribedText, prompt) => {
+    console.log("prompt being used right now: ", prompt);
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -54,12 +35,32 @@ export const postProcessTranscriptWithGPT = async (transcribedText) => {
         body: JSON.stringify({
             model: "gpt-4-turbo",
             messages: [
-                { role: "system", content: promptInstructions },
+                { role: "system", content: prompt },
                 { role: "user", content: transcribedText }
             ]
         })
     });
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    console.log("response after processing:", data);
+
+    // Check if the response has choices and the first choice has content
+    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+        const content = data.choices[0].message.content;
+
+        // Attempt to parse the content as JSON
+        try {
+            const parsedContent = JSON.parse(content);
+            console.log("Parsed content:", parsedContent);
+            return parsedContent;
+        } catch (e) {
+            // If parsing fails, return the content as plain text
+            console.log("Content is plain text:", content);
+            return content;
+        }
+    } else {
+        console.error("No choices available or invalid response structure:", data);
+        return null;
+    }
 };
+

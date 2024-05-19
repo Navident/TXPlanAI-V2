@@ -34,12 +34,26 @@ import {
 import EmptyStatePlaceholder from '../../../Components/Common/EmptyStatePlaceholder';
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import LoginPopup from '../../../Components/Common/LoginPopup';
-import MicIcon from '@mui/icons-material/Mic';
+
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
 import AudioPopup from "../../../Components/AudioPopup/index";
+import { Tabs, Tab, Box } from '@mui/material';
 
-const GenerateTreatmentPlan = () => {
+import FindingsTab from './Tabs/FindingsTab/index';
+import AllergiesTab from './Tabs/AllergiesTab/index';
+import ExtraOralAndIntraOralFindingsTab from './Tabs/ExtraOralAndIntraOralFindingsTab/index';
+import MedicalHistoryTab from './Tabs/MedicalHistoryTab/index';
+import MedicationsTab from './Tabs/MedicationsTab/index';
+import ChiefComplaintTab from './Tabs/ChiefComplaintTab/index';
+import OcclusionsTab from './Tabs/OcclusionsTab/index';
+import MicIcon from '@mui/icons-material/Mic';
+
+import { extractPatientIdFromUrl } from '../../../Utils/helpers';
+import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
+
+const SmartNotes = () => {
     const dispatch = useDispatch();
+
     const { data: subcategoryTreatmentPlans, refetch } = useGetAllSubcategoryTreatmentPlansQuery();
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
     const [isLoading, setIsLoading] = useState(false);
@@ -53,10 +67,29 @@ const GenerateTreatmentPlan = () => {
     const [showAudioPopup, setShowAudioPopup] = useState(false);
     const [recording, setRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
+    const [tabValue, setTabValue] = useState(0);
 
-    const handleAllRowsUpdate = (newAllRows) => {
-        setAllRowsFromChild(newAllRows);
-    };
+
+
+    const patientID = extractPatientIdFromUrl();
+
+    const { data: diseases, isFetching: isFetchingDiseases, isError: isErrorDiseases, error: errorDiseases } = useGetDiseasesForPatientQuery(patientID);
+    const { data: medications, isFetching: isFetchingMedications, isError: isErrorMedications, error: errorMedications } = useGetMedicationsForPatientQuery(patientID);
+
+    const { data: allergies, isFetching: isFetchingAllergies, isError: isErrorAllergies, error: errorAllergies } = useGetAllergiesForPatientQuery(patientID);
+
+
+
+    useEffect(() => {
+        if (allergies) {
+            console.log('allergies data:', allergies);
+        }
+        if (isErrorAllergies) {
+            console.error('Error fetching allergies:', errorAllergies);
+        }
+    }, [allergies, isErrorAllergies, errorAllergies]);
+
+
 
     useEffect(() => {
         return () => {
@@ -93,6 +126,12 @@ const GenerateTreatmentPlan = () => {
         setInputText(event.target.value);
     };
 
+    const handleAllRowsUpdate = (newAllRows) => {
+        setAllRowsFromChild(newAllRows);
+    };
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
     function extractActiveTxCategories(visits) {
         const uniqueCategories = visits.reduce((acc, visit) => {
             acc.add(visit.procedureCategoryName);
@@ -149,7 +188,7 @@ const GenerateTreatmentPlan = () => {
         console.log(subcategoryTreatmentPlans);
         let allVisits = [];
         let globalVisitIdCounter = 0;
-        let nonRepeatableAdded = new Set(); 
+        let nonRepeatableAdded = new Set();
 
         const plansMap = new Map(
             subcategoryTreatmentPlans.map((plan) => [
@@ -194,7 +233,7 @@ const GenerateTreatmentPlan = () => {
                                 })),
                             };
                         }).filter(procedureMap => procedureMap !== null),
-                        procedureCategoryName: plan.procedureCategoryName, 
+                        procedureCategoryName: plan.procedureCategoryName,
                     }));
                     allVisits.push(...clonedVisits);
                 }
@@ -240,9 +279,9 @@ const GenerateTreatmentPlan = () => {
         };
     }
 
-
+    const [treatmentsInputText, setTreatmentsInputText] = useState("");
     const handleGenerateTreatmentPlan = async () => {
-        if (!inputText.trim()) {
+        if (!treatmentsInputText.trim()) {
             showAlert(
                 "error",
                 "Please enter some text to generate a treatment plan."
@@ -251,7 +290,7 @@ const GenerateTreatmentPlan = () => {
         }
         setIsLoading(true);
         try {
-            const treatmentEntries = await preprocessInputText(inputText);
+            const treatmentEntries = await preprocessInputText(treatmentsInputText);
             console.log("treatmentEntries", treatmentEntries);
             let allVisits = await fetchAndProcessTreatments(
                 treatmentEntries,
@@ -278,12 +317,13 @@ const GenerateTreatmentPlan = () => {
     };
 
 
+    const [currentProcessAudioFile, setCurrentProcessAudioFile] = useState(null);
+
     const handleMicClick = () => {
         if (!recording) {
-            // Stop the previous stream if it's still running
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
-                setStream(null);  // Ensure the stream is cleared
+                setStream(null);
             }
 
             navigator.mediaDevices.getUserMedia({ audio: true })
@@ -294,43 +334,48 @@ const GenerateTreatmentPlan = () => {
                     recorder.start();
                     setRecording(true);
                     setShowAudioPopup(true);
+                    console.log("Recording started");
 
                     recorder.ondataavailable = async (event) => {
                         if (recorder.state === 'inactive') {
                             const audioFile = new File([event.data], "audio.webm", { type: 'audio/webm' });
-                            processAudioFile(audioFile);
+                            console.log("Audio recording available for processing:", audioFile);
+
+                            if (currentProcessAudioFile) {
+                                console.log("About to process audio file with currentProcessAudioFile function.");
+                                await currentProcessAudioFile(audioFile)
+                                    .then(() => {
+                                        console.log("Audio file processing completed successfully.");
+                                    })
+                                    .catch(error => {
+                                        console.error("Error during audio file processing:", error);
+                                    });
+                                setShowAudioPopup(false);
+                            } else {
+                                console.error("No audio processing function is set.");
+                            }
                         }
                     };
 
                     recorder.onstop = () => {
-                        setRecording(false);
+                        console.log("Recording stopped.");
                         newStream.getTracks().forEach(track => track.stop());
                         setStream(null);
+                        setRecording(false);
                     };
                 }).catch(error => {
                     console.error('Error accessing microphone:', error);
                     showAlert("error", "Failed to access microphone.");
                 });
+        } else {
+            console.log("Already recording or handling previous recording.");
         }
     };
 
-
-
-    const processAudioFile = async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (transcribedText) {
-            const processedText = await postProcessTranscriptWithGPT(transcribedText);
-            console.log("processed text: ", processedText);
-            // Append the new processed text onto the next line
-            setInputText(prevText => prevText ? `${prevText}\n${processedText}` : processedText);
-        }
-        setShowAudioPopup(false); // Close the popup after processing
-    };
-
-
+    
     const stopAndProcessRecording = () => {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop(); 
+            mediaRecorder.stop();
             // Ensure that all tracks of the stream are stopped
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
@@ -341,13 +386,12 @@ const GenerateTreatmentPlan = () => {
         }
     };
 
-
     const handleClose = () => {
         // close the popup
         setShowAudioPopup(false);
         // Check if the mediaRecorder is recording and stop it if so
         if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop(); 
+            mediaRecorder.stop();
             mediaRecorder.ondataavailable = () => { }; // Override the handler to prevent processing
         }
         // Whether it's recording or not, ensure all tracks are stopped
@@ -357,8 +401,6 @@ const GenerateTreatmentPlan = () => {
         }
         setRecording(false); // Reset recording state
     };
-
-
 
     return (
         <div className="dashboard-bottom-inner-row">
@@ -370,32 +412,47 @@ const GenerateTreatmentPlan = () => {
             )}
             <AudioPopup
                 open={showAudioPopup}
-                stopRecording={stopAndProcessRecording} 
+                stopRecording={stopAndProcessRecording}
                 onClose={handleClose}
             />
 
             <div className="create-treatment-plan-section rounded-box box-shadow">
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="treatment plan tabs">
+                    <Tab label="Chief Complaint" />
+                    <Tab label="Medical History" />
+                    <Tab label="Medications" />
+                    <Tab label="Allergies" />
+                    <Tab label="Extra oral and Intra oral Findings" />
+                    <Tab label="Occlusions" />
+                    <Tab label="Findings" />
+
+                </Tabs>
                 <div className="create-treatment-plan-section-inner">
-                    <img src={PenIcon} alt="Edit" />
-                    <div className="large-text">
-                        What can I help you treatment plan today?
-                    </div>
-                    <MultilineTextfield
-                        label="Input your treatments"
-                        value={inputText}
-                        onChange={handleInputChange}
-                        onMicClick={handleMicClick}
-                    />
-                    <RoundedButton
-                        text="Generate Treatment Plan"
-                        backgroundColor="#7777a1"
-                        textColor="white"
-                        border={false}
-                        width="fit-content"
-                        onClick={handleGenerateTreatmentPlan}
-                        className="purple-button-hover"
+
+                    {tabValue === 0 && <ChiefComplaintTab
+                        handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                    />}
+                    {tabValue === 1 && <MedicalHistoryTab diseases={diseases} />}
+                    {tabValue === 2 && <MedicationsTab medications={medications}  />}
+                    {tabValue === 3 && <AllergiesTab allergies={allergies} />}
+                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab />}
+                    {tabValue === 5 && <OcclusionsTab  />}
+                    {tabValue === 6 && <FindingsTab
+                        handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                    />}
+
+                    <MicIcon
+                        onClick={handleMicClick}
+                        style={{
+                            cursor: 'pointer',
+                            height: 'auto',
+                           zIndex: '999',
+                        }}
                     />
                 </div>
+
             </div>
             <div className="treatment-plan-output-section rounded-box box-shadow">
                 <TxViewCustomizationToolbar allRows={allRowsFromChild} />
@@ -450,4 +507,4 @@ const GenerateTreatmentPlan = () => {
     );
 };
 
-export default GenerateTreatmentPlan;
+export default SmartNotes;

@@ -1,5 +1,5 @@
 import { StyledEmptyStateContainer, StyledEmptyStateTextContainer, StyledEmptyStateGraphic, StyledEmptyStateTitle, StyledEmptyStateInfoText } from "./index.style";
-import emptyStateIllustration from "../../../../assets/empty-state-illustration.svg";
+import emptyStateIllustration from "../../../assets/empty-state-illustration.svg";
 
 const EmptyStatePlaceholder = () => {
     return (

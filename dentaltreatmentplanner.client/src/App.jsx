@@ -18,13 +18,14 @@ import SavedPatientTxPlans from './Pages/PatientManagementDashboard/SavedPatient
 import PatientTreatmentPlanCustomizer from './Pages/PatientTreatmentPlanCustomizer/PatientTreatmentPlanCustomizer';
 import AllSavedPatientTxPlans from "./Pages/Dashboard/AllSavedPatientTxPlans/index";
 import TreatmentPlanConfiguration from './Components/TreatmentPlanConfiguration/TreatmentPlanConfiguration';
-import { BusinessProvider } from './Contexts/BusinessContext/BusinessProvider';
 import AlertWrapper from './Components/AlertWrapper/index';
 import { Provider } from 'react-redux';
 import { store, persistor } from './Redux/ReduxStore/store';
 import { PersistGate } from 'redux-persist/integration/react';
-//import InitialDataLoader from './Components/InitialDataLoader';
 import { enableMapSet } from 'immer';
+import SmartNotes from './Pages/PatientManagementDashboard/SmartNotes/index'; 
+
+
 function App() {
 
     enableMapSet();
@@ -52,7 +53,9 @@ function App() {
                                 <Route index element={<GenerateTreatmentPlan />} />
                                 <Route path="create-new-patient" element={<CreateNewPatient />} />
                                 <Route path="saved-patient-tx-plans/:patientId" element={<SavedPatientTxPlans />} />
-                            </Route> 
+                                <Route path="smart-notes" element={<SmartNotes />} />
+                            </Route>
+
 
                             <Route path="/customize-treatment-plan/:treatmentPlanId" element={<PatientTreatmentPlanCustomizer />} />
                         </Routes>

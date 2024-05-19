@@ -15,6 +15,10 @@ import { treatmentPlansApiSlice } from '../ReduxSlices/TreatmentPlans/treatmentP
 import { categoriesSubcategoriesApiSlice } from '../ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesApiSlice';
 import { cdtCodesApiSlice } from '../ReduxSlices/CdtCodes/cdtCodesApiSlice';
 import { openDentalApiSlice } from '../ReduxSlices/OpenDental/openDentalApiSlice';
+import audioRecorderReducer from '../ReduxSlices/AudioRecorder/audioRecorderSlice';
+import compExamTabsReducer from '../ReduxSlices/CompExamTabs/compExamTabsSlice';
+
+
 // Combine all reducers 
 const rootReducer = combineReducers({
     categoriesSubcategories: categoriesSubcategoriesReducer,
@@ -24,6 +28,8 @@ const rootReducer = combineReducers({
     alert: alertReducer,
     tableViewControl: tableViewControlReducer,
     user: userReducer,
+    audioRecorder: audioRecorderReducer,
+    compExamTabs: compExamTabsReducer,
     [userApiSlice.reducerPath]: userApiSlice.reducer,
     [patientsApiSlice.reducerPath]: patientsApiSlice.reducer,
     [treatmentPlansApiSlice.reducerPath]: treatmentPlansApiSlice.reducer,

@@ -29,6 +29,9 @@ import AlertDialog from "../../Components/Common/PopupAlert/index";
 import { useImportTreatmentPlanToOpenDentalMutation } from '../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
 import { Backdrop, CircularProgress } from '@mui/material';
 
+import { extractPatientIdFromUrl } from '../../Utils/helpers';
+
+
 const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupBtnAndFilters }) => {
     const dispatch = useDispatch();
     const treatmentPlans = useSelector(selectAllTreatmentPlans);
@@ -41,11 +44,6 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
 
     const [importTreatmentPlanToOpenDental, { isLoading, isError, isSuccess }] = useImportTreatmentPlanToOpenDentalMutation();
 
-
-    const extractPatientIdFromUrl = () => {
-        const searchParams = new URLSearchParams(window.location.search);
-        return searchParams.get('patientID'); 
-    };
 
     const handleSaveButtonClick = () => {
         if (immediateSave) {

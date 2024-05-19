@@ -93,6 +93,106 @@ namespace DentalTreatmentPlanner.Server.Services
             return "Successfully imported all procedures.";
         }
 
+        public async Task<IEnumerable<OpenDentalAllergiesDto>> GetAllergiesForPatient(int patNum, int facilityId)
+        {
+            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
+            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
+            {
+                _logger.LogError($"Facility {facilityId} not found or lacks a customer key.");
+                return Enumerable.Empty<OpenDentalAllergiesDto>();
+            }
+
+            var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+            var apiUrl = $"{_openDentalApiUrl}/allergies?PatNum={patNum}";
+
+            try
+            {
+                var response = await httpClient.GetAsync(apiUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var allergies = await response.Content.ReadFromJsonAsync<List<OpenDentalAllergiesDto>>();
+                    return allergies ?? Enumerable.Empty<OpenDentalAllergiesDto>();
+                }
+                else
+                {
+                    _logger.LogError($"Failed to retrieve allergies from OpenDental for patient {patNum}. Status: {response.StatusCode}");
+                    return Enumerable.Empty<OpenDentalAllergiesDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Exception occurred while retrieving allergies for patient {patNum}.");
+                return Enumerable.Empty<OpenDentalAllergiesDto>();
+            }
+        }
+
+
+        public async Task<IEnumerable<OpenDentalMedicationPatDto>> GetMedicationsForPatient(int patNum, int facilityId)
+        {
+            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
+            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
+            {
+                _logger.LogError($"Facility {facilityId} not found or lacks a customer key.");
+                return Enumerable.Empty<OpenDentalMedicationPatDto>();
+            }
+
+            var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+            var apiUrl = $"{_openDentalApiUrl}/medicationpats?PatNum={patNum}";
+
+            try
+            {
+                var response = await httpClient.GetAsync(apiUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var medications = await response.Content.ReadFromJsonAsync<List<OpenDentalMedicationPatDto>>();
+                    return medications ?? Enumerable.Empty<OpenDentalMedicationPatDto>();
+                }
+                else
+                {
+                    _logger.LogError($"Failed to retrieve medications from OpenDental for patient {patNum}. Status: {response.StatusCode}");
+                    return Enumerable.Empty<OpenDentalMedicationPatDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Exception occurred while retrieving medications for patient {patNum}.");
+                return Enumerable.Empty<OpenDentalMedicationPatDto>();
+            }
+        }
+
+
+        public async Task<IEnumerable<OpenDentalDiseasesDto>> GetDiseasesForPatient(int patNum, int facilityId)
+        {
+            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
+            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
+            {
+                _logger.LogError($"Facility {facilityId} not found or lacks a customer key.");
+                return Enumerable.Empty<OpenDentalDiseasesDto>();
+            }
+
+            var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+            var apiUrl = $"{_openDentalApiUrl}/diseases?PatNum={patNum}";
+
+            try
+            {
+                var response = await httpClient.GetAsync(apiUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var diseases = await response.Content.ReadFromJsonAsync<List<OpenDentalDiseasesDto>>();
+                    return diseases ?? Enumerable.Empty<OpenDentalDiseasesDto>();
+                }
+                else
+                {
+                    _logger.LogError($"Failed to retrieve diseases from OpenDental for patient {patNum}. Status: {response.StatusCode}");
+                    return Enumerable.Empty<OpenDentalDiseasesDto>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Exception occurred while retrieving diseases for patient {patNum}.");
+                return Enumerable.Empty<OpenDentalDiseasesDto>();
+            }
+        }
 
 
 

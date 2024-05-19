@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-
 import { API_BASE_URL } from '../../../Utils/constants';
 
 const OPEN_DENTAL_API_URL = `${API_BASE_URL}/OpenDental`;
@@ -21,6 +20,15 @@ export const openDentalApiSlice = createApi({
         getPatientsForUserFacilityFromOpenDental: builder.query({
             query: () => '/facilityPatientsOpenDental',
         }),
+        getDiseasesForPatient: builder.query({
+            query: (patNum) => `/diseases/${patNum}`,
+        }),
+        getMedicationsForPatient: builder.query({
+            query: (patNum) => `/medications/${patNum}`,
+        }),
+        getAllergiesForPatient: builder.query({
+            query: (patNum) => `/allergies/${patNum}`,
+        }),
         importTreatmentPlanToOpenDental: builder.mutation({
             query: (openDentalTreatmentPlanDto) => ({
                 url: '/importtoopendental',
@@ -40,6 +48,9 @@ export const openDentalApiSlice = createApi({
 // Export the auto-generated hook for each endpoint
 export const {
     useGetPatientsForUserFacilityFromOpenDentalQuery,
+    useGetDiseasesForPatientQuery,
+    useGetMedicationsForPatientQuery,
+    useGetAllergiesForPatientQuery, 
     useImportTreatmentPlanToOpenDentalMutation,
     useSavePatientsFromOpenDentalToDatabaseMutation,
 } = openDentalApiSlice;

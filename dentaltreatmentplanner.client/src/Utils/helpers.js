@@ -60,3 +60,9 @@ export const updateVisitsInTreatmentPlan = (treatmentPlans, treatmentPlanId, upd
             : plan
     );
 };
+
+
+export const extractPatientIdFromUrl = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get('patientID');
+};

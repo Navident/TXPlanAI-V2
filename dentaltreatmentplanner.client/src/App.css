@@ -113,7 +113,14 @@
     padding-left: 60px;
     padding-right: 60px;
 }
+.textfield-row {
+    display: flex;
+    flex-direction: row;
+}
 
+    .textfield-row .multiline-textfield {
+        flex: 1;
+    }
 .loading-spinner{
     margin: auto;
 }
