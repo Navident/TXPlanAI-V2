@@ -81,13 +81,13 @@ const SmartNotes = () => {
 
 
     useEffect(() => {
-        if (allergies) {
-            console.log('allergies data:', allergies);
+        if (medications) {
+            console.log('medications data:', medications);
         }
-        if (isErrorAllergies) {
-            console.error('Error fetching allergies:', errorAllergies);
+        if (isErrorMedications) {
+            console.error('Error fetching medications:', errorMedications);
         }
-    }, [allergies, isErrorAllergies, errorAllergies]);
+    }, [medications, isErrorMedications, errorMedications]);
 
 
 
@@ -372,7 +372,7 @@ const SmartNotes = () => {
         }
     };
 
-    
+
     const stopAndProcessRecording = () => {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
@@ -430,14 +430,19 @@ const SmartNotes = () => {
                 <div className="create-treatment-plan-section-inner">
 
                     {tabValue === 0 && <ChiefComplaintTab
-                        handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
                     />}
-                    {tabValue === 1 && <MedicalHistoryTab diseases={diseases} />}
-                    {tabValue === 2 && <MedicationsTab medications={medications}  />}
+                    {tabValue === 1 && <MedicalHistoryTab
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                        diseases={diseases}
+                    />}
+                    {tabValue === 2 && <MedicationsTab
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                        medications={medications}
+                    />}
                     {tabValue === 3 && <AllergiesTab allergies={allergies} />}
                     {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab />}
-                    {tabValue === 5 && <OcclusionsTab  />}
+                    {tabValue === 5 && <OcclusionsTab />}
                     {tabValue === 6 && <FindingsTab
                         handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
@@ -448,63 +453,63 @@ const SmartNotes = () => {
                         style={{
                             cursor: 'pointer',
                             height: 'auto',
-                           zIndex: '999',
+                            zIndex: '999',
                         }}
                     />
                 </div>
 
             </div>
-            <div className="treatment-plan-output-section rounded-box box-shadow">
-                <TxViewCustomizationToolbar allRows={allRowsFromChild} />
-                <StyledSeparator customMarginTop="0px" />
-                <StyledContainerWithTableInner>
-                    {treatmentPlans.length > 0 && !isLoading && (
-                        <StyledTitleAndPaymentTotalsContainer>
-                            <div style={{ flex: 1 }}></div>
-                            <StyledLargeText>Treatment Plan</StyledLargeText>
-                            <div style={{ flex: 1 }}>
-                            </div>
-                        </StyledTitleAndPaymentTotalsContainer>
-                    )}
-                    {isLoading ? (
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                height: "100%",
-                            }}
-                        >
-                            <CircularProgress style={{ color: "#7777a1" }} />
-                        </div>
-                    ) : treatmentPlans.length > 0 ? (
-                        treatmentPlans.map((plan, index) => (
-                            <TreatmentPlanOutput
-                                key={`treatment-plan-${index}`}
-                                treatmentPlan={plan}
-                                treatmentPlans={treatmentPlans}
-                                onAddVisit={(newVisit) =>
-                                    dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
-                                }
-                                onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
-                                    console.log("Dispatching updated visits:", updatedVisits);
-                                    dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
+            {tabValue === 6 && (
+                <div className="treatment-plan-output-section rounded-box box-shadow">
+                    <TxViewCustomizationToolbar allRows={allRowsFromChild} />
+                    <StyledSeparator customMarginTop="0px" />
+                    <StyledContainerWithTableInner>
+                        {treatmentPlans.length > 0 && !isLoading && (
+                            <StyledTitleAndPaymentTotalsContainer>
+                                <div style={{ flex: 1 }}></div>
+                                <StyledLargeText>Treatment Plan</StyledLargeText>
+                                <div style={{ flex: 1 }}></div>
+                            </StyledTitleAndPaymentTotalsContainer>
+                        )}
+                        {isLoading ? (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    height: "100%",
                                 }}
-                                onDeleteVisit={(deletedVisitId) =>
-                                    dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
-                                }
-                                showToothNumber={true}
-                                isInGenerateTreatmentPlanContext={true}
-                                onAllRowsUpdate={handleAllRowsUpdate}
-                            />
-                        ))
-                    ) : (
-                        <EmptyStatePlaceholder />
-                    )}
-                </StyledContainerWithTableInner>
-            </div>
+                            >
+                                <CircularProgress style={{ color: "#7777a1" }} />
+                            </div>
+                        ) : treatmentPlans.length > 0 ? (
+                            treatmentPlans.map((plan, index) => (
+                                <TreatmentPlanOutput
+                                    key={`treatment-plan-${index}`}
+                                    treatmentPlan={plan}
+                                    treatmentPlans={treatmentPlans}
+                                    onAddVisit={(newVisit) =>
+                                        dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
+                                    }
+                                    onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
+                                        console.log("Dispatching updated visits:", updatedVisits);
+                                        dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
+                                    }}
+                                    onDeleteVisit={(deletedVisitId) =>
+                                        dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
+                                    }
+                                    showToothNumber={true}
+                                    isInGenerateTreatmentPlanContext={true}
+                                    onAllRowsUpdate={handleAllRowsUpdate}
+                                />
+                            ))
+                        ) : (
+                            <EmptyStatePlaceholder />
+                        )}
+                    </StyledContainerWithTableInner>
+                </div>
+            )}
         </div>
     );
 };
-
-export default SmartNotes;
+    export default SmartNotes;

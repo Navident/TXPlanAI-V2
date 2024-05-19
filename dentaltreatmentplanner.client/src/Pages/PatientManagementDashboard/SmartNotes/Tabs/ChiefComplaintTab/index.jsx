@@ -6,7 +6,6 @@ import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../Op
 import { getChiefComplaintsTabPrompt } from './prompt';
 
 const ChiefComplaintsTab = ({
-    handleGenerateTreatmentPlan,
     setAudioProcessingFunction
 }) => {
     const dispatch = useDispatch();

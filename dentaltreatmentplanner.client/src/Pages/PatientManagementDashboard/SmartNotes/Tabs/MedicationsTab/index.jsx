@@ -1,18 +1,20 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import TreeView from '../../../../../Components/TreeView/index';
-import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setMedicationsTreeData, setMedicationsNotes, selectMedications } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { useEffect, useCallback } from "react";
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
+import { getMedicationsTabPrompt } from './prompt';
 
-const MedicationsTab = ({ medications }) => {
+const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
-    const { treeData, additionalNotes } = useSelector(selectMedications);
+    const { treeData } = useSelector(selectMedications);
 
     useEffect(() => {
         if (medications && treeData.length === 0) {
             const initialData = medications.map((medication, index) => ({
                 label: `Medication ${index + 1}`,
-                value: medication.defDescription || '',
+                value: medication.medName || '',
                 children: [
                     { label: 'Patient Note', value: medication.patNote || '' },
                     { label: 'Date Start', value: medication.dateStart || '' },
@@ -36,9 +38,37 @@ const MedicationsTab = ({ medications }) => {
         dispatch(setMedicationsTreeData([...treeData, newNode]));
     };
 
-    const handleNotesChange = (e) => {
-        dispatch(setMedicationsNotes(e.target.value));
-    };
+    const updateInputTexts = useCallback((newValues) => {
+        const formattedData = newValues.map((medication, index) => ({
+            label: `Medication ${index + 1}`,
+            value: medication.medName || '',
+            children: [
+                { label: 'Patient Note', value: medication.patNote || '' },
+                { label: 'Date Start', value: medication.dateStart || '' },
+                { label: 'Date Stop', value: medication.dateStop || '' },
+            ]
+        }));
+        dispatch(setMedicationsTreeData(formattedData));
+    }, [dispatch]);
+
+    const processAudioFile = useCallback(async (audioFile) => {
+        const transcribedText = await transcribeAudio(audioFile);
+        if (!transcribedText) {
+            console.log("No transcribed text available");
+            return;
+        }
+
+        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getMedicationsTabPrompt());
+        console.log("Processed categories:", categorizedText);
+
+        if (categorizedText) {
+            updateInputTexts(categorizedText);
+        }
+    }, [updateInputTexts]);
+
+    useEffect(() => {
+        setAudioProcessingFunction(() => processAudioFile);
+    }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
         <div>
@@ -48,11 +78,7 @@ const MedicationsTab = ({ medications }) => {
                 selector={selectMedications}
                 setTreeData={setMedicationsTreeData}
             />
-            <MultilineTextfield
-                label="Additional Notes"
-                value={additionalNotes}
-                onChange={handleNotesChange}
-            />
+
         </div>
     );
 };
