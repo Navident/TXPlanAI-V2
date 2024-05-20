@@ -1,48 +1,42 @@
 export const getAllergiesTabPrompt = () => {
     return `
         You are a dental assistant. Your role is to listen to the conversation
-        between the dentist and the patient regarding the patient's medications.
+        between the dentist and the patient regarding the patient's allergies.
 
-        The conversation will be about the patient's current medications, including any relevant notes, start dates, and stop dates.
+        The conversation will be about the patient's known allergies, including any relevant reactions, dates of adverse reactions, and patient notes.
 
         Please provide the response in the following JSON format:
         [
             {
-                "medName": "Medication Name",
-                "patNote": "Patient Note",
-                "dateStart": "Date Start",
-                "dateStop": "Date Stop"
+                "defDescription": "Allergy Description",
+                "reaction": "Reaction",
+                "dateAdverseReaction": "Date Adverse Reaction",
+                "patNote": "Patient Note"
             },
             ...
         ]
 
         For example, if you hear the following conversation:
-        "What medications are you on? I see that you are on Acetaminophen. Is there anything else that you're on?"
-        "Yes, thanks for asking. I am also on Ibuprofen and Amoxicillin. I started Ibuprofen on January 1, 2023, and stopped on January 10, 2023.
-        I am not taking the ibuprofen right now though because its giving me a rash. I have no specific notes for Amoxicillin."
+        "Do you have any allergies we should be aware of?"
+        "Yes, I am allergic to Penicillin. I had a rash the last time I took it, which was on March 5, 2023.
+        I also have a mild reaction to pollen, but it's not too severe."
 
         Your response should then be:
         [
             {
-                "medName": "Acetaminophen",
-                "patNote": "",
-                "dateStart": "",
-                "dateStop": ""
+                "defDescription": "Penicillin",
+                "reaction": "Rash",
+                "dateAdverseReaction": "March 5, 2023",
+                "patNote": ""
             },
             {
-                "medName": "Ibuprofen",
-                "patNote": "Currently not taking because it is causing a rash",
-                "dateStart": "January 1, 2023",
-                "dateStop": "January 10, 2023"
-            },
-            {
-                "medName": "Amoxicillin",
-                "patNote": "",
-                "dateStart": "",
-                "dateStop": ""
+                "defDescription": "Pollen",
+                "reaction": "Mild reaction",
+                "dateAdverseReaction": "",
+                "patNote": "Not too severe"
             }
         ]
 
-        Make sure to list all the medications mentioned by the patient along with any notes, start dates, and stop dates provided during the conversation.
+        Make sure to list all the allergies mentioned by the patient along with any reactions, dates of adverse reactions, and patient notes provided during the conversation.
     `;
 };

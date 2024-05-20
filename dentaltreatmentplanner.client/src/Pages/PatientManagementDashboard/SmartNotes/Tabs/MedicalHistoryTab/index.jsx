@@ -6,7 +6,7 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicalHistoryTabPrompt } from './prompt';
 
-const MedicalHistoryTab = ({ medications, setAudioProcessingFunction }) => {
+const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
     const { treeData, additionalNotes } = useSelector(selectMedicalHistory);
 
@@ -21,11 +21,11 @@ const MedicalHistoryTab = ({ medications, setAudioProcessingFunction }) => {
     });
 
     useEffect(() => {
-        if (medications && treeData.length === 0) {
-            const initialData = medications.map(createNode);
+        if (diseases && treeData.length === 0) {
+            const initialData = diseases.map(createNode);
             dispatch(setMedicalHistoryTreeData(initialData));
         }
-    }, [medications, treeData.length, dispatch]);
+    }, [diseases, treeData.length, dispatch]);
 
     const addParentNode = () => {
         const newNode = createNode({}, treeData.length);
@@ -36,8 +36,8 @@ const MedicalHistoryTab = ({ medications, setAudioProcessingFunction }) => {
 
     const updateInputTexts = useCallback((newValues) => {
         const updatedData = [...treeData];
-        newValues.forEach((medication, index) => {
-            const node = createNode(medication, updatedData.length + index);
+        newValues.forEach((disease, index) => {
+            const node = createNode(disease, updatedData.length + index);
             updatedData.push(node);
         });
         dispatch(setMedicalHistoryTreeData(updatedData));

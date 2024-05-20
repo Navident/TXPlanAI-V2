@@ -34,8 +34,8 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
 
     const updateInputTexts = useCallback((newValues) => {
         const updatedData = [...treeData];
-        newValues.forEach((medication, index) => {
-            const node = createNode(medication, updatedData.length + index);
+        newValues.forEach((allergy, index) => {
+            const node = createNode(allergy, updatedData.length + index);
             updatedData.push(node);
         });
         dispatch(setAllergiesTreeData(updatedData));
