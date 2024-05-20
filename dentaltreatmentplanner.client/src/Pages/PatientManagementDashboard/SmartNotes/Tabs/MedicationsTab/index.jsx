@@ -8,48 +8,38 @@ import { getMedicationsTabPrompt } from './prompt';
 
 const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
-    const { treeData } = useSelector(selectMedications);
+    const { treeData, additionalNotes } = useSelector(selectMedications);
+
+    const createNode = (medication, index) => ({
+        label: `Medication ${index + 1}`,
+        value: medication?.medName || '',
+        children: [
+            { label: 'Patient Note', value: medication?.patNote || '' },
+            { label: 'Date Start', value: medication?.dateStart || '' },
+            { label: 'Date Stop', value: medication?.dateStop || '' }
+        ]
+    });
 
     useEffect(() => {
         if (medications && treeData.length === 0) {
-            const initialData = medications.map((medication, index) => ({
-                label: `Medication ${index + 1}`,
-                value: medication.medName || '',
-                children: [
-                    { label: 'Patient Note', value: medication.patNote || '' },
-                    { label: 'Date Start', value: medication.dateStart || '' },
-                    { label: 'Date Stop', value: medication.dateStop || '' },
-                ]
-            }));
+            const initialData = medications.map(createNode);
             dispatch(setMedicationsTreeData(initialData));
         }
     }, [medications, treeData.length, dispatch]);
 
     const addParentNode = () => {
-        const newNode = {
-            label: `Medication ${treeData.length + 1}`,
-            value: '',
-            children: [
-                { label: 'Patient Note', value: '' },
-                { label: 'Date Start', value: '' },
-                { label: 'Date Stop', value: '' }
-            ]
-        };
+        const newNode = createNode({}, treeData.length);
         dispatch(setMedicationsTreeData([...treeData, newNode]));
     };
 
     const updateInputTexts = useCallback((newValues) => {
-        const formattedData = newValues.map((medication, index) => ({
-            label: `Medication ${index + 1}`,
-            value: medication.medName || '',
-            children: [
-                { label: 'Patient Note', value: medication.patNote || '' },
-                { label: 'Date Start', value: medication.dateStart || '' },
-                { label: 'Date Stop', value: medication.dateStop || '' },
-            ]
-        }));
-        dispatch(setMedicationsTreeData(formattedData));
-    }, [dispatch]);
+        const updatedData = [...treeData];
+        newValues.forEach((medication, index) => {
+            const node = createNode(medication, updatedData.length + index);
+            updatedData.push(node);
+        });
+        dispatch(setMedicationsTreeData(updatedData));
+    }, [dispatch, treeData]);
 
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);

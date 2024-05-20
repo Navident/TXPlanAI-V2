@@ -440,7 +440,10 @@ const SmartNotes = () => {
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
                         medications={medications}
                     />}
-                    {tabValue === 3 && <AllergiesTab allergies={allergies} />}
+                    {tabValue === 3 && <AllergiesTab
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                        allergies={allergies}
+                    />}
                     {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab />}
                     {tabValue === 5 && <OcclusionsTab />}
                     {tabValue === 6 && <FindingsTab
