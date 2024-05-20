@@ -15,7 +15,7 @@ import { treatmentPlansApiSlice } from '../ReduxSlices/TreatmentPlans/treatmentP
 import { categoriesSubcategoriesApiSlice } from '../ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesApiSlice';
 import { cdtCodesApiSlice } from '../ReduxSlices/CdtCodes/cdtCodesApiSlice';
 import { openDentalApiSlice } from '../ReduxSlices/OpenDental/openDentalApiSlice';
-import audioRecorderReducer from '../ReduxSlices/AudioRecorder/audioRecorderSlice';
+import audioRecorderReducer from '../ReduxSlices/AudioRecorder/AudioRecorderSlice';
 import compExamTabsReducer from '../ReduxSlices/CompExamTabs/compExamTabsSlice';
 
 
