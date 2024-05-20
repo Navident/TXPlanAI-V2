@@ -1,5 +1,5 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
-import StandardTextField from '../../../../../Components/Common/StandardTextField/StandardTextfield';
+import StandardTextField from '../../../../../Components/Common/StandardTextfield/StandardTextfield';
 import { StyledLabelTextfieldRow  } from '../../index.style';
 
 import { useDispatch, useSelector } from 'react-redux';
