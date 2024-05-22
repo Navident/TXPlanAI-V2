@@ -3,10 +3,13 @@ import { useState } from 'react';
 import StandardTextField from '../../../../../Components/Common/StandardTextfield/StandardTextfield';
 import { StyledLabelTextfieldRow  } from '../../index.style';
 import { StyledTwoColumnContainer, StyledColumn } from './index.style';
-import { useSelector, useDispatch } from 'react-redux';
 import { setOcclusions, selectOcclusions } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { getOcclusionsTabPrompt } from './prompt';
+import { useEffect, useCallback } from "react";
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
+import { useDispatch, useSelector } from 'react-redux';
 
-const OcclusionsTab = () => {
+const OcclusionsTab = ({ setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
     const occlusions = useSelector(selectOcclusions);
 
@@ -34,6 +37,29 @@ const OcclusionsTab = () => {
         { label: "Overall Crowding", field: "overallCrowding" },
         { label: "Is the patient interested in orthodontics", field: "isThePatientInterestedInOrthodontics" }
     ];
+
+    const updateInputTexts = useCallback((newValues) => {
+        dispatch(setOcclusions(newValues));
+    }, [dispatch]);
+
+    const processAudioFile = useCallback(async (audioFile) => {
+        const transcribedText = await transcribeAudio(audioFile);
+        if (!transcribedText) {
+            console.log("No transcribed text available");
+            return;
+        }
+
+        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getOcclusionsTabPrompt());
+        console.log("Processed categories:", categorizedText);
+
+        if (categorizedText) {
+            updateInputTexts(categorizedText);
+        }
+    }, [updateInputTexts]);
+
+    useEffect(() => {
+        setAudioProcessingFunction(() => processAudioFile);
+    }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
         <div>

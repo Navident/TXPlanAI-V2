@@ -1,11 +1,13 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import StandardTextField from '../../../../../Components/Common/StandardTextfield/StandardTextfield';
 import { StyledLabelTextfieldRow  } from '../../index.style';
-
+import { useEffect, useCallback } from "react";
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { useDispatch, useSelector } from 'react-redux';
 import { setExtraOralAndIntraOralFindings, selectExtraOralAndIntraOralFindings } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { getExtraOralAndIntraOralFindingsTabPrompt } from './prompt';
 
-const ExtraOralAndIntraOralFindingsTab = () => {
+const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
     const findings = useSelector(selectExtraOralAndIntraOralFindings);
 
@@ -20,9 +22,32 @@ const ExtraOralAndIntraOralFindingsTab = () => {
         { label: "Tongue", field: "tongue" },
         { label: "Floor and Mouth", field: "floorAndMouth" },
         { label: "Hard and Soft Palate", field: "hardAndSoftPalate" },
-        { label: "Phoyne", field: "phoyne" },
+        { label: "Pharynx", field: "pharynx" },
         { label: "Gingiva", field: "gingiva" },
     ];
+
+    const updateInputTexts = useCallback((newValues) => {
+        dispatch(setExtraOralAndIntraOralFindings(newValues));
+    }, [dispatch]);
+
+    const processAudioFile = useCallback(async (audioFile) => {
+        const transcribedText = await transcribeAudio(audioFile);
+        if (!transcribedText) {
+            console.log("No transcribed text available");
+            return;
+        }
+
+        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getExtraOralAndIntraOralFindingsTabPrompt());
+        console.log("Processed categories:", categorizedText);
+
+        if (categorizedText) {
+            updateInputTexts(categorizedText);
+        }
+    }, [updateInputTexts]);
+
+    useEffect(() => {
+        setAudioProcessingFunction(() => processAudioFile);
+    }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
         <div>
@@ -37,11 +62,7 @@ const ExtraOralAndIntraOralFindingsTab = () => {
                     />
                 </StyledLabelTextfieldRow>
             ))}
-            <MultilineTextfield
-                label="Additional Notes"
-                value={findings.additionalNotes || ''}
-                onChange={(e) => dispatch(setExtraOralAndIntraOralFindings({ additionalNotes: e.target.value }))}
-            />
+
         </div>
     );
 };

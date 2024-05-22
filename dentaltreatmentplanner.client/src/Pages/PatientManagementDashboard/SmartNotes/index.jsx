@@ -444,8 +444,12 @@ const SmartNotes = () => {
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
                         allergies={allergies}
                     />}
-                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab />}
-                    {tabValue === 5 && <OcclusionsTab />}
+                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                    />}
+                    {tabValue === 5 && <OcclusionsTab
+                        setAudioProcessingFunction={setCurrentProcessAudioFile}
+                    />}
                     {tabValue === 6 && <FindingsTab
                         handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
