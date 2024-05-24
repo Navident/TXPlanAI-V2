@@ -81,13 +81,13 @@ const SmartNotes = () => {
 
 
     useEffect(() => {
-        if (medications) {
-            console.log('medications data:', medications);
+        if (diseases) {
+            console.log('diseases data:', diseases);
         }
-        if (isErrorMedications) {
-            console.error('Error fetching medications:', errorMedications);
+        if (isErrorDiseases) {
+            console.error('Error fetching diseases:', errorDiseases);
         }
-    }, [medications, isErrorMedications, errorMedications]);
+    }, [diseases, isErrorDiseases, errorDiseases]);
 
 
 

@@ -8,7 +8,7 @@ export const getMedicalHistoryTabPrompt = () => {
         Please provide the response in the following JSON format:
         [
             {
-                "diseaseName": "Condition Name",
+                "diseaseDefName": "Condition Name",
                 "patNote": "Patient Note",
                 "dateStart": "Date Start",
                 "dateStop": "Date Stop"
@@ -24,19 +24,19 @@ export const getMedicalHistoryTabPrompt = () => {
         Your response should then be:
         [
             {
-                "diseaseName": "Asthma",
+                "diseaseDefName": "Asthma",
                 "patNote": "",
                 "dateStart": "",
                 "dateStop": ""
             },
             {
-                "diseaseName": "Diabetes",
+                "diseaseDefName": "Diabetes",
                 "patNote": "Ongoing condition",
                 "dateStart": "March 3, 2020",
                 "dateStop": ""
             },
             {
-                "diseaseName": "Hypertension",
+                "diseaseDefName": "Hypertension",
                 "patNote": "Well-controlled since last year",
                 "dateStart": "2018",
                 "dateStop": ""

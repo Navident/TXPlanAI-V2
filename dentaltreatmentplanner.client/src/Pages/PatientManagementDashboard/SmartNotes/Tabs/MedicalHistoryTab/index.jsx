@@ -12,7 +12,7 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
 
     const createNode = (disease, index) => ({
         label: `Problem ${index + 1}`,
-        value: disease?.medName || '',
+        value: disease?.diseaseDefName || '',
         children: [
             { label: 'Patient Note', value: disease?.patNote || '' },
             { label: 'Date Start', value: disease?.dateStart || '' },
@@ -31,8 +31,6 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
         const newNode = createNode({}, treeData.length);
         dispatch(setMedicalHistoryTreeData([...treeData, newNode]));
     };
-
-
 
     const updateInputTexts = useCallback((newValues) => {
         const updatedData = [...treeData];
