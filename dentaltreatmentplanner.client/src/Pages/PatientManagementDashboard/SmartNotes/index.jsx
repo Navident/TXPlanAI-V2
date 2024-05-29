@@ -47,6 +47,7 @@ import MedicationsTab from './Tabs/MedicationsTab/index';
 import ChiefComplaintTab from './Tabs/ChiefComplaintTab/index';
 import OcclusionsTab from './Tabs/OcclusionsTab/index';
 import MicIcon from '@mui/icons-material/Mic';
+import NotesOutput from './NotesOutput/index';
 
 import { extractPatientIdFromUrl } from '../../../Utils/helpers';
 import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
@@ -417,7 +418,7 @@ const SmartNotes = () => {
             />
 
             <div className="create-treatment-plan-section rounded-box box-shadow">
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="treatment plan tabs">
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="treatment plan tabs" centered>
                     <Tab label="Chief Complaint" />
                     <Tab label="Medical History" />
                     <Tab label="Medications" />
@@ -452,6 +453,7 @@ const SmartNotes = () => {
                     />}
                     {tabValue === 6 && <FindingsTab
                         handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
+                        setTreatmentsInputText={setTreatmentsInputText}
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
                     />}
 
@@ -467,6 +469,8 @@ const SmartNotes = () => {
 
             </div>
             {tabValue === 6 && (
+                <>
+                <NotesOutput /> 
                 <div className="treatment-plan-output-section rounded-box box-shadow">
                     <TxViewCustomizationToolbar allRows={allRowsFromChild} />
                     <StyledSeparator customMarginTop="0px" />
@@ -514,9 +518,11 @@ const SmartNotes = () => {
                             <EmptyStatePlaceholder />
                         )}
                     </StyledContainerWithTableInner>
-                </div>
+                    </div>
+                </>
             )}
         </div>
+
     );
 };
     export default SmartNotes;

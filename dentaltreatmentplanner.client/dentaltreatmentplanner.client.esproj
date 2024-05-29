@@ -19,6 +19,7 @@
     <Folder Include="src\Components\Common\PopupAlert\" />
     <Folder Include="src\Components\Common\StandardTextfield\" />
     <Folder Include="src\Components\AlertWrapper\" />
+    <Folder Include="src\Components\Containers\ContainerRoundedBox\" />
     <Folder Include="src\Components\DropdownHeaderPopup\" />
     <Folder Include="src\Components\InitialDataLoader\" />
     <Folder Include="src\Components\AudioPopup\" />
@@ -36,6 +37,7 @@
     <Folder Include="src\Contexts\TreatmentPlanContext\" />
     <Folder Include="src\Components\Common\EmptyStatePlaceholder\" />
     <Folder Include="src\Components\Common\LoginPopup\" />
+    <Folder Include="src\Pages\PatientManagementDashboard\SmartNotes\NotesOutput\" />
     <Folder Include="src\Redux\ReduxSlices\CategoriesSubcategories\" />
     <Folder Include="src\Redux\ReduxSlices\CdtCodes\" />
     <Folder Include="src\Redux\ReduxSlices\AudioRecorder\" />

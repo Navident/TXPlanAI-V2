@@ -173,18 +173,20 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
                 )}
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
-                        <StyledPrintImportBtnContainer>
-                            <StyledPrintExportBtnWithText>
-                                <div>Print</div>
-                                <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" /> 
-                            </StyledPrintExportBtnWithText>
-                            
-                            <StyledPrintExportBtnWithText>
-                                <div>Export</div>
-                                <StyledPrintImportButton src={importIcon} alt="import Icon" title="Export to EHR" height="30px" onClick={handleExportClick} />
-                            </StyledPrintExportBtnWithText>
-                        </StyledPrintImportBtnContainer>
-                        <SaveButtonRow onSave={handleSaveButtonClick} />
+
+
+                            <RoundedButton
+                                text="Export"
+                                backgroundColor={UI_COLORS.green}
+                                textColor="white"
+                                border={false}
+                                width="150px"
+                                minWidth="150px"
+                                className="green-button-hover"
+                                onClick={handleExportClick}
+                                borderRadius="4px"
+                                height="39px"
+                            />
                     </StyledPrintSaveBtnContainer>
                 </StyledFlexAlignContainer>
             </ToolbarContainer>

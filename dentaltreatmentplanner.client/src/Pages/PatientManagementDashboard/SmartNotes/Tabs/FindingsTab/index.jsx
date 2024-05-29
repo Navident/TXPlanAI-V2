@@ -9,6 +9,7 @@ import { setFindings, selectFindings } from '../../../../../Redux/ReduxSlices/Co
 
 const FindingsTab = ({
     handleGenerateTreatmentPlan,
+    setTreatmentsInputText,
     setAudioProcessingFunction
 }) => {
     const dispatch = useDispatch();
@@ -16,7 +17,10 @@ const FindingsTab = ({
 
     const updateInputTexts = useCallback((newValues) => {
         dispatch(setFindings(newValues));
-    }, [dispatch]);
+        if (newValues.treatments) {
+            setTreatmentsInputText(newValues.treatments);
+        }
+    }, [dispatch, setTreatmentsInputText]);
 
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);
