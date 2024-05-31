@@ -1,7 +1,7 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import TreeView from '../../../../../Components/TreeView/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { setMedicationsTreeData, setMedicationsNotes, selectMedications } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setMedicationsTreeData, setMedicationsNotes, selectMedications, setMedicationsExpandedNodes } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicationsTabPrompt } from './prompt';
@@ -67,6 +67,7 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
                 addButtonText="Add Medications"
                 selector={selectMedications}
                 setTreeData={setMedicationsTreeData}
+                setExpandedNodes={(nodes) => dispatch(setMedicationsExpandedNodes(nodes))}
             />
 
         </div>

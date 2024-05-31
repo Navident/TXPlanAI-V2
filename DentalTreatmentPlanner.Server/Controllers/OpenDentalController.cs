@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace DentalTreatmentPlanner.Server.Controllers
 {
@@ -84,6 +85,54 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
             catch (Exception ex)
             {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("procedurelogs")]
+        public async Task<IActionResult> CreateProcedureLog([FromBody] OpenDentalProcedureLogCreateRequest request)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var requestPayload = System.Text.Json.JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true });
+                Console.WriteLine($"Received request to create procedure log with payload: {requestPayload}");
+
+                var response = await _openDentalService.CreateProcedureLog(request, facilityId.Value);
+                return CreatedAtAction(nameof(CreateProcedureLog), new { id = response.ProcNum }, response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating procedure log: {ex}");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("procnotes")]
+        public async Task<IActionResult> CreateProcNote([FromBody] OpenDentalProcNoteCreateRequest request)
+        {
+            var facilityId = await GetUserFacilityIdAsync();
+            if (!facilityId.HasValue)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var requestPayload = System.Text.Json.JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true });
+                Console.WriteLine($"Received request to create procedure note with payload: {requestPayload}");
+
+                await _openDentalService.CreateProcNoteAsync(request, facilityId.Value);
+                return CreatedAtAction(nameof(CreateProcNote), new { PatNum = request.PatNum, ProcNum = request.ProcNum }, request);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating procedure note: {ex}");
                 return BadRequest(new { error = ex.Message });
             }
         }

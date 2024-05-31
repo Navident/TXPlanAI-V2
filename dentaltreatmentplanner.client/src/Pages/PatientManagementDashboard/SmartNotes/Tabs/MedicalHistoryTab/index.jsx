@@ -1,7 +1,7 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import TreeView from '../../../../../Components/TreeView/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { setMedicalHistoryTreeData, setMedicalHistoryNotes, selectMedicalHistory } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setMedicalHistoryTreeData, setMedicalHistoryNotes, setMedicalHistoryExpandedNodes, selectMedicalHistory } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicalHistoryTabPrompt } from './prompt';
@@ -67,6 +67,8 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
                 addButtonText="Add Medical"
                 selector={selectMedicalHistory}
                 setTreeData={setMedicalHistoryTreeData}
+                setExpandedNodes={(nodes) => dispatch(setMedicalHistoryExpandedNodes(nodes))}
+
             />
         </div>
     );

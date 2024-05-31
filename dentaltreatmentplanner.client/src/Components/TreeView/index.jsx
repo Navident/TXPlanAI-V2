@@ -4,14 +4,22 @@ import StandardTextField from '../../Components/Common/StandardTextfield/Standar
 
 import { useSelector, useDispatch } from 'react-redux';
 
-const TreeView = ({ addParentNode, addButtonText, selector, setTreeData }) => {
+const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpandedNodes }) => {
     const dispatch = useDispatch();
-    const { treeData } = useSelector(selector);
+    const { treeData, expandedNodes } = useSelector(selector);
 
     return (
         <div>
             {treeData.map((node, index) => (
-                <TreeNode key={index} node={node} nodeIndex={index} selector={selector} setTreeData={setTreeData} />
+                <TreeNode
+                    key={index}
+                    node={node}
+                    nodeIndex={index}
+                    selector={selector}
+                    setTreeData={setTreeData}
+                    expandedNodes={expandedNodes}
+                    setExpandedNodes={setExpandedNodes}
+                />
             ))}
             <button onClick={addParentNode} style={{ marginTop: '10px' }}>
                 {addButtonText}
@@ -20,12 +28,13 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData }) => {
     );
 };
 
-const TreeNode = ({ node, nodeIndex, selector, setTreeData, parentPath = [] }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [value, setValue] = useState(node.value || '');
+const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setExpandedNodes, parentPath = [] }) => {
     const dispatch = useDispatch();
     const treeData = useSelector(selector).treeData;
     const currentPath = [...parentPath, nodeIndex];
+    const pathString = currentPath.join('-');
+    const isOpen = expandedNodes.includes(pathString);
+    const [value, setValue] = useState(node.value || '');
 
     const handleTextFieldChange = (event) => {
         setValue(event.target.value);
@@ -52,10 +61,17 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, parentPath = [] }) =
 
     const hasChildren = node.children && node.children.length > 0;
 
+    const toggleNode = () => {
+        const newExpandedNodes = isOpen
+            ? expandedNodes.filter(id => id !== pathString)
+            : [...expandedNodes, pathString];
+        dispatch(setExpandedNodes(newExpandedNodes));
+    };
+
     return (
         <StyledTreeNodeContainer>
             <StyledTreeNodeLabelContainer>
-                <StyledTreeNodeIcon onClick={() => setIsOpen(!isOpen)}>
+                <StyledTreeNodeIcon onClick={toggleNode}>
                     {hasChildren && (isOpen ? '-' : '+')}
                 </StyledTreeNodeIcon>
                 <div style={{ marginRight: '8px' }}>{node.label}:</div>
@@ -75,6 +91,8 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, parentPath = [] }) =
                             nodeIndex={index}
                             selector={selector}
                             setTreeData={setTreeData}
+                            expandedNodes={expandedNodes}
+                            setExpandedNodes={setExpandedNodes}
                             parentPath={currentPath}
                         />
                     ))}

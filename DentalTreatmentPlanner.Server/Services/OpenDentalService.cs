@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Text;
 using DentalTreatmentPlanner.Server.Dtos;
 using Azure;
+using System.Text.Json;
 
 namespace DentalTreatmentPlanner.Server.Services
 {
@@ -92,6 +93,101 @@ namespace DentalTreatmentPlanner.Server.Services
 
             return "Successfully imported all procedures.";
         }
+        public async Task<OpenDentalProcedureLogCreateResponse> CreateProcedureLog(OpenDentalProcedureLogCreateRequest request, int facilityId)
+        {
+            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
+            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
+            {
+                _logger.LogError($"Facility {facilityId} not found or lacks a customer key.");
+                throw new InvalidOperationException($"Facility {facilityId} not found or lacks a customer key.");
+            }
+
+            var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+
+            // Remove null values from the request object
+            var cleanedRequest = new Dictionary<string, object>();
+            foreach (var prop in request.GetType().GetProperties())
+            {
+                var value = prop.GetValue(request);
+                if (value != null)
+                {
+                    cleanedRequest[prop.Name] = value;
+                }
+            }
+
+            var jsonRequest = System.Text.Json.JsonSerializer.Serialize(cleanedRequest);
+            var content = new StringContent(jsonRequest, Encoding.UTF8);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            // Log the JSON payload
+            _logger.LogInformation($"JSON Payload: {jsonRequest}");
+
+            var response = await httpClient.PostAsync($"{_openDentalApiUrl}/procedurelogs", content);
+
+            // Log the response status code and headers
+            _logger.LogInformation($"Response Status: {response.StatusCode}");
+            foreach (var header in response.Headers)
+            {
+                _logger.LogInformation($"Response Header: {header.Key} = {string.Join(", ", header.Value)}");
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Failed to create procedure log. Status: {response.StatusCode}, Details: {errorContent}");
+                throw new Exception($"Error creating procedure log: Status Code {response.StatusCode}, Details: {errorContent}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<OpenDentalProcedureLogCreateResponse>();
+            return result;
+        }
+
+
+
+        public async Task CreateProcNoteAsync(OpenDentalProcNoteCreateRequest request, int facilityId)
+        {
+            var facility = await _context.Facilities.FirstOrDefaultAsync(f => f.FacilityId == facilityId);
+            if (facility == null || string.IsNullOrEmpty(facility.CustomerKey))
+            {
+                _logger.LogError($"Facility {facilityId} not found or lacks a customer key.");
+                throw new InvalidOperationException($"Facility {facilityId} not found or lacks a customer key.");
+            }
+
+            var httpClient = GetConfiguredHttpClient(facility.CustomerKey);
+
+            // Remove null values from the request object
+            var cleanedRequest = new Dictionary<string, object>();
+            foreach (var prop in request.GetType().GetProperties())
+            {
+                var value = prop.GetValue(request);
+                if (value != null)
+                {
+                    cleanedRequest[prop.Name] = value;
+                }
+            }
+
+            var jsonRequest = System.Text.Json.JsonSerializer.Serialize(cleanedRequest);
+            var content = new StringContent(jsonRequest, Encoding.UTF8);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            // Log the JSON payload and headers
+            _logger.LogInformation($"JSON Payload: {jsonRequest}");
+            foreach (var header in content.Headers)
+            {
+                _logger.LogInformation($"Request Header: {header.Key} = {string.Join(", ", header.Value)}");
+            }
+
+            _logger.LogInformation($"Sending request to OpenDental API: {_openDentalApiUrl}/procnotes");
+
+            var response = await httpClient.PostAsync($"{_openDentalApiUrl}/procnotes", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Failed to create procedure note in OpenDental. Status: {response.StatusCode}, Details: {errorContent}");
+                throw new Exception($"Error creating procedure note: Status Code {response.StatusCode}, Details: {errorContent}");
+            }
+        }
+
 
         public async Task<IEnumerable<OpenDentalAllergiesDto>> GetAllergiesForPatient(int patNum, int facilityId)
         {

@@ -13,6 +13,7 @@ export const openDentalApiSlice = createApi({
             if (token) {
                 headers.set('authorization', `Bearer ${token}`);
             }
+            headers.set('Content-Type', 'application/json');
             return headers;
         },
     }),
@@ -34,23 +35,50 @@ export const openDentalApiSlice = createApi({
                 url: '/importtoopendental',
                 method: 'POST',
                 body: openDentalTreatmentPlanDto,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             }),
         }),
         savePatientsFromOpenDentalToDatabase: builder.mutation({
             query: () => ({
                 url: '/savePatientsFromOpenDentalToDatabase',
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }),
+        }),
+        createProcedureLog: builder.mutation({
+            query: (openDentalProcedureLogCreateRequest) => ({
+                url: '/procedurelogs',
+                method: 'POST',
+                body: openDentalProcedureLogCreateRequest,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }),
+        }),
+        createProcNote: builder.mutation({
+            query: (openDentalProcNoteCreateRequest) => ({
+                url: '/procnotes',
+                method: 'POST',
+                body: openDentalProcNoteCreateRequest,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             }),
         }),
     }),
 });
-
 // Export the auto-generated hook for each endpoint
 export const {
     useGetPatientsForUserFacilityFromOpenDentalQuery,
     useGetDiseasesForPatientQuery,
     useGetMedicationsForPatientQuery,
-    useGetAllergiesForPatientQuery, 
+    useGetAllergiesForPatientQuery,
     useImportTreatmentPlanToOpenDentalMutation,
     useSavePatientsFromOpenDentalToDatabaseMutation,
+    useCreateProcedureLogMutation,
+    useCreateProcNoteMutation, 
 } = openDentalApiSlice;

@@ -1,27 +1,4 @@
-import { useSelector } from 'react-redux';
-import {
-    selectChiefComplaint,
-    selectMedicalHistory,
-    selectMedications,
-    selectAllergies,
-    selectExtraOralAndIntraOralFindings,
-    selectOcclusions,
-    selectFindings
-} from '../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
-
-import ContainerRoundedBox from '../../../../Components/Containers/ContainerRoundedBox/index';
-import { StyledNotesContainer, StyledNote } from './index.style';
-
-
-const NotesOutput = () => {
-    const chiefComplaint = useSelector(selectChiefComplaint);
-    const medicalHistory = useSelector(selectMedicalHistory);
-    const medications = useSelector(selectMedications);
-    const allergies = useSelector(selectAllergies);
-    const extraOralAndIntraOralFindings = useSelector(selectExtraOralAndIntraOralFindings);
-    const occlusions = useSelector(selectOcclusions);
-    const findings = useSelector(selectFindings);
-
+export const formatNotes = (chiefComplaint, medicalHistory, medications, allergies, extraOralAndIntraOralFindings, occlusions, findings) => {
     const formatTreeData = (treeData) => {
         return treeData.map((node, index) => {
             const children = node.children.map(child => `${child.label}: ${child.value}`).join('\n        ');
@@ -29,8 +6,7 @@ const NotesOutput = () => {
         }).join('\n    ');
     };
 
-    const formatNotes = () => {
-        const sNotes = `
+    const sNotes = `
 Subjective
     Chief Complaint: ${chiefComplaint}
     Medical History: ${formatTreeData(medicalHistory.treeData)}
@@ -41,7 +17,7 @@ Subjective
     Additional Allergy Notes: ${allergies.additionalNotes}
 `;
 
-        const oNotes = `
+    const oNotes = `
 Objective
     Extra Oral and Intra Oral Findings:
         Head and Neck: ${extraOralAndIntraOralFindings.headAndNeck}
@@ -69,32 +45,16 @@ Objective
         Additional Notes: ${occlusions.additionalNotes}
 `;
 
-        const aNotes = `
+    const aNotes = `
 Assessment
     Existing: ${findings.existing}
     Conditions: ${findings.conditions}
 `;
 
-        const pNotes = `
+    const pNotes = `
 Plan
     Treatment Plan: ${findings.treatments}
 `;
 
-        return { sNotes, oNotes, aNotes, pNotes };
-    };
-
-    const { sNotes, oNotes, aNotes, pNotes } = formatNotes();
-    return (
-        <ContainerRoundedBox>
-            <StyledNotesContainer>
-                <StyledNote><pre>{sNotes}</pre></StyledNote>
-                <StyledNote><pre>{oNotes}</pre></StyledNote>
-                <StyledNote><pre>{aNotes}</pre></StyledNote>
-                <StyledNote><pre>{pNotes}</pre></StyledNote>
-            </StyledNotesContainer>
-            
-        </ContainerRoundedBox >
-    );
+    return { sNotes, oNotes, aNotes, pNotes };
 };
-
-export default NotesOutput;

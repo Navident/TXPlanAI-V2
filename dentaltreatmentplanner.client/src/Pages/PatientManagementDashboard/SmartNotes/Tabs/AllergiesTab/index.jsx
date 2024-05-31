@@ -1,19 +1,19 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import TreeView from '../../../../../Components/TreeView/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { setAllergiesTreeData, setAllergiesNotes, selectAllergies } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setAllergiesTreeData, setAllergiesExpandedNodes, setAllergiesNotes, selectAllergies } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getAllergiesTabPrompt } from './prompt';
 
 const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
-    const { treeData, additionalNotes } = useSelector(selectAllergies);
+    const { treeData, additionalNotes, expandedNodes } = useSelector(selectAllergies);
 
     const createNode = (allergy, index) => ({
         label: `Allergy ${index + 1}`,
         value: allergy?.defDescription || '',
-        children: [        
+        children: [
             { label: 'Reaction', value: allergy?.reaction || '' },
             { label: 'Date Adverse Reaction', value: allergy?.dateAdverseReaction || '' },
             { label: 'Patient Note', value: allergy?.patNote || '' },
@@ -67,8 +67,8 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
                 addButtonText="Add Allergies"
                 selector={selectAllergies}
                 setTreeData={setAllergiesTreeData}
+                setExpandedNodes={(nodes) => dispatch(setAllergiesExpandedNodes(nodes))}
             />
-
         </div>
     );
 };

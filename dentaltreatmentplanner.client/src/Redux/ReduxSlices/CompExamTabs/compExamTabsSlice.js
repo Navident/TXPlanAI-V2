@@ -4,15 +4,21 @@ const initialState = {
     chiefComplaint: '',
     medicalHistory: {
         treeData: [],
-        additionalNotes: ''
+        additionalNotes: '',
+        expandedNodes: []
+
     },
     medications: {
         treeData: [],
-        additionalNotes: ''
+        additionalNotes: '',
+        expandedNodes: []
+
     },
     allergies: {
         treeData: [],
-        additionalNotes: ''
+        additionalNotes: '',
+        expandedNodes: []
+
     },
     extraOralAndIntraOralFindings: {
         headAndNeck: '',
@@ -61,6 +67,9 @@ const compExamTabsSlice = createSlice({
         setMedicalHistoryTreeData: (state, action) => {
             state.medicalHistory.treeData = action.payload;
         },
+        setMedicalHistoryExpandedNodes: (state, action) => {
+            state.allergies.expandedNodes = action.payload;
+        },
         setMedicalHistoryNotes: (state, action) => {
             state.medicalHistory.additionalNotes = action.payload;
         },
@@ -70,6 +79,9 @@ const compExamTabsSlice = createSlice({
         setMedicationsTreeData: (state, action) => {
             state.medications.treeData = action.payload;
         },
+        setMedicationsExpandedNodes: (state, action) => {
+            state.allergies.expandedNodes = action.payload;
+        },
         setMedicationsNotes: (state, action) => {
             state.medications.additionalNotes = action.payload;
         },
@@ -78,6 +90,9 @@ const compExamTabsSlice = createSlice({
         },
         setAllergiesTreeData: (state, action) => {
             state.allergies.treeData = action.payload;
+        },
+        setAllergiesExpandedNodes: (state, action) => {
+            state.allergies.expandedNodes = action.payload;
         },
         setAllergiesNotes: (state, action) => {
             state.allergies.additionalNotes = action.payload;
@@ -103,13 +118,12 @@ const compExamTabsSlice = createSlice({
 export const {
     setChiefComplaint,
     setMedicalHistory,
-    setMedicalHistoryTreeData,
+    setMedicalHistoryTreeData, setMedicalHistoryExpandedNodes,
     setMedicalHistoryNotes,
     setMedications,
-    setMedicationsTreeData,
+    setMedicationsTreeData, setMedicationsExpandedNodes,
     setMedicationsNotes,
-    setAllergies,
-    setAllergiesTreeData,
+    setAllergies, setAllergiesTreeData, setAllergiesExpandedNodes,
     setAllergiesNotes,
     setExtraOralAndIntraOralFindings,
     setOcclusions,
