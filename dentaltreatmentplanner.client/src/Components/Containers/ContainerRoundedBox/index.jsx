@@ -1,11 +1,15 @@
-import { StyledRoundedBoxContainer, StyledRoundedBoxContainerInner, StyledLargeText } from '../../../GlobalStyledComponents';
+import { StyledRoundedBoxContainer, StyledRoundedBoxContainerInner, StyledSemiboldBlackTitle } from '../../../GlobalStyledComponents';
 import { StyledRoundedBoxContainerTitle } from './index.style';
 
-const ContainerRoundedBox = ({ children }) => {
+const ContainerRoundedBox = ({ children, title = 'Notes Preview', showTitle = true, centerTitle = true }) => {
     return (
         <StyledRoundedBoxContainer>
             <StyledRoundedBoxContainerInner>
-                <StyledRoundedBoxContainerTitle>Notes Preview</StyledRoundedBoxContainerTitle>
+                {showTitle && (
+                    <StyledSemiboldBlackTitle center={centerTitle}>
+                        {title}
+                    </StyledSemiboldBlackTitle>
+                )}
                 {children}
             </StyledRoundedBoxContainerInner>
         </StyledRoundedBoxContainer>
@@ -13,3 +17,5 @@ const ContainerRoundedBox = ({ children }) => {
 };
 
 export default ContainerRoundedBox;
+
+

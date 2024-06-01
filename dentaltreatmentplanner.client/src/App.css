@@ -118,9 +118,14 @@
     flex-direction: row;
 }
 
-    .textfield-row .multiline-textfield {
-        flex: 1;
-    }
+.create-treatment-plan-section-inner .treeview-container .rounded-button {
+    margin: 0;
+    margin-top: 10px;
+}
+
+.textfield-row .multiline-textfield {
+    flex: 1;
+}
 .loading-spinner{
     margin: auto;
 }

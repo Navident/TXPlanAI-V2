@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { StyledTreeNodeContainer, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
 import StandardTextField from '../../Components/Common/StandardTextfield/StandardTextfield';
+import { UI_COLORS } from '../../Theme';
+import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -9,7 +11,7 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
     const { treeData, expandedNodes } = useSelector(selector);
 
     return (
-        <div>
+        <div className="treeview-container">
             {treeData.map((node, index) => (
                 <TreeNode
                     key={index}
@@ -21,9 +23,17 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
                     setExpandedNodes={setExpandedNodes}
                 />
             ))}
-            <button onClick={addParentNode} style={{ marginTop: '10px' }}>
-                {addButtonText}
-            </button>
+            <RoundedButton
+                text={addButtonText}
+                onClick={addParentNode}
+                backgroundColor={UI_COLORS.light_grey2}
+                textColor="white"
+                border={false}
+                borderRadius="4px"
+                height="39px"
+                width="fit-content"
+            />
+
         </div>
     );
 };

@@ -1,14 +1,12 @@
-import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
-import MultilineTextfield from "../../../Components/Common/MultilineTextfield/index";
+
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
-import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
 import {
     StyledContainerWithTableInner,
     StyledLargeText,
     StyledSeparator,
-    StyledTitleAndPaymentTotalsContainer
+    StyledTitleAndPaymentTotalsContainer,
 } from "../../../GlobalStyledComponents";
 import { fetchOpenAIResponse } from "../../../OpenAI/LLM/gptRunner";
 import { CircularProgress } from "@mui/material";
@@ -35,7 +33,6 @@ import EmptyStatePlaceholder from '../../../Components/Common/EmptyStatePlacehol
 import { useGetAllSubcategoryTreatmentPlansQuery } from '../../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import LoginPopup from '../../../Components/Common/LoginPopup';
 
-import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
 import AudioPopup from "../../../Components/AudioPopup/index";
 import { Tabs, Tab, Box } from '@mui/material';
 
@@ -48,6 +45,7 @@ import ChiefComplaintTab from './Tabs/ChiefComplaintTab/index';
 import OcclusionsTab from './Tabs/OcclusionsTab/index';
 import MicIcon from '@mui/icons-material/Mic';
 import NotesOutput from './NotesOutput/index';
+import ContainerRoundedBox from '../../../Components/Containers/ContainerRoundedBox/index';
 
 import { extractPatientIdFromUrl } from '../../../Utils/helpers';
 import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
@@ -417,8 +415,24 @@ const SmartNotes = () => {
                 onClose={handleClose}
             />
 
-            <div className="create-treatment-plan-section rounded-box box-shadow">
-                <Tabs value={tabValue} onChange={handleTabChange} aria-label="treatment plan tabs" centered>
+            <ContainerRoundedBox showTitle={true} title="Smart Notes">
+                <Tabs
+                    value={tabValue}
+                    onChange={handleTabChange}
+                    aria-label="treatment plan tabs"
+                    centered
+                    textColor="inherit"
+                    TabIndicatorProps={{
+                        style: {
+                            backgroundColor: '#7777a1',
+                        },
+                    }}
+                    sx={{
+                        '.Mui-selected': {
+                            color: '#7777a1',
+                        },
+                    }}
+                >
                     <Tab label="Chief Complaint" />
                     <Tab label="Medical History" />
                     <Tab label="Medications" />
@@ -467,7 +481,7 @@ const SmartNotes = () => {
                     />
                 </div>
 
-            </div>
+            </ContainerRoundedBox>
             {tabValue === 6 && (
                 <>
                 <NotesOutput /> 

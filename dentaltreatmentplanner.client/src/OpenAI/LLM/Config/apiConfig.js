@@ -1,6 +1,6 @@
 export const API_CONFIG = {
     endpoint: "https://api.openai.com/v1/chat/completions",
-    model: "gpt-4-turbo-preview",
+    model: "gpt-4o",
     headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`

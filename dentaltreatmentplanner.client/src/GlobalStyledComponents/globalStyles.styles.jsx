@@ -86,6 +86,7 @@ export const StyledSemiboldBlackTitle = styled.div`
     font-size: 21px;
     font-weight: 600;
     white-space: nowrap;
+    text-align: ${(props) => (props.center ? 'center' : 'left')};
 `;
 
 export const StyledLightGreyText = styled.div`

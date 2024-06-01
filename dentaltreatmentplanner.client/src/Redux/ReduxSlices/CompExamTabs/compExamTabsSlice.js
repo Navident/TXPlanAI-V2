@@ -68,7 +68,7 @@ const compExamTabsSlice = createSlice({
             state.medicalHistory.treeData = action.payload;
         },
         setMedicalHistoryExpandedNodes: (state, action) => {
-            state.allergies.expandedNodes = action.payload;
+            state.medicalHistory.expandedNodes = action.payload;
         },
         setMedicalHistoryNotes: (state, action) => {
             state.medicalHistory.additionalNotes = action.payload;
@@ -80,7 +80,7 @@ const compExamTabsSlice = createSlice({
             state.medications.treeData = action.payload;
         },
         setMedicationsExpandedNodes: (state, action) => {
-            state.allergies.expandedNodes = action.payload;
+            state.medications.expandedNodes = action.payload;
         },
         setMedicationsNotes: (state, action) => {
             state.medications.additionalNotes = action.payload;
@@ -118,12 +118,16 @@ const compExamTabsSlice = createSlice({
 export const {
     setChiefComplaint,
     setMedicalHistory,
-    setMedicalHistoryTreeData, setMedicalHistoryExpandedNodes,
+    setMedicalHistoryTreeData,
+    setMedicalHistoryExpandedNodes,
     setMedicalHistoryNotes,
     setMedications,
-    setMedicationsTreeData, setMedicationsExpandedNodes,
+    setMedicationsTreeData,
+    setMedicationsExpandedNodes,
     setMedicationsNotes,
-    setAllergies, setAllergiesTreeData, setAllergiesExpandedNodes,
+    setAllergies,
+    setAllergiesTreeData,
+    setAllergiesExpandedNodes,
     setAllergiesNotes,
     setExtraOralAndIntraOralFindings,
     setOcclusions,
