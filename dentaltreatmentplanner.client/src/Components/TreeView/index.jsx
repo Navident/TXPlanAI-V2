@@ -90,6 +90,7 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
                     value={value}
                     onChange={handleTextFieldChange}
                     borderColor="#ccc"
+                    width="350px"
                 />
             </StyledTreeNodeLabelContainer>
             {hasChildren && isOpen && (

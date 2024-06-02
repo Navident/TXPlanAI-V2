@@ -2,7 +2,7 @@ import MultilineTextfield from '../../../../../Components/Common/MultilineTextfi
 import { useState } from 'react';
 import StandardTextField from '../../../../../Components/Common/StandardTextfield/StandardTextfield';
 import { StyledLabelTextfieldRow  } from '../../index.style';
-import { StyledTwoColumnContainer, StyledColumn } from './index.style';
+import { StyledTwoColumnContainer, StyledColumn, StyledOcclusionsContainer } from './index.style';
 import { setOcclusions, selectOcclusions } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { getOcclusionsTabPrompt } from './prompt';
 import { useEffect, useCallback } from "react";
@@ -62,7 +62,7 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
+        <StyledOcclusionsContainer>
             <StyledTwoColumnContainer>
                 <StyledColumn>
                     {firstColumnFields.map((data, index) => (
@@ -94,7 +94,7 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
                 value={occlusions.additionalNotes || ''}
                 onChange={(e) => dispatch(setOcclusions({ ...occlusions, additionalNotes: e.target.value }))}
             />
-        </div>
+        </StyledOcclusionsContainer>
     );
 };
 

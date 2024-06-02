@@ -471,16 +471,18 @@ const SmartNotes = () => {
                         setAudioProcessingFunction={setCurrentProcessAudioFile}
                     />}
 
-                    <MicIcon
-                        onClick={handleMicClick}
-                        style={{
-                            cursor: 'pointer',
-                            height: 'auto',
-                            zIndex: '999',
-                        }}
-                    />
-                </div>
 
+                </div>
+                <MicIcon
+                    onClick={handleMicClick}
+                    style={{
+                        cursor: 'pointer',
+                        width: '40px',
+                        height: 'auto',
+                        zIndex: '999',
+                        marginTop: 'auto',
+                    }}
+                />
             </ContainerRoundedBox>
             {tabValue === 6 && (
                 <>

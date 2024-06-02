@@ -59,6 +59,7 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
                         value={findings[data.field] || ''}
                         onChange={handleTextFieldChange(data.field)}
                         borderColor="#ccc"
+                        width="350px"
                     />
                 </StyledLabelTextfieldRow>
             ))}

@@ -15,9 +15,7 @@ import {
     toggleGroupActive,
     requestUpdateTreatmentPlan
 } from '../../Redux/ReduxSlices/TableViewControls/tableViewControlSlice';
-import SaveButtonRow from "../../Components/Common/SaveButtonRow/index";
-import printIcon from "../../assets/printer-icon.svg";
-import importIcon from "../../assets/import-icon.svg";
+
 import { mapToOpenDentalTreatmentPlanDtoByAllRows } from "../../Utils/Mapping/openDentalMapping";
 import {
     selectAllTreatmentPlans,
