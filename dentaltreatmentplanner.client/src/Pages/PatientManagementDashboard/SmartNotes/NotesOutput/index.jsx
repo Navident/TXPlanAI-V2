@@ -11,6 +11,10 @@ import {
 
 import ContainerRoundedBox from '../../../../Components/Containers/ContainerRoundedBox/index';
 import { StyledNotesContainer, StyledNote } from './index.style';
+import {
+    StyledLargeText,
+
+} from "../../../../GlobalStyledComponents";
 
 
 const NotesOutput = () => {
@@ -85,15 +89,17 @@ Plan
 
     const { sNotes, oNotes, aNotes, pNotes } = formatNotes();
     return (
-        <ContainerRoundedBox>
-            <StyledNotesContainer>
+        <>
+        <StyledLargeText>Final Note</StyledLargeText>
+        <StyledNotesContainer>
+            
                 <StyledNote><pre>{sNotes}</pre></StyledNote>
                 <StyledNote><pre>{oNotes}</pre></StyledNote>
                 <StyledNote><pre>{aNotes}</pre></StyledNote>
                 <StyledNote><pre>{pNotes}</pre></StyledNote>
             </StyledNotesContainer>
             
-        </ContainerRoundedBox >
+        </>
     );
 };
 

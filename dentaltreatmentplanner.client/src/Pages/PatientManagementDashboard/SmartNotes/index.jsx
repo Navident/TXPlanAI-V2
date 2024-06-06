@@ -128,9 +128,8 @@ const SmartNotes = () => {
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
     };
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-    };
+
+
     function extractActiveTxCategories(visits) {
         const uniqueCategories = visits.reduce((acc, visit) => {
             acc.add(visit.procedureCategoryName);
@@ -278,8 +277,11 @@ const SmartNotes = () => {
         };
     }
 
+
+
     const [treatmentsInputText, setTreatmentsInputText] = useState("");
     const handleGenerateTreatmentPlan = async () => {
+        console.log("treatmentsInputText when executed", treatmentsInputText);
         if (!treatmentsInputText.trim()) {
             showAlert(
                 "error",
@@ -401,6 +403,14 @@ const SmartNotes = () => {
         setRecording(false); // Reset recording state
     };
 
+    const handleTabChange = (event, newValue) => {
+        if (newValue === 7) {  
+            console.log("executing generate now");
+            handleGenerateTreatmentPlan();
+        }
+        setTabValue(newValue);
+    };
+
     return (
         <div className="dashboard-bottom-inner-row">
             {showLoginPopup && (
@@ -414,7 +424,6 @@ const SmartNotes = () => {
                 stopRecording={stopAndProcessRecording}
                 onClose={handleClose}
             />
-
             <ContainerRoundedBox showTitle={true} title="Smart Notes">
                 <Tabs
                     value={tabValue}
@@ -424,12 +433,12 @@ const SmartNotes = () => {
                     textColor="inherit"
                     TabIndicatorProps={{
                         style: {
-                            backgroundColor: '#7777a1',
+                            backgroundColor: "#7777a1",
                         },
                     }}
                     sx={{
-                        '.Mui-selected': {
-                            color: '#7777a1',
+                        ".Mui-selected": {
+                            color: "#7777a1",
                         },
                     }}
                 >
@@ -440,53 +449,32 @@ const SmartNotes = () => {
                     <Tab label="Extra oral and Intra oral Findings" />
                     <Tab label="Occlusions" />
                     <Tab label="Findings" />
-
+                    <Tab label="Generate" />
                 </Tabs>
                 <div className="create-treatment-plan-section-inner">
-
-                    {tabValue === 0 && <ChiefComplaintTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                    />}
-                    {tabValue === 1 && <MedicalHistoryTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                        diseases={diseases}
-                    />}
-                    {tabValue === 2 && <MedicationsTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                        medications={medications}
-                    />}
-                    {tabValue === 3 && <AllergiesTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                        allergies={allergies}
-                    />}
-                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                    />}
-                    {tabValue === 5 && <OcclusionsTab
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                    />}
-                    {tabValue === 6 && <FindingsTab
-                        handleGenerateTreatmentPlan={handleGenerateTreatmentPlan}
-                        setTreatmentsInputText={setTreatmentsInputText}
-                        setAudioProcessingFunction={setCurrentProcessAudioFile}
-                    />}
-
-
+                    {tabValue === 0 && <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
+                    {tabValue === 1 && <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} />}
+                    {tabValue === 2 && <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} medications={medications} />}
+                    {tabValue === 3 && <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} allergies={allergies} />}
+                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
+                    {tabValue === 5 && <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
+                    {tabValue === 6 && <FindingsTab setTreatmentsInputText={setTreatmentsInputText} setAudioProcessingFunction={setCurrentProcessAudioFile} />}
+                    {tabValue === 7 && <NotesOutput/>}
                 </div>
-                <MicIcon
-                    onClick={handleMicClick}
-                    style={{
-                        cursor: 'pointer',
-                        width: '40px',
-                        height: 'auto',
-                        zIndex: '999',
-                        marginTop: 'auto',
-                    }}
-                />
+                {tabValue !== 7 && (
+                    <MicIcon
+                        onClick={() => setShowAudioPopup(true)}
+                        style={{
+                            cursor: "pointer",
+                            width: "40px",
+                            height: "auto",
+                            zIndex: "999",
+                            marginTop: "auto",
+                        }}
+                    />
+                )}
             </ContainerRoundedBox>
-            {tabValue === 6 && (
-                <>
-                <NotesOutput /> 
+            {tabValue === 7 && (
                 <div className="treatment-plan-output-section rounded-box box-shadow">
                     <TxViewCustomizationToolbar allRows={allRowsFromChild} />
                     <StyledSeparator customMarginTop="0px" />
@@ -534,11 +522,10 @@ const SmartNotes = () => {
                             <EmptyStatePlaceholder />
                         )}
                     </StyledContainerWithTableInner>
-                    </div>
-                </>
+                </div>
             )}
         </div>
-
     );
 };
-    export default SmartNotes;
+
+export default SmartNotes;

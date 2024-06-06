@@ -64,15 +64,6 @@ const FindingsTab = ({
                 value={inputTexts.treatments}
                 onChange={(e) => updateInputTexts({ treatments: e.target.value })}
             />
-            <RoundedButton
-                text="Generate Treatment Plan"
-                backgroundColor="#7777a1"
-                textColor="white"
-                border={false}
-                width="fit-content"
-                onClick={handleGenerateTreatmentPlan}
-                className="purple-button-hover"
-            />
         </div>
     );
 };
