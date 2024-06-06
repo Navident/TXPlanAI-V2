@@ -450,7 +450,9 @@ const SmartNotes = () => {
                     <Tab label="Occlusions" />
                     <Tab label="Findings" />
                     <Tab label="Generate" />
+
                 </Tabs>
+                <StyledSeparator customMarginTop="0px" />
                 <div className="create-treatment-plan-section-inner">
                     {tabValue === 0 && <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
                     {tabValue === 1 && <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} />}

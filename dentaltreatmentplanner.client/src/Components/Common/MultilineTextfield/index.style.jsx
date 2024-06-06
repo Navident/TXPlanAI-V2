@@ -30,4 +30,5 @@ export const StyledTextfieldArea = styled.textarea`
 export const StyledTextfieldWrap = styled.div`
     position: relative;
     flex: 1;
+    width: 100%;
 `;

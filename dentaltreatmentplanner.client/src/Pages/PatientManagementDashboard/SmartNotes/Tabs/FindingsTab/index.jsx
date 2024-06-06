@@ -6,6 +6,7 @@ import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../Op
 import { getFindingsTabPrompt } from './prompt';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFindings, selectFindings } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { StyledFindingsTabContainer  } from './index.style';
 
 const FindingsTab = ({
     handleGenerateTreatmentPlan,
@@ -46,7 +47,7 @@ const FindingsTab = ({
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
+        <StyledFindingsTabContainer>
             <div className="textfield-row">
                 <MultilineTextfield
                     label="Existing"
@@ -64,7 +65,7 @@ const FindingsTab = ({
                 value={inputTexts.treatments}
                 onChange={(e) => updateInputTexts({ treatments: e.target.value })}
             />
-        </div>
+        </StyledFindingsTabContainer>
     );
 };
 

@@ -7,6 +7,10 @@ export const StyledLargeText = styled.div`
     text-align: ${props => props.textAlign || 'inherit'};
 `;
 
+export const StyledHorizontalCenterContainer = styled.div`
+    margin: 0 auto;
+`;
+
 export const StyledSeparator = styled.div`
   height: 1px;
   background-color: #EAEBEB; 

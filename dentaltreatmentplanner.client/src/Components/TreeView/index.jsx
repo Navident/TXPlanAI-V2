@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyledTreeNodeContainer, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
+import { StyledTreeNodeContainer, StyledTreeViewContainer, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
 import StandardTextField from '../../Components/Common/StandardTextfield/StandardTextfield';
 import { UI_COLORS } from '../../Theme';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
@@ -11,7 +11,7 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
     const { treeData, expandedNodes } = useSelector(selector);
 
     return (
-        <div className="treeview-container">
+        <StyledTreeViewContainer>
             {treeData.map((node, index) => (
                 <TreeNode
                     key={index}
@@ -34,7 +34,7 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
                 width="fit-content"
             />
 
-        </div>
+        </StyledTreeViewContainer>
     );
 };
 

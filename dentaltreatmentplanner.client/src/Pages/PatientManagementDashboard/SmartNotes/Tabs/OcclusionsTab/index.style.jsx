@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const StyledOcclusionsContainer = styled.div`
    display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 40px;
 `;
 
 
@@ -17,4 +17,5 @@ export const StyledColumn = styled.div`
    display: flex;
    flex-direction: column;
    width: 50%;
+   gap: 11px;
 `;

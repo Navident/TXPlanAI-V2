@@ -4,6 +4,7 @@ import { setMedicalHistoryTreeData, setMedicalHistoryNotes, setMedicalHistoryExp
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicalHistoryTabPrompt } from './prompt';
+import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComponents';
 
 const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
@@ -60,7 +61,7 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
+        <StyledHorizontalCenterContainer>
             <TreeView
                 addParentNode={addParentNode}
                 addButtonText="Add Medical"
@@ -69,7 +70,7 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
                 setExpandedNodes={(nodes) => dispatch(setMedicalHistoryExpandedNodes(nodes))}
 
             />
-        </div>
+        </StyledHorizontalCenterContainer>
     );
 };
 

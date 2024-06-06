@@ -5,6 +5,7 @@ import { setMedicationsTreeData, setMedicationsNotes, selectMedications, setMedi
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicationsTabPrompt } from './prompt';
+import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComponents';
 
 const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
@@ -61,7 +62,6 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
             <TreeView
                 addParentNode={addParentNode}
                 addButtonText="Add Medications"
@@ -70,7 +70,6 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
                 setExpandedNodes={(nodes) => dispatch(setMedicationsExpandedNodes(nodes))}
             />
 
-        </div>
     );
 };
 

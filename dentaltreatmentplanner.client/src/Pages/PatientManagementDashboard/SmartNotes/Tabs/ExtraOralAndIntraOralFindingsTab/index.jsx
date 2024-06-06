@@ -6,6 +6,7 @@ import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../Op
 import { useDispatch, useSelector } from 'react-redux';
 import { setExtraOralAndIntraOralFindings, selectExtraOralAndIntraOralFindings } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { getExtraOralAndIntraOralFindingsTabPrompt } from './prompt';
+import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComponents';
 
 const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
@@ -50,7 +51,7 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
+        <StyledHorizontalCenterContainer>
             {fieldData.map((data, index) => (
                 <StyledLabelTextfieldRow key={index}>
                     <div>{data.label}:</div>
@@ -64,7 +65,7 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
                 </StyledLabelTextfieldRow>
             ))}
 
-        </div>
+        </StyledHorizontalCenterContainer>
     );
 };
 
