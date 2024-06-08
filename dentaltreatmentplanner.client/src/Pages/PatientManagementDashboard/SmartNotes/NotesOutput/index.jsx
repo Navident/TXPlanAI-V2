@@ -26,13 +26,27 @@ const NotesOutput = () => {
     const occlusions = useSelector(selectOcclusions);
     const findings = useSelector(selectFindings);
 
+    const setDefaultValues = (obj, defaultValue) => {
+        const updatedObj = {};
+        for (const key in obj) {
+            if (obj[key] === "" || obj[key] === null || obj[key] === undefined) {
+                updatedObj[key] = defaultValue;
+            } else {
+                updatedObj[key] = obj[key];
+            }
+        }
+        return updatedObj;
+    };
+
+    const extraOralFindingsWithNPP = setDefaultValues(extraOralAndIntraOralFindings, "NPP");
+
     const formatTreeData = (treeData) => {
         return treeData.map((node, index) => {
             const children = node.children.map(child => (
-                <div key={child.label}>{child.label}: {child.value}</div>
+                <div className="final-note-child-label" key={child.label}>{child.label}: {child.value}</div>
             ));
             return (
-                <div key={index}>
+                <div className="final-note-child-label" key={index}>
                     Problem {index + 1}:
                     {children}
                 </div>
@@ -58,15 +72,19 @@ const NotesOutput = () => {
         <>
             <h2>Objective</h2>
             <h4>Extra Oral and Intra Oral Findings</h4>
-            <div className="final-note-child-label">Head and Neck: {extraOralAndIntraOralFindings.headAndNeck}</div>
-            <div className="final-note-child-label">Lymph Chain: {extraOralAndIntraOralFindings.lymphChain}</div>
-            <div className="final-note-child-label">Lips: {extraOralAndIntraOralFindings.lips}</div>
-            <div className="final-note-child-label">Tongue: {extraOralAndIntraOralFindings.tongue}</div>
-            <div className="final-note-child-label">Floor and Mouth: {extraOralAndIntraOralFindings.floorAndMouth}</div>
-            <div className="final-note-child-label">Hard and Soft Palate: {extraOralAndIntraOralFindings.hardAndSoftPalate}</div>
-            <div className="final-note-child-label">Pharynx: {extraOralAndIntraOralFindings.pharynx}</div>
-            <div className="final-note-child-label">Gingiva: {extraOralAndIntraOralFindings.gingiva}</div>
-            <h4>Additional Notes {extraOralAndIntraOralFindings.additionalNotes}</h4>
+
+            <div className="final-note-child-label">Head and Neck: {extraOralFindingsWithNPP.headAndNeck}</div>
+            <div className="final-note-child-label">Lymph Chain: {extraOralFindingsWithNPP.lymphChain}</div>
+            <div className="final-note-child-label">Lips: {extraOralFindingsWithNPP.lips}</div>
+            <div className="final-note-child-label">Tongue: {extraOralFindingsWithNPP.tongue}</div>
+            <div className="final-note-child-label">Floor and Mouth: {extraOralFindingsWithNPP.floorAndMouth}</div>
+            <div className="final-note-child-label">Hard and Soft Palate: {extraOralFindingsWithNPP.hardAndSoftPalate}</div>
+            <div className="final-note-child-label">Pharynx: {extraOralFindingsWithNPP.pharynx}</div>
+            <div className="final-note-child-label">Gingiva: {extraOralFindingsWithNPP.gingiva}</div>
+
+            <h4>Additional Notes</h4>
+            <div className="final-note-child-label">Text: {extraOralAndIntraOralFindings.additionalNotes}</div>
+
             <h4>Occlusion</h4>
             <div className="final-note-child-label">Overjet: {occlusions.overjet}</div>
             <div className="final-note-child-label">Overbite: {occlusions.overbite}</div>
@@ -80,7 +98,8 @@ const NotesOutput = () => {
             <div className="final-note-child-label">Overall Spacing: {occlusions.overallSpacing}</div>
             <div className="final-note-child-label">Overall Crowding: {occlusions.overallCrowding}</div>
             <div className="final-note-child-label">Is the Patient Interested in Orthodontics: {occlusions.isThePatientInterestedInOrthodontics}</div>
-            <h4>Additional Notes {occlusions.additionalNotes}</h4>
+            <h4>Additional Notes</h4>
+            <div className="final-note-child-label">Text: {occlusions.additionalNotes}</div>
         </>
     );
 

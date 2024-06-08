@@ -390,6 +390,7 @@ p {
     line-height: 1.5;
     margin-left: 60px;
     margin-bottom: 5px;
+    font-size: 16px;
 }
 
 .notes-output-wrap h4 {
