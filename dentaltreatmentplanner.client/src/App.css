@@ -8,10 +8,183 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
 }
-h2{
 
+/* START - font faces */
+@font-face {
+    font-family: 'Poppins-Thin';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Thin.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-ThinItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ThinItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ThinItalic.ttf') format('truetype');
+    font-weight: 100;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-ExtraLight';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraLight.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraLight.ttf') format('truetype');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-ExtraLightItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraLightItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraLightItalic.ttf') format('truetype');
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-Light';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Light.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-LightItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-LightItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-Regular';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Regular.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Regular.woff') format('woff'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-Italic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Italic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-Medium';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Medium.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-MediumItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-MediumItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-SemiBold';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-SemiBold.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-SemiBoldItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-SemiBoldItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-Bold';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Bold.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Bold.woff') format('woff'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-BoldItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-BoldItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-BoldItalic.ttf') format('truetype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-ExtraBold';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraBold.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-ExtraBoldItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraBoldItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-ExtraBoldItalic.ttf') format('truetype');
+    font-weight: 800;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Poppins-Black';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Black.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-Black.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins-BlackItalic';
+    src: url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-BlackItalic.woff2') format('woff2'), url('C:/Projects/askDentalAI/DentalTreatmentPlanner/dentaltreatmentplanner.client/src/assets/fonts/Poppins-BlackItalic.ttf') format('truetype');
+    font-weight: 900;
+    font-style: italic;
+}
+/* END - font faces */
+
+
+/* START - Global font styles */
+h1 {
+    font-family: 'Poppins-Bold';
+    font-size: 32px;
+    line-height: 1;
+    margin: 0;
+}
+h2 {
+    font-family: 'Poppins-Medium';
+    font-size: 24px;
+    line-height: 1;
 
 }
+
+h4 {
+    font-family: 'Poppins-Medium';
+    font-size: 20px;
+    line-height: 1;
+}
+
+p {
+    font-family: 'Poppins-Regular';
+    font-size: 16px;
+    line-height: 1.1;
+}
+/* END - Global font styles */
+
+.bold {
+    font-weight: 700;
+}
+
+.container-rounded-box-title {
+    margin: 0;
+    text-align: center;
+}
+
+.large-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.large-text-bold {
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 18px;
+}
+
 .large-text {
     font-size: 18px;
     font-weight: 600;
@@ -207,9 +380,30 @@ h2{
     border-right: 1px solid #7777a1;
 }
 
+/* START - notesoutput styling */
 
+.final-note-parent-label {
+    line-height: 1.5;
+    margin-left: 30px;
+}
+.final-note-child-label {
+    line-height: 1.5;
+    margin-left: 60px;
+    margin-bottom: 5px;
+}
 
+.notes-output-wrap h4 {
+    margin: 0;
+    margin-left: 30px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.notes-output-wrap h2 {
+    margin: 0;
+    margin: 15px 0;
+}
 
+/* END - notesoutput faces */
 .login-signup-container {
     margin-top: 80px;
     padding: 60px;

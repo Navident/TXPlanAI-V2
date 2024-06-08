@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { StyledTreeNodeContainer, StyledTreeViewContainer, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
 import StandardTextField from '../../Components/Common/StandardTextfield/StandardTextfield';
 import { UI_COLORS } from '../../Theme';
@@ -45,6 +45,8 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
     const pathString = currentPath.join('-');
     const isOpen = expandedNodes.includes(pathString);
     const [value, setValue] = useState(node.value || '');
+    const [height, setHeight] = useState(isOpen ? 'auto' : '0px');
+    const contentRef = useRef(null);
 
     const handleTextFieldChange = (event) => {
         setValue(event.target.value);
@@ -78,6 +80,14 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
         dispatch(setExpandedNodes(newExpandedNodes));
     };
 
+    useEffect(() => {
+        if (isOpen) {
+            setHeight(`${contentRef.current.scrollHeight}px`);
+        } else {
+            setHeight('0px');
+        }
+    }, [isOpen]);
+
     return (
         <StyledTreeNodeContainer>
             <StyledTreeNodeLabelContainer>
@@ -93,8 +103,15 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
                     width="350px"
                 />
             </StyledTreeNodeLabelContainer>
-            {hasChildren && isOpen && (
-                <StyledTreeNodeChildren>
+            {hasChildren && (
+                <StyledTreeNodeChildren
+                    ref={contentRef}
+                    style={{
+                        height,
+                        overflow: 'hidden',
+                        transition: 'height 0.3s ease-out'
+                    }}
+                >
                     {node.children.map((child, index) => (
                         <TreeNode
                             key={index}

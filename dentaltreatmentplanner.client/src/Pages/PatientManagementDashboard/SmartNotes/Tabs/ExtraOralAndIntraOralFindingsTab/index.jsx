@@ -25,6 +25,7 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
         { label: "Hard and Soft Palate", field: "hardAndSoftPalate" },
         { label: "Pharynx", field: "pharynx" },
         { label: "Gingiva", field: "gingiva" },
+        { label: "Buccal Mucosa", field: "buccalMucosa" },
     ];
 
     const updateInputTexts = useCallback((newValues) => {

@@ -6,9 +6,9 @@ const ContainerRoundedBox = ({ children, title = 'Notes Preview', showTitle = tr
         <StyledRoundedBoxContainer>
             <StyledRoundedBoxContainerInner>
                 {showTitle && (
-                    <StyledSemiboldBlackTitle center={centerTitle}>
+                    <h2 className="container-rounded-box-title">
                         {title}
-                    </StyledSemiboldBlackTitle>
+                    </h2>
                 )}
                 {children}
             </StyledRoundedBoxContainerInner>

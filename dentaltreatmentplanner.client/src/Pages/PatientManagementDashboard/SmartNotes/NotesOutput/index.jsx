@@ -28,78 +28,89 @@ const NotesOutput = () => {
 
     const formatTreeData = (treeData) => {
         return treeData.map((node, index) => {
-            const children = node.children.map(child => `${child.label}: ${child.value}`).join('\n        ');
-            return `Problem ${index + 1}:\n        ${children}`;
-        }).join('\n    ');
+            const children = node.children.map(child => (
+                <div key={child.label}>{child.label}: {child.value}</div>
+            ));
+            return (
+                <div key={index}>
+                    Problem {index + 1}:
+                    {children}
+                </div>
+            );
+        });
     };
 
-    const formatNotes = () => {
-        const sNotes = `
-Subjective
-    Chief Complaint: ${chiefComplaint}
-    Medical History: ${formatTreeData(medicalHistory.treeData)}
-    Additional Medical Notes: ${medicalHistory.additionalNotes}
-    Medications: ${formatTreeData(medications.treeData)}
-    Additional Medication Notes: ${medications.additionalNotes}
-    Allergies: ${formatTreeData(allergies.treeData)}
-    Additional Allergy Notes: ${allergies.additionalNotes}
-`;
-
-        const oNotes = `
-Objective
-    Extra Oral and Intra Oral Findings:
-        Head and Neck: ${extraOralAndIntraOralFindings.headAndNeck}
-        Lymph Chain: ${extraOralAndIntraOralFindings.lymphChain}
-        Lips: ${extraOralAndIntraOralFindings.lips}
-        Tongue: ${extraOralAndIntraOralFindings.tongue}
-        Floor and Mouth: ${extraOralAndIntraOralFindings.floorAndMouth}
-        Hard and Soft Palate: ${extraOralAndIntraOralFindings.hardAndSoftPalate}
-        Pharynx: ${extraOralAndIntraOralFindings.pharynx}
-        Gingiva: ${extraOralAndIntraOralFindings.gingiva}
-        Additional Notes: ${extraOralAndIntraOralFindings.additionalNotes}
-    Occlusion:
-        Overjet: ${occlusions.overjet}
-        Overbite: ${occlusions.overbite}
-        Anterior Crossbite: ${occlusions.anteriorCrossbite}
-        Posterior Crossbite: ${occlusions.posteriorCrossbite}
-        Left Molar Classification: ${occlusions.leftMolarClassification}
-        Right Molar Classification: ${occlusions.rightMolarClassification}
-        Left Canine Classification: ${occlusions.leftCanineClassification}
-        Right Canine Classification: ${occlusions.rightCanineClassification}
-        Does the Patient Wear a Night Guard: ${occlusions.doesThePatientWearANightGuard}
-        Overall Spacing: ${occlusions.overallSpacing}
-        Overall Crowding: ${occlusions.overallCrowding}
-        Is the Patient Interested in Orthodontics: ${occlusions.isThePatientInterestedInOrthodontics}
-        Additional Notes: ${occlusions.additionalNotes}
-`;
-
-        const aNotes = `
-Assessment
-    Existing: ${findings.existing}
-    Conditions: ${findings.conditions}
-`;
-
-        const pNotes = `
-Plan
-    Treatment Plan: ${findings.treatments}
-`;
-
-        return { sNotes, oNotes, aNotes, pNotes };
-    };
-
-    const { sNotes, oNotes, aNotes, pNotes } = formatNotes();
-    return (
+    const sNotes = (
         <>
-        <StyledLargeText>Final Note</StyledLargeText>
-        <StyledNotesContainer>
-            
-                <StyledNote><pre>{sNotes}</pre></StyledNote>
-                <StyledNote><pre>{oNotes}</pre></StyledNote>
-                <StyledNote><pre>{aNotes}</pre></StyledNote>
-                <StyledNote><pre>{pNotes}</pre></StyledNote>
-            </StyledNotesContainer>
-            
+            <h2>Subjective</h2>
+            <h4> Chief Complaint</h4>
+            <div className="final-note-child-label">Text: {chiefComplaint}</div>
+            <h4>Medical History{formatTreeData(medicalHistory.treeData)}</h4>
+            <h4>Additional Medical Notes {medicalHistory.additionalNotes}</h4>
+            <h4>Medications{formatTreeData(medications.treeData)}</h4>
+            <h4>Additional Medication Notes: {medications.additionalNotes}</h4>
+            <h4>Allergies{formatTreeData(allergies.treeData)}</h4>
+            <h4>Additional Allergy Notes {allergies.additionalNotes}</h4>
         </>
+    );
+
+    const oNotes = (
+        <>
+            <h2>Objective</h2>
+            <h4>Extra Oral and Intra Oral Findings</h4>
+            <div className="final-note-child-label">Head and Neck: {extraOralAndIntraOralFindings.headAndNeck}</div>
+            <div className="final-note-child-label">Lymph Chain: {extraOralAndIntraOralFindings.lymphChain}</div>
+            <div className="final-note-child-label">Lips: {extraOralAndIntraOralFindings.lips}</div>
+            <div className="final-note-child-label">Tongue: {extraOralAndIntraOralFindings.tongue}</div>
+            <div className="final-note-child-label">Floor and Mouth: {extraOralAndIntraOralFindings.floorAndMouth}</div>
+            <div className="final-note-child-label">Hard and Soft Palate: {extraOralAndIntraOralFindings.hardAndSoftPalate}</div>
+            <div className="final-note-child-label">Pharynx: {extraOralAndIntraOralFindings.pharynx}</div>
+            <div className="final-note-child-label">Gingiva: {extraOralAndIntraOralFindings.gingiva}</div>
+            <h4>Additional Notes {extraOralAndIntraOralFindings.additionalNotes}</h4>
+            <h4>Occlusion</h4>
+            <div className="final-note-child-label">Overjet: {occlusions.overjet}</div>
+            <div className="final-note-child-label">Overbite: {occlusions.overbite}</div>
+            <div className="final-note-child-label">Anterior Crossbite: {occlusions.anteriorCrossbite}</div>
+            <div className="final-note-child-label">Posterior Crossbite: {occlusions.posteriorCrossbite}</div>
+            <div className="final-note-child-label">Left Molar Classification: {occlusions.leftMolarClassification}</div>
+            <div className="final-note-child-label">Right Molar Classification: {occlusions.rightMolarClassification}</div>
+            <div className="final-note-child-label">Left Canine Classification: {occlusions.leftCanineClassification}</div>
+            <div className="final-note-child-label">Right Canine Classification: {occlusions.rightCanineClassification}</div>
+            <div className="final-note-child-label">Does the Patient Wear a Night Guard: {occlusions.doesThePatientWearANightGuard}</div>
+            <div className="final-note-child-label">Overall Spacing: {occlusions.overallSpacing}</div>
+            <div className="final-note-child-label">Overall Crowding: {occlusions.overallCrowding}</div>
+            <div className="final-note-child-label">Is the Patient Interested in Orthodontics: {occlusions.isThePatientInterestedInOrthodontics}</div>
+            <h4>Additional Notes {occlusions.additionalNotes}</h4>
+        </>
+    );
+
+    const aNotes = (
+        <>
+            <h2>Assessment</h2>
+            <h4>Findings</h4>
+            <div className="final-note-child-label">Existing: {findings.existing}</div>
+            <div className="final-note-child-label">Conditions: {findings.conditions}</div>
+        </>
+    );
+
+    const pNotes = (
+        <>
+            <h2>Plan</h2>
+            <h4>Findings</h4>
+            <div className="final-note-child-label">Treatment Plan: {findings.treatments}</div>
+        </>
+    );
+
+    return (
+        <div className="notes-output-wrap">
+            <h2>Final Note</h2>
+            <StyledNotesContainer>
+                <StyledNote>{sNotes}</StyledNote>
+                <StyledNote>{oNotes}</StyledNote>
+                <StyledNote>{aNotes}</StyledNote>
+                <StyledNote>{pNotes}</StyledNote>
+            </StyledNotesContainer>
+        </div>
     );
 };
 

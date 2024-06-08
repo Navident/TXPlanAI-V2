@@ -366,7 +366,11 @@ const SmartNotes = () => {
                     };
                 }).catch(error => {
                     console.error('Error accessing microphone:', error);
-                    showAlert("error", "Failed to access microphone.");
+                    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                        showAlert("error", "Microphone access denied. Please enable it in the settings.");
+                    } else {
+                        showAlert("error", "Failed to access microphone.");
+                    }
                 });
         } else {
             console.log("Already recording or handling previous recording.");
@@ -465,7 +469,7 @@ const SmartNotes = () => {
                 </div>
                 {tabValue !== 7 && (
                     <MicIcon
-                        onClick={() => setShowAudioPopup(true)}
+                        onClick={handleMicClick}
                         style={{
                             cursor: "pointer",
                             width: "40px",
