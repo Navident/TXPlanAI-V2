@@ -10,6 +10,16 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
     const dispatch = useDispatch();
     const { treeData, expandedNodes } = useSelector(selector);
 
+    const handleAddParentNode = () => {
+        addParentNode();
+        const newExpandedNodes = [
+            ...expandedNodes,
+            String(treeData.length)
+        ];
+        const childrenPaths = treeData[treeData.length]?.children?.map((_, index) => `${treeData.length}-${index}`) || [];
+        dispatch(setExpandedNodes([...newExpandedNodes, ...childrenPaths]));
+    };
+
     return (
         <StyledTreeViewContainer>
             {treeData.map((node, index) => (
@@ -25,7 +35,7 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
             ))}
             <RoundedButton
                 text={addButtonText}
-                onClick={addParentNode}
+                onClick={handleAddParentNode}
                 backgroundColor={UI_COLORS.light_grey2}
                 textColor="white"
                 border={false}
@@ -33,10 +43,10 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
                 height="39px"
                 width="fit-content"
             />
-
         </StyledTreeViewContainer>
     );
 };
+
 
 const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setExpandedNodes, parentPath = [] }) => {
     const dispatch = useDispatch();
@@ -81,10 +91,12 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
     };
 
     useEffect(() => {
-        if (isOpen) {
-            setHeight(`${contentRef.current.scrollHeight}px`);
-        } else {
-            setHeight('0px');
+        if (contentRef.current) {
+            if (isOpen) {
+                setHeight(`${contentRef.current.scrollHeight}px`);
+            } else {
+                setHeight('0px');
+            }
         }
     }, [isOpen]);
 

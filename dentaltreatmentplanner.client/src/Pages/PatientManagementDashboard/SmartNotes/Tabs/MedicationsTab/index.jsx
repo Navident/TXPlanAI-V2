@@ -31,6 +31,12 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     const addParentNode = () => {
         const newNode = createNode({}, treeData.length);
         dispatch(setMedicationsTreeData([...treeData, newNode]));
+        const newExpandedNodes = [
+            ...treeData.map((_, index) => String(index)),
+            String(treeData.length),
+            ...newNode.children.map((_, index) => `${treeData.length}-${index}`)
+        ];
+        dispatch(setMedicationsExpandedNodes(newExpandedNodes));
     };
 
     const updateInputTexts = useCallback((newValues) => {
@@ -62,14 +68,13 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-            <TreeView
-                addParentNode={addParentNode}
-                addButtonText="Add Medications"
-                selector={selectMedications}
-                setTreeData={setMedicationsTreeData}
-                setExpandedNodes={(nodes) => dispatch(setMedicationsExpandedNodes(nodes))}
-            />
-
+        <TreeView
+            addParentNode={addParentNode}
+            addButtonText="Add Medications"
+            selector={selectMedications}
+            setTreeData={setMedicationsTreeData}
+            setExpandedNodes={(nodes) => dispatch(setMedicationsExpandedNodes(nodes))}
+        />
     );
 };
 

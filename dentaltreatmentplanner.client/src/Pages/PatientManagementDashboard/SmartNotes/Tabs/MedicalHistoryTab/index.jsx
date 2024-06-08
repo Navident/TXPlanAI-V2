@@ -30,6 +30,12 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     const addParentNode = () => {
         const newNode = createNode({}, treeData.length);
         dispatch(setMedicalHistoryTreeData([...treeData, newNode]));
+        const newExpandedNodes = [
+            ...treeData.map((_, index) => String(index)),
+            String(treeData.length),
+            ...newNode.children.map((_, index) => `${treeData.length}-${index}`)
+        ];
+        dispatch(setMedicalHistoryExpandedNodes(newExpandedNodes));
     };
 
     const updateInputTexts = useCallback((newValues) => {
@@ -68,7 +74,6 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
                 selector={selectMedicalHistory}
                 setTreeData={setMedicalHistoryTreeData}
                 setExpandedNodes={(nodes) => dispatch(setMedicalHistoryExpandedNodes(nodes))}
-
             />
         </StyledHorizontalCenterContainer>
     );

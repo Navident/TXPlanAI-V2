@@ -30,6 +30,12 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
     const addParentNode = () => {
         const newNode = createNode({}, treeData.length);
         dispatch(setAllergiesTreeData([...treeData, newNode]));
+        const newExpandedNodes = [
+            ...expandedNodes,
+            String(treeData.length),
+            ...newNode.children.map((_, index) => `${treeData.length}-${index}`)
+        ];
+        dispatch(setAllergiesExpandedNodes(newExpandedNodes));
     };
 
     const updateInputTexts = useCallback((newValues) => {
@@ -61,15 +67,13 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
-        <div>
-            <TreeView
-                addParentNode={addParentNode}
-                addButtonText="Add Allergies"
-                selector={selectAllergies}
-                setTreeData={setAllergiesTreeData}
-                setExpandedNodes={(nodes) => dispatch(setAllergiesExpandedNodes(nodes))}
-            />
-        </div>
+        <TreeView
+            addParentNode={addParentNode}
+            addButtonText="Add Allergies"
+            selector={selectAllergies}
+            setTreeData={setAllergiesTreeData}
+            setExpandedNodes={(nodes) => dispatch(setAllergiesExpandedNodes(nodes))}
+        />
     );
 };
 
