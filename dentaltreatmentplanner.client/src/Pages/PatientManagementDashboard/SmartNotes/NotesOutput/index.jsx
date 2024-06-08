@@ -56,22 +56,22 @@ const NotesOutput = () => {
 
     const sNotes = (
         <>
-            <h2>Subjective</h2>
-            <h4> Chief Complaint</h4>
-            <div className="final-note-child-label">Text: {chiefComplaint}</div>
-            <h4>Medical History{formatTreeData(medicalHistory.treeData)}</h4>
+            <h2>SUBJECTIVE:</h2>
+            <h4>-Chief Complaint-</h4>
+            <div className="final-note-child-label">{chiefComplaint}</div>
+            <h4>-Medical History-{formatTreeData(medicalHistory.treeData)}</h4>
             <h4>Additional Medical Notes {medicalHistory.additionalNotes}</h4>
-            <h4>Medications{formatTreeData(medications.treeData)}</h4>
+            <h4>-Medications-{formatTreeData(medications.treeData)}</h4>
             <h4>Additional Medication Notes: {medications.additionalNotes}</h4>
-            <h4>Allergies{formatTreeData(allergies.treeData)}</h4>
+            <h4>-Allergies-{formatTreeData(allergies.treeData)}</h4>
             <h4>Additional Allergy Notes {allergies.additionalNotes}</h4>
         </>
     );
 
     const oNotes = (
         <>
-            <h2>Objective</h2>
-            <h4>Extra Oral and Intra Oral Findings</h4>
+            <h2>OBJECTIVE:</h2>
+            <h4>-Extra Oral and Intra Oral Findings-</h4>
 
             <div className="final-note-child-label">Head and Neck: {extraOralFindingsWithNPP.headAndNeck}</div>
             <div className="final-note-child-label">Lymph Chain: {extraOralFindingsWithNPP.lymphChain}</div>
@@ -81,11 +81,10 @@ const NotesOutput = () => {
             <div className="final-note-child-label">Hard and Soft Palate: {extraOralFindingsWithNPP.hardAndSoftPalate}</div>
             <div className="final-note-child-label">Pharynx: {extraOralFindingsWithNPP.pharynx}</div>
             <div className="final-note-child-label">Gingiva: {extraOralFindingsWithNPP.gingiva}</div>
+            <h4>Additional Notes:</h4>
+            <div className="final-note-child-label">{extraOralAndIntraOralFindings.additionalNotes}</div>
 
-            <h4>Additional Notes</h4>
-            <div className="final-note-child-label">Text: {extraOralAndIntraOralFindings.additionalNotes}</div>
-
-            <h4>Occlusion</h4>
+            <h4>-Occlusion-</h4>
             <div className="final-note-child-label">Overjet: {occlusions.overjet}</div>
             <div className="final-note-child-label">Overbite: {occlusions.overbite}</div>
             <div className="final-note-child-label">Anterior Crossbite: {occlusions.anteriorCrossbite}</div>
@@ -98,25 +97,26 @@ const NotesOutput = () => {
             <div className="final-note-child-label">Overall Spacing: {occlusions.overallSpacing}</div>
             <div className="final-note-child-label">Overall Crowding: {occlusions.overallCrowding}</div>
             <div className="final-note-child-label">Is the Patient Interested in Orthodontics: {occlusions.isThePatientInterestedInOrthodontics}</div>
-            <h4>Additional Notes</h4>
-            <div className="final-note-child-label">Text: {occlusions.additionalNotes}</div>
+            <h4>Additional Notes:</h4>
+            <div className="final-note-child-label">{occlusions.additionalNotes}</div>
         </>
     );
 
     const aNotes = (
         <>
-            <h2>Assessment</h2>
-            <h4>Findings</h4>
-            <div className="final-note-child-label">Existing: {findings.existing}</div>
-            <div className="final-note-child-label">Conditions: {findings.conditions}</div>
+            <h2>ASSESSMENT:</h2>
+            <h4>-Existing-</h4>
+            <div className="final-note-child-label">{findings.existing}</div>
+            <h4>-Conditions-</h4>          
+            <div className="final-note-child-label">{findings.conditions}</div>
         </>
     );
 
     const pNotes = (
         <>
-            <h2>Plan</h2>
-            <h4>Findings</h4>
-            <div className="final-note-child-label">Treatment Plan: {findings.treatments}</div>
+            <h2>PLAN:</h2>
+            <h4>-Treatment Plan-</h4>
+            <div className="final-note-child-label"> {findings.treatments}</div>
         </>
     );
 
