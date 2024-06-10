@@ -38,7 +38,20 @@ const NotesOutput = () => {
         return updatedObj;
     };
 
-    const extraOralFindingsWithNPP = setDefaultValues(extraOralAndIntraOralFindings, "NPP");
+    const extraOralFindingsWithNPP = setDefaultValues(extraOralAndIntraOralFindings, "WNL");
+
+    const filterAndRemoveEmptyFields = (obj) => {
+        const filteredObj = {};
+        for (const key in obj) {
+            if (obj[key] !== "" && obj[key] !== null && obj[key] !== undefined) {
+                filteredObj[key] = obj[key];
+            }
+        }
+        return filteredObj;
+    };
+
+    const filteredOcclusions = filterAndRemoveEmptyFields(occlusions);
+
 
     const formatTreeData = (treeData) => {
         return treeData.map((node, index) => {
@@ -85,18 +98,9 @@ const NotesOutput = () => {
             <div className="final-note-child-label">{extraOralAndIntraOralFindings.additionalNotes}</div>
 
             <h4>-Occlusion-</h4>
-            <div className="final-note-child-label">Overjet: {occlusions.overjet}</div>
-            <div className="final-note-child-label">Overbite: {occlusions.overbite}</div>
-            <div className="final-note-child-label">Anterior Crossbite: {occlusions.anteriorCrossbite}</div>
-            <div className="final-note-child-label">Posterior Crossbite: {occlusions.posteriorCrossbite}</div>
-            <div className="final-note-child-label">Left Molar Classification: {occlusions.leftMolarClassification}</div>
-            <div className="final-note-child-label">Right Molar Classification: {occlusions.rightMolarClassification}</div>
-            <div className="final-note-child-label">Left Canine Classification: {occlusions.leftCanineClassification}</div>
-            <div className="final-note-child-label">Right Canine Classification: {occlusions.rightCanineClassification}</div>
-            <div className="final-note-child-label">Does the Patient Wear a Night Guard: {occlusions.doesThePatientWearANightGuard}</div>
-            <div className="final-note-child-label">Overall Spacing: {occlusions.overallSpacing}</div>
-            <div className="final-note-child-label">Overall Crowding: {occlusions.overallCrowding}</div>
-            <div className="final-note-child-label">Is the Patient Interested in Orthodontics: {occlusions.isThePatientInterestedInOrthodontics}</div>
+            {Object.keys(filteredOcclusions).map(key => (
+                <div className="final-note-child-label" key={key}>{key}: {filteredOcclusions[key]}</div>
+            ))}
             <h4>Additional Notes:</h4>
             <div className="final-note-child-label">{occlusions.additionalNotes}</div>
         </>

@@ -52,11 +52,16 @@ const initialState = {
         treatments: ''
     }
 };
-const expandNewNode = (treeData, expandedNodes) => {
-    const newPath = String(treeData.length - 1);
-    const childrenPaths = treeData[treeData.length - 1]?.children?.map((_, index) => `${newPath}-${index}`) || [];
-    return [...expandedNodes, newPath, ...childrenPaths];
+const expandNewNode = (treeData, expandedNodes, numNewNodes = 1) => {
+    const newPaths = [];
+    for (let i = treeData.length - numNewNodes; i < treeData.length; i++) {
+        const newPath = String(i);
+        const childrenPaths = treeData[i]?.children?.map((_, index) => `${newPath}-${index}`) || [];
+        newPaths.push(newPath, ...childrenPaths);
+    }
+    return [...expandedNodes, ...newPaths];
 };
+
 
 
 const compExamTabsSlice = createSlice({
@@ -70,8 +75,9 @@ const compExamTabsSlice = createSlice({
             state.medicalHistory = action.payload;
         },
         setMedicalHistoryTreeData: (state, action) => {
+            const numNewNodes = action.payload.length - state.medicalHistory.treeData.length;
             state.medicalHistory.treeData = action.payload;
-            state.medicalHistory.expandedNodes = expandNewNode(action.payload, state.medicalHistory.expandedNodes);
+            state.medicalHistory.expandedNodes = expandNewNode(action.payload, state.medicalHistory.expandedNodes, numNewNodes);
         },
         setMedicalHistoryExpandedNodes: (state, action) => {
             state.medicalHistory.expandedNodes = action.payload;
@@ -83,9 +89,9 @@ const compExamTabsSlice = createSlice({
             state.medications = action.payload;
         },
         setMedicationsTreeData: (state, action) => {
+            const numNewNodes = action.payload.length - state.medications.treeData.length;
             state.medications.treeData = action.payload;
-            state.medications.expandedNodes = expandNewNode(action.payload, state.medications.expandedNodes);
-
+            state.medications.expandedNodes = expandNewNode(action.payload, state.medications.expandedNodes, numNewNodes);
         },
         setMedicationsExpandedNodes: (state, action) => {
             state.medications.expandedNodes = action.payload;
@@ -97,9 +103,9 @@ const compExamTabsSlice = createSlice({
             state.allergies = action.payload;
         },
         setAllergiesTreeData: (state, action) => {
+            const numNewNodes = action.payload.length - state.allergies.treeData.length;
             state.allergies.treeData = action.payload;
-            state.allergies.expandedNodes = expandNewNode(action.payload, state.allergies.expandedNodes);
-
+            state.allergies.expandedNodes = expandNewNode(action.payload, state.allergies.expandedNodes, numNewNodes);
         },
         setAllergiesExpandedNodes: (state, action) => {
             state.allergies.expandedNodes = action.payload;

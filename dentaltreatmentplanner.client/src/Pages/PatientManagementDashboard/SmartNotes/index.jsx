@@ -451,7 +451,7 @@ const SmartNotes = () => {
                     <Tab label="Medications" />
                     <Tab label="Allergies" />
                     <Tab label="Extra oral and Intra oral Findings" />
-                    <Tab label="Occlusions" />
+                    <Tab label="Occlusion" />
                     <Tab label="Findings" />
                     <Tab label="Generate" />
 

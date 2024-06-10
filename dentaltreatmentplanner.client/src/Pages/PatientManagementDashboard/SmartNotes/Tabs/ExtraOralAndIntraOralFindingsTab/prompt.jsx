@@ -37,6 +37,40 @@ export const getExtraOralAndIntraOralFindingsTabPrompt = () => {
             "additionalNotes": ""
         }
 
+        For example, if you hear the following conversation:
+        "There’s a two by two millimeter slightly raised macule bluish in color on the upper lip"
+        "Okay, we'll note that as a lip finding."
+
+        Your response should then be:
+        {
+            "headAndNeck": "",
+            "lymphChain": "",
+            "lips": "2x2 mm slightly raised macule bluish in color on the upper lip",
+            "tongue": "",
+            "floorAndMouth": "",
+            "hardAndSoftPalate": "",
+            "pharynx": "",
+            "gingiva": "",
+            "additionalNotes": ""
+        }
+
+        For example, if you hear the following conversation:
+        "Bilateral linea alba"
+        "Got it, I'll note that under buccal mucosa."
+
+        Your response should then be:
+        {
+            "headAndNeck": "",
+            "lymphChain": "",
+            "lips": "",
+            "tongue": "",
+            "floorAndMouth": "",
+            "hardAndSoftPalate": "",
+            "pharynx": "",
+            "gingiva": "",
+            "additionalNotes": "Bilateral linea alba"
+        }
+
         Make sure to list all the findings mentioned by the patient along with any additional notes provided during the conversation.
     `;
 };

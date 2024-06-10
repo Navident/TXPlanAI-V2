@@ -8,7 +8,7 @@ import { getAllergiesTabPrompt } from './prompt';
 
 const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
-    const { treeData, additionalNotes, expandedNodes } = useSelector(selectAllergies);
+    const { treeData, expandedNodes } = useSelector(selectAllergies);
 
     const createNode = (allergy, index) => ({
         label: `Allergy ${index + 1}`,
@@ -40,12 +40,21 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
 
     const updateInputTexts = useCallback((newValues) => {
         const updatedData = [...treeData];
+        const currentIndex = updatedData.length;
+        const newExpandedNodes = [...expandedNodes];
+
         newValues.forEach((allergy, index) => {
-            const node = createNode(allergy, updatedData.length + index);
+            const node = createNode(allergy, currentIndex + index);
             updatedData.push(node);
+            newExpandedNodes.push(String(currentIndex + index));
+            node.children.forEach((_, childIndex) => {
+                newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+            });
         });
+
         dispatch(setAllergiesTreeData(updatedData));
-    }, [dispatch, treeData]);
+        dispatch(setAllergiesExpandedNodes(newExpandedNodes));
+    }, [dispatch, treeData, expandedNodes]);
 
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);

@@ -8,7 +8,7 @@ import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComp
 
 const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     const dispatch = useDispatch();
-    const { treeData, additionalNotes } = useSelector(selectMedicalHistory);
+    const { treeData, expandedNodes } = useSelector(selectMedicalHistory);
 
     const createNode = (disease, index) => ({
         label: `Problem ${index + 1}`,
@@ -40,12 +40,21 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
 
     const updateInputTexts = useCallback((newValues) => {
         const updatedData = [...treeData];
+        const currentIndex = updatedData.length;
+        const newExpandedNodes = [...expandedNodes];
+
         newValues.forEach((disease, index) => {
-            const node = createNode(disease, updatedData.length + index);
+            const node = createNode(disease, currentIndex + index);
             updatedData.push(node);
+            newExpandedNodes.push(String(currentIndex + index));
+            node.children.forEach((_, childIndex) => {
+                newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+            });
         });
+
         dispatch(setMedicalHistoryTreeData(updatedData));
-    }, [dispatch, treeData]);
+        dispatch(setMedicalHistoryExpandedNodes(newExpandedNodes));
+    }, [dispatch, treeData, expandedNodes]);
 
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);
