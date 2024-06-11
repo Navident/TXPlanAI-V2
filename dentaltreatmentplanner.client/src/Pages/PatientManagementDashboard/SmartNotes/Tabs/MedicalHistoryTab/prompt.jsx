@@ -16,6 +16,9 @@ export const getMedicalHistoryTabPrompt = () => {
             ...
         ]
 
+        Ensure that the medication names are spelled correctly according to standard medical and dental terminology.
+        Use your knowledge of common medications to correct any potential misspellings.
+
         For example, if you hear the following conversation:
         "Can you tell me about your medical history? I see that you have asthma. Do you have any other medical conditions?"
         "Yes, I also have diabetes and hypertension. I was diagnosed with diabetes on March 3, 2020, and it is still ongoing.
@@ -43,6 +46,37 @@ export const getMedicalHistoryTabPrompt = () => {
             }
         ]
 
+
+         For another example, if you hear the following conversation:
+        "What medications are you on? I see that you are on Acetaminophen. Is there anything else that you're on?"
+        "Yes, thanks for asking. I am also on Lucinapro and Amoxicillin. I started Lucinapro on January 1, 2023, and stopped on January 10, 2023.
+        I am not taking the Lucinapro right now though because its giving me a rash. I have no specific notes for Amoxicillin."
+
+        Your response should then be:
+        [
+            {
+                "medName": "Acetaminophen",
+                "patNote": "",
+                "dateStart": "",
+                "dateStop": ""
+            },
+            {
+                "medName": "Lisinopril",
+                "patNote": "Currently not taking because it is causing a rash",
+                "dateStart": "January 1, 2023",
+                "dateStop": "January 10, 2023"
+            },
+            {
+                "medName": "Amoxicillin",
+                "patNote": "",
+                "dateStart": "",
+                "dateStop": ""
+            }
+        ]
+
+
+
         Make sure to list all the medical conditions mentioned by the patient along with any notes, start dates, and stop dates provided during the conversation.
+        Verify the spelling of each medication name based on standard medical and dental terminology.
     `;
 };

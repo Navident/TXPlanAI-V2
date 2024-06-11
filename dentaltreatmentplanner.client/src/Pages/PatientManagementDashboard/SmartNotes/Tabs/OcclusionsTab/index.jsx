@@ -38,10 +38,6 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
         { label: "Is the patient interested in orthodontics", field: "isThePatientInterestedInOrthodontics" }
     ];
 
-    const updateInputTexts = useCallback((newValues) => {
-        dispatch(setOcclusions(newValues));
-    }, [dispatch]);
-
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);
         if (!transcribedText) {
@@ -53,9 +49,16 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
         console.log("Processed categories:", categorizedText);
 
         if (categorizedText) {
-            updateInputTexts(categorizedText);
+            const updatedOcclusions = {
+                ...occlusions,
+                ...Object.fromEntries(Object.entries(categorizedText).map(([key, value]) => {
+                    return [key, occlusions[key] ? occlusions[key] + ' ' + value : value];
+                }))
+            };
+
+            dispatch(setOcclusions(updatedOcclusions));
         }
-    }, [updateInputTexts]);
+    }, [occlusions, dispatch]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);
@@ -93,6 +96,7 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
                 label="Additional Notes"
                 value={occlusions.additionalNotes || ''}
                 onChange={(e) => dispatch(setOcclusions({ ...occlusions, additionalNotes: e.target.value }))}
+                placeholder="patient wants to wait for ortho until next year"
             />
         </StyledOcclusionsContainer>
     );

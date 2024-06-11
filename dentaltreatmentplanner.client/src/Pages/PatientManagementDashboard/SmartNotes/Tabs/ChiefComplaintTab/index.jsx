@@ -41,6 +41,8 @@ const ChiefComplaintsTab = ({
                 label="Chief Complaints"
                 value={chiefComplaint}
                 onChange={handleInputChange}
+                placeholder="Pain on upper right when eating"
+
             />
         </div>
     );

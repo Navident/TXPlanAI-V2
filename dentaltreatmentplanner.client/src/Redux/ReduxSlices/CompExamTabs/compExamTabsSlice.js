@@ -120,8 +120,12 @@ const compExamTabsSlice = createSlice({
             };
         },
         setOcclusions: (state, action) => {
-            state.occlusions = action.payload;
+            state.occlusions = {
+                ...state.occlusions,
+                ...action.payload
+            };
         },
+
         setFindings: (state, action) => {
             state.findings = {
                 ...state.findings,

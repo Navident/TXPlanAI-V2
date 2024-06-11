@@ -23,6 +23,25 @@ const FindingsTab = ({
         }
     }, [dispatch, setTreatmentsInputText]);
 
+    const groupTreatmentsByTooth = (treatments) => {
+        const treatmentMap = {};
+
+        treatments.forEach(treatment => {
+            const [tooth, ...procedure] = treatment.split(' ');
+            const procedureText = procedure.join(' ');
+
+            if (treatmentMap[tooth]) {
+                treatmentMap[tooth].push(procedureText);
+            } else {
+                treatmentMap[tooth] = [procedureText];
+            }
+        });
+
+        return Object.entries(treatmentMap).map(
+            ([tooth, procedures]) => `${tooth} ${procedures.join(', ')}`
+        );
+    };
+
     const processAudioFile = useCallback(async (audioFile) => {
         const transcribedText = await transcribeAudio(audioFile);
         if (!transcribedText) {
@@ -33,10 +52,12 @@ const FindingsTab = ({
         const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getFindingsTabPrompt());
         console.log("Processed categories:", categorizedText);
 
+        const processedTreatments = groupTreatmentsByTooth(categorizedText.Treatments);
+
         const newTexts = {
             existing: categorizedText.Existing.join('\n'),
             conditions: categorizedText.Conditions.join('\n'),
-            treatments: categorizedText.Treatments.join('\n')
+            treatments: processedTreatments.join('\n')
         };
 
         updateInputTexts(newTexts);
