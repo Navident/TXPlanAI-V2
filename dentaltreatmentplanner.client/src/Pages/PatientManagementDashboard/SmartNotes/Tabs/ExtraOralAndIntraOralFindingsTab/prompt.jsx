@@ -15,6 +15,7 @@ export const getExtraOralAndIntraOralFindingsTabPrompt = () => {
             "hardAndSoftPalate": "Hard and Soft Palate findings",
             "pharynx": "Pharynx findings",
             "gingiva": "Gingiva findings",
+            "buccalMucosa": "buccal mucosa findings",
             "additionalNotes": "Additional Notes"
         }
 
@@ -34,6 +35,7 @@ export const getExtraOralAndIntraOralFindingsTabPrompt = () => {
             "hardAndSoftPalate": "",
             "pharynx": "",
             "gingiva": "",
+            "buccalMucosa": "",
             "additionalNotes": ""
         }
 
@@ -51,6 +53,7 @@ export const getExtraOralAndIntraOralFindingsTabPrompt = () => {
             "hardAndSoftPalate": "",
             "pharynx": "",
             "gingiva": "",
+            "buccalMucosa": "",
             "additionalNotes": ""
         }
 
@@ -68,7 +71,8 @@ export const getExtraOralAndIntraOralFindingsTabPrompt = () => {
             "hardAndSoftPalate": "",
             "pharynx": "",
             "gingiva": "",
-            "additionalNotes": "Bilateral linea alba"
+            "buccalMucosa": "Bilateral linea alba",
+            "additionalNotes": ""
         }
 
         Make sure to list all the findings mentioned by the patient along with any additional notes provided during the conversation.

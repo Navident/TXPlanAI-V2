@@ -34,9 +34,13 @@ const NotesOutput = () => {
             } else {
                 updatedObj[key] = obj[key];
             }
+            console.log(`Key: ${key}, Value: ${updatedObj[key]}`); // Debugging line
         }
         return updatedObj;
     };
+
+    // Check if the "pharynx" key is present in extraOralAndIntraOralFindings
+    console.log("Before setting default values:", extraOralAndIntraOralFindings);
 
     const extraOralFindingsWithNPP = setDefaultValues(extraOralAndIntraOralFindings, "WNL");
 
@@ -94,6 +98,7 @@ const NotesOutput = () => {
             <div className="final-note-child-label">Hard and Soft Palate: {extraOralFindingsWithNPP.hardAndSoftPalate}</div>
             <div className="final-note-child-label">Pharynx: {extraOralFindingsWithNPP.pharynx}</div>
             <div className="final-note-child-label">Gingiva: {extraOralFindingsWithNPP.gingiva}</div>
+            <div className="final-note-child-label">Buccal Mucosa: {extraOralFindingsWithNPP.buccalMucosa}</div>
             <h4>Additional Notes:</h4>
             <div className="final-note-child-label">{extraOralAndIntraOralFindings.additionalNotes}</div>
 

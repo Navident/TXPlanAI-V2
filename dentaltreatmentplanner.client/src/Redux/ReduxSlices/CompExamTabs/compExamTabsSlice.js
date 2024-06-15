@@ -27,7 +27,8 @@ const initialState = {
         tongue: '',
         floorAndMouth: '',
         hardAndSoftPalate: '',
-        phoyne: '',
+        pharynx: '',
+        buccalMucosa: '',
         gingiva: '',
         additionalNotes: ''
     },
