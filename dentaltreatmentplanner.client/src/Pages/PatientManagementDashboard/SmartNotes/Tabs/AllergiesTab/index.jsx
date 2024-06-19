@@ -6,7 +6,7 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getAllergiesTabPrompt } from './prompt';
 
-const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
+const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => {
     const dispatch = useDispatch();
     const { treeData, expandedNodes } = useSelector(selectAllergies);
 
@@ -57,19 +57,26 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction }) => {
     }, [dispatch, treeData, expandedNodes]);
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
-        }
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
 
-        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getAllergiesTabPrompt());
-        console.log("Processed categories:", categorizedText);
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getAllergiesTabPrompt());
+            console.log("Processed categories:", categorizedText);
 
-        if (categorizedText) {
-            updateInputTexts(categorizedText);
+            if (categorizedText) {
+                updateInputTexts(categorizedText);
+            }
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [updateInputTexts]);
+    }, [updateInputTexts, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);

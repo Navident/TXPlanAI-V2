@@ -9,7 +9,7 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { useDispatch, useSelector } from 'react-redux';
 
-const OcclusionsTab = ({ setAudioProcessingFunction }) => {
+const OcclusionsTab = ({ setAudioProcessingFunction, setLoading }) => {
     const dispatch = useDispatch();
     const occlusions = useSelector(selectOcclusions);
 
@@ -39,26 +39,33 @@ const OcclusionsTab = ({ setAudioProcessingFunction }) => {
     ];
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
+
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getOcclusionsTabPrompt());
+            console.log("Processed categories:", categorizedText);
+
+            if (categorizedText) {
+                const updatedOcclusions = {
+                    ...occlusions,
+                    ...Object.fromEntries(Object.entries(categorizedText).map(([key, value]) => {
+                        return [key, occlusions[key] ? occlusions[key] + ' ' + value : value];
+                    }))
+                };
+
+                dispatch(setOcclusions(updatedOcclusions));
+            }
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
         }
-
-        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getOcclusionsTabPrompt());
-        console.log("Processed categories:", categorizedText);
-
-        if (categorizedText) {
-            const updatedOcclusions = {
-                ...occlusions,
-                ...Object.fromEntries(Object.entries(categorizedText).map(([key, value]) => {
-                    return [key, occlusions[key] ? occlusions[key] + ' ' + value : value];
-                }))
-            };
-
-            dispatch(setOcclusions(updatedOcclusions));
-        }
-    }, [occlusions, dispatch]);
+    }, [occlusions, dispatch, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);

@@ -9,9 +9,9 @@ import { setFindings, selectFindings } from '../../../../../Redux/ReduxSlices/Co
 import { StyledFindingsTabContainer  } from './index.style';
 
 const FindingsTab = ({
-    handleGenerateTreatmentPlan,
     setTreatmentsInputText,
-    setAudioProcessingFunction
+    setAudioProcessingFunction,
+    setLoading
 }) => {
     const dispatch = useDispatch();
     const inputTexts = useSelector(selectFindings);
@@ -43,25 +43,32 @@ const FindingsTab = ({
     };
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
+
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getFindingsTabPrompt());
+            console.log("Processed categories:", categorizedText);
+
+            const processedTreatments = groupTreatmentsByTooth(categorizedText.Treatments);
+
+            const newTexts = {
+                existing: categorizedText.Existing.join('\n'),
+                conditions: categorizedText.Conditions.join('\n'),
+                treatments: processedTreatments.join('\n')
+            };
+
+            updateInputTexts(newTexts);
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
         }
-
-        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getFindingsTabPrompt());
-        console.log("Processed categories:", categorizedText);
-
-        const processedTreatments = groupTreatmentsByTooth(categorizedText.Treatments);
-
-        const newTexts = {
-            existing: categorizedText.Existing.join('\n'),
-            conditions: categorizedText.Conditions.join('\n'),
-            treatments: processedTreatments.join('\n')
-        };
-
-        updateInputTexts(newTexts);
-    }, [updateInputTexts]);
+    }, [updateInputTexts, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);

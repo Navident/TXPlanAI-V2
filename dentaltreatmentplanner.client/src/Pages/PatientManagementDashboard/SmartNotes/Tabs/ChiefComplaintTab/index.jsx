@@ -5,9 +5,7 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getChiefComplaintsTabPrompt } from './prompt';
 
-const ChiefComplaintsTab = ({
-    setAudioProcessingFunction
-}) => {
+const ChiefComplaintsTab = ({ setAudioProcessingFunction, setLoading }) => {
     const dispatch = useDispatch();
     const chiefComplaint = useSelector(selectChiefComplaint);
 
@@ -16,16 +14,23 @@ const ChiefComplaintsTab = ({
     }, [dispatch]);
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
-        }
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
 
-        const chiefComplaintSummaryText = await postProcessTranscriptWithGPT(transcribedText, getChiefComplaintsTabPrompt());
-        console.log("chiefComplaintSummaryText", chiefComplaintSummaryText);
-        updateInputTexts(chiefComplaintSummaryText);
-    }, [updateInputTexts]);
+            const chiefComplaintSummaryText = await postProcessTranscriptWithGPT(transcribedText, getChiefComplaintsTabPrompt());
+            console.log("chiefComplaintSummaryText", chiefComplaintSummaryText);
+            updateInputTexts(chiefComplaintSummaryText);
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [updateInputTexts, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);
@@ -42,7 +47,6 @@ const ChiefComplaintsTab = ({
                 value={chiefComplaint}
                 onChange={handleInputChange}
                 placeholder="Pain on upper right when eating"
-
             />
         </div>
     );

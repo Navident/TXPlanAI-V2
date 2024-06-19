@@ -8,7 +8,7 @@ import { setExtraOralAndIntraOralFindings, selectExtraOralAndIntraOralFindings }
 import { getExtraOralAndIntraOralFindingsTabPrompt } from './prompt';
 import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComponents';
 
-const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
+const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction, setLoading }) => {
     const dispatch = useDispatch();
     const findings = useSelector(selectExtraOralAndIntraOralFindings);
 
@@ -33,19 +33,26 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction }) => {
     }, [dispatch]);
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
-        }
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
 
-        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getExtraOralAndIntraOralFindingsTabPrompt());
-        console.log("Processed categories:", categorizedText);
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getExtraOralAndIntraOralFindingsTabPrompt());
+            console.log("Processed categories:", categorizedText);
 
-        if (categorizedText) {
-            updateInputTexts(categorizedText);
+            if (categorizedText) {
+                updateInputTexts(categorizedText);
+            }
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [updateInputTexts]);
+    }, [updateInputTexts, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);

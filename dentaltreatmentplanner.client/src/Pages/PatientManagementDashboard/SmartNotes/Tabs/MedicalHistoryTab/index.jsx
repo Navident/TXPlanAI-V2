@@ -6,7 +6,7 @@ import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../Op
 import { getMedicalHistoryTabPrompt } from './prompt';
 import { StyledHorizontalCenterContainer } from '../../../../../GlobalStyledComponents';
 
-const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
+const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction, setLoading }) => {
     const dispatch = useDispatch();
     const { treeData, expandedNodes } = useSelector(selectMedicalHistory);
 
@@ -57,19 +57,26 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction }) => {
     }, [dispatch, treeData, expandedNodes]);
 
     const processAudioFile = useCallback(async (audioFile) => {
-        const transcribedText = await transcribeAudio(audioFile);
-        if (!transcribedText) {
-            console.log("No transcribed text available");
-            return;
-        }
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
 
-        const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getMedicalHistoryTabPrompt());
-        console.log("Processed categories:", categorizedText);
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getMedicalHistoryTabPrompt());
+            console.log("Processed categories:", categorizedText);
 
-        if (categorizedText) {
-            updateInputTexts(categorizedText);
+            if (categorizedText) {
+                updateInputTexts(categorizedText);
+            }
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
         }
-    }, [updateInputTexts]);
+    }, [updateInputTexts, setLoading]);
 
     useEffect(() => {
         setAudioProcessingFunction(() => processAudioFile);

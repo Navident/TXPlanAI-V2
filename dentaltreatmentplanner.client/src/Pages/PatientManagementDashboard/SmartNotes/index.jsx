@@ -9,7 +9,7 @@ import {
     StyledTitleAndPaymentTotalsContainer,
 } from "../../../GlobalStyledComponents";
 import { fetchOpenAIResponse } from "../../../OpenAI/LLM/gptRunner";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Backdrop } from "@mui/material";
 import {
     setActiveTxCategories,
     resetCategoryFilters
@@ -49,6 +49,8 @@ import ContainerRoundedBox from '../../../Components/Containers/ContainerRounded
 
 import { extractPatientIdFromUrl } from '../../../Utils/helpers';
 import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import { UI_COLORS } from '../../../Theme';
 
 const SmartNotes = () => {
     const dispatch = useDispatch();
@@ -68,7 +70,8 @@ const SmartNotes = () => {
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [tabValue, setTabValue] = useState(0);
 
-
+    const [loading, setLoading] = useState(false);
+    const purple = UI_COLORS.purple;
 
     const patientID = extractPatientIdFromUrl();
 
@@ -322,6 +325,7 @@ const SmartNotes = () => {
 
     const handleMicClick = () => {
         if (!recording) {
+            // Start recording
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 setStream(null);
@@ -334,7 +338,6 @@ const SmartNotes = () => {
                     setMediaRecorder(recorder);
                     recorder.start();
                     setRecording(true);
-                    setShowAudioPopup(true);
                     console.log("Recording started");
 
                     recorder.ondataavailable = async (event) => {
@@ -351,7 +354,6 @@ const SmartNotes = () => {
                                     .catch(error => {
                                         console.error("Error during audio file processing:", error);
                                     });
-                                setShowAudioPopup(false);
                             } else {
                                 console.error("No audio processing function is set.");
                             }
@@ -373,10 +375,18 @@ const SmartNotes = () => {
                     }
                 });
         } else {
-            console.log("Already recording or handling previous recording.");
+            // Stop recording
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                // Ensure that all tracks of the stream are stopped
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    setStream(null); // Clear the stream
+                }
+                setRecording(false); // Reset recording state
+            }
         }
     };
-
 
     const stopAndProcessRecording = () => {
         if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -423,11 +433,7 @@ const SmartNotes = () => {
                     onClose={() => setShowLoginPopup(false)}
                 />
             )}
-            <AudioPopup
-                open={showAudioPopup}
-                stopRecording={stopAndProcessRecording}
-                onClose={handleClose}
-            />
+
             <ContainerRoundedBox showTitle={true} title="Smart Notes">
                 <Tabs
                     value={tabValue}
@@ -456,28 +462,26 @@ const SmartNotes = () => {
                     <Tab label="Generate" />
 
                 </Tabs>
+                {loading && (
+                    <Backdrop open={loading} style={{ zIndex: 9999, color: '#fff' }}>
+                        <CircularProgress color="inherit" />
+                    </Backdrop>
+                )}
                 <StyledSeparator customMarginTop="0px" />
                 <div className="create-treatment-plan-section-inner">
-                    {tabValue === 0 && <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
-                    {tabValue === 1 && <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} />}
-                    {tabValue === 2 && <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} medications={medications} />}
-                    {tabValue === 3 && <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} allergies={allergies} />}
-                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
-                    {tabValue === 5 && <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} />}
-                    {tabValue === 6 && <FindingsTab setTreatmentsInputText={setTreatmentsInputText} setAudioProcessingFunction={setCurrentProcessAudioFile} />}
+                    {tabValue === 0 && <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
+                    {tabValue === 1 && <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} setLoading={setLoading} />}
+                    {tabValue === 2 && <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} medications={medications} />}
+                    {tabValue === 3 && <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} allergies={allergies} />}
+                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
+                    {tabValue === 5 && <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
+                    {tabValue === 6 && <FindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} setTreatmentsInputText={setTreatmentsInputText} />}
                     {tabValue === 7 && <NotesOutput/>}
                 </div>
                 {tabValue !== 7 && (
-                    <MicIcon
-                        onClick={handleMicClick}
-                        style={{
-                            cursor: "pointer",
-                            width: "40px",
-                            height: "auto",
-                            zIndex: "999",
-                            marginTop: "auto",
-                        }}
-                    />
+                    <div onClick={handleMicClick} style={{ cursor: "pointer", width: "40px", height: "auto", zIndex: "999", marginTop: "auto" }}>
+                        {recording ? <StopCircleIcon style={{ width: "40px", height: "auto", color: "red" }} /> : <MicIcon style={{ width: "40px", height: "auto" }} />}
+                    </div>
                 )}
             </ContainerRoundedBox>
             {tabValue === 7 && (
@@ -501,7 +505,7 @@ const SmartNotes = () => {
                                     height: "100%",
                                 }}
                             >
-                                <CircularProgress style={{ color: "#7777a1" }} />
+                                <CircularProgress style={{ color: purple }} />
                             </div>
                         ) : treatmentPlans.length > 0 ? (
                             treatmentPlans.map((plan, index) => (
