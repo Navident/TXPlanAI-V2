@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { StyledTreeNodeContainer, StyledTreeViewContainer, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
+import { StyledTreeNodeContainer, StyledTreeViewContainer, StyledDeleteButton, StyledTreeNodeIcon, StyledTreeNodeChildren, StyledTreeNodeLabelContainer } from './index.style';
 import StandardTextField from '../../Components/Common/StandardTextfield/StandardTextfield';
 import { UI_COLORS } from '../../Theme';
 import RoundedButton from "../../Components/Common/RoundedButton/RoundedButton";
 
 import { useSelector, useDispatch } from 'react-redux';
 
-const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpandedNodes }) => {
+const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpandedNodes, deleteNodeAction }) => {
     const dispatch = useDispatch();
     const { treeData, expandedNodes } = useSelector(selector);
 
@@ -31,6 +31,8 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
                     setTreeData={setTreeData}
                     expandedNodes={expandedNodes}
                     setExpandedNodes={setExpandedNodes}
+                    deleteNodeAction={deleteNodeAction}
+                    parentPath={[]}
                 />
             ))}
             <RoundedButton
@@ -48,7 +50,10 @@ const TreeView = ({ addParentNode, addButtonText, selector, setTreeData, setExpa
 };
 
 
-const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setExpandedNodes, parentPath = [] }) => {
+
+
+
+const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setExpandedNodes, deleteNodeAction, parentPath }) => {
     const dispatch = useDispatch();
     const treeData = useSelector(selector).treeData;
     const currentPath = [...parentPath, nodeIndex];
@@ -62,6 +67,11 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
         setValue(event.target.value);
         const newData = updateTreeData(treeData, currentPath, event.target.value);
         dispatch(setTreeData(newData));
+    };
+
+    const handleDeleteNode = () => {
+        console.log('Deleting node at path:', currentPath);
+        dispatch(deleteNodeAction(currentPath));
     };
 
     const updateTreeData = (data, path, newValue) => {
@@ -114,6 +124,9 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
                     borderColor="#ccc"
                     width="350px"
                 />
+                {parentPath.length === 0 && (
+                    <StyledDeleteButton onClick={handleDeleteNode}>x</StyledDeleteButton>
+                )}
             </StyledTreeNodeLabelContainer>
             {hasChildren && (
                 <StyledTreeNodeChildren
@@ -133,6 +146,7 @@ const TreeNode = ({ node, nodeIndex, selector, setTreeData, expandedNodes, setEx
                             setTreeData={setTreeData}
                             expandedNodes={expandedNodes}
                             setExpandedNodes={setExpandedNodes}
+                            deleteNodeAction={deleteNodeAction}
                             parentPath={currentPath}
                         />
                     ))}

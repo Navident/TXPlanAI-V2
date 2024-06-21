@@ -1,6 +1,6 @@
 import TreeView from '../../../../../Components/TreeView/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { setMedicalHistoryTreeData, setMedicalHistoryNotes, setMedicalHistoryExpandedNodes, selectMedicalHistory } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setMedicalHistoryTreeData, setMedicalHistoryNotes, setMedicalHistoryExpandedNodes, selectMedicalHistory, deleteMedicalHistoryNode } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getMedicalHistoryTabPrompt } from './prompt';
@@ -90,6 +90,10 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction, setLoading })
                 selector={selectMedicalHistory}
                 setTreeData={setMedicalHistoryTreeData}
                 setExpandedNodes={(nodes) => dispatch(setMedicalHistoryExpandedNodes(nodes))}
+                deleteNodeAction={(path) => {
+                    console.log('Dispatching deleteNodeAction with path:', path);
+                    dispatch(deleteMedicalHistoryNode(path));
+                }}
             />
         </StyledHorizontalCenterContainer>
     );

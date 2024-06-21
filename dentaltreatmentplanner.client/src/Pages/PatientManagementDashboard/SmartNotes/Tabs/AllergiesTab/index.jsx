@@ -1,7 +1,7 @@
 import MultilineTextfield from '../../../../../Components/Common/MultilineTextfield';
 import TreeView from '../../../../../Components/TreeView/index';
 import { useSelector, useDispatch } from 'react-redux';
-import { setAllergiesTreeData, setAllergiesExpandedNodes, setAllergiesNotes, selectAllergies } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setAllergiesTreeData, setAllergiesExpandedNodes, setAllergiesNotes, selectAllergies, deleteAllergiesNode } from '../../../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getAllergiesTabPrompt } from './prompt';
@@ -89,6 +89,10 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
             selector={selectAllergies}
             setTreeData={setAllergiesTreeData}
             setExpandedNodes={(nodes) => dispatch(setAllergiesExpandedNodes(nodes))}
+            deleteNodeAction={(path) => {
+                console.log('Dispatching deleteNodeAction with path:', path);
+                dispatch(deleteAllergiesNode(path));
+            }}
         />
     );
 };

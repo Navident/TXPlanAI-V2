@@ -37,3 +37,18 @@ export const StyledTreeNodeLabelContainer = styled.div`
 export const StyledTreeViewContainer = styled.div`
     margin: 0 auto;
 `;
+
+export const StyledDeleteButton = styled.button`
+    background-color: #ff6666;
+    border: none;
+    color: white;
+    padding: 3px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: 999px;
+    &:hover {
+        background-color: #ff4c4c;
+    }
+`;

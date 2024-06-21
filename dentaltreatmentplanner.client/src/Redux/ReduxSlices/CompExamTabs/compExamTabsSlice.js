@@ -63,6 +63,24 @@ const expandNewNode = (treeData, expandedNodes, numNewNodes = 1) => {
     return [...expandedNodes, ...newPaths];
 };
 
+const deleteNode = (treeData, path) => {
+    console.log('deleteNode called with:', { treeData: JSON.stringify(treeData), path });
+
+    if (path.length === 1) {
+        const filteredTreeData = treeData.filter((_, index) => index !== path[0]);
+        console.log('Filtered treeData at root level:', JSON.stringify(filteredTreeData));
+        return filteredTreeData;
+    }
+
+    const updatedTreeData = treeData.map((node, index) =>
+        index === path[0]
+            ? { ...node, children: deleteNode(node.children || [], path.slice(1)) }
+            : node
+    );
+
+    console.log('Updated treeData at deeper level:', JSON.stringify(updatedTreeData));
+    return updatedTreeData;
+};
 
 
 const compExamTabsSlice = createSlice({
@@ -86,6 +104,9 @@ const compExamTabsSlice = createSlice({
         setMedicalHistoryNotes: (state, action) => {
             state.medicalHistory.additionalNotes = action.payload;
         },
+        deleteMedicalHistoryNode: (state, action) => {
+            state.medicalHistory.treeData = deleteNode(state.medicalHistory.treeData, action.payload);
+        },
         setMedications: (state, action) => {
             state.medications = action.payload;
         },
@@ -100,6 +121,9 @@ const compExamTabsSlice = createSlice({
         setMedicationsNotes: (state, action) => {
             state.medications.additionalNotes = action.payload;
         },
+        deleteMedicationsNode: (state, action) => {
+            state.medications.treeData = deleteNode(state.medications.treeData, action.payload);
+        },
         setAllergies: (state, action) => {
             state.allergies = action.payload;
         },
@@ -113,6 +137,9 @@ const compExamTabsSlice = createSlice({
         },
         setAllergiesNotes: (state, action) => {
             state.allergies.additionalNotes = action.payload;
+        },
+        deleteAllergiesNode: (state, action) => {
+            state.allergies.treeData = deleteNode(state.allergies.treeData, action.payload);
         },
         setExtraOralAndIntraOralFindings: (state, action) => {
             state.extraOralAndIntraOralFindings = {
@@ -152,7 +179,10 @@ export const {
     setAllergiesNotes,
     setExtraOralAndIntraOralFindings,
     setOcclusions,
-    setFindings
+    setFindings,
+    deleteMedicalHistoryNode,
+    deleteMedicationsNode,
+    deleteAllergiesNode
 } = compExamTabsSlice.actions;
 
 export const selectChiefComplaint = (state) => state.compExamTabs.chiefComplaint;
