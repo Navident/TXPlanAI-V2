@@ -51,6 +51,7 @@ import { extractPatientIdFromUrl } from '../../../Utils/helpers';
 import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { UI_COLORS } from '../../../Theme';
+import { StyledListeningText } from './index.style';
 
 const SmartNotes = () => {
     const dispatch = useDispatch();
@@ -479,8 +480,15 @@ const SmartNotes = () => {
                     {tabValue === 7 && <NotesOutput/>}
                 </div>
                 {tabValue !== 7 && (
-                    <div onClick={handleMicClick} style={{ cursor: "pointer", width: "40px", height: "auto", zIndex: "999", marginTop: "auto" }}>
-                        {recording ? <StopCircleIcon style={{ width: "40px", height: "auto", color: "red" }} /> : <MicIcon style={{ width: "40px", height: "auto" }} />}
+                    <div onClick={handleMicClick} style={{ cursor: "pointer", display: 'flex', alignItems: 'center', zIndex: "999", marginTop: "auto" }}>
+                        {recording ? (
+                            <>
+                                <StopCircleIcon style={{ width: "40px", height: "auto", color: "red" }} />
+                                <StyledListeningText>listening...</StyledListeningText>
+                            </>
+                        ) : (
+                            <MicIcon style={{ width: "40px", height: "auto" }} />
+                        )}
                     </div>
                 )}
             </ContainerRoundedBox>
