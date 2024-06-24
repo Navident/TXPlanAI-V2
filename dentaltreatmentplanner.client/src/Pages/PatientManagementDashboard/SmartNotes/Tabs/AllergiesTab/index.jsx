@@ -44,12 +44,16 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
         const newExpandedNodes = [...expandedNodes];
 
         newValues.forEach((allergy, index) => {
-            const node = createNode(allergy, currentIndex + index);
-            updatedData.push(node);
-            newExpandedNodes.push(String(currentIndex + index));
-            node.children.forEach((_, childIndex) => {
-                newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
-            });
+            // Check if the allergy already exists
+            const exists = updatedData.some(node => node.value === allergy.defDescription);
+            if (!exists) {
+                const node = createNode(allergy, currentIndex + index);
+                updatedData.push(node);
+                newExpandedNodes.push(String(currentIndex + index));
+                node.children.forEach((_, childIndex) => {
+                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+                });
+            }
         });
 
         dispatch(setAllergiesTreeData(updatedData));
