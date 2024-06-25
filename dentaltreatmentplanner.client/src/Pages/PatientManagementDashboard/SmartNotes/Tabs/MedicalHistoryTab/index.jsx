@@ -44,12 +44,16 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction, setLoading })
         const newExpandedNodes = [...expandedNodes];
 
         newValues.forEach((disease, index) => {
-            const node = createNode(disease, currentIndex + index);
-            updatedData.push(node);
-            newExpandedNodes.push(String(currentIndex + index));
-            node.children.forEach((_, childIndex) => {
-                newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
-            });
+            // Check if the disease already exists
+            const exists = updatedData.some(node => node.value === disease.diseaseDefName);
+            if (!exists) {
+                const node = createNode(disease, currentIndex + index);
+                updatedData.push(node);
+                newExpandedNodes.push(String(currentIndex + index));
+                node.children.forEach((_, childIndex) => {
+                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+                });
+            }
         });
 
         dispatch(setMedicalHistoryTreeData(updatedData));

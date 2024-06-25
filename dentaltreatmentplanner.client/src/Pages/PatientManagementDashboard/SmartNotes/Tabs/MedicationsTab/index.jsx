@@ -45,12 +45,16 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction, setLoading })
         const newExpandedNodes = [...expandedNodes];
 
         newValues.forEach((medication, index) => {
-            const node = createNode(medication, currentIndex + index);
-            updatedData.push(node);
-            newExpandedNodes.push(String(currentIndex + index));
-            node.children.forEach((_, childIndex) => {
-                newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
-            });
+            // Check if the medication already exists
+            const exists = updatedData.some(node => node.value === medication.medName);
+            if (!exists) {
+                const node = createNode(medication, currentIndex + index);
+                updatedData.push(node);
+                newExpandedNodes.push(String(currentIndex + index));
+                node.children.forEach((_, childIndex) => {
+                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+                });
+            }
         });
 
         dispatch(setMedicationsTreeData(updatedData));
