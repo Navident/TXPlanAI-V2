@@ -7,6 +7,7 @@ import {
     StyledLargeText,
     StyledSeparator,
     StyledTitleAndPaymentTotalsContainer,
+    StyledTitleText
 } from "../../../GlobalStyledComponents";
 import { fetchOpenAIResponse } from "../../../OpenAI/LLM/gptRunner";
 import { CircularProgress, Backdrop } from "@mui/material";
@@ -46,6 +47,7 @@ import OcclusionsTab from './Tabs/OcclusionsTab/index';
 import MicIcon from '@mui/icons-material/Mic';
 import NotesOutput from './NotesOutput/index';
 import ContainerRoundedBox from '../../../Components/Containers/ContainerRoundedBox/index';
+import SmartNotesToolbar from './SmartNotesToolbar/index';
 
 import { extractPatientIdFromUrl } from '../../../Utils/helpers';
 import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGetAllergiesForPatientQuery } from '../../../Redux/ReduxSlices/OpenDental/openDentalApiSlice';
@@ -389,42 +391,6 @@ const SmartNotes = () => {
         }
     };
 
-    const stopAndProcessRecording = () => {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            // Ensure that all tracks of the stream are stopped
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                setStream(null); // Clear the stream
-            }
-            setRecording(false); // Reset recording state
-            setShowAudioPopup(false); // close the popup
-        }
-    };
-
-    const handleClose = () => {
-        // close the popup
-        setShowAudioPopup(false);
-        // Check if the mediaRecorder is recording and stop it if so
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            mediaRecorder.ondataavailable = () => { }; // Override the handler to prevent processing
-        }
-        // Whether it's recording or not, ensure all tracks are stopped
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(null); // Clear the stream
-        }
-        setRecording(false); // Reset recording state
-    };
-
-    const handleTabChange = (event, newValue) => {
-        if (newValue === 7) {  
-            console.log("executing generate now");
-            handleGenerateTreatmentPlan();
-        }
-        setTabValue(newValue);
-    };
 
     return (
         <div className="dashboard-bottom-inner-row">
@@ -435,115 +401,87 @@ const SmartNotes = () => {
                 />
             )}
 
-            <ContainerRoundedBox showTitle={true} title="Smart Notes">
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    aria-label="treatment plan tabs"
-                    centered
-                    textColor="inherit"
-                    TabIndicatorProps={{
-                        style: {
-                            backgroundColor: "#7777a1",
-                        },
-                    }}
-                    sx={{
-                        ".Mui-selected": {
-                            color: "#7777a1",
-                        },
-                    }}
-                >
-                    <Tab label="Chief Complaint" />
-                    <Tab label="Medical History" />
-                    <Tab label="Medications" />
-                    <Tab label="Allergies" />
-                    <Tab label="Extra oral and Intra oral Findings" />
-                    <Tab label="Occlusion" />
-                    <Tab label="Findings" />
-                    <Tab label="Generate" />
-
-                </Tabs>
+            <div className="treatment-plan-output-section rounded-box box-shadow">
+                <StyledTitleText>Smart Notes</StyledTitleText>
+                <SmartNotesToolbar
+                    recording={recording}
+                    handleMicClick={handleMicClick}
+                />
                 {loading && (
                     <Backdrop open={loading} style={{ zIndex: 9999, color: '#fff' }}>
                         <CircularProgress color="inherit" />
                     </Backdrop>
                 )}
                 <StyledSeparator customMarginTop="0px" />
-                <div className="create-treatment-plan-section-inner">
-                    {tabValue === 0 && <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
-                    {tabValue === 1 && <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} setLoading={setLoading} />}
-                    {tabValue === 2 && <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} medications={medications} />}
-                    {tabValue === 3 && <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} allergies={allergies} />}
-                    {tabValue === 4 && <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
-                    {tabValue === 5 && <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />}
-                    {tabValue === 6 && <FindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} setTreatmentsInputText={setTreatmentsInputText} />}
-                    {tabValue === 7 && <NotesOutput/>}
+                <div className="smart-notes-section-inner">
+                    <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
+                    <StyledSeparator />
+                    <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} setLoading={setLoading} />
+                    <StyledSeparator />
+                    <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} medications={medications} />
+                    <StyledSeparator />
+                    <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} allergies={allergies} />
+                    <StyledSeparator />
+                    <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
+                    <StyledSeparator />
+                    <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
+                    <StyledSeparator />
+                    <FindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} setTreatmentsInputText={setTreatmentsInputText} />
                 </div>
-                {tabValue !== 7 && (
-                    <div onClick={handleMicClick} style={{ cursor: "pointer", display: 'flex', alignItems: 'center', zIndex: "999", marginTop: "auto" }}>
-                        {recording ? (
-                            <>
-                                <StopCircleIcon style={{ width: "40px", height: "auto", color: "red" }} />
-                                <StyledListeningText>listening...</StyledListeningText>
-                            </>
-                        ) : (
-                            <MicIcon style={{ width: "40px", height: "auto" }} />
-                        )}
-                    </div>
-                )}
-            </ContainerRoundedBox>
-            {tabValue === 7 && (
-                <div className="treatment-plan-output-section rounded-box box-shadow">
-                    <TxViewCustomizationToolbar allRows={allRowsFromChild} />
-                    <StyledSeparator customMarginTop="0px" />
-                    <StyledContainerWithTableInner>
-                        {treatmentPlans.length > 0 && !isLoading && (
-                            <StyledTitleAndPaymentTotalsContainer>
-                                <div style={{ flex: 1 }}></div>
-                                <StyledLargeText>Treatment Plan</StyledLargeText>
-                                <div style={{ flex: 1 }}></div>
-                            </StyledTitleAndPaymentTotalsContainer>
-                        )}
-                        {isLoading ? (
-                            <div
-                                style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    height: "100%",
+            </div>
+
+            <div className="treatment-plan-output-section rounded-box box-shadow">
+                <TxViewCustomizationToolbar allRows={allRowsFromChild} />
+                <StyledSeparator customMarginTop="0px" />
+                <StyledContainerWithTableInner>
+                    {treatmentPlans.length > 0 && !isLoading && (
+                        <StyledTitleAndPaymentTotalsContainer>
+                            <div style={{ flex: 1 }}></div>
+                            <StyledLargeText>Treatment Plan</StyledLargeText>
+                            <div style={{ flex: 1 }}></div>
+                        </StyledTitleAndPaymentTotalsContainer>
+                    )}
+                    {isLoading ? (
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                height: "100%",
+                            }}
+                        >
+                            <CircularProgress style={{ color: purple }} />
+                        </div>
+                    ) : treatmentPlans.length > 0 ? (
+                        treatmentPlans.map((plan, index) => (
+                            <TreatmentPlanOutput
+                                key={`treatment-plan-${index}`}
+                                treatmentPlan={plan}
+                                treatmentPlans={treatmentPlans}
+                                onAddVisit={(newVisit) =>
+                                    dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
+                                }
+                                onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
+                                    console.log("Dispatching updated visits:", updatedVisits);
+                                    dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
                                 }}
-                            >
-                                <CircularProgress style={{ color: purple }} />
-                            </div>
-                        ) : treatmentPlans.length > 0 ? (
-                            treatmentPlans.map((plan, index) => (
-                                <TreatmentPlanOutput
-                                    key={`treatment-plan-${index}`}
-                                    treatmentPlan={plan}
-                                    treatmentPlans={treatmentPlans}
-                                    onAddVisit={(newVisit) =>
-                                        dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
-                                    }
-                                    onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
-                                        console.log("Dispatching updated visits:", updatedVisits);
-                                        dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
-                                    }}
-                                    onDeleteVisit={(deletedVisitId) =>
-                                        dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
-                                    }
-                                    showToothNumber={true}
-                                    isInGenerateTreatmentPlanContext={true}
-                                    onAllRowsUpdate={handleAllRowsUpdate}
-                                />
-                            ))
-                        ) : (
-                            <EmptyStatePlaceholder />
-                        )}
-                    </StyledContainerWithTableInner>
-                </div>
-            )}
+                                onDeleteVisit={(deletedVisitId) =>
+                                    dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
+                                }
+                                showToothNumber={true}
+                                isInGenerateTreatmentPlanContext={true}
+                                onAllRowsUpdate={handleAllRowsUpdate}
+                            />
+                        ))
+                    ) : (
+                        <EmptyStatePlaceholder />
+                    )}
+                </StyledContainerWithTableInner>
+            </div>
+            <ContainerRoundedBox showTitle={false} >
+                <NotesOutput />
+            </ContainerRoundedBox>
         </div>
     );
 };
-
-export default SmartNotes;
+    export default SmartNotes;

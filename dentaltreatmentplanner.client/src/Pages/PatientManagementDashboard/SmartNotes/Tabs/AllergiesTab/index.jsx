@@ -87,6 +87,8 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
+                <>
+            <div>Allergies</div>      
         <TreeView
             addParentNode={addParentNode}
             addButtonText="Add Allergies"
@@ -97,7 +99,8 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
                 console.log('Dispatching deleteNodeAction with path:', path);
                 dispatch(deleteAllergiesNode(path));
             }}
-        />
+            />
+        </>
     );
 };
 

@@ -7,6 +7,12 @@ export const StyledLargeText = styled.div`
     text-align: ${props => props.textAlign || 'inherit'};
 `;
 
+export const StyledTitleText = styled.div`
+    font-size: 22px;
+    font-weight: 600;
+    text-align: ${props => props.textAlign || 'center'};
+`;
+
 export const StyledHorizontalCenterContainer = styled.div`
     margin: 0 auto;
 `;
@@ -182,9 +188,9 @@ export const StyledRedCircleWithArrowDropdownContainer = styled.div`
   position: relative;
   width: 20px;
   height: 20px;
-  border: 2px solid #C10000; /* Adjust the border thickness as needed */
-  border-radius: 50%; /* This creates the circle shape */
-  background-color: white; /* Set the background color to white */
+  border: 2px solid #C10000; 
+  border-radius: 50%; 
+  background-color: white; 
   display: flex;
   align-items: center;
   justify-content: center;

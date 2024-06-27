@@ -72,6 +72,8 @@ const OcclusionsTab = ({ setAudioProcessingFunction, setLoading }) => {
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
+                                <>
+            <div>Occlusions</div>     
         <StyledOcclusionsContainer>
             <StyledTwoColumnContainer>
                 <StyledColumn>
@@ -105,7 +107,8 @@ const OcclusionsTab = ({ setAudioProcessingFunction, setLoading }) => {
                 onChange={(e) => dispatch(setOcclusions({ ...occlusions, additionalNotes: e.target.value }))}
                 placeholder="patient wants to wait for ortho until next year"
             />
-        </StyledOcclusionsContainer>
+            </StyledOcclusionsContainer>
+        </>
     );
 };
 

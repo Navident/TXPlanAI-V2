@@ -87,6 +87,8 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction, setLoading })
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
+        <>
+        <div>Medical History</div>       
         <StyledHorizontalCenterContainer>
             <TreeView
                 addParentNode={addParentNode}
@@ -99,7 +101,8 @@ const MedicalHistoryTab = ({ diseases, setAudioProcessingFunction, setLoading })
                     dispatch(deleteMedicalHistoryNode(path));
                 }}
             />
-        </StyledHorizontalCenterContainer>
+            </StyledHorizontalCenterContainer>
+        </>
     );
 };
 

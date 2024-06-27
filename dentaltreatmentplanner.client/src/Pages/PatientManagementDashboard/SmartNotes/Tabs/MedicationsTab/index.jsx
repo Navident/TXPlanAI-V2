@@ -88,6 +88,8 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction, setLoading })
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
+                <>
+            <div>Medications</div>      
         <TreeView
             addParentNode={addParentNode}
             addButtonText="Add Medications"
@@ -98,7 +100,8 @@ const MedicationsTab = ({ medications, setAudioProcessingFunction, setLoading })
                 console.log('Dispatching deleteNodeAction with path:', path);
                 dispatch(deleteMedicationsNode(path));
             }}
-        />
+            />
+        </>
     );
 };
 

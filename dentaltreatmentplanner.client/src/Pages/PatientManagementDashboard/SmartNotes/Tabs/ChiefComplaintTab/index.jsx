@@ -41,14 +41,17 @@ const ChiefComplaintsTab = ({ setAudioProcessingFunction, setLoading }) => {
     };
 
     return (
+        <>
+        <div>Chief Complaints</div>   
         <div>
             <MultilineTextfield
-                label="Chief Complaints"
+                label=""
                 value={chiefComplaint}
                 onChange={handleInputChange}
                 placeholder="Pain on upper right when eating"
             />
         </div>
+        </>
     );
 };
 

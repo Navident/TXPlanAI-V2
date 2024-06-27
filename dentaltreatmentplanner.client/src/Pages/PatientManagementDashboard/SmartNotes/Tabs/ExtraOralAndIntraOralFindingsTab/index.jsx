@@ -59,6 +59,8 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction, setLoadi
     }, [setAudioProcessingFunction, processAudioFile]);
 
     return (
+                        <>
+            <div>Extra Oral Intra Oral Health</div>      
         <StyledHorizontalCenterContainer>
             {fieldData.map((data, index) => (
                 <StyledLabelTextfieldRow key={index}>
@@ -73,7 +75,8 @@ const ExtraOralAndIntraOralFindingsTab = ({ setAudioProcessingFunction, setLoadi
                 </StyledLabelTextfieldRow>
             ))}
 
-        </StyledHorizontalCenterContainer>
+            </StyledHorizontalCenterContainer>
+        </>
     );
 };
 
