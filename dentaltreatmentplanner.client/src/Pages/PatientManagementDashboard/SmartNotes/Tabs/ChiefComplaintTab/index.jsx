@@ -5,52 +5,34 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getChiefComplaintsTabPrompt } from './prompt';
 
-const ChiefComplaintsTab = ({ setAudioProcessingFunction, setLoading }) => {
+const ChiefComplaintsTab = ({ setAudioProcessingFunction, processAudioFile, updateChiefComplaints }) => {
     const dispatch = useDispatch();
     const chiefComplaint = useSelector(selectChiefComplaint);
 
-    const updateInputTexts = useCallback((newValues) => {
-        dispatch(setChiefComplaint(newValues));
-    }, [dispatch]);
-
-    const processAudioFile = useCallback(async (audioFile) => {
-        setLoading(true);
-        try {
-            const transcribedText = await transcribeAudio(audioFile);
-            if (!transcribedText) {
-                console.log("No transcribed text available");
-                return;
-            }
-
-            const chiefComplaintSummaryText = await postProcessTranscriptWithGPT(transcribedText, getChiefComplaintsTabPrompt());
-            console.log("chiefComplaintSummaryText", chiefComplaintSummaryText);
-            updateInputTexts(chiefComplaintSummaryText);
-        } catch (error) {
-            console.error("Error during audio file processing:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [updateInputTexts, setLoading]);
-
     useEffect(() => {
-        setAudioProcessingFunction(() => processAudioFile);
-    }, [setAudioProcessingFunction, processAudioFile]);
+        console.log("Setting audio processing function in ChiefComplaintsTab");
+
+        const wrappedProcessAudioFile = (audioFile) => processAudioFile(audioFile, { ChiefComplaints: updateChiefComplaints });
+        setAudioProcessingFunction(() => wrappedProcessAudioFile);
+    }, [setAudioProcessingFunction, processAudioFile, updateChiefComplaints]);
 
     const handleInputChange = (event) => {
-        updateInputTexts(event.target.value);
+        const value = event.target.value;
+        updateChiefComplaints([{ description: value, duration: '', context: '' }]);
     };
+    console.log("Chief Complaint state:", chiefComplaint);
 
     return (
         <>
-        <div>Chief Complaints</div>   
-        <div>
-            <MultilineTextfield
-                label=""
-                value={chiefComplaint}
-                onChange={handleInputChange}
-                placeholder="Pain on upper right when eating"
-            />
-        </div>
+            <div>Chief Complaints</div>
+            <div>
+                <MultilineTextfield
+                    label=""
+                    value={chiefComplaint.length ? chiefComplaint[0].description : ''}
+                    onChange={handleInputChange}
+                    placeholder="Pain on upper right when eating"
+                />
+            </div>
         </>
     );
 };

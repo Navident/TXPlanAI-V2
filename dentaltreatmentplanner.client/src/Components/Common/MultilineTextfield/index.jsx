@@ -8,7 +8,7 @@ const MultiLineTextfield = ({ label, value, onChange, placeholder, onMicClick })
         <StyledTextfieldWrap>
             {label && <label>{label}</label>} 
             <StyledTextfieldArea
-                value={value}
+                value={value || ''}
                 onChange={onChange}
                 rows={5}
                 placeholder={multilinePlaceholder}

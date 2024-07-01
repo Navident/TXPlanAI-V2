@@ -1,6 +1,6 @@
 
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
 import {
     StyledContainerWithTableInner,
@@ -39,6 +39,8 @@ import { Tabs, Tab, Box } from '@mui/material';
 
 import FindingsTab from './Tabs/FindingsTab/index';
 import AllergiesTab from './Tabs/AllergiesTab/index';
+import ChiefComplaintsTab from './Tabs/ChiefComplaintTab/index';
+
 import ExtraOralAndIntraOralFindingsTab from './Tabs/ExtraOralAndIntraOralFindingsTab/index';
 import MedicalHistoryTab from './Tabs/MedicalHistoryTab/index';
 import MedicationsTab from './Tabs/MedicationsTab/index';
@@ -54,6 +56,11 @@ import { useGetDiseasesForPatientQuery, useGetMedicationsForPatientQuery, useGet
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { UI_COLORS } from '../../../Theme';
 import { StyledListeningText } from './index.style';
+import { getCombinedPrompt } from './Tabs/combinedPrompt';
+import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
+import { setAllergiesTreeData, setAllergiesExpandedNodes, selectAllergies } from '../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setChiefComplaint, selectChiefComplaint } from '../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
+import { setMedicalHistoryTreeData, setMedicalHistoryNotes, setMedicalHistoryExpandedNodes, selectMedicalHistory, deleteMedicalHistoryNode } from '../../../Redux/ReduxSlices/CompExamTabs/compExamTabsSlice';
 
 const SmartNotes = () => {
     const dispatch = useDispatch();
@@ -81,7 +88,7 @@ const SmartNotes = () => {
     const { data: diseases, isFetching: isFetchingDiseases, isError: isErrorDiseases, error: errorDiseases } = useGetDiseasesForPatientQuery(patientID);
     const { data: medications, isFetching: isFetchingMedications, isError: isErrorMedications, error: errorMedications } = useGetMedicationsForPatientQuery(patientID);
 
-    const { data: allergies, isFetching: isFetchingAllergies, isError: isErrorAllergies, error: errorAllergies } = useGetAllergiesForPatientQuery(patientID);
+    //const { data: allergies, isFetching: isFetchingAllergies, isError: isErrorAllergies, error: errorAllergies } = useGetAllergiesForPatientQuery(patientID);
 
 
 
@@ -323,12 +330,130 @@ const SmartNotes = () => {
         }
     };
 
-
     const [currentProcessAudioFile, setCurrentProcessAudioFile] = useState(null);
+
+
+    //selectors
+    const chiefComplaint = useSelector(selectChiefComplaint);
+    const allergies = useSelector(selectAllergies);
+    const medicalHistory = useSelector(selectMedicalHistory);
+
+    // Update functions
+    const updateChiefComplaints = useCallback((newValues) => {
+        console.log("Updating Chief Complaints with values:", newValues);
+        dispatch(setChiefComplaint(newValues));
+    }, [dispatch]);
+
+    const updateAllergies = useCallback((newValues) => {
+        const { treeData, expandedNodes } = allergies;
+        const updatedData = [...treeData];
+        const currentIndex = updatedData.length;
+        const newExpandedNodes = [...expandedNodes];
+
+        newValues.forEach((allergy, index) => {
+            const exists = updatedData.some(node => node.value === allergy.defDescription);
+            if (!exists) {
+                const node = {
+                    label: `Allergy ${currentIndex + index + 1}`,
+                    value: allergy.defDescription || '',
+                    children: [
+                        { label: 'Reaction', value: allergy.reaction || '' },
+                        { label: 'Date Adverse Reaction', value: allergy.dateAdverseReaction || '' },
+                        { label: 'Patient Note', value: allergy.patNote || '' },
+                    ],
+                };
+                updatedData.push(node);
+                newExpandedNodes.push(String(currentIndex + index));
+                node.children.forEach((_, childIndex) => {
+                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+                });
+            }
+        });
+
+        dispatch(setAllergiesTreeData(updatedData));
+        dispatch(setAllergiesExpandedNodes(newExpandedNodes));
+    }, [dispatch, allergies]);
+
+
+    const updateMedicalHistory = useCallback((newValues) => {
+        const { treeData, expandedNodes } = medicalHistory;
+        const updatedData = [...treeData];
+        const currentIndex = updatedData.length;
+        const newExpandedNodes = [...expandedNodes];
+
+        newValues.forEach((disease, index) => {
+            const exists = updatedData.some(node => node.value === disease.diseaseDefName);
+            if (!exists) {
+                const node = {
+                    label: `Problem ${currentIndex + index + 1}`,
+                    value: disease.diseaseDefName || '',
+                    children: [
+                        { label: 'Patient Note', value: disease.patNote || '' },
+                        { label: 'Date Start', value: disease.dateStart || '' },
+                        { label: 'Date Stop', value: disease.dateStop || '' }
+                    ]
+                };
+                updatedData.push(node);
+                newExpandedNodes.push(String(currentIndex + index));
+                node.children.forEach((_, childIndex) => {
+                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
+                });
+            }
+        });
+
+        dispatch(setMedicalHistoryTreeData(updatedData));
+        dispatch(setMedicalHistoryExpandedNodes(newExpandedNodes));
+    }, [dispatch, medicalHistory]);
+
+    const updateFunctions = useMemo(() => ({
+        ChiefComplaints: updateChiefComplaints,
+        Allergies: updateAllergies,
+        MedicalHistory: updateMedicalHistory,
+    }), [updateChiefComplaints, updateAllergies, updateMedicalHistory]);
+
+    // Audio input processing
+    const processAudioFile = useCallback(async (audioFile) => {
+        setLoading(true);
+        try {
+            const transcribedText = await transcribeAudio(audioFile);
+            if (!transcribedText) {
+                console.log("No transcribed text available");
+                return;
+            }
+
+            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getCombinedPrompt());
+            console.log("categorizedText:", categorizedText);
+
+            if (categorizedText && Array.isArray(categorizedText)) {
+                categorizedText.forEach(sectionData => {
+                    const { section, data } = sectionData;
+                    const updateFunction = updateFunctions[section];
+                    if (updateFunction) {
+                        updateFunction(data);
+                    } else {
+                        console.error('No update function found for section:', section);
+                    }
+                });
+            } else {
+                console.error('Invalid categorizedText format:', categorizedText);
+            }
+        } catch (error) {
+            console.error("Error during audio file processing:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [updateFunctions]);
+
+
+
+
+    useEffect(() => {
+        console.log("Setting audio processing function in SmartNotes");
+        setCurrentProcessAudioFile(() => processAudioFile);
+    }, [processAudioFile]);
 
     const handleMicClick = () => {
         if (!recording) {
-            // Start recording
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 setStream(null);
@@ -348,7 +473,7 @@ const SmartNotes = () => {
                             const audioFile = new File([event.data], "audio.webm", { type: 'audio/webm' });
                             console.log("Audio recording available for processing:", audioFile);
 
-                            if (currentProcessAudioFile) {
+                            if (typeof currentProcessAudioFile === 'function') {
                                 console.log("About to process audio file with currentProcessAudioFile function.");
                                 await currentProcessAudioFile(audioFile)
                                     .then(() => {
@@ -358,7 +483,7 @@ const SmartNotes = () => {
                                         console.error("Error during audio file processing:", error);
                                     });
                             } else {
-                                console.error("No audio processing function is set.");
+                                console.error("No audio processing function is set or is not a function.");
                             }
                         }
                     };
@@ -378,15 +503,13 @@ const SmartNotes = () => {
                     }
                 });
         } else {
-            // Stop recording
             if (mediaRecorder && mediaRecorder.state === 'recording') {
                 mediaRecorder.stop();
-                // Ensure that all tracks of the stream are stopped
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
-                    setStream(null); // Clear the stream
+                    setStream(null);
                 }
-                setRecording(false); // Reset recording state
+                setRecording(false);
             }
         }
     };
@@ -414,19 +537,19 @@ const SmartNotes = () => {
                 )}
                 <StyledSeparator customMarginTop="0px" />
                 <div className="smart-notes-section-inner">
-                    <ChiefComplaintTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
+                    <ChiefComplaintsTab setAudioProcessingFunction={setCurrentProcessAudioFile} processAudioFile={processAudioFile} updateChiefComplaints={updateChiefComplaints} />
                     <StyledSeparator />
-                    <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} setLoading={setLoading} />
+                    <MedicalHistoryTab setAudioProcessingFunction={setCurrentProcessAudioFile} diseases={diseases} setLoading={setLoading} processAudioFile={processAudioFile} updateMedicalHistory={updateMedicalHistory} />
                     <StyledSeparator />
-                    <MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} medications={medications} />
+                    {/*<MedicationsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} medications={medications} processAudioFile={processAudioFile} />
+                    <StyledSeparator />*/}
+                    <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} allergies={allergies} processAudioFile={processAudioFile} />
+{/*                    <StyledSeparator />
+                    <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} processAudioFile={processAudioFile} />
                     <StyledSeparator />
-                    <AllergiesTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} allergies={allergies} />
+                    <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} processAudioFile={processAudioFile} />
                     <StyledSeparator />
-                    <ExtraOralAndIntraOralFindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
-                    <StyledSeparator />
-                    <OcclusionsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} />
-                    <StyledSeparator />
-                    <FindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} setTreatmentsInputText={setTreatmentsInputText} />
+                    <FindingsTab setAudioProcessingFunction={setCurrentProcessAudioFile} setLoading={setLoading} setTreatmentsInputText={setTreatmentsInputText} processAudioFile={processAudioFile} />*/}
                 </div>
             </div>
 
@@ -479,7 +602,7 @@ const SmartNotes = () => {
                 </StyledContainerWithTableInner>
             </div>
             <ContainerRoundedBox showTitle={false} >
-                <NotesOutput />
+            {/*    <NotesOutput />*/}
             </ContainerRoundedBox>
         </div>
     );

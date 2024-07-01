@@ -34,13 +34,10 @@ const NotesOutput = () => {
             } else {
                 updatedObj[key] = obj[key];
             }
-            console.log(`Key: ${key}, Value: ${updatedObj[key]}`); // Debugging line
         }
         return updatedObj;
     };
 
-    // Check if the "pharynx" key is present in extraOralAndIntraOralFindings
-    console.log("Before setting default values:", extraOralAndIntraOralFindings);
 
     const extraOralFindingsWithNPP = setDefaultValues(extraOralAndIntraOralFindings, "WNL");
 

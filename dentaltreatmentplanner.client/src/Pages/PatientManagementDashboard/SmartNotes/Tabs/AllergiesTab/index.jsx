@@ -6,9 +6,10 @@ import { useEffect, useCallback } from "react";
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../../../OpenAI/Whisper/whisperService";
 import { getAllergiesTabPrompt } from './prompt';
 
-const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => {
+const AllergiesTab = ({ setAudioProcessingFunction, processAudioFile, updateAllergies }) => {
     const dispatch = useDispatch();
-    const { treeData, expandedNodes } = useSelector(selectAllergies);
+    const allergies = useSelector(selectAllergies);
+    const { treeData, expandedNodes } = allergies;
 
     const createNode = (allergy, index) => ({
         label: `Allergy ${index + 1}`,
@@ -21,7 +22,7 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
     });
 
     useEffect(() => {
-        if (allergies && treeData.length === 0) {
+        if (treeData.length === 0 && allergies.length > 0) {
             const initialData = allergies.map(createNode);
             dispatch(setAllergiesTreeData(initialData));
         }
@@ -38,67 +39,26 @@ const AllergiesTab = ({ allergies, setAudioProcessingFunction, setLoading }) => 
         dispatch(setAllergiesExpandedNodes(newExpandedNodes));
     };
 
-    const updateInputTexts = useCallback((newValues) => {
-        const updatedData = [...treeData];
-        const currentIndex = updatedData.length;
-        const newExpandedNodes = [...expandedNodes];
-
-        newValues.forEach((allergy, index) => {
-            // Check if the allergy already exists
-            const exists = updatedData.some(node => node.value === allergy.defDescription);
-            if (!exists) {
-                const node = createNode(allergy, currentIndex + index);
-                updatedData.push(node);
-                newExpandedNodes.push(String(currentIndex + index));
-                node.children.forEach((_, childIndex) => {
-                    newExpandedNodes.push(`${currentIndex + index}-${childIndex}`);
-                });
-            }
-        });
-
-        dispatch(setAllergiesTreeData(updatedData));
-        dispatch(setAllergiesExpandedNodes(newExpandedNodes));
-    }, [dispatch, treeData, expandedNodes]);
-
-    const processAudioFile = useCallback(async (audioFile) => {
-        setLoading(true);
-        try {
-            const transcribedText = await transcribeAudio(audioFile);
-            if (!transcribedText) {
-                console.log("No transcribed text available");
-                return;
-            }
-
-            const categorizedText = await postProcessTranscriptWithGPT(transcribedText, getAllergiesTabPrompt());
-            console.log("Processed categories:", categorizedText);
-
-            if (categorizedText) {
-                updateInputTexts(categorizedText);
-            }
-        } catch (error) {
-            console.error("Error during audio file processing:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [updateInputTexts, setLoading]);
-
     useEffect(() => {
-        setAudioProcessingFunction(() => processAudioFile);
-    }, [setAudioProcessingFunction, processAudioFile]);
+        console.log("Setting audio processing function in AllergiesTab");
+
+        const wrappedProcessAudioFile = (audioFile) => processAudioFile(audioFile, { Allergies: updateAllergies });
+        setAudioProcessingFunction(() => wrappedProcessAudioFile);
+    }, [setAudioProcessingFunction, processAudioFile, updateAllergies]);
 
     return (
-                <>
-            <div>Allergies</div>      
-        <TreeView
-            addParentNode={addParentNode}
-            addButtonText="Add Allergies"
-            selector={selectAllergies}
-            setTreeData={setAllergiesTreeData}
-            setExpandedNodes={(nodes) => dispatch(setAllergiesExpandedNodes(nodes))}
-            deleteNodeAction={(path) => {
-                console.log('Dispatching deleteNodeAction with path:', path);
-                dispatch(deleteAllergiesNode(path));
-            }}
+        <>
+            <div>Allergies</div>
+            <TreeView
+                addParentNode={addParentNode}
+                addButtonText="Add Allergies"
+                selector={selectAllergies}
+                setTreeData={data => dispatch(setAllergiesTreeData(data))}
+                setExpandedNodes={nodes => dispatch(setAllergiesExpandedNodes(nodes))}
+                deleteNodeAction={path => {
+                    console.log('Dispatching deleteNodeAction with path:', path);
+                    dispatch(deleteAllergiesNode(path));
+                }}
             />
         </>
     );
