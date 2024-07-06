@@ -30,7 +30,7 @@ const SideBar = () => {
 
     const items = [
         { imgSrc: homeIcon, imgSrcSelected: homeIconActive, text: "Home", path: "", redirectEnabled: true },
-        { imgSrc: feeSchedulingIcon, imgSrcSelected: feeSchedulingIconActive, text: "Fee Schedule", path: "feescheduling", redirectEnabled: false },
+        { imgSrc: feeSchedulingIcon, imgSrcSelected: feeSchedulingIconActive, text: "Fee Schedule", path: "feescheduling", redirectEnabled: true },
         { imgSrc: savedTxPlansIcon, imgSrcSelected: savedTxPlansIconActive, text: "Saved Tx Plans", path: "all-saved-patient-tx-plans", redirectEnabled: true },
         { imgSrc: providersIcon, imgSrcSelected: providersIcon, text: "Providers", path: "providers", redirectEnabled: false }, // Disabled redirect
         { imgSrc: cdtCodesIcon, imgSrcSelected: cdtCodesIconActive, text: "Custom CDT Codes", path: "customcdtCodes", redirectEnabled: true },

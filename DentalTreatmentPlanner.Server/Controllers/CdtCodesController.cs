@@ -88,35 +88,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
-        //[HttpGet]
-        //[Route("alternativeprocedures")]
-        //public async Task<IActionResult> GetAlternativeProceduresByFacility()
-        //{
-        //    try
-        //    {
-        //        var facilityId = await GetUserFacilityIdAsync();
-        //        if (!facilityId.HasValue)
-        //        {
-        //            Console.WriteLine("Unauthorized access attempt due to null facility ID");
-        //            return Unauthorized();
-        //        }
 
-        //        var alternativeProcedures = await _dentalTreatmentPlannerService.GetAlternativeProceduresByFacilityDTO(facilityId.Value);
-
-        //        if (alternativeProcedures == null || !alternativeProcedures.Any())
-        //        {
-        //            return NotFound($"No alternative procedures found for facility with ID {facilityId}.");
-        //        }
-
-        //        Console.WriteLine($"Fetched {alternativeProcedures.Count} alternative procedures for facility ID {facilityId}");
-        //        return Ok(alternativeProcedures);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Error occurred while fetching alternative procedures for facility ID: {ex.Message}");
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
 
 
         [HttpGet("cdtCodesFees")]

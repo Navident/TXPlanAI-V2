@@ -1,0 +1,54 @@
+[
+  {
+    "ProcedureCategoryId": 1,
+    "Name": "EXAM"
+  },
+  {
+    "ProcedureCategoryId": 2,
+    "Name": "XRAYS"
+  },
+  {
+    "ProcedureCategoryId": 3,
+    "Name": "PERIO"
+  },
+  {
+    "ProcedureCategoryId": 4,
+    "Name": "RESTORATION"
+  },
+  {
+    "ProcedureCategoryId": 5,
+    "Name": "SINGLE CROWN"
+  },
+  {
+    "ProcedureCategoryId": 6,
+    "Name": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureCategoryId": 7,
+    "Name": "EXTRACTIONS"
+  },
+  {
+    "ProcedureCategoryId": 8,
+    "Name": "IMPLANT"
+  },
+  {
+    "ProcedureCategoryId": 9,
+    "Name": "IMPLANT ABUTMENT BRIDGE"
+  },
+  {
+    "ProcedureCategoryId": 10,
+    "Name": "REMOVABLE"
+  },
+  {
+    "ProcedureCategoryId": 11,
+    "Name": "ENDO"
+  },
+  {
+    "ProcedureCategoryId": 12,
+    "Name": "PEDO"
+  },
+  {
+    "ProcedureCategoryId": 13,
+    "Name": "EXTRA"
+  }
+]

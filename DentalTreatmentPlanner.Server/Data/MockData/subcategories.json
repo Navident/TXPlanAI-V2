@@ -1,0 +1,686 @@
+[
+  {
+    "ProcedureSubCategoryId": 1,
+    "Name": "Consultation Ortho/OS",
+    "ProcedureCategoryId": 1,
+    "ProcedureCategoryName": "EXAM"
+  },
+  {
+    "ProcedureSubCategoryId": 2,
+    "Name": "Initial Exam",
+    "ProcedureCategoryId": 1,
+    "ProcedureCategoryName": "EXAM"
+  },
+  {
+    "ProcedureSubCategoryId": 3,
+    "Name": "Recall Exam ER Limited",
+    "ProcedureCategoryId": 1,
+    "ProcedureCategoryName": "EXAM"
+  },
+  {
+    "ProcedureSubCategoryId": 4,
+    "Name": "FMX",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 5,
+    "Name": "Pano",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 6,
+    "Name": "4x6 X-rays",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 7,
+    "Name": "2x6 X-rays",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 8,
+    "Name": "PA",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 9,
+    "Name": "Additional PA Same Visit",
+    "ProcedureCategoryId": 2,
+    "ProcedureCategoryName": "XRAYS"
+  },
+  {
+    "ProcedureSubCategoryId": 10,
+    "Name": "Consultation Ortho/OS",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 11,
+    "Name": "Prophy Child",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 12,
+    "Name": "Prophy Adult",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 13,
+    "Name": "Perio Maintenance",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 14,
+    "Name": "SRP 1-3 Teeth",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 15,
+    "Name": "SRP 4+ Teeth",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 16,
+    "Name": "Laser Therapy",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 17,
+    "Name": "Gingivectomy 1-3 Teeth",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 18,
+    "Name": "Gingivectomy 4+ Teeth",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 19,
+    "Name": "Crown Lengthening",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 20,
+    "Name": "Chlorhexidine",
+    "ProcedureCategoryId": 3,
+    "ProcedureCategoryName": "PERIO"
+  },
+  {
+    "ProcedureSubCategoryId": 21,
+    "Name": "Sealant",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 22,
+    "Name": "PRR (Preventative Resin Restoration)",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 23,
+    "Name": "Anterior 1 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 24,
+    "Name": "Anterior 2 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 25,
+    "Name": "Anterior 3 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 26,
+    "Name": "Anterior 4 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 27,
+    "Name": "Build-up",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 28,
+    "Name": "Post and Build-up",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 29,
+    "Name": "Posterior 1 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 30,
+    "Name": "Posterior 2 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 31,
+    "Name": "Posterior 3 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 32,
+    "Name": "Posterior 4 Surface",
+    "ProcedureCategoryId": 4,
+    "ProcedureCategoryName": "RESTORATION"
+  },
+  {
+    "ProcedureSubCategoryId": 33,
+    "Name": "ACC Zirconia/Emax Crown",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 34,
+    "Name": "PFM Crown",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 35,
+    "Name": "PFG Crown",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 36,
+    "Name": "FMC Full Metal Gold Crown",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 37,
+    "Name": "Porcelain Veneer",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 38,
+    "Name": "Recement Veneer",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 39,
+    "Name": "Recement Crown",
+    "ProcedureCategoryId": 5,
+    "ProcedureCategoryName": "SINGLE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 40,
+    "Name": "ACC Retainer Zirconia/Emax",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 41,
+    "Name": "PFM Retainer",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 42,
+    "Name": "PFG Retainer",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 43,
+    "Name": "FMC Retainer Full Metal Gold",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 44,
+    "Name": "ACC Pontic Zirconia/Emax",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 45,
+    "Name": "PFM Pontic",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 46,
+    "Name": "PFG Pontic",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 47,
+    "Name": "FMC Pontic Full Metal Gold",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 48,
+    "Name": "Gold Inlay 1 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 49,
+    "Name": "Gold Inlay 2 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 50,
+    "Name": "Gold Inlay 3 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 51,
+    "Name": "Gold Onlay 2 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 52,
+    "Name": "Gold Onlay 3 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 53,
+    "Name": "Gold Onlay 4+ Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 54,
+    "Name": "Ceramic Inlay 1 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 55,
+    "Name": "Ceramic Inlay 2 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 56,
+    "Name": "Ceramic Inlay 3 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 57,
+    "Name": "Ceramic Onlay 2 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 58,
+    "Name": "Ceramic Onlay 3 Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 59,
+    "Name": "Ceramic Onlay 4+ Surface",
+    "ProcedureCategoryId": 6,
+    "ProcedureCategoryName": "BRIDGE CROWN"
+  },
+  {
+    "ProcedureSubCategoryId": 60,
+    "Name": "Simple Extraction",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 61,
+    "Name": "Surgical Extraction",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 62,
+    "Name": "Extraction Soft Tissue Impacted",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 63,
+    "Name": "Extraction Partial Bony Impacted",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 64,
+    "Name": "Extraction Full Bony Impacted",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 65,
+    "Name": "Extraction Full Bony Impacted w/complications",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 66,
+    "Name": "Bone Graft",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 67,
+    "Name": "Non-resorbable Membrane",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 68,
+    "Name": "Bone Graft During Implant Placement",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 69,
+    "Name": "Sinus Lift Lateral Window",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 70,
+    "Name": "Sinus Lift Vertical Approach",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 71,
+    "Name": "Coronectomy",
+    "ProcedureCategoryId": 7,
+    "ProcedureCategoryName": "EXTRACTIONS"
+  },
+  {
+    "ProcedureSubCategoryId": 72,
+    "Name": "CBCT Maxilla",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 73,
+    "Name": "CBCT Mandible",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 74,
+    "Name": "CBCT Maxilla and Mandible",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 75,
+    "Name": "Surgical Guide",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 76,
+    "Name": "Implant Placement - PFG",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 77,
+    "Name": "Implant Retainer - PFG",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 78,
+    "Name": "PFG Pontic",
+    "ProcedureCategoryId": 8,
+    "ProcedureCategoryName": "IMPLANT"
+  },
+  {
+    "ProcedureSubCategoryId": 79,
+    "Name": "Implant Retainer Abutment - PFG",
+    "ProcedureCategoryId": 9,
+    "ProcedureCategoryName": "IMPLANT ABUTMENT BRIDGE"
+  },
+  {
+    "ProcedureSubCategoryId": 80,
+    "Name": "Maxillary Stayplate",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 81,
+    "Name": "Mandibular Stayplate",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 82,
+    "Name": "Maxillary Valplast",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 83,
+    "Name": "Mandibular Valplast",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 84,
+    "Name": "Maxillary Metal Base Partial",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 85,
+    "Name": "Mandibular Metal Base Partial",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 86,
+    "Name": "Replace Tooth",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 87,
+    "Name": "Maxillary Denture Lab Reline",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 88,
+    "Name": "Mandibular Denture Lab Reline",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 89,
+    "Name": "Immediate Maxillary Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 90,
+    "Name": "Immediate Mandibular Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 91,
+    "Name": "Maxillary Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 92,
+    "Name": "Mandibular Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 93,
+    "Name": "Maxillary Overdenture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 94,
+    "Name": "Mandibular Overdenture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 95,
+    "Name": "Repair Maxillary Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 96,
+    "Name": "Repair Mandibular Denture",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 97,
+    "Name": "Occlusal Night Guard",
+    "ProcedureCategoryId": 10,
+    "ProcedureCategoryName": "REMOVABLE"
+  },
+  {
+    "ProcedureSubCategoryId": 98,
+    "Name": "Indirect Pulp Cap - Theracal",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 99,
+    "Name": "Direct Pulp Cap - Endosequence",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 100,
+    "Name": "Pulpotomy",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 101,
+    "Name": "Pulpectomy",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 102,
+    "Name": "Anterior RCT (tooth #6-11, 22-27)",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 103,
+    "Name": "Bicuspid RCT (tooth #4, 5, 12, 13, 20, 21, 28, 29)",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 104,
+    "Name": "Molar RCT",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 105,
+    "Name": "Retreat Anterior RCT",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 106,
+    "Name": "Retreat Bicuspid RCT",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 107,
+    "Name": "Retreat Molar RCT",
+    "ProcedureCategoryId": 11,
+    "ProcedureCategoryName": "ENDO"
+  },
+  {
+    "ProcedureSubCategoryId": 108,
+    "Name": "Anterior Pulpotomy Primary Tooth (tooth #C-H, M-R)",
+    "ProcedureCategoryId": 12,
+    "ProcedureCategoryName": "PEDO"
+  },
+  {
+    "ProcedureSubCategoryId": 109,
+    "Name": "Posterior Pulpotomy Primary Tooth (tooth #A, B, I-L, S, T)",
+    "ProcedureCategoryId": 12,
+    "ProcedureCategoryName": "PEDO"
+  },
+  {
+    "ProcedureSubCategoryId": 110,
+    "Name": "Sealant",
+    "ProcedureCategoryId": 12,
+    "ProcedureCategoryName": "PEDO"
+  },
+  {
+    "ProcedureSubCategoryId": 111,
+    "Name": "Preventative Resin Restoration",
+    "ProcedureCategoryId": 12,
+    "ProcedureCategoryName": "PEDO"
+  },
+  {
+    "ProcedureSubCategoryId": 112,
+    "Name": "Office Bleaching",
+    "ProcedureCategoryId": 13,
+    "ProcedureCategoryName": "EXTRA"
+  },
+  {
+    "ProcedureSubCategoryId": 113,
+    "Name": "Home Bleaching",
+    "ProcedureCategoryId": 13,
+    "ProcedureCategoryName": "EXTRA"
+  },
+  {
+    "ProcedureSubCategoryId": 114,
+    "Name": "Nylon Denture Abutment Inserts",
+    "ProcedureCategoryId": 13,
+    "ProcedureCategoryName": "EXTRA"
+  }
+]

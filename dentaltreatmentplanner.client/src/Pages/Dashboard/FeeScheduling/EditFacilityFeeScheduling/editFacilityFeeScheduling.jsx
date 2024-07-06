@@ -16,6 +16,7 @@ import { CircularProgress } from "@mui/material";
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveCdtCodes, selectPayersForFacility, fetchPayersWithCdtCodesFeesForFacility } from '../../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import { showAlert } from '../../../../Redux/ReduxSlices/Alerts/alertSlice';
+import { useGetDefaultCdtCodesQuery, useGetCustomCdtCodesQuery } from '../../../../Redux/ReduxSlices/CdtCodes/cdtCodesApiSlice';
 
 const EditFacilityFeeScheduling = () => {
     const dispatch = useDispatch();
@@ -29,47 +30,57 @@ const EditFacilityFeeScheduling = () => {
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
     const [originalRowData, setOriginalRowData] = useState(null);
-    const { facilityCdtCodes, defaultCdtCodes, fetchPayers  } = useBusiness(); 
     const [activeRowsData, setActiveRowsData] = useState([]);
     const [inactiveRowsData, setInactiveRowsData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const activeCdtCodes = useSelector(selectActiveCdtCodes);
-    const payers = useSelector(selectPayersForFacility); 
+    const payers = useSelector(selectPayersForFacility);
+
+    // New hooks to fetch default and custom CDT codes
+    const { data: defaultCdtCodes = [], isLoading: isDefaultLoading } = useGetDefaultCdtCodesQuery();
+    const { data: facilityCdtCodes = [], isLoading: isFacilityLoading } = useGetCustomCdtCodesQuery();
 
     useEffect(() => {
-        setIsLoading(true);
-    }, [payerId]);
+        setIsLoading(isDefaultLoading || isFacilityLoading);
+    }, [isDefaultLoading, isFacilityLoading]);
 
     useEffect(() => {
-        const payerFees = payers.find(payer => payer.payerId === parseInt(payerId))?.cdtCodeFees || [];
+        if (!isLoading && defaultCdtCodes.length > 0 && facilityCdtCodes.length > 0) {
+            const payerFees = payers.find(payer => payer.payerId === parseInt(payerId))?.cdtCodeFees || [];
 
-        const combinedCdtCodes = [...defaultCdtCodes, ...facilityCdtCodes];
-        const _activeRowsData = [];
-        const _inactiveRowsData = [];
+            const combinedCdtCodes = [...defaultCdtCodes, ...facilityCdtCodes];
+            console.log('Combined CDT Codes:', combinedCdtCodes); // Add this line to check combinedCdtCodes
 
-        combinedCdtCodes.forEach(code => {
-            const fee = payerFees.find(f => f.cdtCodeId === code.cdtCodeId);
-            const rowData = {
-                id: code.cdtCodeId.toString(),
-                code: code.code,
-                description: code.longDescription,
-                ucrFee: fee?.ucrDollarAmount ?? '',
-                coveragePercent: fee?.coveragePercent ?? '',
-                coPay: fee?.coPay ?? '', 
-                isStatic: true
-            };
+            const _activeRowsData = [];
+            const _inactiveRowsData = [];
+            console.log("payerFees: ", payerFees);
+            combinedCdtCodes.forEach(code => {
+                const fee = payerFees.find(f => f.cdtCodeId === code.cdtCodeId);
+                const rowData = {
+                    id: code.cdtCodeId.toString(),
+                    code: code.code,
+                    description: code.longDescription,
+                    ucrFee: fee?.ucrDollarAmount ?? '',
+                    coveragePercent: fee?.coveragePercent ?? '',
+                    coPay: fee?.coPay ?? '',
+                    isStatic: true
+                };
+                console.log('Row Data:', rowData);
+                if (activeCdtCodes.includes(code.cdtCodeId)) {
+                    _activeRowsData.push(rowData);
+                } else {
+                    _inactiveRowsData.push(rowData);
+                }
+            });
 
-            if (activeCdtCodes.includes(code.cdtCodeId)) {
-                _activeRowsData.push(rowData);
-            } else {
-                _inactiveRowsData.push(rowData);
-            }
-        });
+            console.log('Active Rows Data:', _activeRowsData); // Debugging log
+            console.log('Inactive Rows Data:', _inactiveRowsData); // Debugging log
 
-        setIsLoading(false);
-        setActiveRowsData(_activeRowsData);
-        setInactiveRowsData(_inactiveRowsData);
-    }, [payers, facilityCdtCodes, defaultCdtCodes, payerId, activeCdtCodes]);
+            setActiveRowsData(_activeRowsData);
+            setInactiveRowsData(_inactiveRowsData);
+        }
+    }, [payers, facilityCdtCodes, defaultCdtCodes, payerId, activeCdtCodes, isLoading]);
+
 
     const renderStaticRow = (row, index) => ([
         <span key={`code-${index}`}>{row.code}</span>,

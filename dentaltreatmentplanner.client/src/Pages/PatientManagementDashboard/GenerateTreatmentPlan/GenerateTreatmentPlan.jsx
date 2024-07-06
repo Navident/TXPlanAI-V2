@@ -1,6 +1,8 @@
 import RoundedButton from "../../../Components/Common/RoundedButton/RoundedButton";
 import MultilineTextfield from "../../../Components/Common/MultilineTextfield/index";
 import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationToolbar/index";
+import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
+
 import PenIcon from "../../../assets/pen-icon.svg";
 import { useState, useEffect } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
@@ -37,6 +39,8 @@ import LoginPopup from '../../../Components/Common/LoginPopup';
 import MicIcon from '@mui/icons-material/Mic';
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
 import AudioPopup from "../../../Components/AudioPopup/index";
+import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import PaymentTotals from "../../../Components/PaymentTotals/index";
 
 const GenerateTreatmentPlan = () => {
     const dispatch = useDispatch();
@@ -53,7 +57,9 @@ const GenerateTreatmentPlan = () => {
     const [showAudioPopup, setShowAudioPopup] = useState(false);
     const [recording, setRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
-
+    const grandUcrTotal = useSelector(selectGrandUcrTotal);
+    const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
+    const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
     };
@@ -118,8 +124,19 @@ const GenerateTreatmentPlan = () => {
 
     async function preprocessInputText(inputText) {
         console.log("inputText sent to ai", inputText);
-        const aiResponse = await fetchOpenAIResponse(inputText);
+
+        let aiResponse;
+        try {
+            aiResponse = await fetchOpenAIResponse(inputText);
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            throw new Error("Failed to fetch AI response.");
+        }
+
         console.log("ai response", aiResponse);
+
+        // Log the aiResponse to inspect its content
+        console.log("Raw AI Response:", aiResponse);
 
         appInsights.trackEvent({
             name: "TreatmentPlan",
@@ -131,18 +148,30 @@ const GenerateTreatmentPlan = () => {
             }
         });
 
-        const parsedResponse = JSON.parse(aiResponse);
-        console.log("parsedResponse", parsedResponse);
+        // Split and parse concatenated JSON arrays
+        const responseParts = aiResponse.split('\n').filter(part => part.trim() !== '');
+        const parsedResponses = [];
 
-        const responseArray = Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse];
-        console.log("responseArray", responseArray);
+        for (const part of responseParts) {
+            try {
+                const parsedPart = JSON.parse(part);
+                parsedResponses.push(...(Array.isArray(parsedPart) ? parsedPart : [parsedPart]));
+            } catch (error) {
+                console.error("Error parsing part of AI response JSON:", error);
+                console.error("AI Response Part Content:", part); // Log the raw response part for debugging
+                throw new Error("Failed to parse part of AI response JSON.");
+            }
+        }
 
-        return responseArray.map((item, index) => ({
+        console.log("parsedResponses", parsedResponses);
+
+        return parsedResponses.map((item, index) => ({
             ...item,
             toothNumber: item.toothNumber ? item.toothNumber.replace('#', '') : '',
             originalOrder: index,
         }));
     }
+
 
     async function fetchAndProcessTreatments(treatmentEntries, subcategoryTreatmentPlans) {
         console.log("Treatment entries (with original order):", treatmentEntries);
@@ -362,6 +391,7 @@ const GenerateTreatmentPlan = () => {
 
     return (
         <div className="dashboard-bottom-inner-row">
+            <PatientInfoSection />
             {showLoginPopup && (
                 <LoginPopup
                     open={showLoginPopup}
@@ -406,6 +436,14 @@ const GenerateTreatmentPlan = () => {
                             <div style={{ flex: 1 }}></div>
                             <StyledLargeText>Treatment Plan</StyledLargeText>
                             <div style={{ flex: 1 }}>
+                                {areGrandTotalsReady && (
+                                    <PaymentTotals
+                                        ucrTotal={grandUcrTotal}
+                                        coPayTotal={grandCoPayTotal}
+                                        isGrandTotal={true}
+                                        justifyContent="end"
+                                    />
+                                )}
                             </div>
                         </StyledTitleAndPaymentTotalsContainer>
                     )}

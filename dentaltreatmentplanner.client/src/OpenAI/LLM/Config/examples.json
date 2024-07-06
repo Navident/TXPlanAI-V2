@@ -1,250 +1,126 @@
 [
   {
     "role": "user",
-    "content": "#5 mod comp"
+    "content": "ortho consult"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#5\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
+    "content": "[{\"treatments\": [\"Consultation Ortho/OS\"]}]"
   },
   {
     "role": "user",
-    "content": "#8 DOB5 composite"
+    "content": "UR gingivectomy"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#8\", \"surface\": \"D, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]}]"
+    "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingivectomy 4+\"]}]"
   },
   {
     "role": "user",
-    "content": "#7 DO composite\n#9 MOB5 composite\n#12 DOL/5 composite"
+    "content": "#5 DLB comp"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#7\", \"surface\": \"D, O\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#9\", \"surface\": \"M, O, BV\", \"treatments\": [\"3 Surface Anterior Composite Filling\"]},\n{\"toothNumber\": \"#12\", \"surface\": \"D, O, LV\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
+    "content": "[{\"toothNumber\": \"5\", \"surface\": \"DLB\", \"treatments\": [\"Posterior 3 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "UR Srp 1-3"
+    "content": "#6 MBV comp"
   },
   {
     "role": "assistant",
-    "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 1-3 Teeth\"]}]"
+    "content": "[{\"toothNumber\": \"6\", \"surface\": \"MBV\", \"treatments\": [\"Anterior 2 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "#3, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15 routine ext\n#5, 7, 9, 12 implant, pre fab abutments"
+    "content": "#7 DLB5 comp"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#6\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#10\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"Routine Extraction\", \"Single Implant\", \"Pre-Fabricated Abutment\"]}, {\"toothNumber\": \"#14\", \"treatments\": [\"Routine Extraction\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"Routine Extraction\"]}]"
+    "content": "[{\"toothNumber\": \"7\", \"surface\": \"DLB5\", \"treatments\": [\"Anterior 3 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "45 mins iv sedation"
+    "content": "#8 B5 comp"
   },
   {
     "role": "assistant",
-    "content": "[{\"treatments\": [\"Initial IV Sedation\", \"IV Sedation\", \"IV Sedation\"]}]"
+    "content": "[{\"toothNumber\": \"8\", \"surface\": \"B5\", \"treatments\": [\"Anterior 1 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "membrane"
+    "content": "#2 DL5 comp"
   },
   {
     "role": "assistant",
-    "content": "[{\"treatments\": [\"Resorbable Membrane\"]}]"
+    "content": "[{\"toothNumber\": \"2\", \"surface\": \"DL5\", \"treatments\": [\"Posterior 2 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "#12-14 acc bridge"
+    "content": "#12-14 pfm bridge"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"ACC Retainer Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Retainer Crown\"]}, {\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, {\"toothNumber\": \"#14\", \"treatments\": [\"ACC Retainer Crown\"]}]"
   },
   {
     "role": "user",
-    "content": "#9-11 implant bridge with acc crowns"
+    "content": "#7-11 pfg bridge"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Single Implant\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
+    "content": "[{\"toothNumber\": \"#7\", \"treatments\": [\"PFG Retainer\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"PFG Pontic\"]}, {\"toothNumber\": \"#9\", \"treatments\": [\"PFG Pontic\"]}, {\"toothNumber\": \"#10\", \"treatments\": [\"PFG Pontic\"]}, {\"toothNumber\": \"#11\", \"treatments\": [\"PFG Retainer\"]}]"
   },
   {
     "role": "user",
-    "content": "#21 bone graft, ext, implant, with pfm"
+    "content": "#12 MOB ceramic onlay"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#21\", \"treatments\": [\"Bone Graft Ridge Preservation\", \"Surgical Extraction\", \"Single Implant\", \"Implant Supported PFM Crown\"]}]"
+    "content": "[{\"toothNumber\": \"12\", \"surface\": \"MOB\", \"treatments\": [\"Ceramic Onlay 3 Surface\"]}]"
   },
   {
     "role": "user",
-    "content": "irrigation"
+    "content": "#6-8 implant bridge"
   },
   {
     "role": "assistant",
-    "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"LL\", \"treatments\": [\"Gingival Irrigation\"]}]"
+    "content": "[{\"toothNumber\": \"#6\", \"treatments\": [\"Implant Retainer - PFG\"]}, {\"toothNumber\": \"#7\", \"treatments\": [\"PFG Pontic\"]}, {\"toothNumber\": \"#8\", \"treatments\": [\"Implant Retainer - PFG\"]}]"
   },
   {
     "role": "user",
-    "content": "upper irrigation"
+    "content": "#12 implant"
   },
   {
     "role": "assistant",
-    "content": "[{\"arch\": \"UR\", \"treatments\": [\"Gingival Irrigation\"]}]\n[{\"arch\": \"UL\", \"treatments\": [\"Gingival Irrigation\"]}]"
+    "content": "[{\"toothNumber\": \"12\", \"treatments\": [\"Implant Placement - PFG\"]}]"
   },
   {
     "role": "user",
-    "content": "#12 porcelain crown"
+    "content": "#12 rct"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
+    "content": "[{\"toothNumber\": \"12\", \"treatments\": [\"Bicuspid RCT\"]}]"
   },
   {
     "role": "user",
-    "content": "#8 porcelain veneer"
+    "content": "#22 retreat"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#8\", \"treatments\": [\"Indirect Veneer\"]}]"
+    "content": "[{\"toothNumber\": \"22\", \"treatments\": [\"Retreat Anterior RCT\"]}]"
   },
   {
     "role": "user",
-    "content": "#9 composite veneer"
+    "content": "#C pulpotomy"
   },
   {
     "role": "assistant",
-    "content": "[{\"toothNumber\": \"#9\", \"treatments\": [\"Direct Veneer\"]}]"
+    "content": "[{\"toothNumber\": \"C\", \"treatments\": [\"Anterior Pulpotomy Primary Tooth\"]}]"
   },
   {
     "role": "user",
-    "content": "#12-15 exts, aveloplasty"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Surgical Extraction\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#14\", \"treatments\": [\"Surgical Extraction\"]},\n{\"toothNumber\": \"#15\", \"treatments\": [\"Surgical Extraction\"]},\n{\"arch\": \"UL\", \"treatments\": [\"Alveoloplasty with Exts 4+ Teeth\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "srp"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"arch\": \"UR\", \"treatments\": [\"SRP 4+ Teeth\"]},\n[{\"arch\": \"UL\", \"treatments\": [\"SRP 4+ Teeth\"]},\n[{\"arch\": \"LR\", \"treatments\": [\"SRP 4+ Teeth\"]},\n[{\"arch\": \"LL\", \"treatments\": [\"SRP 4+ Teeth\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "POE"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"treatments\": [\"Recall\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#12-14 implant bridge"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#22-24 implants with pfm"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "membrane"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"treatments\": [\"Resorbable Membrane\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#12 crown"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"ACC Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#12-14 implant bridge, custom abutment, acc"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#12\", \"treatments\": [\"Single Implant\", \"Custom Abutment\", \"Abutment Supported ACC Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Single Implant\", \"Custom Abutment\", \"Abutment Supported ACC Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#3 MOD composite\n#5 rct, build up, post, porcelain crown\n#6-11 pfm bridge\n#22-24 extraction, bone graft, membrane, implant bridge, porcelain crowns"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Root Canal Molar\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"ACC Pontic\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#3 mod comp\n#4 implant, custom abutment, porcelain crown\n#8 rct, post, build up, porcelain crown\n#12-15 pfm bridge"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"Single Implant\", \"Custom Abutment\", \"Abutment Supported ACC Crown\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"PFM Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#15\", \"treatments\": [\"PFM Retainer Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#3 mod comp\n#6 rct, post and core, acc\n#12-14 pfm bridge\n#22 implant, prefab abutment, pfm"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Pre-Fabricated Abutment\", \"Abutment Supported PFM Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#3 mod comp\n#6 rct, post and core, acc\n#12-14 pfm bridge\n#22 implant, pfm"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Root Canal Anterior\", \"Build Up with Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported PFM Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "implant bridge 22-27 \nmaxillary veneers 6-11 \nzirocnia FPD from 2-5 \ncrowns on 12-14 with build ups \nRCT 2,5,14"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#22\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#23\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#24\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#25\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#26\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#27\", \"treatments\": [\"Single Implant\", \"Implant Supported ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#9\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#10\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#11\", \"treatments\": [\"Indirect Veneer\"]}, \n{\"toothNumber\": \"#2\", \"treatments\": [\"Root Canal Molar\", \"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#3\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#4\", \"treatments\": [\"ACC Pontic\"]}, \n{\"toothNumber\": \"#5\", \"treatments\": [\"Root Canal Pre-Molar\", \"ACC Retainer Crown\"]}, \n{\"toothNumber\": \"#12\", \"treatments\": [\"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#13\", \"treatments\": [\"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#14\", \"treatments\": [\"Root Canal Molar\", \"Build Up without Post\", \"ACC Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#2 rct, build up, porcelain crown\n#3 MOD comp\n#6-8 pfm bridge with RCT #8\n#27-29 ext, bone graft, implant bridge, pfm "
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#2\", \"treatments\": [\"Root Canal Molar\", \"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#3\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Root Canal Anterior\", \"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#27\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#28\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"PFM Pontic\"]}, \n{\"toothNumber\": \"#29\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#2 rct, build up and ceramic crown\n#6-8 pfm bridge with rct on #8\n#27-29 extractions, bone graft, implant bridge, with pfm crowns\n#30 MOD comp"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#2\", \"treatments\": [\"Root Canal Molar\", \"Build Up without Post\", \"ACC Crown\"]}, \n{\"toothNumber\": \"#6\", \"treatments\": [\"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#7\", \"treatments\": [\"PFM Pontic\"]}, \n{\"toothNumber\": \"#8\", \"treatments\": [\"Root Canal Anterior\", \"PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#27\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#28\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"PFM Pontic\"]}, \n{\"toothNumber\": \"#29\", \"treatments\": [\"Surgical Extraction\", \"Bone Graft Ridge Preservation\", \"Resorbable Membrane\", \"Single Implant\", \"Implant Supported PFM Retainer Crown\"]}, \n{\"toothNumber\": \"#30\", \"surface\": \"M, O, D\", \"treatments\": [\"3 Surface Posterior Composite Filling\"]}]"
-  },
-  {
-    "role": "user",
-    "content": "#27 ML comp"
-  },
-  {
-    "role": "assistant",
-    "content": "[{\"toothNumber\": \"#27\", \"surface\": \"M, L\", \"treatments\": [\"2 Surface Anterior Composite Filling\"]}]"
+    "content": "#14 PRR"
   }
 ]

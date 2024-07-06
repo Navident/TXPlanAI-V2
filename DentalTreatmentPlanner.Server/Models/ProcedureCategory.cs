@@ -11,6 +11,13 @@ namespace DentalTreatmentPlanner.Server.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ModifiedAt { get; set; }
 
+
         public ICollection<ProcedureSubCategory> ProcedureSubCategories { get; set; }
+
+        public int? FacilityId { get; set; }
+
+
+        // Navigation property to Facility
+        public Facility Facility { get; set; }
     }
 }

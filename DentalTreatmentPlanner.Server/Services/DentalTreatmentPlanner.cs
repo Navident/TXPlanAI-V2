@@ -1427,29 +1427,34 @@ namespace DentalTreatmentPlanner.Server.Services
             return orderRule != null ? orderRule.OrderValue : 0; // Return the found order, or 0 if no rule matches
         }
 
-        public async Task<IEnumerable<ProcedureCategoryDto>> GetAllCategoriesAsync()
+        // retrieve only categories specific to a facility
+        public async Task<IEnumerable<ProcedureCategoryDto>> GetAllCategoriesAsync(int facilityId)
         {
             return await _context.ProcedureCategories
-                        .Select(c => new ProcedureCategoryDto
-                        {
-                            ProcedureCategoryId = c.ProcedureCategoryId,
-                            Name = c.Name
-                        })
-                        .ToListAsync();
+                .Where(c => c.FacilityId == facilityId)
+                .Select(c => new ProcedureCategoryDto
+                {
+                    ProcedureCategoryId = c.ProcedureCategoryId,
+                    Name = c.Name
+                })
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<ProcedureSubCategoryDto>> GetAllSubCategoriesAsync()
+        //  retrieve only subcategories specific to a facility
+        public async Task<IEnumerable<ProcedureSubCategoryDto>> GetAllSubCategoriesAsync(int facilityId)
         {
             return await _context.ProcedureSubCategories
+                .Where(sc => sc.ProcedureCategory.FacilityId == facilityId)
                 .Select(sc => new ProcedureSubCategoryDto
                 {
                     ProcedureSubCategoryId = sc.ProcedureSubCategoryId,
                     Name = sc.Name,
-                    ProcedureCategoryId = sc.ProcedureCategoryId, 
-                    ProcedureCategoryName = sc.ProcedureCategory.Name 
+                    ProcedureCategoryId = sc.ProcedureCategoryId,
+                    ProcedureCategoryName = sc.ProcedureCategory.Name
                 })
                 .ToListAsync();
         }
+
 
         public async Task<IEnumerable<ProcedureSubCategoryDto>> GetSubCategoriesByCategoryNameAsync(string categoryName)
         {

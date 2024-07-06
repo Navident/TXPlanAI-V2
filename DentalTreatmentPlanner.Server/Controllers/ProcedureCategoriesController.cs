@@ -9,6 +9,9 @@ using DentalTreatmentPlanner.Server.Data;
 using DentalTreatmentPlanner.Server.Models;
 using DentalTreatmentPlanner.Server.Dtos;
 using DentalTreatmentPlanner.Server.Services;
+using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DentalTreatmentPlanner.Server.Controllers
 {
@@ -17,10 +20,41 @@ namespace DentalTreatmentPlanner.Server.Controllers
     public class ProcedureCategoryController : ControllerBase
     {
         private readonly DentalTreatmentPlannerService _service;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProcedureCategoryController(DentalTreatmentPlannerService service)
+        public ProcedureCategoryController(DentalTreatmentPlannerService service, UserManager<ApplicationUser> userManager)
         {
             _service = service;
+            _userManager = userManager;
+        }
+
+        private string GetUsernameFromToken()
+        {
+            var authorizationHeader = HttpContext.Request.Headers["Authorization"].ToString();
+
+            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+            {
+                return null;
+            }
+
+            var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            var usernameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+            return usernameClaim?.Value;
+        }
+
+        private async Task<int?> GetUserFacilityIdAsync()
+        {
+            var username = GetUsernameFromToken();
+            if (string.IsNullOrEmpty(username))
+            {
+                return null;
+            }
+
+            var user = await _userManager.FindByNameAsync(username);
+            return user?.FacilityId;
         }
 
         [HttpGet("subcategories")]
@@ -28,7 +62,13 @@ namespace DentalTreatmentPlanner.Server.Controllers
         {
             try
             {
-                var subCategories = await _service.GetAllSubCategoriesAsync(); 
+                var facilityId = await GetUserFacilityIdAsync();
+                if (!facilityId.HasValue)
+                {
+                    return Unauthorized();
+                }
+
+                var subCategories = await _service.GetAllSubCategoriesAsync(facilityId.Value);
                 return Ok(subCategories);
             }
             catch (Exception ex)
@@ -37,13 +77,18 @@ namespace DentalTreatmentPlanner.Server.Controllers
             }
         }
 
-
         [HttpGet("categories")]
         public async Task<ActionResult<IEnumerable<ProcedureCategoryDto>>> GetCategories()
         {
             try
             {
-                var categories = await _service.GetAllCategoriesAsync();
+                var facilityId = await GetUserFacilityIdAsync();
+                if (!facilityId.HasValue)
+                {
+                    return Unauthorized();
+                }
+
+                var categories = await _service.GetAllCategoriesAsync(facilityId.Value);
                 return Ok(categories);
             }
             catch (Exception ex)
@@ -53,4 +98,3 @@ namespace DentalTreatmentPlanner.Server.Controllers
         }
     }
 }
-

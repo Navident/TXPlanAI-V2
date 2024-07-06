@@ -25,6 +25,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { enableMapSet } from 'immer';
 import SmartNotes from './Pages/PatientManagementDashboard/SmartNotes/index'; 
 
+import FeeScheduling from "./Pages/Dashboard/FeeScheduling/feeScheduling";
+import EditFacilityFeeScheduling from "./Pages/Dashboard/FeeScheduling/EditFacilityFeeScheduling/editFacilityFeeScheduling";
 
 function App() {
 
@@ -44,7 +46,10 @@ function App() {
                                     <Route path="procedurescustomizer/:category/:subcategory" element={<ProceduresCustomizer />} />
                                     <Route path="treatmentplanconfiguration" element={<TreatmentPlanConfiguration />} />
                                 </Route> 
-                                <Route path="customcdtCodes" element={<CustomCdtCodes />} />
+                            <Route path="customcdtCodes" element={<CustomCdtCodes />} />
+                            <Route path="feescheduling" element={<FeeScheduling />}>
+                                <Route path="edit/:payerId" element={<EditFacilityFeeScheduling />} />
+                            </Route>
                                 <Route path="accountinfo" element={<AccountInfo />} />
                                 <Route path="all-saved-patient-tx-plans" element={<AllSavedPatientTxPlans />} />
                             </Route> 

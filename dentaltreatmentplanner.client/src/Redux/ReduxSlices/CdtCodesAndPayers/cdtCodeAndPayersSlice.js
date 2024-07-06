@@ -1,5 +1,5 @@
-/*import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getCdtCodes, getCustomCdtCodesForFacility, getPayersForFacility, getAlternativeProceduresByFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { getPayersForFacility, getFacilityPayerCdtCodesFeesByPayer, getFacilityPayersWithCdtCodesFees } from '../../../ClientServices/apiService';
 
 const initialState = {
     defaultCdtCodes: [],
@@ -17,23 +17,8 @@ const initialState = {
 };
 
 
-export const fetchCustomCdtCodesForFacility = createAsyncThunk(
-    'cdtCodeAndPayers/fetchCustomCdtCodesForFacility',
-    async () => {
-        const response = await getCustomCdtCodesForFacility();
-        return response;
-    }
-);
 
 
-
-export const fetchDefaultCdtCodes = createAsyncThunk(
-    'cdtCodeAndPayers/fetchDefaultCdtCodesForFacility',
-    async () => {
-        const response = await getCdtCodes();
-        return response;
-    }
-);
 
 export const fetchPayersForFacility = createAsyncThunk(
     'cdtCodeAndPayers/fetchPayersForFacility',
@@ -87,12 +72,7 @@ export const cdtCodeAndPayersSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchDefaultCdtCodes.fulfilled, (state, action) => {
-                state.defaultCdtCodes = action.payload;
-            })
-            .addCase(fetchCustomCdtCodesForFacility.fulfilled, (state, action) => {
-                state.facilityCdtCodes = action.payload;
-            })
+
             .addCase(fetchPayersWithCdtCodesFeesForFacility.fulfilled, (state, action) => {
                 state.payers = action.payload.map(payer => ({
                     payerId: payer.payerId,
@@ -168,4 +148,3 @@ export const selectCombinedCdtCodes = (state) => {
 
 
 export default cdtCodeAndPayersSlice.reducer;
-*/

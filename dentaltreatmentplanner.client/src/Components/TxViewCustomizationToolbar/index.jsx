@@ -29,6 +29,7 @@ import { Backdrop, CircularProgress } from '@mui/material';
 
 import { extractPatientIdFromUrl } from '../../Utils/helpers';
 import { formatNotes } from '../../Utils/noteUtils';
+import printIcon from "../../assets/printer-icon.svg";
 
 import {
     selectChiefComplaint,
@@ -215,6 +216,10 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
                 )}
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
+                        <StyledPrintExportBtnWithText>
+                            <div>Print</div>
+                            <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
+                        </StyledPrintExportBtnWithText>
                         <RoundedButton
                             text="Export"
                             backgroundColor={UI_COLORS.green}

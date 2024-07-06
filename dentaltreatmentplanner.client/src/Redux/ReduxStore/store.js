@@ -17,6 +17,7 @@ import { cdtCodesApiSlice } from '../ReduxSlices/CdtCodes/cdtCodesApiSlice';
 import { openDentalApiSlice } from '../ReduxSlices/OpenDental/openDentalApiSlice';
 import audioRecorderReducer from '../ReduxSlices/AudioRecorder/AudioRecorderSlice';
 import compExamTabsReducer from '../ReduxSlices/CompExamTabs/compExamTabsSlice';
+import cdtCodeAndPayersReducer from '../ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 
 // Combine all reducers 
@@ -28,6 +29,8 @@ const rootReducer = combineReducers({
     alert: alertReducer,
     tableViewControl: tableViewControlReducer,
     user: userReducer,
+    cdtCodeAndPayers: cdtCodeAndPayersReducer,
+
     audioRecorder: audioRecorderReducer,
     compExamTabs: compExamTabsReducer,
     [userApiSlice.reducerPath]: userApiSlice.reducer,
@@ -41,7 +44,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['categoriesSubcategories', 'patients', 'cdtCodes', 'user', 'treatmentPlans'] // Specific reducers to persist
+    whitelist: ['categoriesSubcategories', 'patients', 'cdtCodes', 'user', 'cdtCodeAndPayers', 'treatmentPlans'] // Specific reducers to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
