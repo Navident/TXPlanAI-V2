@@ -4,7 +4,7 @@ import TxViewCustomizationToolbar from "../../../Components/TxViewCustomizationT
 import PatientInfoSection from "../../../Components/PatientInfoSection/PatientInfoSection";
 
 import PenIcon from "../../../assets/pen-icon.svg";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TreatmentPlanOutput from "../../TreatmentPlanOutput/TreatmentPlanOutput";
 import {
     StyledContainerWithTableInner,
@@ -388,6 +388,7 @@ const GenerateTreatmentPlan = () => {
     };
 
 
+    const treatmentPlanRef = useRef();
 
     return (
         <div className="dashboard-bottom-inner-row">
@@ -428,25 +429,10 @@ const GenerateTreatmentPlan = () => {
                 </div>
             </div>
             <div className="treatment-plan-output-section rounded-box box-shadow">
-                <TxViewCustomizationToolbar allRows={allRowsFromChild} />
+                <TxViewCustomizationToolbar allRows={allRowsFromChild} treatmentPlanRef={treatmentPlanRef} />
                 <StyledSeparator customMarginTop="0px" />
                 <StyledContainerWithTableInner>
-                    {treatmentPlans.length > 0 && !isLoading && (
-                        <StyledTitleAndPaymentTotalsContainer>
-                            <div style={{ flex: 1 }}></div>
-                            <StyledLargeText>Treatment Plan</StyledLargeText>
-                            <div style={{ flex: 1 }}>
-                                {areGrandTotalsReady && (
-                                    <PaymentTotals
-                                        ucrTotal={grandUcrTotal}
-                                        coPayTotal={grandCoPayTotal}
-                                        isGrandTotal={true}
-                                        justifyContent="end"
-                                    />
-                                )}
-                            </div>
-                        </StyledTitleAndPaymentTotalsContainer>
-                    )}
+
                     {isLoading ? (
                         <div
                             style={{
@@ -460,24 +446,41 @@ const GenerateTreatmentPlan = () => {
                         </div>
                     ) : treatmentPlans.length > 0 ? (
                         treatmentPlans.map((plan, index) => (
-                            <TreatmentPlanOutput
-                                key={`treatment-plan-${index}`}
-                                treatmentPlan={plan}
-                                treatmentPlans={treatmentPlans}
-                                onAddVisit={(newVisit) =>
-                                    dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
-                                }
-                                onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
-                                    console.log("Dispatching updated visits:", updatedVisits);
-                                    dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
-                                }}
-                                onDeleteVisit={(deletedVisitId) =>
-                                    dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
-                                }
-                                showToothNumber={true}
-                                isInGenerateTreatmentPlanContext={true}
-                                onAllRowsUpdate={handleAllRowsUpdate}
-                            />
+                            <div id="treatment-plan-output" key={`treatment-plan-${index}`}>
+                                {treatmentPlans.length > 0 && !isLoading && (
+                                    <StyledTitleAndPaymentTotalsContainer>
+                                        <div style={{ flex: 1 }}></div>
+                                        <StyledLargeText>Treatment Plan</StyledLargeText>
+                                        <div style={{ flex: 1 }}>
+                                            {areGrandTotalsReady && (
+                                                <PaymentTotals
+                                                    ucrTotal={grandUcrTotal}
+                                                    coPayTotal={grandCoPayTotal}
+                                                    isGrandTotal={true}
+                                                    justifyContent="end"
+                                                />
+                                            )}
+                                        </div>
+                                    </StyledTitleAndPaymentTotalsContainer>
+                                )}
+                                <TreatmentPlanOutput
+                                    treatmentPlan={plan}
+                                    treatmentPlans={treatmentPlans}
+                                    onAddVisit={(newVisit) =>
+                                        dispatch(handleAddVisit({ treatmentPlanId: plan.treatmentPlanId, newVisit }))
+                                    }
+                                    onUpdateVisitsInTreatmentPlan={(treatmentPlanId, updatedVisits) => {
+                                        console.log("Dispatching updated visits:", updatedVisits);
+                                        dispatch(onUpdateVisitsInTreatmentPlan({ treatmentPlanId, updatedVisits }));
+                                    }}
+                                    onDeleteVisit={(deletedVisitId) =>
+                                        dispatch(onDeleteVisit({ treatmentPlanId: plan.treatmentPlanId, deletedVisitId }))
+                                    }
+                                    showToothNumber={true}
+                                    isInGenerateTreatmentPlanContext={true}
+                                    onAllRowsUpdate={handleAllRowsUpdate}
+                                />
+                            </div>
                         ))
                     ) : (
                         <EmptyStatePlaceholder />

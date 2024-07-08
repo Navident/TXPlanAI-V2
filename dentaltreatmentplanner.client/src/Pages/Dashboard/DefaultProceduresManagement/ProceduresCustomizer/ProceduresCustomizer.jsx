@@ -44,6 +44,8 @@ const ProceduresCustomizer = () => {
 		console.error("Error fetching subcategoryTreatmentPlans: ", error);
 	}
 
+	console.log("subcategoryTreatmentPlans", subcategoryTreatmentPlans)
+
 	const currentSubcategoryPlan = subcategoryTreatmentPlans?.find(plan => plan.procedureSubcategoryId === paramsSubcategoryId);
 	// Check if the names are defined, otherwise use fallbacks from the first treatment plan, if available.
 	const activeCategoryName = currentSubcategoryPlan?.procedureCategoryName ??

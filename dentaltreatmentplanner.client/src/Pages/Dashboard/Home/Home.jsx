@@ -89,9 +89,8 @@ const Home = () => {
                     <StyledRoundedBoxContainerInner flexBasisZero padding="20px">
                         <div className="large-text">Smart Notes</div>
                         <StyledSeparator />
-                        <StyledHomeBoxBottomContainer>
-                            <img src={createNewNotes} alt="Create New Notes" onClick={handleCreateNewNotesClick} />
-
+                        <StyledHomeBoxBottomContainer purpleContainer>
+                            <div>Coming soon..</div>
                         </StyledHomeBoxBottomContainer>
                     </StyledRoundedBoxContainerInner>
                 </StyledRoundedBoxContainer>

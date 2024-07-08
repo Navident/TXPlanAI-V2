@@ -94,7 +94,15 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
     };
 
 
+    const handlePrintClick = () => {
+        const printContents = document.getElementById('treatment-plan-output').innerHTML;
+        const originalContents = document.body.innerHTML;
 
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+       // window.location.reload(); 
+    };
 
     const handleClose = () => {
         setIsDialogOpen(false);
@@ -216,7 +224,7 @@ const TxViewCustomizationToolbar = ({ immediateSave = false, allRows, hideGroupB
                 )}
                 <StyledFlexAlignContainer justify="flex-end">
                     <StyledPrintSaveBtnContainer>
-                        <StyledPrintExportBtnWithText>
+                        <StyledPrintExportBtnWithText onClick={handlePrintClick}>
                             <div>Print</div>
                             <StyledPrintImportButton src={printIcon} alt="Print Icon" title="Print TX Plan" />
                         </StyledPrintExportBtnWithText>

@@ -7,6 +7,8 @@ export const StyledTotalsContainer = styled.div`
   justify-content: ${props => props.justifyContent || 'center'};
   height: 15px;
   font-size: 14px;
+    margin-top: ${props => props.marginTop || '0px'};
+
 `;
 
 

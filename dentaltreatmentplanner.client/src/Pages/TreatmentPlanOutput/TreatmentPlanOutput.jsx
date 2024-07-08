@@ -1019,7 +1019,7 @@ const TreatmentPlanOutput = ({
 			/>
 		);
 
-		return [toothNumberInput, cdtDropdown, row.description, surf, arch];
+		return [toothNumberInput, cdtDropdown, row.description, surf, arch, '', '',''];
 	};
 
 
@@ -1584,7 +1584,7 @@ const TreatmentPlanOutput = ({
 								expandedRows={expandedRows}
 								onSwapAltRow={handleSwapAltRow}
 							/>
-							<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" />
+							<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" marginTop="10px" />
 						</StyledTableHeaderContainer>
 					</StyledVisitSection>
 				)}
@@ -1624,7 +1624,7 @@ const TreatmentPlanOutput = ({
 					</Droppable>
 				</DragDropContext>
 			)}
-			<StyledBottomAddVisitSection>
+			<StyledBottomAddVisitSection className="no-print">
 				<div className="add-visit-btn-container" onClick={handleAddVisit}>
 					+ Add Treatment Table
 				</div>

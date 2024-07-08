@@ -16,11 +16,12 @@ import { Outlet } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SaveButtonRow from "../../../Components/Common/SaveButtonRow/index";
 import { selectPayersForFacility, fetchPayersWithCdtCodesFeesForFacility } from "../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice";
+import { useGetFacilityPayersQuery, useUpdateFacilityPayersMutation } from "../../../Redux/ReduxSlices/Payers/payersApiSlice";
+
 import { showAlert } from '../../../Redux/ReduxSlices/Alerts/alertSlice';
 
 const FeeScheduling = () => {
     const dispatch = useDispatch();
-    const payers = useSelector(selectPayersForFacility);
     const [inputText, setInputText] = useState('');
     const [rowsData, setRowsData] = useState([]);
     const headers = ["Payer", ""];
@@ -31,6 +32,10 @@ const FeeScheduling = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const isEditingFacilityFeeScheduling = location.pathname.includes("/feescheduling/edit");
+    const { data: payers, error, isLoading } = useGetFacilityPayersQuery();
+    const [updateFacilityPayers] = useUpdateFacilityPayersMutation();
+    console.log("payers: ", payers)
+
     useEffect(() => {
         let payerRows = [];
         if (payers && payers.length > 0) {
@@ -232,14 +237,14 @@ const FeeScheduling = () => {
             EditedPayers: editedPayers,
             DeletedPayerIds: deletedPayerIds
         };
-        const response = await updateFacilityPayers(updateData);
-        if (response) {
-            dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
-            // Re-fetch payers to refresh the global state after successful update
-            dispatch(fetchPayersWithCdtCodesFeesForFacility());
-        } else {
-            setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
-        }
+
+        updateFacilityPayers(updateData).unwrap()
+            .then(() => {
+                dispatch(showAlert({ type: 'success', message: 'Your changes were saved successfully!' }));
+            })
+            .catch(() => {
+                setAlertInfo({ open: true, type: 'error', message: 'Failed to save changes' });
+            });
     };
 
     const handleCloseAlert = () => {

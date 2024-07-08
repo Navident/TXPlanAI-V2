@@ -15,9 +15,13 @@ import { treatmentPlansApiSlice } from '../ReduxSlices/TreatmentPlans/treatmentP
 import { categoriesSubcategoriesApiSlice } from '../ReduxSlices/CategoriesSubcategories/categoriesSubcategoriesApiSlice';
 import { cdtCodesApiSlice } from '../ReduxSlices/CdtCodes/cdtCodesApiSlice';
 import { openDentalApiSlice } from '../ReduxSlices/OpenDental/openDentalApiSlice';
+import { payersApiSlice } from '../ReduxSlices/Payers/payersApiSlice';
+
+
 import audioRecorderReducer from '../ReduxSlices/AudioRecorder/AudioRecorderSlice';
 import compExamTabsReducer from '../ReduxSlices/CompExamTabs/compExamTabsSlice';
 import cdtCodeAndPayersReducer from '../ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+
 
 
 // Combine all reducers 
@@ -39,12 +43,14 @@ const rootReducer = combineReducers({
     [categoriesSubcategoriesApiSlice.reducerPath]: categoriesSubcategoriesApiSlice.reducer,
     [cdtCodesApiSlice.reducerPath]: cdtCodesApiSlice.reducer,
     [openDentalApiSlice.reducerPath]: openDentalApiSlice.reducer,
+    [payersApiSlice.reducerPath]: payersApiSlice.reducer,
+
 });
 
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['categoriesSubcategories', 'patients', 'cdtCodes', 'user', 'cdtCodeAndPayers', 'treatmentPlans'] // Specific reducers to persist
+    whitelist: ['categoriesSubcategories', 'patients', 'cdtCodes', 'user', 'cdtCodeAndPayers', 'treatmentPlans', 'payers'] // Specific reducers to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -56,7 +62,7 @@ export const store = configureStore({
             serializableCheck: {
                 ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/PURGE'],
             },
-        }).concat(userApiSlice.middleware).concat(patientsApiSlice.middleware).concat(treatmentPlansApiSlice.middleware).concat(categoriesSubcategoriesApiSlice.middleware).concat(cdtCodesApiSlice.middleware).concat(openDentalApiSlice.middleware),
+        }).concat(userApiSlice.middleware).concat(patientsApiSlice.middleware).concat(treatmentPlansApiSlice.middleware).concat(categoriesSubcategoriesApiSlice.middleware).concat(cdtCodesApiSlice.middleware).concat(openDentalApiSlice.middleware).concat(payersApiSlice.middleware),
 });
 
 
