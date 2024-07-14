@@ -7,5 +7,6 @@
         public int UcrFeeId { get; set; }
         public decimal? UcrDollarAmount { get; set; }
         public decimal? CoveragePercent { get; set; }
+        public decimal? DiscountFeeDollarAmount { get; set; }
     }
 }

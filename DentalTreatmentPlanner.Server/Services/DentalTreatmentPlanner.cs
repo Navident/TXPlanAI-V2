@@ -274,6 +274,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         {
                             existingUcrFee.UcrDollarAmount = newFee.UcrDollarAmount;
                             existingUcrFee.CoveragePercent = newFee.CoveragePercent;
+                            existingUcrFee.DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount;
                             existingUcrFee.ModifiedAt = DateTime.UtcNow;
                         }
                         else // Otherwise, create a new UcrFee
@@ -284,6 +285,7 @@ namespace DentalTreatmentPlanner.Server.Services
                                 CdtCodeId = newFee.CdtCodeId,
                                 UcrDollarAmount = newFee.UcrDollarAmount,
                                 CoveragePercent = newFee.CoveragePercent,
+                                DiscountFeeDollarAmount = newFee.DiscountFeeDollarAmount,
                             };
                             _context.UcrFees.Add(newUcrFee);
                         }
@@ -296,6 +298,7 @@ namespace DentalTreatmentPlanner.Server.Services
                         {
                             existingUcrFee.UcrDollarAmount = updatedFee.UcrDollarAmount;
                             existingUcrFee.CoveragePercent = updatedFee.CoveragePercent;
+                            existingUcrFee.DiscountFeeDollarAmount = updatedFee.DiscountFeeDollarAmount;
                             existingUcrFee.ModifiedAt = DateTime.UtcNow;
                         }
                         {
@@ -331,6 +334,7 @@ namespace DentalTreatmentPlanner.Server.Services
                     CdtCodeId = uf.CDTCode.CdtCodeId,
                     UcrDollarAmount = uf.UcrDollarAmount,
                     CoveragePercent = uf.CoveragePercent,
+                    DiscountFeeDollarAmount = uf.DiscountFeeDollarAmount,
                     // Calculate CoPay 
                     CoPay = uf.UcrDollarAmount.HasValue && uf.CoveragePercent.HasValue
                         ? uf.UcrDollarAmount.Value - (uf.UcrDollarAmount.Value * (uf.CoveragePercent.Value / 100))

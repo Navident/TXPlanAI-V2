@@ -105,6 +105,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
             try
             {
                 var payersWithFees = await _dentalService.GetFacilityPayersWithCdtCodesFeesAsync(facilityId.Value);
+                Console.WriteLine($"payersWithFees in GetFacilityPayersWithCdtCodesFees", payersWithFees);
                 return Ok(payersWithFees);
             }
             catch (Exception ex)

@@ -101,6 +101,7 @@ namespace DentalTreatmentPlanner.Server.Controllers
                 if (payerId.HasValue)
                 {
                     var fees = await _dentalTreatmentPlannerService.GetPayerCdtCodesFeesByFacilityAndPayer(facilityId.Value, payerId.Value);
+                    Console.WriteLine("fees in GetFacilityPayerCdtCodesFees", fees);
                     return Ok(fees);
                 }
                 else
