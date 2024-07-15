@@ -25,7 +25,7 @@ const EditFacilityFeeScheduling = () => {
     const initialPayerName = location.state?.payerName || 'Unknown Payer';
     const [payerNameInputText, setPayerNameInputText] = useState(initialPayerName);
     const [searchInputText, setSearchInputText] = useState('');
-    const headers = ["CDT Code", "Description", "UCR Fee", "Coverage %", ""];
+    const headers = ["CDT Code", "Description", "UCR Fee", "Discount Fee", ""];
     const columnWidths = ['20%', '45%', '15%', '15%', '5%'];
     const [alertInfo, setAlertInfo] = useState({ open: false, type: '', message: '' });
     const [editingRowId, setEditingRowId] = useState(null);
@@ -86,7 +86,7 @@ const EditFacilityFeeScheduling = () => {
         <span key={`code-${index}`}>{row.code}</span>,
         <span key={`description-${index}`}>{row.description}</span>,
         <span key={`ucrFee-${index}`}>{row.ucrFee ? `$${row.ucrFee}` : ''}</span>,
-        <span key={`coveragePercent-${index}`}>{row.coveragePercent ? `${row.coveragePercent}%` : ''}</span>,
+        <span key={`coveragePercent-${index}`}>{row.coveragePercent ? `$${row.coveragePercent}` : ''}</span>,
         createDeleteAndEditIconCell(row, index)
     ]);
 
@@ -95,8 +95,8 @@ const EditFacilityFeeScheduling = () => {
 
         return [
             <span key={`code-${index}`}>{row.code}</span>,
-            <span key={`description-${index}`}>{row.description}</span>, 
-            <StandardTextfield 
+            <span key={`description-${index}`}>{row.description}</span>,
+            <StandardTextfield
                 key={`ucrFee-${index}`}
                 value={row.ucrFee}
                 onChange={(e) => handleInputChange(row.id, 'ucrFee', e.target.value)}
@@ -104,17 +104,18 @@ const EditFacilityFeeScheduling = () => {
                 width="180px"
                 adornment={<InputAdornment position="start">$</InputAdornment>}
             />,
-            <StandardTextfield 
+            <StandardTextfield
                 key={`coveragePercent-${index}`}
                 value={row.coveragePercent}
                 onChange={(e) => handleInputChange(row.id, 'coveragePercent', e.target.value)}
                 borderColor={UI_COLORS.purple}
                 width="300px"
-                adornment={<InputAdornment position="start">%</InputAdornment>}
+                adornment={<InputAdornment position="start">$</InputAdornment>}
             />,
             lastCell
         ];
     };
+
 
     // Filter active and inactive rows based on search input text
     const filteredActiveRowsData = activeRowsData.filter(row =>

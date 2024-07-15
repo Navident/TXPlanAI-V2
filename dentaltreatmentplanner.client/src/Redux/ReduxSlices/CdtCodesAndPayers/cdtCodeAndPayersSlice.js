@@ -11,8 +11,7 @@ const initialState = {
     alternativeProcedures: [],
     isLoading: false,
     error: null,
-    grandUcrTotal: 0,
-    grandCoPayTotal: 0,
+    grandTotal: 0,
     areGrandTotalsReady: false,
 };
 
@@ -59,11 +58,8 @@ export const cdtCodeAndPayersSlice = createSlice({
         setSelectedPayer: (state, action) => {
             state.selectedPayer = action.payload;
         },
-        setGrandUcrTotal: (state, action) => {
-            state.grandUcrTotal = action.payload;
-        },
-        setGrandCoPayTotal: (state, action) => {
-            state.grandCoPayTotal = action.payload;
+        setGrandTotal: (state, action) => {
+            state.grandTotal = action.payload;
         },
         setGrandTotalsReady: (state, action) => {
             state.areGrandTotalsReady = action.payload;
@@ -103,7 +99,7 @@ export const cdtCodeAndPayersSlice = createSlice({
 
 });
 
-export const { resetState, updateAlternativeProcedureVisitCdtCodeMapIds, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandUcrTotal, setGrandCoPayTotal, addAlternativeProcedure, updateAlternativeProcedure, deleteAlternativeProcedure, setAlternativeProcedures } = cdtCodeAndPayersSlice.actions;
+export const { resetState, updateAlternativeProcedureVisitCdtCodeMapIds, setGrandTotalsReady, setSelectedPayer, setActiveCdtCodes, setGrandTotal,  addAlternativeProcedure, updateAlternativeProcedure, deleteAlternativeProcedure, setAlternativeProcedures } = cdtCodeAndPayersSlice.actions;
 
 // Selector to get the default CDT codes
 export const selectDefaultCdtCodes = (state) => state.cdtCodeAndPayers.defaultCdtCodes;
@@ -129,11 +125,8 @@ export const selectIsLoading = (state) => state.cdtCodeAndPayers.isLoading;
 // Selector to get any errors
 export const selectError = (state) => state.cdtCodeAndPayers.error;
 
-// Selector to get the grand UCR total
-export const selectGrandUcrTotal = (state) => state.cdtCodeAndPayers.grandUcrTotal;
-
-// Selector to get the grand Co-Pay total
-export const selectGrandCoPayTotal = (state) => state.cdtCodeAndPayers.grandCoPayTotal;
+// Selector to get the grand total
+export const selectGrandTotal = (state) => state.cdtCodeAndPayers.grandTotal;  // Updated
 
 // Selector to check if the grand totals are ready to be displayed
 export const selectAreGrandTotalsReady = (state) => state.cdtCodeAndPayers.areGrandTotalsReady;
@@ -141,10 +134,11 @@ export const selectAreGrandTotalsReady = (state) => state.cdtCodeAndPayers.areGr
 // Selector to get the alternative procedures for the facility
 export const selectAlternativeProcedures = (state) => state.cdtCodeAndPayers.alternativeProcedures;
 
-// Add this selector to your existing selectors
+// Selector to get combined CDT codes
 export const selectCombinedCdtCodes = (state) => {
     return [...state.cdtCodeAndPayers.defaultCdtCodes, ...state.cdtCodeAndPayers.facilityCdtCodes];
 };
+
 
 
 export default cdtCodeAndPayersSlice.reducer;

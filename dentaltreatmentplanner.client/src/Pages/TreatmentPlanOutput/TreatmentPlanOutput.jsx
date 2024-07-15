@@ -44,7 +44,7 @@ import {
 	StyledVisitSection,
 	StyledBottomAddVisitSection
 } from "./index.style";
-import { selectPayersForFacility, selectSelectedPayer, setGrandUcrTotal, setGrandCoPayTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { selectPayersForFacility, selectSelectedPayer, setGrandTotal, setGrandTotalsReady } from '../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 
 import { onDeleteTemporaryVisit, onUpdateVisitDescription, setTreatmentPlanId, addTreatmentPlan, setVisitOrder, selectVisitOrder, handleAddCdtCode, onDeleteProcedure } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansSlice';
 import categoryColorMapping from '../../Utils/categoryColorMapping';
@@ -53,7 +53,7 @@ import { selectSelectedPatient } from '../../Redux/ReduxSlices/Patients/patients
 import InputAdornment from '@mui/material/InputAdornment';
 import { useCreateNewTreatmentPlanForPatientMutation, useUpdateTreatmentPlanMutation } from '../../Redux/ReduxSlices/TreatmentPlans/treatmentPlansApiSlice';
 import { useCombinedCdtCodes } from '../../Utils/Hooks/useCombinedCdtCodes';
-import PaymentTotals from "../../Components/PaymentTotals/index";
+import Switch from '@mui/material/Switch';
 
 const TreatmentPlanOutput = ({
 	treatmentPlan,
@@ -126,17 +126,7 @@ const TreatmentPlanOutput = ({
 		}
 	}, [isGroupActive, checkedRows]); 
 
-	useEffect(() => {
-		console.log("current treatmentPlan:", treatmentPlan);
-	}, [treatmentPlan]);
 
-	useEffect(() => {
-		console.log("allRows:", allRows);
-	}, [allRows]);
-
-	useEffect(() => {
-		console.log("alternativeRows:", alternativeRows);
-	}, [allRows]);
 
 	useEffect(() => {
 		if (isInGenerateTreatmentPlanContext) {
@@ -303,10 +293,10 @@ const TreatmentPlanOutput = ({
 
 		const fee = selectedPayerDetails?.cdtCodeFees?.find(f => f.code === cdtMap.code);
 
+		console.log("fee: ", fee)
 		// Default values for UCR Fee, Coverage Percent, and CoPay when fee details are available
 		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
 		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
-		const coPay = fee ? fee.coPay : "Not configured";
 		//END - payer/fees code
 
 		const extraRowInput = [
@@ -318,7 +308,6 @@ const TreatmentPlanOutput = ({
 			arch,
 			ucrFee,
 			coveragePercent,
-			coPay
 		];
 
 		return {
@@ -409,7 +398,6 @@ const TreatmentPlanOutput = ({
 		// Use extracted or default values
 		const ucrFee = fee ? fee.ucrDollarAmount : "Not configured";
 		const coveragePercent = fee ? fee.coveragePercent : "Not configured";
-		const coPay = fee ? fee.coPay : "Not configured";
 		//END - PAYER/fees code
 
 		const toothNumber = currentRow.selectedCdtCode?.toothNumber || "";
@@ -448,7 +436,6 @@ const TreatmentPlanOutput = ({
 				arch,
 				ucrFee,
 				coveragePercent,
-				coPay
 			],
 		};
 	};
@@ -931,8 +918,9 @@ const TreatmentPlanOutput = ({
 			"Surf",
 			"Arch",
 			"UCR Fee",
-			"Coverage %",
-			"Co-Pay",
+			"Toggle",
+			"Discount Fee",
+			
 		];
 		return headers;
 	};
@@ -1019,7 +1007,7 @@ const TreatmentPlanOutput = ({
 			/>
 		);
 
-		return [toothNumberInput, cdtDropdown, row.description, surf, arch, '', '',''];
+		return [toothNumberInput, cdtDropdown, row.description, surf, arch, '', ''];
 	};
 
 
@@ -1109,41 +1097,32 @@ const TreatmentPlanOutput = ({
 	}
 
 	const calculateTotalsForVisit = (visitRows) => {
-		let ucrTotal = 0;
-		let coPayTotal = 0;
+		let total = 0;
 
 		visitRows.forEach(row => {
 			if (row.isStatic) {
-				const ucrFee = parseFloat(row.extraRowInput[3]);
-				const coPay = parseFloat(row.extraRowInput[5]);
+				const fee = row.isToggled ? parseFloat(row.extraRowInput[6]) : parseFloat(row.extraRowInput[5]);
 
-				if (!isNaN(ucrFee)) {
-					ucrTotal += ucrFee;
-				}
-
-				if (!isNaN(coPay)) {
-					coPayTotal += coPay;
+				if (!isNaN(fee)) {
+					total += fee;
 				}
 			}
 		});
 
-		return { ucrTotal, coPayTotal };
+		return { total };
 	};
 
 	const calculateGrandTotals = (allRows) => {
-		let grandUcrTotal = 0;
-		let grandCoPayTotal = 0;
+		let grandTotal = 0;
 
 		if (allRows) {
-			console.log("we went inside the if condition")
 			Object.values(allRows).forEach(visitRows => {
-				const { ucrTotal, coPayTotal } = calculateTotalsForVisit(visitRows);
-				grandUcrTotal += ucrTotal;
-				grandCoPayTotal += coPayTotal;
+				const { total } = calculateTotalsForVisit(visitRows);
+				grandTotal += total;
 			});
 		}
 
-		return { grandUcrTotal, grandCoPayTotal };
+		return { grandTotal };
 	};
 
 	const padRowData = (rowData, headers) => {
@@ -1178,6 +1157,15 @@ const TreatmentPlanOutput = ({
 		}
 		rowData.push(lastCellContent);
 
+		const switchCell = (
+			<Switch
+				checked={row.isToggled}
+				onChange={() => handleToggle(row.id, visitId)}
+				color="primary"
+			/>
+		);
+		rowData.splice(6, 0, switchCell);
+
 		// Determine if the row is checked
 		const isRowChecked = checkedRows.includes(row.id);
 
@@ -1206,7 +1194,20 @@ const TreatmentPlanOutput = ({
 		};
 	};
 
-
+	const handleToggle = (rowId, visitId) => {
+		setAllRows(prevRows => {
+			const updatedRows = { ...prevRows };
+			updatedRows[visitId] = updatedRows[visitId].map(row => {
+				if (row.id === rowId) {
+					return { ...row, isToggled: !row.isToggled };
+				}
+				return row;
+			});
+			const { grandTotal } = calculateGrandTotals(updatedRows);
+			dispatch(setGrandTotal(grandTotal)); // Update grand total
+			return updatedRows;
+		});
+	};
 	const handleEditRow = (rowId, visitId) => {
 		// Directly access the rows for the specific visitId
 		const rows = allRows[visitId];
@@ -1514,11 +1515,8 @@ const TreatmentPlanOutput = ({
 				allRows[visitIdStr]
 			);
 		});
-		const { ucrTotal, coPayTotal } = calculateTotalsForVisit(allRows[visitIdStr]);
-		const { grandUcrTotal, grandCoPayTotal } = calculateGrandTotals(allRows);
-		// Dispatch actions to update the totals in the store
-		dispatch(setGrandUcrTotal(grandUcrTotal));
-		dispatch(setGrandCoPayTotal(grandCoPayTotal));
+		const { grandTotal } = calculateGrandTotals(allRows);
+		dispatch(setGrandTotal(grandTotal));
 		dispatch(setGrandTotalsReady(true));
 		console.log("Visit before return", visit);
 		return (
@@ -1584,7 +1582,6 @@ const TreatmentPlanOutput = ({
 								expandedRows={expandedRows}
 								onSwapAltRow={handleSwapAltRow}
 							/>
-							<PaymentTotals ucrTotal={ucrTotal} coPayTotal={coPayTotal} justifyContent="center" marginTop="10px" />
 						</StyledTableHeaderContainer>
 					</StyledVisitSection>
 				)}

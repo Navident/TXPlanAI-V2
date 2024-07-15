@@ -39,7 +39,7 @@ import LoginPopup from '../../../Components/Common/LoginPopup';
 import MicIcon from '@mui/icons-material/Mic';
 import { transcribeAudio, postProcessTranscriptWithGPT } from "../../../OpenAI/Whisper/whisperService";
 import AudioPopup from "../../../Components/AudioPopup/index";
-import { selectGrandUcrTotal, selectGrandCoPayTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
+import { setGrandTotal , selectGrandTotal, selectAreGrandTotalsReady, setAlternativeProcedures } from '../../../Redux/ReduxSlices/CdtCodesAndPayers/cdtCodeAndPayersSlice';
 import PaymentTotals from "../../../Components/PaymentTotals/index";
 
 const GenerateTreatmentPlan = () => {
@@ -57,8 +57,7 @@ const GenerateTreatmentPlan = () => {
     const [showAudioPopup, setShowAudioPopup] = useState(false);
     const [recording, setRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
-    const grandUcrTotal = useSelector(selectGrandUcrTotal);
-    const grandCoPayTotal = useSelector(selectGrandCoPayTotal);
+    const grandTotal = useSelector(selectGrandTotal); 
     const areGrandTotalsReady = useSelector(selectAreGrandTotalsReady);
     const handleAllRowsUpdate = (newAllRows) => {
         setAllRowsFromChild(newAllRows);
@@ -454,8 +453,7 @@ const GenerateTreatmentPlan = () => {
                                         <div style={{ flex: 1 }}>
                                             {areGrandTotalsReady && (
                                                 <PaymentTotals
-                                                    ucrTotal={grandUcrTotal}
-                                                    coPayTotal={grandCoPayTotal}
+                                                    total={grandTotal} 
                                                     isGrandTotal={true}
                                                     justifyContent="end"
                                                 />
